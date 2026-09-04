@@ -1,0 +1,21 @@
+{
+  "name": "Der Zoll",
+  "short_name": "Der Zoll",
+  "description": "Pass-the-Phone-Bluffspiel für 4–8 Personen. Koffer packen, Grenze passieren, nicht auffliegen.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
+  "orientation": "portrait",
+  "background_color": "#0F0E1A",
+  "theme_color": "#0F0E1A",
+  "lang": "de",
+  "dir": "ltr",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

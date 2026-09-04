@@ -1,0 +1,127 @@
+/*
+ * Design-Tokens — CSS-Pendant zu `src/config/theme.ts`.
+ * Quelle: docs/02-ART-DIRECTION.md §2, §3, §7.
+ * Keine Magic-Numbers in Komponenten: alles laeuft ueber diese Variablen.
+ */
+
+:root {
+  color-scheme: dark; /* Menues sind dunkel; nur die Zollhalle ist hell */
+
+  /* --- UI (Art Direction §2) --- */
+  --c-bg-deep: #0f0e1a;
+  --c-bg-panel: #1c1b2e;
+  --c-bg-panel-raised: #27263d;
+  --c-ink: #1a1024;
+  --c-paper: #fff8e7;
+
+  /* --- Zoll-Akzent --- */
+  --c-customs: #ffb800;
+  --c-customs-shade: #d18e00;
+
+  /* --- Die Halle (die einzige helle Buehne der Familie) --- */
+  --c-hall-floor: #d8d3c6;
+  --c-hall-floor-line: #c4bfb0;
+  --c-hall-wall: #eef0f4;
+  --c-steel: #8c93a8;
+  --c-steel-dark: #4a506a;
+  --c-belt: #2e2b3f;
+
+  /* --- Roentgenmonitor --- */
+  --c-xray-bg: #0b2233;
+  --c-xray-glow: #3df5c6;
+  --c-xray-dim: #1a6b5c;
+
+  /* --- Ergebnisse --- */
+  --c-alarm: #ff2d55;
+  --c-ok: #2ed573;
+  --c-busted: #a55eea;
+  --c-carpet: #c0392b;
+
+  /* --- Spielerfarben (identisch zu Drinkshot) --- */
+  --c-player-red: #ff4757;
+  --c-player-red-shade: #c0392b;
+  --c-player-blue: #3b82f6;
+  --c-player-blue-shade: #1e5bb8;
+  --c-player-green: #2ed573;
+  --c-player-green-shade: #1e9e52;
+  --c-player-yellow: #ffd32a;
+  --c-player-yellow-shade: #d4a800;
+  --c-player-purple: #af73ee;
+  --c-player-purple-shade: #7b3fbf;
+  --c-player-orange: #ff7f50;
+  --c-player-orange-shade: #cc5a2e;
+  --c-player-pink: #ff6b9d;
+  --c-player-pink-shade: #c94a78;
+  --c-player-cyan: #18dcff;
+  --c-player-cyan-shade: #0fa6c2;
+
+  /* --- Typografie (§3) --- */
+  --font-display: 'Luckiest Guy', 'Comic Sans MS', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.75rem;
+  --fs-2xl: 2.5rem;
+  --fs-hero: 4rem;
+  --fs-mega: 6rem;
+
+  --sticker-stroke: 4px;
+  --sticker-shadow: 0 4px 0 var(--c-ink);
+
+  /* --- Spacing / Radien --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-frame: 32px;
+
+  /* --- Touch-Ziele (A1/A2-Audit) --- */
+  --touch-min: 48px;
+  --touch-primary: 64px;
+  --touch-stepper: 72px;
+  /* Koffer muessen mindestens so gross bleiben (CLAUDE.md). */
+  --touch-suitcase: 56px;
+
+  /* --- Motion (§7) --- */
+  --t-fast: 120ms;
+  --t-base: 260ms;
+  --t-slow: 420ms;
+  --t-wipe: 320ms;
+  --t-sheet: 260ms;
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-snappy: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-sheet: cubic-bezier(0.2, 0.9, 0.3, 1.2);
+
+  /* --- Layout (Architektur §8) --- */
+  --frame-max-width: 480px;
+  --frame-aspect: 9 / 16;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  --z-stage: 0;
+  --z-screen: 1;
+  --z-hud: 20;
+  --z-wipe: 40;
+  --z-sheet: 50;
+  --z-toast: 60;
+  --z-orientation: 80;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    /* §7: Wipes werden zu Fades, Shake aus. Der Scanline-Aufbau bleibt — er ist Gameplay. */
+    --t-wipe: 160ms;
+  }
+}

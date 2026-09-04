@@ -1,0 +1,177 @@
+{
+  "app": {
+    "title": "Customs",
+    "tagline": "Pack your case. Cross the border. Don't get caught."
+  },
+  "orientation": {
+    "headline": "Please hold upright",
+    "body": "Customs only inspects in portrait mode."
+  },
+  "common": {
+    "next": "Next",
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "sips_one": "sip",
+    "sips_other": "sips",
+    "tokens_one": "token",
+    "tokens_other": "tokens",
+    "items_one": "item",
+    "items_other": "items"
+  },
+  "title": {
+    "play": "Play",
+    "rules": "Rules",
+    "settings": "Settings"
+  },
+  "lobby": {
+    "headline": "Who's travelling?",
+    "cta": "Open the border",
+    "officerNext": "Officer round {round}: {name}",
+    "tooFewPlayers": "Two travellers and one officer — that's not customs, that's a coin toss. Get someone else.",
+    "addPlayer": "Add player",
+    "interrogationDuration": "Interrogation",
+    "packTimer": "Thinking time"
+  },
+  "modes": {
+    "bribery": { "name": "Bribery", "hint": "Travellers may openly offer the officer tokens." },
+    "sniffer": { "name": "Sniffer dog", "hint": "Waldi gives one reliable hint — at the cost of one opening." },
+    "diplomat": { "name": "Diplomat", "hint": "One traveller secretly has immunity." },
+    "highSeason": { "name": "High season", "hint": "Smuggle up to 10 items, one extra opening." }
+  },
+  "officerIntro": {
+    "headline": "{name} is the customs officer.",
+    "body": "Everyone else packs.",
+    "tap": "Tap"
+  },
+  "pass": {
+    "headline": "Pass to {name}",
+    "body": "Only {name} may look now.",
+    "tap": "I am {name}"
+  },
+  "pack": {
+    "headline": "What are you packing?",
+    "clean": "Clean",
+    "cleanGoods": "Clean goods",
+    "contraband": "Contraband",
+    "close": "Close the case",
+    "risk": "Caught = {caught} sips · Through = hand out {tokens}",
+    "riskClean": "Clean. No risk, no loot.",
+    "immunity": "You have diplomatic immunity. They don't know.",
+    "timeout": "Time's up — your case stays clean."
+  },
+  "packed": {
+    "headline": "All cases closed.",
+    "body": "Phone in the middle."
+  },
+  "hall": {
+    "interrogation": "Interrogation in progress.",
+    "endInterrogation": "End interrogation",
+    "replayHints": "Show again",
+    "hintsDone": "The officer is up.",
+    "bribeOffer": "Bribe",
+    "bribeAccept": "Accept",
+    "bribeDecline": "Decline",
+    "bribeAccepted": "Paid",
+    "bribeSpeech": "I'll give you {amount} to hand out if you don't open mine.",
+    "dogBark": "Waldi barks.",
+    "dogQuiet": "Waldi moves on."
+  },
+  "hints": {
+    "wobble": "wobbled",
+    "drip": "drips",
+    "heavy": "is heavy",
+    "click": "ticks",
+    "feather": "sheds feathers",
+    "dog": "was sniffed"
+  },
+  "questions": [
+    "Anything to declare?",
+    "What's that ticking in your case?",
+    "Why are you sweating?",
+    "Who at this table is definitely smuggling?",
+    "Describe the contents. Slowly.",
+    "Where are you travelling and why are you lying?"
+  ],
+  "inspect": {
+    "headline": "Inspection",
+    "openings": "Openings: {left}",
+    "waveAll": "Wave everyone through",
+    "next": "Next",
+    "scanning": "Scanning …",
+    "bannerCaught": "{name} BUSTED · drinks {sips}",
+    "bannerClean": "HARASSMENT · {officer} drinks {sips}",
+    "bannerDiplomat": "DIPLOMAT · {officer} drinks {sips}"
+  },
+  "gate": {
+    "headline": "Gate",
+    "next": "NEXT: {name}",
+    "stampOk": "OK",
+    "stampBusted": "BUSTED",
+    "stampHarassment": "HARASSMENT",
+    "bannerThrough": "{name} GOT THROUGH · hands out {tokens}",
+    "bannerOk": "{name} passes."
+  },
+  "distribute": {
+    "headline": "{name} hands out {tokens}",
+    "hint": "Tap = +1, long press = −1. Not to yourself.",
+    "done": "Done"
+  },
+  "result": {
+    "banner": {
+      "officerOfTheMonth": "Officer of the month",
+      "gotThrough": "{name} got through",
+      "smugglerParadise": "Smuggler's paradise",
+      "harassment": "Harassment!",
+      "honestRound": "An honest round"
+    },
+    "bonus": {
+      "allCaught": "Caught them all: +{tokens}",
+      "goodInstinct": "Good instinct: +{tokens}"
+    },
+    "suitcases": "All cases",
+    "opened": "Opened",
+    "passed": "Through",
+    "hintResolution": "Hints",
+    "hintTrue": "was true",
+    "hintFalse": "lied",
+    "hintTrueLine": "The case that {hint}: {amount} — good nose.",
+    "hintFalseLine": "The case that {hint} was clean. Fell for it.",
+    "stats": "Statistics",
+    "statSmuggled": "Smuggled across",
+    "statCaught": "Caught",
+    "statHitRate": "Hit rate as officer",
+    "statHarassed": "Innocents harassed",
+    "boldestSmuggler": "Boldest smuggler",
+    "bestNose": "Best nose",
+    "nextRound": "Next round",
+    "changePlayers": "Change players",
+    "changeMode": "Change mode"
+  },
+  "rules": {
+    "headline": "Rules",
+    "pack": { "title": "Packing", "body": "Every traveller secretly packs 0 to 6 items of contraband. 0 is clean and safe. More is more risk and more loot." },
+    "hints": { "title": "Hints lie sometimes", "body": "The officer sees small hints on the cases. They are only mostly right — and they never reveal how much is inside." },
+    "inspect": { "title": "Interrogation & inspection", "body": "The officer asks, everyone answers. Then they open up to k cases in the scanner. Busted means drinking double; opening an innocent case means the officer drinks." },
+    "payout": { "title": "Payout", "body": "Whoever gets through hands out one sip per item. The officer keeps what they catch." }
+  },
+  "settings": {
+    "headline": "Settings",
+    "sound": "Sound",
+    "music": "Music",
+    "haptics": "Haptics",
+    "lowEffects": "Fewer effects",
+    "language": "Language"
+  },
+  "onboarding": {
+    "pack": "0 = clean and safe. More = more risk, more loot.",
+    "hall": "Hints are only mostly right."
+  },
+  "backDialog": {
+    "headline": "Abandon the round?",
+    "body": "The cases will not be inspected.",
+    "confirm": "Abandon",
+    "dismiss": "Keep playing"
+  }
+}

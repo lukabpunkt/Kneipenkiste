@@ -1,0 +1,177 @@
+{
+  "app": {
+    "title": "Der Zoll",
+    "tagline": "Koffer packen. Grenze passieren. Nicht auffliegen."
+  },
+  "orientation": {
+    "headline": "Bitte hochkant halten",
+    "body": "Der Zoll kontrolliert nur im Portrait-Format."
+  },
+  "common": {
+    "next": "Weiter",
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "sips_one": "Schluck",
+    "sips_other": "Schlücke",
+    "tokens_one": "Token",
+    "tokens_other": "Tokens",
+    "items_one": "Stück",
+    "items_other": "Stück"
+  },
+  "title": {
+    "play": "Spielen",
+    "rules": "Regeln",
+    "settings": "Einstellungen"
+  },
+  "lobby": {
+    "headline": "Wer reist mit?",
+    "cta": "Grenze öffnen",
+    "officerNext": "Beamter Runde {round}: {name}",
+    "tooFewPlayers": "Zwei Reisende und ein Beamter — das ist kein Zoll, das ist ein Münzwurf. Holt noch jemanden.",
+    "addPlayer": "Spieler hinzufügen",
+    "interrogationDuration": "Verhör",
+    "packTimer": "Bedenkzeit"
+  },
+  "modes": {
+    "bribery": { "name": "Bestechung", "hint": "Reisende dürfen dem Beamten öffentlich Tokens anbieten." },
+    "sniffer": { "name": "Spürhund", "hint": "Waldi gibt einen verlässlichen Hinweis — dafür eine Öffnung weniger." },
+    "diplomat": { "name": "Diplomat", "hint": "Ein Reisender hat geheim Immunität." },
+    "highSeason": { "name": "Hochsaison", "hint": "Bis zu 10 Stück schmuggeln, eine Öffnung mehr." }
+  },
+  "officerIntro": {
+    "headline": "{name} ist Zollbeamter.",
+    "body": "Alle anderen packen.",
+    "tap": "Tippen"
+  },
+  "pass": {
+    "headline": "Weiterreichen an {name}",
+    "body": "Nur {name} darf jetzt schauen.",
+    "tap": "Ich bin {name}"
+  },
+  "pack": {
+    "headline": "Was packst du ein?",
+    "clean": "Sauber",
+    "cleanGoods": "Saubere Ware",
+    "contraband": "Schmuggelware",
+    "close": "Koffer schließen",
+    "risk": "Erwischt = {caught} Schlücke · Durch = {tokens} verteilen",
+    "riskClean": "Sauber. Kein Risiko, keine Beute.",
+    "immunity": "Du hast diplomatische Immunität. Sie wissen es nicht.",
+    "timeout": "Zeit abgelaufen — dein Koffer bleibt sauber."
+  },
+  "packed": {
+    "headline": "Alle Koffer geschlossen.",
+    "body": "Handy in die Mitte."
+  },
+  "hall": {
+    "interrogation": "Verhör läuft.",
+    "endInterrogation": "Verhör beenden",
+    "replayHints": "Nochmal ansehen",
+    "hintsDone": "Der Beamte ist dran.",
+    "bribeOffer": "Bestechen",
+    "bribeAccept": "Annehmen",
+    "bribeDecline": "Ablehnen",
+    "bribeAccepted": "Bezahlt",
+    "bribeSpeech": "Ich gebe dir {amount} zu verteilen, wenn du mich nicht öffnest.",
+    "dogBark": "Waldi bellt.",
+    "dogQuiet": "Waldi geht weiter."
+  },
+  "hints": {
+    "wobble": "wackelte",
+    "drip": "tropft",
+    "heavy": "ist schwer",
+    "click": "tickt",
+    "feather": "federt",
+    "dog": "beschnüffelt"
+  },
+  "questions": [
+    "Hast du etwas zu verzollen?",
+    "Was tickt da in deinem Koffer?",
+    "Warum schwitzt du?",
+    "Wer am Tisch schmuggelt bestimmt?",
+    "Beschreib mir den Inhalt. Langsam.",
+    "Wohin reist du und warum lügst du?"
+  ],
+  "inspect": {
+    "headline": "Kontrolle",
+    "openings": "Öffnungen: {left}",
+    "waveAll": "Alle durchwinken",
+    "next": "Weiter",
+    "scanning": "Röntgen läuft …",
+    "bannerCaught": "{name} ERWISCHT · trinkt {sips}",
+    "bannerClean": "BELÄSTIGUNG · {officer} trinkt {sips}",
+    "bannerDiplomat": "DIPLOMAT · {officer} trinkt {sips}"
+  },
+  "gate": {
+    "headline": "Schranke",
+    "next": "NÄCHSTER: {name}",
+    "stampOk": "OK",
+    "stampBusted": "ERWISCHT",
+    "stampHarassment": "BELÄSTIGUNG",
+    "bannerThrough": "{name} DURCHGEKOMMEN · verteilt {tokens}",
+    "bannerOk": "{name} passiert."
+  },
+  "distribute": {
+    "headline": "{name} verteilt {tokens}",
+    "hint": "Tippen = +1, lange drücken = −1. Nicht an dich selbst.",
+    "done": "Fertig"
+  },
+  "result": {
+    "banner": {
+      "officerOfTheMonth": "Beamter des Monats",
+      "gotThrough": "{name} ist durchgekommen",
+      "smugglerParadise": "Schmugglerparadies",
+      "harassment": "Belästigung!",
+      "honestRound": "Ehrliche Runde"
+    },
+    "bonus": {
+      "allCaught": "Alle erwischt: +{tokens}",
+      "goodInstinct": "Menschenkenntnis: +{tokens}"
+    },
+    "suitcases": "Koffer-Übersicht",
+    "opened": "Geöffnet",
+    "passed": "Durch",
+    "hintResolution": "Hinweise",
+    "hintTrue": "stimmte",
+    "hintFalse": "log",
+    "hintTrueLine": "Der {hint} Koffer: {amount} — guter Riecher.",
+    "hintFalseLine": "Der {hint} Koffer war sauber. Reingefallen.",
+    "stats": "Statistik",
+    "statSmuggled": "Über die Grenze gebracht",
+    "statCaught": "Erwischt",
+    "statHitRate": "Trefferquote als Beamter",
+    "statHarassed": "Unschuldig belästigt",
+    "boldestSmuggler": "Dreistester Schmuggler",
+    "bestNose": "Bester Riecher",
+    "nextRound": "Nächste Runde",
+    "changePlayers": "Spieler ändern",
+    "changeMode": "Modus ändern"
+  },
+  "rules": {
+    "headline": "Regeln",
+    "pack": { "title": "Packen", "body": "Jeder Reisende packt heimlich 0 bis 6 Stück Schmuggelware. 0 ist sauber und sicher. Mehr ist mehr Risiko und mehr Beute." },
+    "hints": { "title": "Hinweise lügen manchmal", "body": "Der Beamte sieht kleine Hinweise an den Koffern. Sie stimmen nur meistens — und sie verraten nie, wie viel drin ist." },
+    "inspect": { "title": "Verhör & Kontrolle", "body": "Der Beamte fragt, alle antworten. Dann öffnet er bis zu k Koffer im Röntgengerät. Erwischt heißt doppelt trinken, unschuldig geöffnet heißt: der Beamte trinkt." },
+    "payout": { "title": "Auszahlung", "body": "Wer durchkommt, verteilt einen Schluck je Stück. Der Beamte bekommt, was er fängt." }
+  },
+  "settings": {
+    "headline": "Einstellungen",
+    "sound": "Sound",
+    "music": "Musik",
+    "haptics": "Vibration",
+    "lowEffects": "Weniger Effekte",
+    "language": "Sprache"
+  },
+  "onboarding": {
+    "pack": "0 = sauber und sicher. Mehr = mehr Risiko, mehr Beute.",
+    "hall": "Hinweise stimmen nur meistens."
+  },
+  "backDialog": {
+    "headline": "Runde abbrechen?",
+    "body": "Die Koffer werden nicht kontrolliert.",
+    "confirm": "Abbrechen",
+    "dismiss": "Weiterspielen"
+  }
+}
