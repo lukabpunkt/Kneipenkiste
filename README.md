@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel über Vertrauen und Verrat für 3–8
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M0 fertig (`v0.0.1`) — Regelkern steht und ist getestet, die UI kommt in M1. Aktueller Stand in [`docs/PROGRESS.md`](docs/PROGRESS.md).
+**Status:** M1 fertig (`v0.1.0`) — **ab hier ist es spielbar.** Der komplette Flow von der Lobby bis zum Result läuft; die Aufdeckung ist noch ein DOM-Platzhalter, die PixiJS-Bühne kommt in M2/M3. Aktueller Stand in [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ## Entwickeln
 
@@ -37,6 +37,11 @@ Die Spiellogik ist eine reine Funktion und lebt vollständig in `src/core/`:
 | [`session.ts`](src/core/session.ts)             | Scoreboard, Vertrauens-Index, Verrats-Streak, Persistenz                               |
 
 Die Show (`src/game/`) liest dieses Ergebnis und inszeniert es — sie würfelt nichts.
+
+Darüber liegt die UI: ein Router mit zehn Screens (`src/ui/screens/`) und die Komponenten
+(`src/ui/components/`) — Tresor-Widget mit Split-Flap-Zähler, Countdown-Ring,
+Entscheidungskarten, Badges mit Eid-Siegel. Menüs sind DOM, nur die Aufdeckung wird
+ab M3 eine PixiJS-Bühne.
 
 ## Planung
 

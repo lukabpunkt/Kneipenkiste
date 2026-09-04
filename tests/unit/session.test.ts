@@ -278,7 +278,143 @@ describe('Persistenz', () => {
 
   it('schreibt jede Aenderung des Stores weg', () => {
     const store = createSessionStore(sessionWith([]));
-    store.set({ vault: 12 });
+    store.setVault(12);
     expect(loadSession().vault).toBe(12);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* SessionStore — der Zustand, den sich alle Screens teilen (M1.1)     */
+/* ------------------------------------------------------------------ */
+
+describe('SessionStore', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  const freshStore = () => createSessionStore(createEmptySession());
+  const nameFor = (index: number) => `Spieler ${index}`;
+
+  it('legt Spieler mit freier Farbe und Default-Namen an', () => {
+    const store = freshStore();
+    const first = store.addPlayer(nameFor);
+    const second = store.addPlayer(nameFor);
+    expect(first?.name).toBe('Spieler 1');
+    expect(second?.name).toBe('Spieler 2');
+    expect(first?.colorId).not.toBe(second?.colorId);
+    expect(store.state.players).toHaveLength(2);
+  });
+
+  it('verteilt Ringelshirts an jeden zweiten Crook (Art Direction §5)', () => {
+    const store = freshStore();
+    store.ensureMinimumPlayers(nameFor);
+    store.addPlayer(nameFor);
+    expect(store.state.players.map((p) => p.outfit.stripes)).toEqual([false, true, false, true]);
+  });
+
+  it('nimmt keinen neunten Spieler auf', () => {
+    const store = freshStore();
+    for (let i = 0; i < 8; i++) expect(store.addPlayer(nameFor)).not.toBeNull();
+    expect(store.addPlayer(nameFor)).toBeNull();
+    expect(store.state.players).toHaveLength(8);
+  });
+
+  it('fuellt auf die Mindestzahl auf und laesst sie danach in Ruhe', () => {
+    const store = freshStore();
+    store.ensureMinimumPlayers(nameFor);
+    expect(store.state.players).toHaveLength(3);
+    store.ensureMinimumPlayers(nameFor);
+    expect(store.state.players).toHaveLength(3);
+    expect(store.canStart()).toBe(true);
+  });
+
+  it('benennt um, kuerzt lange Namen und entfernt Spieler', () => {
+    const store = freshStore();
+    const player = store.addPlayer(nameFor)!;
+    store.renamePlayer(player.id, 'Ein viel zu langer Name');
+    expect(store.playerById(player.id)?.name).toHaveLength(MAX_NAME_LENGTH);
+
+    store.removePlayer(player.id);
+    expect(store.playerById(player.id)).toBeUndefined();
+    expect(store.canStart()).toBe(false);
+  });
+
+  it('zieht den Tresor nach, solange keine Runde gespielt ist', () => {
+    const store = freshStore();
+    expect(store.state.vault).toBe(4);
+    store.setSettings({ hardness: 'hard' });
+    expect(store.state.vault).toBe(6);
+    store.setModes({ highroller: true });
+    expect(store.state.vault).toBe(6);
+  });
+
+  it('laesst einen laufenden Tresor in Ruhe, sobald Runden gespielt sind', () => {
+    const store = freshStore();
+    store.ensureMinimumPlayers(nameFor);
+    store.recordRound(resolve(3, 0, 4));
+    expect(store.state.vault).toBe(6);
+    store.setSettings({ hardness: 'hard' });
+    // Mitten in der Session wechselt der Tresorstand nicht — nur neue Runden rechnen anders.
+    expect(store.state.vault).toBe(6);
+  });
+
+  it('traegt Runden ein und uebernimmt nextVault', () => {
+    const store = freshStore();
+    store.ensureMinimumPlayers(nameFor);
+    const round = resolve(3, 2, 4);
+    store.recordRound(round);
+    expect(store.state.rounds).toHaveLength(1);
+    expect(store.state.vault).toBe(round.nextVault);
+  });
+
+  it('liefert Scoreboard und Statistik ueber die eigenen Spieler', () => {
+    const store = createSessionStore({ ...createEmptySession(), players: makePlayers(4) });
+    store.recordRound(resolve(4, 0, 4));
+    expect(store.scoreboard()['p0']).toBe(1);
+    expect(store.stats().map((s) => s.playerId)).toEqual(['p0', 'p1', 'p2', 'p3']);
+    expect(store.stats()[0]!.trustIndex).toBe(100);
+  });
+
+  it('benachrichtigt Abonnenten und meldet sie wieder ab', () => {
+    const store = freshStore();
+    let calls = 0;
+    const off = store.subscribe(() => {
+      calls += 1;
+    });
+    store.addPlayer(nameFor);
+    expect(calls).toBe(1);
+    off();
+    store.addPlayer(nameFor);
+    expect(calls).toBe(1);
+  });
+
+  it('setzt Runden zurueck, behaelt aber Spieler und Settings', () => {
+    const store = freshStore();
+    store.ensureMinimumPlayers(nameFor);
+    store.setSettings({ hardness: 'hard' });
+    store.recordRound(resolve(3, 0, 6));
+
+    store.resetRounds();
+    expect(store.state.rounds).toEqual([]);
+    expect(store.state.players).toHaveLength(3);
+    expect(store.state.settings.hardness).toBe('hard');
+    expect(store.state.vault).toBe(6);
+  });
+
+  it('reset stellt den Werkszustand her', () => {
+    const store = freshStore();
+    store.ensureMinimumPlayers(nameFor);
+    store.setSettings({ hardness: 'hard' });
+    store.reset();
+    expect(store.state.players).toEqual([]);
+    expect(store.state.settings.hardness).toBe('normal');
+    expect(loadSession().players).toEqual([]);
+  });
+
+  it('setVault schreibt den Stand direkt fort', () => {
+    const store = freshStore();
+    store.setVault(11);
+    expect(store.state.vault).toBe(11);
+    expect(loadSession().vault).toBe(11);
   });
 });

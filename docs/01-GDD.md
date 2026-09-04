@@ -59,7 +59,7 @@ Eine **Session** = beliebig viele Runden; der Tresorstand, das Scoreboard und di
 ### 3.4 Geheime Wahl (Handy rumgeben)
 
 - Reihenfolge: Spieler 1 → n, jeweils **Privacy-Screen** ("Handy an **{Name}**. Tippe, wenn nur du aufs Display schaust.") → **Wahl-Screen**.
-- Wahl-Screen: Zwei große Karten nebeneinander, **TEILEN** (grün, zwei Hände, die sich schütteln) und **STEHLEN** (rot, Hand greift in den Sack). Tap wählt und zeigt eine 400-ms-Bestätigungsanimation (Karte dreht sich auf die Rückseite, "Versiegelt"), dann sofort der nächste Privacy-Screen. Kein "Zurück".
+- Wahl-Screen: Zwei große Karten nebeneinander, **TEILEN** (grün, zwei anstoßende Gläser — ADR-11) und **STEHLEN** (rot, Hand greift nach dem Geldsack). Tap wählt und zeigt eine 400-ms-Bestätigungsanimation (Karte dreht sich auf die Rückseite, "Versiegelt"), dann sofort der nächste Privacy-Screen. Kein "Zurück".
 - **Bedenkzeit-Timer** optional (Setting): 5 s pro Spieler, danach wird automatisch TEILEN gewählt (mit Hinweis). Verhindert, dass jemand 30 s grübelt und die Gruppe daraus Schlüsse zieht.
 - Nach dem letzten Spieler: kurzer Screen "Alle Karten versiegelt. Legt das Handy in die Mitte." mit Tap zum Start der Aufdeckung.
 

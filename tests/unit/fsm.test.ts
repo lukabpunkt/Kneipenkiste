@@ -565,3 +565,16 @@ function driveTo(fsm: Fsm, state: GameState): void {
   if (state === 'REVEAL') return;
   fsm.send({ type: 'showFinished' });
 }
+
+describe('setVault', () => {
+  it('uebernimmt den Tresorstand aus der Session', () => {
+    const fsm = makeFsm();
+    fsm.setVault(12);
+    expect(fsm.context.vault).toBe(12);
+
+    // Die naechste Runde startet mit genau diesem Stand.
+    fsm.send({ type: 'start' });
+    fsm.send({ type: 'open' });
+    expect(fsm.context.setup?.vault).toBe(12);
+  });
+});

@@ -3,7 +3,7 @@
 | Meilenstein | Status | Tag | Audit |
 |---|---|---|---|
 | M0 Setup & Regelkern | ✅ fertig (⏳ 3 manuelle Checks offen) | `v0.0.1` | A0 bestanden |
-| M1 UI-Flow | ⬜ offen | – | – |
+| M1 UI-Flow | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.1.0` | A1 bestanden |
 | M2 Bühne, Crooks, Tresor | ⬜ offen | – | – |
 | M3 Reveal-Show | ⬜ offen | – | – |
 | M4 Inszenierungen | ⬜ offen | – | – |
@@ -44,3 +44,41 @@
 - [ ] Repo nach `github.com/lukabpunkt/Tresor` pushen und den ersten CI- und Pages-Lauf grün sehen (Pages aktiviert sich beim ersten Deploy selbst).
 
 **Zahlen:** 511 Unit-Tests · 8 E2E-Tests · Coverage `core/` 99,7 % Statements / 97,6 % Branches, `fsm.ts` 100 % · Bundle 6,8 KB JS gzip (ohne PIXI, das ab M2 dazukommt) · Build 159 ms.
+
+## Audit A1 — 2026-09-04
+
+**Ergebnis:** BESTANDEN (alle automatisierbaren MUSS-Checks grün; 2 Checks brauchen echte Menschen)
+
+| Check | Status | Notiz |
+|---|---|---|
+| E2E-Szenarien aus M1.7 grün (Mobile-Emulation iPhone 12 + Pixel 5) | ✅ | 15 Szenarien × 2 Geräte = 30 Tests grün. Darunter der geforderte Dreirunden-Durchlauf (allShare → soloSteal mit Verteilung → multiSteal), eine Eid-Runde mit Meineid, eine Maulwurf-Runde und eine Nachtschicht-Runde. Alle Wartebedingungen hängen an Zuständen, nicht an Uhrzeiten — `tests/e2e/helpers.ts`. |
+| Auszahlungstabelle im Negotiation-Screen stimmt mit `payout` überein | ✅ | Der Screen ruft `previewPayouts()` auf, dieselbe Funktion, die `tests/unit/payout.test.ts` gegen das echte `resolveRound()` für k = 0/1/2/n prüft. Die Tabelle kann damit gar nicht abweichen. |
+| Choice-Screen: Wahl nach Versiegeln nirgends sichtbar; kein Zurück; Bedenkzeit → auto TEILEN | ✅ | E2E prüft das Markup des Folge-Screens auf „TEILEN"/„STEHLEN" → nichts. Der Screen hat keinen Zurück-Weg, und der Bedenkzeit-Timer wählt bei Ablauf TEILEN mit Toast-Hinweis. |
+| Distribute: „Auszahlen" erst bei 0 Rest; Summe == V (bzw. V−2 bei Meineid); alles auf eine Person erlaubt | ✅ | Der Button hängt am Restzähler; die Summe erzwingt `applyDistribution()` (Invariante aus A0). E2E verteilt in Runde 2 alle 6 Schlücke auf eine Person — erlaubt (ADR-4) — und in der Eid-Runde nur die verbleibenden 2. |
+| Result-Banner je Outcome korrekt; Tresor-Vorschau zeigt `nextVault` | ✅ | E2E prüft „Ehre unter Dieben" → „Der Alleingang" → „Zu viele Köche" → „MEINEID!" und die Zeilen „Der Tresor wächst auf 6" bzw. „Der Tresor wurde geleert". Das Widget zeigt beim Betreten den alten Stand und klappt nach 420 ms sichtbar auf den neuen. |
+| Statistik: Vertrauens-Index, Streak, Meistbetrogen nach 5 Testrunden korrekt | ✅ | `tests/unit/session.test.ts` rechnet fünf konstruierte Runden durch (Scoreboard, Vertrauens-Index 40/80/100/100 %, aktuelle und längste Streak, Meistbetrogen). E2E prüft zusätzlich, dass das Sheet nach drei echten Runden die Abschnitte zeigt. |
+| Touch-Ziele ≥ 48 px, Safe-Areas, Reload-Persistenz, Back-Dialog | ✅ | E2E misst alle sichtbaren Buttons in einem Rutsch (keiner unter 48 px), lädt die Lobby neu und findet Name und Härte-Einstellung wieder, und prüft den „Runde abbrechen?"-Dialog in beide Richtungen. Safe-Areas laufen über die `env()`-Tokens aus `base.css`. |
+| Countdown letzte 10 s rot, letzte 5 s Tick | ✅ | `countdownRing.ts` setzt `is-warning` ab 10 s und `is-ticking` ab 5 s; die Ziffer bekommt in der Tick-Phase einen Punch, damit der Takt auch stumm sichtbar ist (GDD §6). Der Ton kommt in M3. |
+| Keine hardcodierten Strings | ✅ | `tests/unit/guards.test.ts` durchsucht `src/ui/` und `src/main.ts` nach `textContent`/`innerText`/`innerHTML`-Zuweisungen mit echtem Text (Inline-SVG ausgenommen) → 0 Treffer. `tests/unit/ui.test.ts` prüft zusätzlich, dass alle 110 von den Screens benutzten Keys in DE **und** EN existieren. |
+| Keine `console.error` im E2E-Flow | ✅ | Der Dreirunden-Test und der Titel-Test sammeln `console`-Errors und `pageerror` → beide leer. |
+| Eine unbeteiligte Person versteht jeden Screen ohne Erklärung | ⏳ manuell | Screenshots liegen in `docs/screens/m1-*.png`. Braucht echte Menschen. |
+| Party-tauglich mit Platzhalter (DoD) | ⏳ manuell | Zwei vollständige Runden laufen sauber durch; die Reveal-Reihenfolge trägt die Spannung schon ohne Effekte (ADR-12). Ob es am Tisch trägt, entscheidet der Playtest. |
+
+**Befunde während der Umsetzung**
+
+- **Die Idle-Animation lag auf dem Tap-Ziel.** Die Wahl-Karten wippten als Ganzes, der Button wanderte also ständig. Auf dem Handy trifft man ein wanderndes Ziel schlechter — und Playwright wartete ewig auf ein „stabiles" Element. Die Bewegung sitzt jetzt auf einem inneren Element, der Button steht still.
+- **Der Münzpegel im Tresor war nie sichtbar.** Die Geometrie schob den Stapel in die falsche Richtung: Selbst bei vollem Tresor lag er unter dem Fensterrand. Neu gezeichnet — in Ruhelage füllt der Stapel das Fenster, `--vault-fill` schiebt ihn nach unten heraus.
+- **Der Countdown-Ring schnitt die Anzeige.** Die Zahl schwebte losgelöst über dem Ring, und der Ring lief quer durch den Flip-Counter. Die Zahl sitzt jetzt als dunkler Chip auf dem oberen Ringrand, Tür und Zähler stehen vollständig innerhalb des Rings — dadurch passt auch die Auszahlungstabelle wieder auf den ersten Bildschirm.
+- **Die TEILEN-Illustration war unlesbar.** Ein Handschlag wird bei 60 px Kantenlänge zu Matsch; im Test las er sich als Korb. Ersetzt durch zwei anstoßende Gläser (ADR-11), GDD und Art Direction nachgezogen.
+- **Die verriegelte Maulwurf-Karte war tot.** `aria-disabled="true"` nahm ihr die Rückmeldung — dabei ist das Rütteln plus „Nicht für dich" genau die Information, die der Maulwurf braucht (ADR-13).
+- **Die Lobby baute sich erst nach dem Wipe auf.** `ensureMinimumPlayers()` lief in `activate()`, die Liste erschien also sichtbar verzögert. Läuft jetzt beim Bau des Screens.
+- **Die letzte Reveal-Karte war breiter und rutschte dadurch in eine eigene Zeile.** Sah nach Layoutfehler aus. Sie hebt sich jetzt über einen Goldrahmen ab statt über Extrabreite.
+
+**Offene SOLL-Follow-ups:** keine.
+
+**Manuelle Checks für Luka vor M2:**
+
+- [ ] Eine Runde mit echten Menschen am Tisch spielen (3–5 Personen, ein Handy): Versteht jeder jeden Screen ohne Erklärung? Ist die Verhandlungsphase lang genug? Trägt die Reveal-Reihenfolge die Spannung schon ohne Effekte?
+- [ ] Auf einem echten Gerät prüfen, ob das Handy während Verhandlung und Aufdeckung wach bleibt (Wake-Lock; auf iOS erst ab Safari 16.4) und ob die Vibration beim Versiegeln und bei der letzten Karte spürbar ist.
+
+**Zahlen:** 534 Unit-Tests · 30 E2E-Tests (15 × 2 Geräte) · Coverage `core/` 99,7 % Statements / 97,1 % Branches, `fsm.ts` 100 % · Bundle 24,3 KB JS gzip (PIXI kommt ab M2 dazu) · 10 Screens, 8 Komponenten.

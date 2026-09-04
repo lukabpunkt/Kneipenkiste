@@ -21,6 +21,12 @@ export default defineConfig({
    * Tresorraums. Zehn Sekunden finden echte Haenger und reparieren keine gesunden Tests.
    */
   expect: { timeout: 10_000 },
+  /*
+   * Playwrights Standard von 30 s reicht hier nicht: Ein Test, der drei komplette Runden
+   * spielt, deckt allein 12 Karten in Echtzeit auf. Zwei Minuten sind immer noch kurz
+   * genug, um einen echten Haenger zu finden.
+   */
+  timeout: 120_000,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
   use: {
     baseURL: 'http://localhost:4173/Tresor/',

@@ -66,11 +66,18 @@ describe('Kein hardcodierter UI-Text (Standing Audit)', () => {
    * Nur `src/ui/` und `src/main.ts` sind betroffen — Screens duerfen Text ausschliesslich
    * ueber `t()` beziehen. In M0 gibt es noch keine Screens; der Test waechst mit.
    */
-  /** Ein Literal ist Text, sobald ausserhalb der `${}`-Loecher ein Wort steht. */
-  const looksLikeCopy = (literal: string): boolean =>
-    /[A-Za-zÄÖÜäöüß]{3,}/.test(literal.replace(/\$\{[^}]*\}/g, ''));
+  /**
+   * Ein Literal ist Text, sobald ausserhalb der `${}`-Loecher ein Wort steht.
+   * Reines Markup zaehlt nicht: Die Icons in `choiceCard.ts` und `badge.ts` sind
+   * Inline-SVG und enthalten keine Copy.
+   */
+  const looksLikeCopy = (literal: string): boolean => {
+    const withoutHoles = literal.replace(/\$\{[^}]*\}/g, '');
+    if (withoutHoles.trim().startsWith('<')) return false;
+    return /[A-Za-zÄÖÜäöüß]{3,}/.test(withoutHoles);
+  };
 
-  it('setzt textContent nie auf einen uebersetzbaren Text', () => {
+  it('setzt textContent und innerHTML nie auf einen uebersetzbaren Text', () => {
     const files = [join(root, 'src/main.ts')];
     try {
       files.push(...walk(join(root, 'src/ui')));
@@ -82,7 +89,7 @@ describe('Kein hardcodierter UI-Text (Standing Audit)', () => {
     for (const file of files) {
       const source = stripComments(readFileSync(file, 'utf8'));
       for (const match of source.matchAll(
-        /\.(?:textContent|innerText)\s*=\s*(?:'([^']*)'|"([^"]*)"|`([^`]*)`)/g
+        /\.(?:textContent|innerText|innerHTML)\s*=\s*(?:'([^']*)'|"([^"]*)"|`([^`]*)`)/gs
       )) {
         const literal = match[1] ?? match[2] ?? match[3] ?? '';
         if (looksLikeCopy(literal)) offenders.push(`${file.slice(root.length)}: ${match[0]}`);

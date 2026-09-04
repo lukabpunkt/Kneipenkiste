@@ -17,11 +17,12 @@ import {
   MAX_ROUND_HISTORY,
   MIN_PLAYERS,
   STORAGE_KEY,
+  type Modes,
   type Settings,
 } from '@/config/rules';
 import { COLOR_IDS, type ColorId } from '@/config/theme';
 import { createId } from './rng';
-import { createStore, type Store } from './store';
+import { createStore, type Unsubscribe } from './store';
 import { vaultSpec } from './vault';
 import type { Player, PlayerId, RoundResult, Session } from './types';
 
@@ -209,14 +210,141 @@ export function clearSession(storage: Storage | undefined = globalThis.localStor
   }
 }
 
-/** Store, der jede Aenderung automatisch wegschreibt. */
+/* ------------------------------------------------------------------ */
+/* SessionStore — der Zustand, den sich alle Screens teilen            */
+/* ------------------------------------------------------------------ */
+
+export interface SessionStore {
+  readonly state: Readonly<Session>;
+  subscribe(listener: (session: Readonly<Session>) => void): Unsubscribe;
+
+  /** Naechste freie Farbe, Default-Name. `null`, wenn schon acht am Tisch sitzen. */
+  addPlayer(nameFor: (index: number) => string): Player | null;
+  removePlayer(id: PlayerId): void;
+  renamePlayer(id: PlayerId, name: string): void;
+  /** Fuellt bis `MIN_PLAYERS` auf — beim ersten Start der App. */
+  ensureMinimumPlayers(nameFor: (index: number) => string): void;
+  playerById(id: PlayerId): Player | undefined;
+
+  setSettings(patch: Partial<Settings>): void;
+  setModes(patch: Partial<Modes>): void;
+
+  /** Traegt eine fertige Runde ein und uebernimmt `nextVault`. */
+  recordRound(result: RoundResult): void;
+  /** Tresorstand direkt setzen — z. B. wenn die Haerte in der Lobby wechselt. */
+  setVault(vault: number): void;
+
+  canStart(): boolean;
+  scoreboard(): Record<PlayerId, number>;
+  stats(): PlayerStats[];
+
+  /** Runden und Tresor zuruecksetzen; Spieler und Settings bleiben. */
+  resetRounds(): void;
+  /** Alles zurueck auf Werkszustand. */
+  reset(): void;
+}
+
+/**
+ * Store mit Persistenz. Jede Aenderung landet sofort im `localStorage` — wer das Handy
+ * mitten in der Runde sperrt, findet die Session danach wieder.
+ */
 export function createSessionStore(
   initial: Session = loadSession(),
   storage: Storage | undefined = globalThis.localStorage
-): Store<Session> {
+): SessionStore {
   const store = createStore<Session>(initial);
-  store.subscribe((state) => saveSession(state, storage));
-  return store;
+
+  const commit = (patch: Partial<Session>): void => {
+    store.set(patch);
+    saveSession(store.get(), storage);
+  };
+
+  const api: SessionStore = {
+    get state() {
+      return store.get();
+    },
+
+    subscribe(listener) {
+      return store.subscribe((session) => listener(session));
+    },
+
+    addPlayer(nameFor) {
+      const players = store.get().players;
+      if (players.length >= MAX_PLAYERS) return null;
+      const colorId = nextFreeColor(players) ?? COLOR_IDS[0]!;
+      // Die Haelfte traegt Ringelshirt (Art Direction §5) — hier einmal gewuerfelt und
+      // dann fest, damit ein Spieler nicht jede Runde die Garderobe wechselt.
+      const player = createPlayer(nameFor(players.length + 1), colorId, players.length % 2 === 1);
+      commit({ players: [...players, player] });
+      return player;
+    },
+
+    removePlayer(id) {
+      commit({ players: store.get().players.filter((player) => player.id !== id) });
+    },
+
+    renamePlayer(id, name) {
+      const trimmed = name.slice(0, MAX_NAME_LENGTH);
+      commit({
+        players: store
+          .get()
+          .players.map((player) => (player.id === id ? { ...player, name: trimmed } : player)),
+      });
+    },
+
+    ensureMinimumPlayers(nameFor) {
+      while (store.get().players.length < MIN_PLAYERS) {
+        if (api.addPlayer(nameFor) === null) break;
+      }
+    },
+
+    playerById(id) {
+      return store.get().players.find((player) => player.id === id);
+    },
+
+    setSettings(patch) {
+      const settings: Settings = { ...store.get().settings, ...patch };
+      commit({ settings });
+      // Haerte oder Highroller geaendert und noch keine Runde gespielt: Der Tresor
+      // startet mit dem neuen V_0, statt einen Stand aus der alten Einstellung zu behalten.
+      if (store.get().rounds.length === 0) commit({ vault: vaultSpec(settings).startVault });
+    },
+
+    setModes(patch) {
+      api.setSettings({ modes: { ...store.get().settings.modes, ...patch } });
+    },
+
+    recordRound(result) {
+      commit(commitRound(store.get(), result));
+    },
+
+    setVault(vault) {
+      commit({ vault });
+    },
+
+    canStart() {
+      return canStart(store.get());
+    },
+
+    scoreboard() {
+      return scoreboard(store.get());
+    },
+
+    stats() {
+      return sessionStats(store.get());
+    },
+
+    resetRounds() {
+      commit({ rounds: [], vault: vaultSpec(store.get().settings).startVault });
+    },
+
+    reset() {
+      store.replace(createEmptySession());
+      saveSession(store.get(), storage);
+    },
+  };
+
+  return api;
 }
 
 /* ------------------------------------------------------------------ */

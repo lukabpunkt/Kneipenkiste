@@ -1,19 +1,35 @@
 /**
- * Einstiegspunkt.
+ * Einstiegspunkt: Session laden, FSM bauen, Screens registrieren, los.
  *
- * M0 zeigt nur den Titel — genug, um die App auf dem Handy zu oeffnen und die PWA zu
- * installieren. Der Router und die echten Screens kommen in M1 (Roadmap M1.1/M1.2)
- * und ersetzen `renderTitle()` hier.
+ * Die Screens kennen einander nicht — sie schicken Events an die FSM und sagen dem
+ * Router, wohin. Diese Datei ist der einzige Ort, der beides zusammenbringt.
  */
 
 import '@/styles/tokens.css';
 import '@/styles/base.css';
 import '@/styles/components.css';
 
-import { DEFAULT_SETTINGS } from '@/config/rules';
+import { createFsm } from '@/core/fsm';
 import { detectLocale, setLocale, t } from '@/core/i18n';
 import { createSessionStore } from '@/core/session';
-import { vaultSpec } from '@/core/vault';
+import { confirmSheet } from '@/ui/components/sheet';
+import { showToast } from '@/ui/components/toast';
+import { setHapticsEnabled } from '@/ui/haptics';
+import { createRouter, type ScreenId } from '@/ui/router';
+import { watchWakeLock } from '@/ui/wakeLock';
+import { createChoiceScreen } from '@/ui/screens/ChoiceScreen';
+import { createDistributeScreen } from '@/ui/screens/DistributeScreen';
+import { createLobbyScreen } from '@/ui/screens/LobbyScreen';
+import { createNegotiationScreen } from '@/ui/screens/NegotiationScreen';
+import { createPassScreen } from '@/ui/screens/PassScreen';
+import { createResultScreen } from '@/ui/screens/ResultScreen';
+import { createRevealScreen } from '@/ui/screens/RevealScreen';
+import { createSealedScreen } from '@/ui/screens/SealedScreen';
+import { createSilenceScreen } from '@/ui/screens/SilenceScreen';
+import { createTitleScreen } from '@/ui/screens/TitleScreen';
+
+/** Aus diesen Screens fuehrt der Zurueck-Knopf nur ueber einen Dialog (Architektur §3). */
+const ABORTABLE: readonly ScreenId[] = ['negotiation', 'silence', 'pass', 'choice', 'sealed', 'reveal'];
 
 function applyStaticTranslations(root: ParentNode = document): void {
   for (const node of root.querySelectorAll<HTMLElement>('[data-i18n]')) {
@@ -22,41 +38,18 @@ function applyStaticTranslations(root: ParentNode = document): void {
   }
 }
 
-/** Platzhalter-Titelbild, bis M1 den Title-Screen baut. */
-function renderTitle(mount: HTMLElement, vault: number): void {
-  mount.innerHTML = '';
-
-  const screen = document.createElement('div');
-  screen.className = 'screen screen--title';
-
-  const logo = document.createElement('h1');
-  logo.className = 'title__logo';
-  logo.textContent = t('app.title');
-
-  const tagline = document.createElement('p');
-  tagline.className = 'title__tagline';
-  tagline.textContent = t('app.tagline');
-
-  const vaultLine = document.createElement('p');
-  vaultLine.className = 'title__vault';
-  vaultLine.textContent = t('negotiation.vaultLine', { count: vault });
-
-  const disclaimer = document.createElement('p');
-  disclaimer.className = 'title__disclaimer';
-  disclaimer.textContent = t('title.disclaimer');
-
-  const version = document.createElement('p');
-  version.className = 'title__version';
-  version.textContent = `v${__APP_VERSION__}`;
-
-  screen.append(logo, tagline, vaultLine, disclaimer, version);
-  mount.append(screen);
-}
-
 function registerServiceWorker(): void {
   if (import.meta.env.DEV) return;
   void import('virtual:pwa-register').then(({ registerSW }) => {
-    registerSW({ immediate: true });
+    const update = registerSW({
+      immediate: true,
+      onNeedRefresh() {
+        showToast(t('app.title'), {
+          durationMs: 8000,
+          action: { label: t('common.continue'), onClick: () => void update(true) },
+        });
+      },
+    });
   });
 }
 
@@ -65,11 +58,82 @@ function boot(): void {
   if (!mount) throw new Error('#app fehlt in index.html.');
 
   const session = createSessionStore();
-  setLocale(session.get().settings.locale ?? detectLocale());
+  const settings = session.state.settings;
 
+  setLocale(settings.locale ?? detectLocale());
+  setHapticsEnabled(settings.haptics);
   applyStaticTranslations();
-  renderTitle(mount, session.get().vault || vaultSpec(DEFAULT_SETTINGS).startVault);
+
+  const fsm = createFsm({
+    players: [...session.state.players],
+    settings,
+    vault: session.state.vault,
+  });
+
+  /*
+   * Die Session ist die Buchhaltung, die FSM der Spielverlauf. Genau ein Ort verbindet
+   * sie: Sobald eine Runde durch ist, wandert das Ergebnis in die Historie — bei
+   * `soloSteal` erst nach der Verteilung, sonst waere die Zeile unvollstaendig.
+   */
+  fsm.subscribe(({ to, event, context }) => {
+    if (to !== 'RESULT' || !context.result) return;
+    if (event.type === 'payout' || context.result.outcome !== 'soloSteal') {
+      session.recordRound(context.result);
+    }
+  });
+
+  const router = createRouter({
+    host: mount,
+    context: { fsm, session, dev: new URLSearchParams(location.search).has('dev') },
+  });
+
+  router.register('title', createTitleScreen);
+  router.register('lobby', createLobbyScreen);
+  router.register('negotiation', createNegotiationScreen);
+  router.register('silence', createSilenceScreen);
+  router.register('pass', createPassScreen);
+  router.register('choice', createChoiceScreen);
+  router.register('sealed', createSealedScreen);
+  router.register('reveal', createRevealScreen);
+  router.register('distribute', createDistributeScreen);
+  router.register('result', createResultScreen);
+
+  setupBackButton(router, () => {
+    if (!fsm.send({ type: 'cancel' })) return;
+    void router.go('lobby', { direction: 'back' });
+  });
+
+  watchWakeLock();
   registerServiceWorker();
+
+  void router.go('title');
+}
+
+/**
+ * Zurueck-Knopf des Browsers abfangen (Architektur §3).
+ *
+ * Ein versehentlicher Wisch darf keine laufende Runde wegwerfen — und ohne
+ * History-Eintrag verlaesst er die App komplett. Deshalb ein Dummy-Eintrag, der nach
+ * jedem `popstate` sofort wieder nachgeschoben wird.
+ */
+function setupBackButton(router: { current: ScreenId | null }, abort: () => void): void {
+  history.pushState({ tresor: true }, '');
+
+  globalThis.addEventListener('popstate', () => {
+    history.pushState({ tresor: true }, '');
+
+    const current = router.current;
+    if (current === null || !ABORTABLE.includes(current)) return;
+
+    void confirmSheet({
+      title: t('dialog.abortRound'),
+      body: t('dialog.abortRoundBody'),
+      confirmLabel: t('dialog.abortConfirm'),
+      cancelLabel: t('dialog.abortKeep'),
+    }).then((confirmed) => {
+      if (confirmed) abort();
+    });
+  });
 }
 
 boot();

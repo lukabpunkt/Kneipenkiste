@@ -31,3 +31,12 @@ Kontext: Architektur §3 notiert die Nachtschicht als Klammer an NEGOTIATION. Si
 
 ## ADR-10 · 2026-09-04 · Tooling und Assets aus Drinkshot kopiert
 Kontext: Drinkshot steht bei M4; Roadmap M0 sagt, fertige Module zu kopieren statt neu zu bauen. Entscheidung: `core/store.ts`, `core/rng.ts`, `core/i18n.ts`, `styles/base.css`, `scripts/build-atlas.mjs`, `scripts/build-audio-sprite.mjs` sowie die Tooling-Configs sind Kopien mit Tresor-Anpassungen; `i18n.ts` wurde um `tList()` für Kassels Sprüche erweitert. Ergänzt um `scripts/build-icons.mjs` (PWA-Icons aus `assets-src/svg/app-icon.svg`). Konsequenz: M0 baut auf erprobtem Code; ein gemeinsames `@party/core` bleibt Backlog (ADR-1).
+
+## ADR-11 · 2026-09-04 · TEILEN zeigt anstoßende Gläser statt eines Handschlags
+Kontext: GDD §3.4 und Art Direction §4.1 fordern für die TEILEN-Karte „zwei Hände, die sich schütteln". Bei 60 px Kantenlänge und 3,6 px Strichstärke wird ein Handschlag unlesbar — im Test las er sich als Korb. Entscheidung: zwei anstoßende Gläser mit Funken. Konsequenz: Dieselbe Aussage („wir sind uns einig"), auf einen Blick lesbar, zitiert die `share_toast`-Inszenierung aus GDD §4.4 und passt zur Schluck-Währung; GDD §3.4 und Art Direction §4.1 wurden angepasst.
+
+## ADR-12 · 2026-09-04 · Der Reveal-Platzhalter hält schon die Reveal-Gesetze ein
+Kontext: Roadmap M1.5 verlangt nur „Karten als einfache Liste nacheinander umdrehen". Entscheidung: Der DOM-Platzhalter liest trotzdem `result.revealOrder` (Teiler zuerst, Diebe zuletzt, Maulwurf am Ende) und respektiert die Tap-to-Skip-Regel (ab Karte 2, nie bei der letzten). Konsequenz: Das Spiel ist ab M1 wirklich party-tauglich — die Spannung kommt aus der Reihenfolge, nicht aus den Effekten; die E2E-Zusicherungen zu ADR-3 gelten schon jetzt und überleben den Umbau in M3.
+
+## ADR-13 · 2026-09-04 · Die Maulwurf-Karte bleibt bedienbar
+Kontext: Die verriegelte TEILEN-Karte war mit `aria-disabled="true"` ausgezeichnet. Entscheidung: Sie bekommt stattdessen ein sprechendes `aria-label` und bleibt fokussierbar. Konsequenz: Der Maulwurf erfährt beim Antippen, dass die Karte existiert und warum sie gesperrt ist (Rütteln + „Nicht für dich"); ein totes Element hätte ihm genau diese Information verschwiegen — und Screenreader-Nutzer noch mehr.

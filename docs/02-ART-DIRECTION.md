@@ -52,8 +52,8 @@ Identisch zu Drinkshot (*Luckiest Guy* Display, *Nunito* Body, self-hosted). Zus
 
 ### 4.1 Entscheidungskarte (Choice-Screen)
 - Zwei Karten 44 % Breite, Ratio 3:4, Radius 24 px, 4 px `ink`-Outline, 8 px Bodenkante.
-- TEILEN: Fläche `share`, Illustration zwei Hände (Handschlag) in `paper`, Label "TEILEN".
-- STEHLEN: Fläche `steal`, Illustration Hand greift Geldsack, Label "STEHLEN".
+- TEILEN: Fläche `share`, Illustration zwei anstoßende Gläser mit Funken in `ink` (ADR-11: ein Handschlag ist bei 60 px unlesbar), Label "TEILEN".
+- STEHLEN: Fläche `steal`, Illustration Geldsack mit Schluck-Glas und Greifspuren in `paper`, Label "STEHLEN".
 - Idle: beide wippen gegenläufig (± 1.5°, 2.4 s). Tap: Karte wächst 1.08×, andere schrumpft und fadet, dann Flip auf die Rückseite (Spielerfarbe + Symbol + Wachssiegel-Stempel "VERSIEGELT", Stempel-Sound).
 - Maulwurf-Variante: TEILEN-Karte ist mit Ketten verriegelt (ausgegraut, rüttelt bei Tap, "Nicht für dich.").
 

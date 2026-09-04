@@ -105,6 +105,8 @@ export interface Fsm {
   send(event: GameEvent): boolean;
   setPlayers(players: Player[]): void;
   setSettings(settings: Settings): void;
+  /** Tresorstand aus der Session uebernehmen (Lobby → NEGOTIATION). */
+  setVault(vault: number): void;
   /** Eid-Modus: Schwur setzen oder zuruecknehmen (nur waehrend der Verhandlung). */
   toggleOath(playerId: PlayerId): boolean;
   on(state: GameState, hooks: StateHooks): () => void;
@@ -322,6 +324,10 @@ export function createFsm(options: FsmOptions): Fsm {
       if (state === 'TITLE' || state === 'LOBBY') {
         context.vault = vaultSpec(settings).startVault;
       }
+    },
+
+    setVault(vault) {
+      context.vault = vault;
     },
 
     toggleOath(playerId) {
