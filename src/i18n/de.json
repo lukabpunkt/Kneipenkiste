@@ -1,0 +1,181 @@
+{
+  "app": {
+    "title": "Sprengmeister",
+    "tagline": "Grab dich zur Kiste. Wenn du dich traust."
+  },
+  "common": {
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "continue": "Weiter",
+    "confirm": "Bestätigen",
+    "ok": "Alles klar",
+    "sips_one": "{count} Schluck",
+    "sips_other": "{count} Schlücke",
+    "mines_one": "{count} Mine",
+    "mines_other": "{count} Minen",
+    "players_one": "{count} Spieler",
+    "players_other": "{count} Spieler"
+  },
+  "orientation": {
+    "headline": "Dreh das Handy hochkant",
+    "body": "Sprengmeister wird im Hochformat gespielt — das Feld liegt auf dem Tisch."
+  },
+  "title": {
+    "play": "Spielen",
+    "rules": "Regeln",
+    "settings": "Einstellungen",
+    "disclaimer": "Trinkspiel ab 18. Trinkt verantwortungsvoll — oder trinkt Wasser, das zählt auch."
+  },
+  "lobby": {
+    "headline": "Wer gräbt mit?",
+    "addPlayer": "Spieler hinzufügen",
+    "removePlayer": "{name} entfernen",
+    "namePlaceholder": "Spieler {index}",
+    "fieldSize": "Feld {size} × {size}",
+    "fieldSizeHint": "{count} Platten, {mines} Minen im Boden",
+    "cta": "Feld verminen",
+    "tooFewPlayers": "Zu zweit weißt du immer, wer die Mine gelegt hat. Holt noch jemanden.",
+    "modes": "Modi",
+    "timers": "Bedenkzeit"
+  },
+  "modes": {
+    "doubleAgent": {
+      "name": "Doppelagent",
+      "hint": "Eine echte Mine, ein Blindgänger. Man sieht, wer gelegt hat — nicht, ob es knallt."
+    },
+    "nightDigger": {
+      "name": "Nachtgräber",
+      "hint": "Keine Temperatur-Hinweise. Nur Wurm und Bauchgefühl."
+    },
+    "twoChests": {
+      "name": "Zwei Kisten",
+      "hint": "Zwei Kisten, je halbe Tokens. Die Runde endet beim zweiten Fund."
+    },
+    "chainReaction": {
+      "name": "Kettenreaktion",
+      "hint": "Eine Explosion reißt die Nachbarminen mit. Niemand trinkt dafür — aber alle sehen, wer gelegt hat."
+    },
+    "masterBonus": {
+      "name": "Sprengmeister-Bonus",
+      "hint": "Zwei Opfer in einer Runde: Extra-Token. Nur auf eigenen Minen gegraben: ein Schluck."
+    }
+  },
+  "timers": {
+    "off": "Aus",
+    "seconds": "{count} s",
+    "placeLabel": "Minen legen",
+    "digLabel": "Graben"
+  },
+  "pass": {
+    "handTo": "Handy an {name}",
+    "tapToStart": "Tippen, wenn nur du draufschaust",
+    "privacy": "Niemand guckt mit?"
+  },
+  "place": {
+    "headline": "Lege {count} Minen.",
+    "headlineDoubleAgent": "Eine Mine, ein Blindgänger.",
+    "counter": "{placed} / {total}",
+    "toolMine": "Mine",
+    "toolDud": "Blindgänger",
+    "bury": "Vergraben",
+    "tooltip": "Deine Minen tun DIR nichts. Merk dir, wo sie liegen.",
+    "timeUp": "Zeit um — der Rest wurde zufällig vergraben."
+  },
+  "buried": {
+    "headline": "Alle Minen vergraben.",
+    "body": "Handy in die Mitte.",
+    "cta": "Los geht's"
+  },
+  "dig": {
+    "turn": "{name} GRÄBT",
+    "drinks": "{name} TRINKT {count}",
+    "killFeed": "{layer} → {victim}",
+    "chest": "{name} HAT DIE KISTE!",
+    "greed": "DER PREIS DER GIER",
+    "dud": "Pfff.",
+    "chainReaction": "Kettenreaktion!",
+    "masterBonus": "SPRENGMEISTER!",
+    "coward": "Feigling…",
+    "tooltip": "Heiß = Kiste ist direkt daneben.",
+    "minesRemaining": "Noch {count} im Boden",
+    "timeUp": "Zeit um — es wurde zufällig gegraben."
+  },
+  "hint": {
+    "hot": "Heiß",
+    "warm": "Warm",
+    "cold": "Kalt",
+    "none": ""
+  },
+  "distribute": {
+    "handTo": "Handy an {name}",
+    "headline": "Verteile {count}",
+    "hint": "Tippen: +1 · Lange drücken: −1",
+    "notYourself": "An dich selbst geht nichts.",
+    "remaining": "Noch {count} zu vergeben",
+    "cta": "Auszahlen"
+  },
+  "result": {
+    "finder": "{name} hat die Kiste!",
+    "greed": "Der Preis der Gier",
+    "doubleFind": "Doppelfund",
+    "drinkers": "Getrunken",
+    "killFeed": "Wer wen",
+    "stats": "Statistik",
+    "phew": "Puh",
+    "nextRound": "Nächste Runde",
+    "changePlayers": "Spieler ändern",
+    "changeModes": "Modus ändern",
+    "share": "{layer} hat {victim} {count}× in die Luft gejagt 💣"
+  },
+  "stats": {
+    "sips": "Getrunken",
+    "blastsCaused": "Sprengungen verursacht",
+    "blastsTaken": "Sprengungen kassiert",
+    "chestsFound": "Kisten gefunden",
+    "mostBlasted": "Meistgesprengt",
+    "deadliestLayer": "Gefährlichster Leger",
+    "empty": "Noch keine Runde gespielt."
+  },
+  "rules": {
+    "headline": "Regeln",
+    "place": {
+      "title": "Minen legen",
+      "body": "Das Handy geht reihum. Jeder vergräbt heimlich zwei Minen. Deine eigenen Minen tun dir nichts — merk dir, wo sie liegen."
+    },
+    "dig": {
+      "title": "Graben",
+      "body": "Reihum wird eine Platte aufgegraben. Fremde Mine: Du trinkst 2 pro Mine, und die Farbe des Legers leuchtet über dem Krater."
+    },
+    "hints": {
+      "title": "Hinweise",
+      "body": "Jedes leere Feld zeigt, wie nah die Kiste ist: Heiß (direkt daneben), Warm (zwei Felder), Kalt (weiter weg)."
+    },
+    "payout": {
+      "title": "Auszahlung",
+      "body": "Wer gesprengt wurde, trinkt sofort. Leger und Kistenfinder sammeln Tokens und verteilen sie am Rundenende — nur nicht an sich selbst."
+    }
+  },
+  "settings": {
+    "headline": "Einstellungen",
+    "sound": "Ton",
+    "music": "Musik",
+    "haptics": "Vibration",
+    "lowEffects": "Weniger Effekte",
+    "language": "Sprache",
+    "resetSession": "Session zurücksetzen"
+  },
+  "dialog": {
+    "abortRound": "Runde abbrechen?",
+    "abortRoundBody": "Die vergrabenen Minen sind dann weg.",
+    "abortConfirm": "Abbrechen",
+    "abortKeep": "Weiterspielen"
+  },
+  "a11y": {
+    "plateCovered": "Platte {index}, verdeckt",
+    "plateEmpty": "Platte {index}, offen, {hint}",
+    "plateCrater": "Platte {index}, Krater von {names}",
+    "plateTreasure": "Platte {index}, Kiste",
+    "plateMine": "Platte {index}, Mine von {name}"
+  }
+}

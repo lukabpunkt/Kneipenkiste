@@ -1,0 +1,183 @@
+/**
+ * Zufall.
+ *
+ * Zwei strikt getrennte Quellen (CLAUDE.md, Architektur §1):
+ *
+ * 1. **Sicherer Zufall** (`secureRandomFloat`, `secureRandomInt`) — ausschliesslich fuer
+ *    die Kistenposition, den Timer-Fallback und den Runden-Seed. Basiert auf
+ *    `crypto.getRandomValues`. `Math.random` ist in `src/core/` per ESLint verboten.
+ * 2. **Seedbarer PRNG** (`createSeededRng`, mulberry32) — fuer die Inszenierung:
+ *    Sequenz-Auswahl, Fundstuecke, Deko. Reproduzierbar fuer Debugging und Tests.
+ *
+ * Warum die Trennung hier haerter zaehlt als in den Schwesterspielen: Die Kiste ist die
+ * einzige Information, die niemand am Tisch kennt. Waere sie aus einem Seed ableitbar,
+ * koennte ein Blick in die Dev-Tools die ganze Runde entscheiden.
+ */
+
+const cryptoRef: Crypto = globalThis.crypto;
+
+if (typeof cryptoRef?.getRandomValues !== 'function') {
+  throw new Error('crypto.getRandomValues ist nicht verfuegbar — Sprengmeister braucht sicheren Zufall.');
+}
+
+const TWO_POW_32 = 0x1_0000_0000;
+const TWO_POW_26 = 0x400_0000;
+const TWO_POW_53 = Number.MAX_SAFE_INTEGER + 1;
+
+/* ------------------------------------------------------------------ */
+/* Sicherer Zufall                                                     */
+/* ------------------------------------------------------------------ */
+
+const secureBuffer = new Uint32Array(2);
+
+/**
+ * Kryptografisch sichere Gleitkommazahl in [0, 1) mit voller 53-Bit-Mantisse.
+ */
+export function secureRandomFloat(): number {
+  cryptoRef.getRandomValues(secureBuffer);
+  const hi = secureBuffer[0]! >>> 5; // 27 Bit
+  const lo = secureBuffer[1]! >>> 6; // 26 Bit
+  return (hi * TWO_POW_26 + lo) / TWO_POW_53; // 27 + 26 = 53 Bit Mantisse
+}
+
+/**
+ * Sichere Ganzzahl in [0, maxExclusive) — ohne Modulo-Bias (Rejection Sampling).
+ * Die Kiste liegt **uniform** ueber allen Zellen; ein Bias waere hier ein Balancing-Fehler.
+ */
+export function secureRandomInt(maxExclusive: number): number {
+  if (!Number.isInteger(maxExclusive) || maxExclusive <= 0) {
+    throw new RangeError(`maxExclusive muss eine positive Ganzzahl sein, war: ${maxExclusive}`);
+  }
+  if (maxExclusive === 1) return 0;
+
+  const limit = Math.floor(TWO_POW_32 / maxExclusive) * maxExclusive;
+  const buf = new Uint32Array(1);
+  let value: number;
+  do {
+    cryptoRef.getRandomValues(buf);
+    value = buf[0]!;
+  } while (value >= limit);
+  return value % maxExclusive;
+}
+
+/** Neuer Seed fuer eine Runde (uint32, aus sicherem Zufall). */
+export function createSeed(): number {
+  const buf = new Uint32Array(1);
+  cryptoRef.getRandomValues(buf);
+  return buf[0]!;
+}
+
+/**
+ * Die Quelle, aus der `board.ts` die Kiste und der Timer-Fallback ihre Zelle ziehen.
+ * Als Interface, damit Tests eine deterministische Variante injizieren koennen —
+ * produktiv steckt hier immer `secureRandomInt`.
+ */
+export interface SecureRandom {
+  int(maxExclusive: number): number;
+}
+
+export const secureRandom: SecureRandom = { int: secureRandomInt };
+
+/* ------------------------------------------------------------------ */
+/* Seedbarer PRNG (mulberry32)                                         */
+/* ------------------------------------------------------------------ */
+
+export interface SeededRng {
+  /** Der Seed, mit dem dieser Generator erzeugt wurde. */
+  readonly seed: number;
+  /** Gleitkommazahl in [0, 1). */
+  next(): number;
+  /** Ganzzahl in [0, maxExclusive). */
+  int(maxExclusive: number): number;
+  /** Gleitkommazahl in [min, max). */
+  range(min: number, max: number): number;
+  /** Ganzzahl in [min, max] (inklusiv) — passt zu den [min, max]-Tokens in `choreo.ts`. */
+  intBetween(min: number, max: number): number;
+  /** Zufaelliges Element. Wirft bei leerem Array. */
+  pick<T>(items: readonly T[]): T;
+  /** Neue, gemischte Kopie (Fisher-Yates). */
+  shuffle<T>(items: readonly T[]): T[];
+  /** Gewichtete Auswahl; Gewichte muessen > 0 sein. */
+  weighted<T>(items: readonly T[], weightOf: (item: T) => number): T;
+  /** true mit Wahrscheinlichkeit p. */
+  chance(p: number): boolean;
+}
+
+/**
+ * mulberry32 — 32 Bit State, sehr schnell, gute Verteilung fuer Spiel-Zwecke.
+ * Nicht kryptografisch und darf niemals die Kiste bestimmen.
+ */
+export function createSeededRng(seed: number): SeededRng {
+  let state = seed >>> 0;
+
+  const next = (): number => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / TWO_POW_32;
+  };
+
+  const int = (maxExclusive: number): number => {
+    if (!Number.isInteger(maxExclusive) || maxExclusive <= 0) {
+      throw new RangeError(`maxExclusive muss eine positive Ganzzahl sein, war: ${maxExclusive}`);
+    }
+    return Math.floor(next() * maxExclusive);
+  };
+
+  const rng: SeededRng = {
+    seed: seed >>> 0,
+    next,
+    int,
+    range: (min, max) => min + next() * (max - min),
+    intBetween: (min, max) => min + int(max - min + 1),
+    pick: <T>(items: readonly T[]): T => {
+      if (items.length === 0) throw new RangeError('pick() auf leerem Array');
+      return items[int(items.length)]!;
+    },
+    shuffle: <T>(items: readonly T[]): T[] => {
+      const copy = items.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = int(i + 1);
+        const a = copy[i]!;
+        copy[i] = copy[j]!;
+        copy[j] = a;
+      }
+      return copy;
+    },
+    weighted: <T>(items: readonly T[], weightOf: (item: T) => number): T => {
+      if (items.length === 0) throw new RangeError('weighted() auf leerem Array');
+      let total = 0;
+      for (const item of items) {
+        const w = weightOf(item);
+        if (!(w > 0) || !Number.isFinite(w)) {
+          throw new RangeError('Gewichte muessen endliche Zahlen > 0 sein.');
+        }
+        total += w;
+      }
+      let r = next() * total;
+      for (const item of items) {
+        r -= weightOf(item);
+        if (r < 0) return item;
+      }
+      return items[items.length - 1]!;
+    },
+    chance: (p) => next() < p,
+  };
+
+  return rng;
+}
+
+/* ------------------------------------------------------------------ */
+/* IDs                                                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Kurze, kollisionssichere ID fuer Spieler und Runden. Laeuft ueber denselben sicheren
+ * Zufall wie alles andere hier — `Math.random` ist in `src/core/` verboten.
+ */
+export function createId(prefix = 'p'): string {
+  const buf = new Uint32Array(2);
+  cryptoRef.getRandomValues(buf);
+  return `${prefix}_${buf[0]!.toString(36)}${buf[1]!.toString(36)}`;
+}
