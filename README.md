@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel für 3–8 Personen: Schatzsuche auf 
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot) und [Der Tresor](https://github.com/lukabpunkt/Tresor) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M0 abgeschlossen (`v0.0.1`) — die gesamte Spiellogik steht als getestete reine Funktionen, das Projekt ist konfiguriert und PWA-installierbar. Screens folgen in M1.
+**Status:** M1 abgeschlossen (`v0.1.0`) — **ab hier auf einer Party spielbar.** Der komplette Flow von der Lobby bis zum Result läuft: Minen legen, graben, Explosionen mit Kill-Feed, Tokens verteilen, Feld-Replay, Session-Statistik. Das Feld ist noch ein DOM-Grid; PixiJS, Diggers und die Slapstick-Sequenzen kommen in M2–M4.
 
 ## Loslegen
 
@@ -42,7 +42,7 @@ src/
 ### Die zwei Regeln, die das Projekt tragen
 
 1. **Die Logik ist rein.** `core/board.ts#dig` entscheidet pro Tap genau einmal, ohne Seiteneffekte; der `DigDirector` (ab M2) inszeniert das Ergebnis nur noch. Die Kiste fällt ausschließlich über `crypto.getRandomValues` — `Math.random` ist in `src/core/` per ESLint verboten.
-2. **Informationssicherheit ist Gameplay.** Eine aufgegrabene eigene Mine ist von einem leeren Feld nicht zu unterscheiden — in Daten, Bild und Ton. Screens sehen ausschließlich `publicView()`; ein Test in `tests/unit/publicView.test.ts` prüft beides, ein CI-Job zusätzlich außerhalb der Testsuite.
+2. **Informationssicherheit ist Gameplay.** Eine aufgegrabene eigene Mine ist von einem leeren Feld nicht zu unterscheiden — in Daten, Bild und Ton. Screens erreichen das private Board gar nicht erst: Es gibt genau drei Ausgänge (`fsm.view()`, `placeViewFor()`, `replay()`), und `.board` ist außerhalb von `core/` per ESLint, Unit-Test und CI-Job verboten. Ebenso abgesichert: Der Test-Seed `?seed=`, mit dem die E2E-Tests die Kistenposition steuern, darf im Deploy-Build nicht existieren (ADR-11).
 
 ## Planung
 
