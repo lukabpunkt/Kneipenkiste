@@ -1492,9 +1492,15 @@
 /* ================================================================== */
 
 .screen--negotiation,
+/*
+ * Der leerste Screen des Spiels — und deshalb mittig. Oben angeschlagen sah er aus, als
+ * fehlte darunter etwas; zentriert ist die Leere Absicht (GDD §3.7: "reines
+ * Prediction-Game, kurze Runden").
+ */
 .screen--silence {
   align-items: center;
-  gap: var(--space-4);
+  justify-content: center;
+  gap: var(--space-5);
   text-align: center;
 }
 
@@ -2550,4 +2556,64 @@
   font-size: var(--fs-md);
   letter-spacing: 0.02em;
   color: var(--c-steal);
+}
+
+/* ------------------------------------------------------------------ */
+/* Nachtschicht-Uhr (GDD §3.7)                                         */
+/* ------------------------------------------------------------------ */
+
+.silence__stage {
+  position: relative;
+}
+
+.nightClock {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 142%;
+  transform: translate(-50%, -50%);
+  opacity: 0.24;
+  pointer-events: none;
+}
+
+.nightClock svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.nightClock__mark {
+  stroke: var(--c-steel);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.nightClock__pin {
+  fill: var(--c-gold);
+}
+
+/*
+ * Ein voller Umlauf dauert genau die Phase (`--clock-seconds`), und `steps()` laesst die
+ * Nadel springen statt gleiten — eine gleitende Nadel beruhigt, eine springende treibt.
+ */
+.nightClock__hand {
+  stroke: var(--c-gold);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transform-origin: 50px 50px;
+  animation: night-hand var(--clock-seconds, 10s) steps(var(--clock-steps, 10)) forwards;
+}
+
+@keyframes night-hand {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nightClock__hand {
+    animation: none;
+  }
 }
