@@ -194,6 +194,10 @@ describe('i18n-Abdeckung der Screens', () => {
     'result.traitor',
     'onboarding.negotiation',
     'onboarding.choice',
+    'install.cta',
+    'install.hint',
+    'update.headline',
+    'update.cta',
     'modes.comboOathMole',
     'modes.comboNightHighroller',
     'modes.comboAllOn',
@@ -225,6 +229,7 @@ describe('i18n-Abdeckung der Screens', () => {
       'common',
       'dialog',
       'distribute',
+      'install',
       'kassel',
       'lobby',
       'modes',
@@ -240,6 +245,7 @@ describe('i18n-Abdeckung der Screens', () => {
       'share',
       'silence',
       'title',
+      'update',
     ]);
   });
 });

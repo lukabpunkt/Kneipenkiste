@@ -4,7 +4,13 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel über Vertrauen und Verrat für 3–8
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M5 fertig (`v0.5.0`) — Politur, Modi-Feinschliff und Barrierefreiheit. Der Title hat seinen Loop, es gibt Musik, der Eid wird gestempelt, das Ergebnis-Banner fährt ein, und die Runde lässt sich als Satz teilen. Lighthouse Mobile: Performance 99 · Accessibility 100 · Best Practices 100. Aktueller Stand in [`docs/PROGRESS.md`](docs/PROGRESS.md).
+<p align="center">
+  <img src="docs/screens/reveal.gif" width="260" alt="Die Aufdeckung: Kassel bittet um die Karten, die Crooks warten im Halbkreis." />
+</p>
+
+**[Spielen →](https://lukabpunkt.github.io/Tresor/)** · kein Backend, kein Konto, offline spielbar.
+
+**Status:** Release-Kandidat (`v1.0.0-rc.1`) — vollständig spielbar. Elf Ergebnis-Inszenierungen, fünf Modi, DE/EN, PWA. Lighthouse Mobile: Performance 99 · Accessibility 100 · Best Practices 100. Was zu 1.0 fehlt, ist der Playtest mit einer echten Gruppe ([`docs/PLAYTEST-01.md`](docs/PLAYTEST-01.md)) und das Balancing, das davon abhängt. Aktueller Stand in [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ## Entwickeln
 
@@ -19,7 +25,7 @@ npm run dev            # Vite mit --host, auch vom Handy im WLAN erreichbar
 | `npm run typecheck` · `lint` · `format`               | TypeScript strict, ESLint, Prettier                      |
 | `npm test`                                            | typecheck + lint + Unit-Tests                            |
 | `npm run test:unit` · `test:coverage`                 | Vitest (Schwellen: `core/` ≥ 95 %, `fsm.ts` = 100 %)     |
-| `npm run test:e2e` · `test:perf`                      | Playwright auf iPhone 12 (WebKit) und Pixel 5 (Chromium) |
+| `npm run test:e2e` · `test:perf`                      | Playwright: Flow, A11y, Resilienz · Perf-Budget           |
 | `npm run build:atlas` · `build:audio` · `build:icons` | Assets aus `assets-src/` bzw. `audio-src/`               |
 | `npm run check:colors`                                | Farb-Audit: Deuteranopie/Protanopie über CIE Lab (A2)    |
 | `npm run check:bundle`                                | Bundle-Budget nach `npm run build` (A5)                  |
@@ -55,6 +61,40 @@ GSAP-Timeline — Kamerafahrten, Blick-Regie, Trommelwirbel, Alarm, Slow-Mo bei 
 letzten Karte. Entschieden hat er nichts; das Ergebnis stand fest, bevor er anfing.
 Die Sounds synthetisiert der `AudioManager` zur Laufzeit (ADR-19).
 
+## Gerätematrix
+
+Die E2E-Suite läuft gegen vier Profile. Primär sind die beiden Handys — sie fahren jede
+Suite und das Perf-Budget. iPad und Desktop laufen nur den Spielfluss: Dort geht es um
+Layout im Portrait-Rahmen, nicht um Bildraten.
+
+| Profil          | Engine    | Suiten                          |
+| --------------- | --------- | ------------------------------- |
+| iPhone 12       | WebKit    | Flow · A11y · Resilienz · Perf  |
+| Pixel 5         | Chromium  | Flow · A11y · Resilienz · Perf  |
+| iPad Mini       | WebKit    | Flow                            |
+| Desktop Chrome  | Chromium  | Flow                            |
+
+Referenzgeräte für die Handmessung bleiben iPhone 11 (Safari) und Pixel 4a (Chrome):
+60 fps Ziel, 30 fps Minimum im Low-Effects-Modus.
+
+## Veröffentlichen
+
+```bash
+npm run build                 # tsc --noEmit && vite build  →  dist/
+npm run check:bundle          # Budget: Einstieg ≤ 40 KB, gesamt ≤ 450 KB gzip
+```
+
+Deploy auf GitHub Pages aus `dist/`, `base` ist `/Tresor/`. Für einen anderen Pfad
+`TRESOR_BASE` setzen. Der Service Worker meldet neue Versionen als Toast; erzwungen wird
+nichts — mitten in einer Runde neu zu laden würde die Runde wegwerfen.
+
+Versionen und Änderungen stehen in [`CHANGELOG.md`](CHANGELOG.md).
+
+## Lizenz
+
+Alle Rechte vorbehalten — siehe [`LICENSE`](LICENSE). Das ist bewusst die zurücknehmbare
+Entscheidung: Ein Projekt lässt sich später öffnen, der umgekehrte Weg praktisch nicht.
+
 ## Planung
 
 | Dokument                                                                          | Inhalt                                                                                               |
@@ -66,6 +106,7 @@ Die Sounds synthetisiert der `AudioManager` zur Laufzeit (ADR-19).
 | [`docs/04-ROADMAP.md`](docs/04-ROADMAP.md)                                        | Meilensteine M0–M6                                                                                   |
 | [`docs/05-AUDITS.md`](docs/05-AUDITS.md)                                          | Audits A0–A6                                                                                         |
 | [`docs/PROGRESS.md`](docs/PROGRESS.md) · [`docs/DECISIONS.md`](docs/DECISIONS.md) | Fortschritt · ADR-Log                                                                                |
+| [`docs/PLAYTEST-01.md`](docs/PLAYTEST-01.md)                                      | Protokollbogen für den Playtest-Abend (Audit A6)                                                     |
 
 ## Stack
 

@@ -234,5 +234,13 @@
   "onboarding": {
     "negotiation": "Talk. Swear. Lie.",
     "choice": "Nobody sees this. Really."
+  },
+  "install": {
+    "cta": "Add to home screen",
+    "hint": "Plays offline, starts instantly."
+  },
+  "update": {
+    "headline": "New version available.",
+    "cta": "Reload"
   }
 }

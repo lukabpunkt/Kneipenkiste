@@ -32,6 +32,14 @@ export default defineConfig({
     baseURL: 'http://localhost:4173/Tresor/',
     trace: 'on-first-retry',
   },
+  /*
+   * Die Geraetematrix aus CLAUDE.md "Referenzgeraete" (Roadmap M6.3).
+   *
+   * Primaer sind die beiden Handys — sie fahren jede Suite. iPad und Desktop sind
+   * sekundaer und laufen nur den Flow: Dort geht es um Layout und Bedienbarkeit im
+   * Portrait-Rahmen, nicht um Bildraten. Wer sie in `perf.spec.ts` mitlaufen liesse,
+   * wuerde einen Desktop-Browser gegen ein Handy-Budget messen.
+   */
   projects: [
     { name: 'iPhone 12', use: { ...devices['iPhone 12'] } },
     {
@@ -47,6 +55,18 @@ export default defineConfig({
           args: ['--use-angle=default', '--enable-gpu', '--ignore-gpu-blocklist'],
         },
       },
+    },
+    {
+      name: 'iPad Mini',
+      testMatch: /flow\.spec\.ts/,
+      use: { ...devices['iPad Mini'] },
+    },
+    {
+      name: 'Desktop Chrome',
+      testMatch: /flow\.spec\.ts/,
+      // Desktop laeuft im Portrait-Rahmen (Architektur §9) — ein schmales Fenster zeigt,
+      // ob der Rahmen haelt.
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 900 } },
     },
   ],
   webServer: {

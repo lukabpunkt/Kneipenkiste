@@ -50,20 +50,9 @@ jobs:
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Bundle-Budget durchsetzen (Architektur §1, Audit A5)
-        run: |
-          # Summe der einzeln gzippten Dateien — so kommen sie auch beim Geraet an.
-          total=0
-          for file in dist/assets/*.js dist/*.js; do
-            [ -f "$file" ] || continue
-            total=$((total + $(gzip -c "$file" | wc -c)))
-          done
-          limit=$((450 * 1024))
-          echo "JS gzip: $((total / 1024)) KB (Grenze $((limit / 1024)) KB)"
-          if [ "$total" -gt "$limit" ]; then
-            echo "::error::JS-Bundle ueberschreitet das Budget aus Architektur §1."
-            exit 1
-          fi
-          # TODO(M5.6): pruefen, dass der Reveal-Chunk lazy geladen wird und nicht in index.html steht.
+        # Das Skript summiert die statische Import-Kette ab index.html und faellt um,
+        # wenn ein Buehnen-Chunk zurueck in den Einstieg gerutscht ist (ADR-28).
+        run: npm run check:bundle
 
       - name: Coverage-Report hochladen
         if: always()

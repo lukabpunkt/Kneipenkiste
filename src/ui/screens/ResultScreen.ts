@@ -15,6 +15,8 @@ import { countUp, growBar, safeAnimate } from '@/ui/animate';
 import { colorById, hex } from '@/config/theme';
 import { createPlayerBadge } from '@/ui/components/badge';
 import { createButton } from '@/ui/components/button';
+import { INSTALL_PROMPT_AFTER_ROUNDS } from '@/config/rules';
+import { canOfferInstall, offerInstall } from '@/ui/install';
 import { openSheet } from '@/ui/components/sheet';
 import { showToast } from '@/ui/components/toast';
 import { createVaultWidget } from '@/ui/components/vaultWidget';
@@ -137,6 +139,31 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
 
   actions.append(stats, share, changePlayers);
   el.append(banner, sub, drinkers, preview, actions, next);
+
+  /*
+   * Das Installationsangebot haengt unten am Result und nur dort: Es ist die einzige
+   * Stelle im Spiel, an der gerade niemand auf etwas wartet (Roadmap M6.3).
+   */
+  const installRow = document.createElement('div');
+  installRow.className = 'result__install';
+  installRow.hidden = true;
+
+  const installButton = createButton({
+    label: t('install.cta'),
+    variant: 'ghost',
+    onClick: () => {
+      void offerInstall().then(() => {
+        installRow.hidden = true;
+      });
+    },
+  });
+
+  const installHint = document.createElement('p');
+  installHint.className = 'result__installHint';
+  installHint.textContent = t('install.hint');
+
+  installRow.append(installButton, installHint);
+  el.append(installRow);
 
   /* ---------------------------------------------------------------- */
 
@@ -298,6 +325,18 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
       globalThis.setTimeout(() => {
         widget.set(result.nextVault, result.nextVault > result.vault ? 'grow' : 'drain');
       }, 420);
+      /*
+       * Erst ab der zweiten gespielten Runde fragen — und nur, wenn der Browser ueberhaupt
+       * ein Angebot gemacht hat. Safari kennt `beforeinstallprompt` nicht; dort bleibt die
+       * Zeile aus, statt eine Anleitung auf einen Ergebnis-Screen zu schreiben.
+       */
+      if (
+        ctx.session.state.rounds.length >= INSTALL_PROMPT_AFTER_ROUNDS &&
+        canOfferInstall()
+      ) {
+        installRow.hidden = false;
+      }
+
       next.focus({ preventScroll: true });
     },
   };

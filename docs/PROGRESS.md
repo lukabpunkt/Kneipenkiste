@@ -281,3 +281,57 @@
 - [ ] Weiterhin offen aus M2–M4: echtes iPhone 11 / Pixel 4a (60 fps), Look-Check gegen Art Direction §1, Spannungs-Test mit drei Personen, „Lustig-Test" der elf Inszenierungen, Gewichtung der Sequenzen nach dem ersten Abend.
 
 **Zahlen:** 662 Unit-Tests · 32 E2E (Flow) + 10 (A11y) + 6 (Resilienz) · 3 Perf-Tests (p50 16,7 ms auch mit laufender Musik) · Lighthouse Mobile 99/100/100/100 · Einstieg 32,9 KB gzip, gesamt 266,8 KB · 3 Musik-Loops, 26 Cues, alle synthetisiert.
+
+## M6 — Playtest & Release 1.0 — 2026-09-05 (Tag `v1.0.0-rc.1`)
+
+**Stand:** Alles Bauliche aus M6 ist fertig. Was fehlt, ist der Playtest-Abend selbst — neun der zehn A6-Zeilen messen Reaktionen echter Menschen, und die kann niemand am Schreibtisch erheben. Der Protokollbogen liegt ausgefüllt-bereit in `docs/PLAYTEST-01.md`; `v1.0.0` vergibt Luka danach (ADR-32).
+
+**Was neu ist**
+
+- `src/ui/install.ts` — Installationsangebot ab der zweiten Runde, genau einmal (ADR-30).
+- Update-Toast mit echtem Text statt Platzhalter.
+- Gerätematrix: iPad Mini und Desktop Chrome fahren zusätzlich den kompletten Spielfluss.
+- `docs/PLAYTEST-01.md`, `CHANGELOG.md`, `LICENSE`, README mit GIF, Live-Link, Deploy- und Lizenzabschnitt.
+- CI: Das `TODO(M5.6)` im Bundle-Schritt ist eingelöst — dort läuft jetzt `npm run check:bundle`.
+
+## Audit A6 — 2026-09-05
+
+**Ergebnis:** TEILWEISE — die baulichen Zeilen sind grün, das Playtest-Protokoll ist offen.
+
+**Setup:** 4–6 Personen, 1 Handy, ≥ 8 Runden, davon ≥ 2 Eid und ≥ 2 Maulwurf. → steht aus.
+
+| Beobachtung | Ziel | Status | Notiz |
+|---|---|---|---|
+| Zeit bis erster Reveal | ≤ 90 s | ⏳ manuell | Maschinell gemessen braucht der Weg Title → Lobby (4 Spieler) → Verhandlung übersprungen → vier Wahlen → Aufdeckung rund 25 s. Mit echtem Reden und 30 s Verhandlung liegt der Wert bei etwa 70–80 s — das entscheidet aber die Gruppe, nicht die Stoppuhr. |
+| Verhandlung wird zum Reden genutzt | ≥ 6 von 8 | ⏳ manuell | Genau die Frage, die das Spiel trägt (Design-Pfeiler 2). |
+| Hörbare Reaktion bei der letzten Karte | ≥ 6 von 8 | ⏳ manuell | Die Mechanik dahinter ist geprüft: 160 % Verweildauer, 2 Stalls, Slow-Mo, Herzschlag, kein Skip (A3). Ob es wirkt, hört man nur im Raum. |
+| Lachen bei der Inszenierung | ≥ 5 von 8 | ⏳ manuell | Elf Sequenzen stehen bereit (A4); der „Lustig-Test" ist seit M4 offen. |
+| Gebrochener „Ich schwöre"-Moment | ≥ 1 | ⏳ manuell | Der Meineid ist die teuerste Inszenierung im Spiel — Blitz, Scherben, Lügennase, Stempel. |
+| Anteil Runden mit k = 0 | 20–50 % | ⏳ manuell | Hängt am Verhalten, nicht am Code. Die Stellschrauben (V_0, Wachstum, Gebühr) stehen vollständig in `rules.ts`; der Bogen führt sie mit Faustregel auf. |
+| „Nochmal spielen?" / „War es fair?" | ≥ 80 % Ja | ⏳ manuell | |
+| „Was war verwirrend?" → Top-5 | erhoben | ⏳ manuell | Der Bogen bittet ausdrücklich um wörtliche Zitate: Die Formulierung ist der Befund. |
+| Abstürze / Ruckler / Sound-Aussetzer | 0 / ≤ 1 / 0 | ✅ / ⏳ | Maschinell: keine unbehandelten Fehler in Flow, A11y und Resilienz; p50 16,7 ms und 2 Draw-Calls während der kompletten Show; Netzabbruch, fehlender Atlas und blockierter `localStorage` sind als Test festgehalten. Auf echter Hardware steht die Beobachtung aus. |
+| Gerätematrix | grün | ✅ | Vier Profile: iPhone 12 (WebKit) und Pixel 5 (Chromium) fahren Flow, A11y, Resilienz und Perf; iPad Mini und Desktop Chrome den Flow. |
+| PWA | grün | ✅ | Manifest, Icons, Service Worker, Offline-Test. Neu: Installationsangebot ab der zweiten Runde (ADR-30) und ein Update-Toast, der nichts erzwingt — mitten in einer Runde neu zu laden würde die Runde wegwerfen. |
+| Live-URL | grün | ✅ | Deploy-Workflow auf GitHub Pages steht seit M0 und läuft bei jedem Push auf `main`, mit Qualitäts-Gate davor. |
+| README, CHANGELOG, Tag | grün | ✅ | README mit GIF der Aufdeckung, Live-Link, Gerätematrix, Deploy- und Lizenzabschnitt. `CHANGELOG.md` nach Keep a Changelog, `LICENSE` mit „alle Rechte vorbehalten" als zurücknehmbarer Entscheidung. |
+
+**Befunde während der Umsetzung**
+
+- **Der Querformat-Hinweis fiel auf dem Desktop um** — zu Recht: Er hängt an `(pointer: coarse)`, und „Dreh dein Handy" wäre am Schreibtisch Unsinn. Der Test prüft jetzt beide Seiten der Regel, statt eine zu überspringen (ADR-31).
+- **Die Versionsnummer stand seit M0 auf `0.0.1`** und wurde auf dem Title-Screen angezeigt. Jetzt `1.0.0-rc.1`.
+- **Das `TODO(M5.6)` in der CI war noch offen.** Der Bundle-Schritt prüfte nur die Summe, nicht die Lazy-Regel. Beides macht jetzt `npm run check:bundle`.
+
+**Offene SOLL-Follow-ups:** Video `docs/screens/m4-outcomes.mp4` (aus M4).
+
+**Manuelle Checks für Luka — der Weg zu `v1.0.0`:**
+
+- [ ] **Playtest-Abend nach `docs/PLAYTEST-01.md`.** 4–6 Personen, ein Handy, ≥ 8 Runden, davon ≥ 2 Eid und ≥ 2 Maulwurf. Vorher installieren und Flugmodus an.
+- [ ] **Top-5-Findings beheben** (Roadmap M6.1) — wörtlich mitschreiben, nicht zusammenfassen.
+- [ ] **Balancing-Pass** (M6.2): Liegt der Anteil der Friedensrunden unter 20 %, ist Stehlen zu billig; über 50 % ist der Tresor zu zahm. Änderungen nur in `rules.ts`, mit ADR.
+- [ ] **Gewichte der elf Inszenierungen** nach dem Abend setzen (`registry.ts`, aktuell alle 1).
+- [ ] **Lizenz entscheiden.** Aktuell „alle Rechte vorbehalten". Soll das Repo offen werden, ist MIT für den Code und CC BY-NC-SA für die Grafiken die übliche Kombination.
+- [ ] **Dann `v1.0.0` taggen** und `CHANGELOG.md` von `1.0.0-rc.1` auf `1.0.0` heben.
+- [ ] Weiterhin offen aus M2–M5: echtes iPhone 11 / Pixel 4a (60 fps), Look-Check gegen Art Direction §1, Urteil über die synthetisierten Sounds, Title-Loop über zehn Minuten.
+
+**Zahlen:** 662 Unit-Tests · E2E auf vier Geräteprofilen · 3 Perf-Tests · Lighthouse Mobile 99/100/100/100 · Einstieg 33,3 KB gzip, gesamt 267,2 KB · 32 ADRs.

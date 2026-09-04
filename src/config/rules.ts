@@ -162,3 +162,14 @@ export const STORAGE_KEY_DISCLAIMER = 'tresor.disclaimer.v1';
 
 /** Praefix der Onboarding-Flags — je Hinweis ein Eintrag (Roadmap M5.5). */
 export const STORAGE_KEY_ONBOARDING = 'tresor.onboarding.v1';
+
+/** Merker, dass nach der Installation gefragt wurde — genau einmal (Roadmap M6.3). */
+export const STORAGE_KEY_INSTALL = 'tresor.install.v1';
+
+/**
+ * Ab welcher Runde nach der Installation gefragt wird (Roadmap M6.3).
+ *
+ * Beim ersten Oeffnen sagt jeder Nein — man weiss ja noch nicht, ob man das Ding behalten
+ * will. Nach zwei Runden weiss man es.
+ */
+export const INSTALL_PROMPT_AFTER_ROUNDS = 2;

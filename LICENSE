@@ -1,0 +1,21 @@
+Copyright (c) 2026 Luka Bloemendal
+
+Alle Rechte vorbehalten.
+
+Dieses Repository enthält den Quellcode und die Grafiken von "Der Tresor".
+Ohne ausdrückliche schriftliche Genehmigung des Rechteinhabers ist keine
+Nutzung, Vervielfältigung, Bearbeitung oder Verbreitung gestattet — weder des
+Codes noch der Assets.
+
+---
+
+Hinweis zur Lizenzwahl: Dies ist bewusst die zurücknehmbare Entscheidung. Ohne
+Lizenzdatei gilt ohnehin das volle Urheberrecht; diese Datei sagt es nur
+deutlich. Ein Projekt lässt sich später jederzeit unter eine offene Lizenz
+stellen — der umgekehrte Weg ist praktisch versperrt, weil einmal erteilte
+Rechte bestehen bleiben. Wenn "Der Tresor" offen werden soll, ist MIT für den
+Code und CC BY-NC-SA für die Grafiken die übliche Kombination für ein Spiel
+dieser Art.
+
+Verwendete Bibliotheken und Schriften stehen unter ihren eigenen Lizenzen:
+siehe package.json bzw. die Lizenzhinweise in public/fonts/.

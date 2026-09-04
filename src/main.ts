@@ -16,6 +16,7 @@ import { confirmSheet } from '@/ui/components/sheet';
 import { showToast } from '@/ui/components/toast';
 import { setHapticsEnabled } from '@/ui/haptics';
 import { createRouter, type ScreenId } from '@/ui/router';
+import { watchInstallPrompt } from '@/ui/install';
 import { watchWakeLock } from '@/ui/wakeLock';
 import { createChoiceScreen } from '@/ui/screens/ChoiceScreen';
 import { createDistributeScreen } from '@/ui/screens/DistributeScreen';
@@ -43,10 +44,14 @@ function registerServiceWorker(): void {
   void import('virtual:pwa-register').then(({ registerSW }) => {
     const update = registerSW({
       immediate: true,
+      /*
+       * Ein Hinweis, kein Zwang: Mitten in einer Runde neu zu laden wuerde die Runde
+       * wegwerfen. Der Toast steht acht Sekunden, wer will, tippt.
+       */
       onNeedRefresh() {
-        showToast(t('app.title'), {
+        showToast(t('update.headline'), {
           durationMs: 8000,
-          action: { label: t('common.continue'), onClick: () => void update(true) },
+          action: { label: t('update.cta'), onClick: () => void update(true) },
         });
       },
     });
@@ -118,6 +123,8 @@ function boot(): void {
   });
 
   watchWakeLock();
+  // Muss vor dem ersten Screen laufen: `beforeinstallprompt` kommt einmal und wartet nicht.
+  watchInstallPrompt();
   registerServiceWorker();
 
   void router.go('title');

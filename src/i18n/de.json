@@ -234,5 +234,13 @@
   "onboarding": {
     "negotiation": "Redet. Schwört. Lügt.",
     "choice": "Niemand sieht das. Wirklich."
+  },
+  "install": {
+    "cta": "Auf den Startbildschirm",
+    "hint": "Offline spielbar, startet sofort."
+  },
+  "update": {
+    "headline": "Neue Version da.",
+    "cta": "Neu laden"
   }
 }

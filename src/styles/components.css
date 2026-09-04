@@ -2664,3 +2664,25 @@
   box-shadow: 0 6px 0 rgb(26 16 36 / 55%);
   pointer-events: none;
 }
+
+/* ------------------------------------------------------------------ */
+/* Installations-Angebot am Result (Roadmap M6.3)                      */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Bewusst leise: eine Geisterschrift-Taste und ein halber Satz. Es ist ein Angebot,
+ * keine Aufforderung — und es steht unter dem, weswegen der Screen offen ist.
+ */
+.result__install {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: var(--space-3);
+}
+
+.result__installHint {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: rgb(255 248 231 / 58%);
+}

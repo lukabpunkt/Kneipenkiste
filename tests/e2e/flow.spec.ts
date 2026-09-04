@@ -74,11 +74,21 @@ test.describe('Start', () => {
     expect(external).toEqual([]);
   });
 
-  test('blendet im Querformat den Hinweis ein', async ({ page }) => {
+  test('blendet im Querformat den Hinweis ein — aber nur auf dem Handy', async ({ page }) => {
     await page.goto('./');
     await expect(page.locator('.orientation-lock')).toBeHidden();
     await page.setViewportSize({ width: 844, height: 390 });
-    await expect(page.locator('.orientation-lock')).toBeVisible();
+
+    /*
+     * Der Hinweis gilt Fingern, nicht Fenstern (Architektur §9): Auf dem Handy im
+     * Querformat ist er richtig, auf dem Desktop waere "Dreh dein Handy" Unsinn — dort
+     * laeuft das Spiel im Portrait-Rahmen. Der Test prueft deshalb beide Seiten der
+     * Regel, statt eine davon zu ueberspringen.
+     */
+    const touch = await page.evaluate(() => matchMedia('(pointer: coarse)').matches);
+    const lock = page.locator('.orientation-lock');
+    if (touch) await expect(lock).toBeVisible();
+    else await expect(lock).toBeHidden();
   });
 });
 
