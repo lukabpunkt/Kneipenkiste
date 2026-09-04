@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel für 3–8 Personen: Schatzsuche auf 
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot) und [Der Tresor](https://github.com/lukabpunkt/Tresor) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M1 abgeschlossen (`v0.1.0`) — **ab hier auf einer Party spielbar.** Der komplette Flow von der Lobby bis zum Result läuft: Minen legen, graben, Explosionen mit Kill-Feed, Tokens verteilen, Feld-Replay, Session-Statistik. Das Feld ist noch ein DOM-Grid; PixiJS, Diggers und die Slapstick-Sequenzen kommen in M2–M4.
+**Status:** M2 abgeschlossen (`v0.2.0`) — das Feld ist jetzt eine PixiJS-Bühne: Erdplatten mit 3D-Kante, Diggers mit Bauhelm in Spielerfarbe auf der Bank, Wiese mit Zaun und Baum, Kamera-Zoom auf die aktive Platte und die Jenga-Sekunde vor jedem Ergebnis. Die acht Slapstick-Sequenzen kommen in M3–M4; bis dahin spielt der `DigDirector` Platzhalter.
 
 ## Loslegen
 
@@ -34,7 +34,7 @@ src/
 ├─ config/     Tokens, Regeln, Choreografie — alle Zahlen und Farben stehen hier
 ├─ core/       Reine Spiellogik: board · payout · modes · turn · fsm · session · simulate
 ├─ ui/         Router, Komponenten, Screens (ab M1)
-├─ game/       PIXI-Feld, Diggers, DigDirector, Sequenzen (ab M2)
+├─ game/       PIXI-Feld: BoardApp · BoardView · Tile · Field · Digger · Camera · DigDirector
 ├─ i18n/       DE · EN
 └─ styles/     Tokens als CSS-Variablen, Basis-Layout
 ```

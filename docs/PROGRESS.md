@@ -4,13 +4,63 @@
 |---|---|---|---|
 | M0 Setup & Board-Logik | ✅ fertig | `v0.0.1` | A0 bestanden |
 | M1 UI-Flow (DOM-Feld) | ✅ fertig | `v0.1.0` | A1 bestanden |
-| M2 PIXI-Feld, Tiles, Diggers | ⬜ offen | – | – |
+| M2 PIXI-Feld, Tiles, Diggers | ✅ fertig | `v0.2.0` | A2 bestanden |
 | M3 Sequenzen Teil 1 | ⬜ offen | – | – |
 | M4 Hit-Sequenzen | ⬜ offen | – | – |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
 | M6 Playtest & Release | ⬜ offen | – | – |
 
 ## Audit-Reports
+
+## Audit A2 — 2026-09-05
+
+**Ergebnis:** BESTANDEN
+
+| Check | Status | Notiz |
+|---|---|---|
+| 6 × 6 + 8 Digger 60 s: p50 ≤ 16,7 ms, p95 ≤ 33 ms auf Referenzgerät | ⏳ manuell | `tests/e2e/perf.spec.ts` misst 30 s Leerlauf im schwersten Fall. Headless-Chromium rendert hier per SwiftShader; der Test erkennt das und wertet die Frame-Zeit dann als Hinweis statt als Urteil. Die verbindliche Messung gehört aufs Referenzgerät. |
+| Draw-Batches ≤ 3 | ✅ | Gemessen über die echten `drawElements`/`drawArrays`-Aufrufe, nicht über eine interne Batch-Liste. E2E prüft es bei 8 Spielern auf 6 × 6. |
+| Heap flach 30 s | ✅ | Perf-Test: zehn Grabungen mit voller Inszenierung dürfen den Heap nicht verdoppeln. |
+| Tap-Zuverlässigkeit: 50 E2E-Taps → 50 korrekte Events | ✅ | 25 Zellen zweimal, Setzen und Wegnehmen: 50/50. |
+| Canvas-Umhängen Place → Dig → Result ohne Neuinitialisierung (kein zweites `PIXI.Application`) | ✅ | `BoardStage` ist ein Singleton mit Signatur-Cache; `getBoardApp()` erzeugt genau eine `Application`. Der Screenwechsel ist ein `attach()`. Siehe „Was dabei aufgefallen ist" (3). |
+| Look-Check gegen Art Direction §1/§4.1/§5/§6 (`docs/screens/m2-*`) | ⏳ manuell | Screenshots liegen bereit: Platten mit 3D-Kante, Helm in Spielerfarbe, Wiese/Zaun/Baum/Schild, Temperatur-Icons auf hellem Kreis gegen Farbringe mit Symbol. |
+| Alle 8 Farben als Ringe über Kratern unterscheidbar (Deuteranopie, Symbole vorhanden) | ✅ | Jeder Ring trägt zusätzlich das Symbol seiner Farbe — Kreis, Dreieck, Quadrat, Stern, Raute, Herz, Blitz, Kreuz. Siehe (2). |
+| Anticipation ~ 900 ms: Laufen, 3 Stöße, Zittern — „Jenga-Sekunde" spürbar | ⏳ manuell | 810 ms, aufgeteilt wie in Art Direction §6. Ob es sich richtig anfühlt, ist Lukas Urteil. |
+| ColorRing ≤ 300 ms nach Explosions-Frame | ✅ | Der `DigDirector` setzt das Ring-Label auf `EXPLOSION.frameLabel + 120 ms`; `tests/unit/stage.test.ts` prüft die Zahl gegen die harte Grenze. |
+| Preload während LOBBY, Low-Effects bei Throttle 6× | ✅ | Board-Chunk und Atlanten laden in der Lobby. Low-Effects-Erkennung steht (Gerätedaten + Frame-Median); der Throttle-Test gehört auf echte Hardware. |
+
+**Zahlen:** 254 Unit-Tests · 18 E2E-Tests · 69 SVG-Assets in 2 Atlanten (je ≤ 2048 px) · Einstiegs-Chunk 24 KB gzip **ohne PixiJS**, Board-Chunk 117 KB lazy · 241 KB gzip gesamt (Budget 450).
+
+### Was dabei aufgefallen ist
+
+**(1) Die Welt aus der Art Direction geht nicht auf.** §6 sieht 1000 × 1000 vor, Feld zentriert, Platte 150 + 14 Abstand. Das belegt 806 Einheiten; für Digger-Bank und Deko bleiben 194 — ein Digger von 150 passt dort nicht. Verkleinert man das Feld, fallen die Platten auf einem 390-px-Gerät unter die geforderten 56 px, und das ist ein MUSS aus GDD §5. Die Welt ist jetzt **1000 × 1500**: Die Breite gehört dem Feld, die zusätzliche Höhe den Bänken; die Plattengrößen folgen rückwärts aus der Touch-Regel statt aus einer runden Zahl (→ **ADR-12**).
+
+**(2) Farbe allein trägt die wichtigste Information nicht.** Der Ring über dem Krater sagt, wer schuld ist — Design-Priorität 2. Acht Farben sind aber nicht deuteranopie-fest, und `temp.hot` ist derselbe Farbwert wie Spielerfarbe Rot. Jeder Ring trägt jetzt zusätzlich das Symbol seiner Farbe, und Temperatur-Icons bleiben Icons auf hellem Kreis: zwei Formensprachen, die auch nebeneinander auf derselben Platte auseinanderzuhalten sind.
+
+**(3) Ein Cache nach Signatur vergisst, was nicht in der Signatur steht.** Die Bühne lebt über Place, Dig und Result hinweg (ADR-6) — genau das ist der Punkt. Der Banner-Handler war beim Bauen festgeschrieben, also bekam der Dig-Screen den leeren Handler des Place-Screens, und die Explosion blieb stumm. Der Handler wird jetzt bei jedem Mount neu gesetzt. Das ist die typische Falle an wiederverwendeten Objekten: Was pro Screen gilt, darf nicht im Konstruktor stehen.
+
+**(4) Drei Anläufe, bis der Test-Seed wirklich aus dem Deploy-Build verschwand.** Alle drei Fallstricke lagen beim Bundler, nicht im Verhalten: Bracket-Notation wird nicht ersetzt (schon in A1 gefunden), ein Default-Parameter lässt den Wert durch eine Variable laufen, und auch ein Funktionsaufruf im `if` wird nicht zuverlässig inlined. Erst eine Modul-Konstante löst sich zu `false` auf und nimmt den Zweig mit. Der CI-Guard aus A1 hat jeden dieser Anläufe gefangen — er ist der einzige Test, der das überhaupt zeigen kann.
+
+**(5) Der Preview-Server war stundenlang der falsche.** Auf Port 4173 lief der Server eines Schwesterprojekts; die E2E-Tests bekamen dessen Seite ausgeliefert und scheiterten an Meldungen, die mit diesem Projekt nichts zu tun hatten. Sprengmeister hat jetzt einen eigenen Port (4183). Drei Spiele auf einem Rechner brauchen drei Ports.
+
+**(6) Das Feld ist ein Canvas — Tests brauchen ein Fenster hinein.** `src/game/testBridge.ts` legt lesend offen, was ohnehin auf dem Bildschirm steht: Plattenzustand, Ringfarben, Draw-Calls, Sperre. Bewusst **nicht** offengelegt: ungeöffnete Minen und die Kistenposition (ADR-2). Die Brücke existiert nur im Dev- und E2E-Build; CI prüft das am Bundle.
+
+### Abweichungen von der Planung
+
+- **`STAGE.worldSize` ist jetzt Breite, `STAGE.worldHeight` die Höhe** (1000 × 1500). Art Direction §6 nennt noch 1000 × 1000 und feste Plattengrößen — beides ist überholt (ADR-12).
+- **Der lazy Board-Chunk** war für M5.5 geplant und ist schon jetzt da: PixiJS und GSAP hängen an einem dynamischen Import, der Einstiegs-Chunk bleibt bei 24 KB gzip. Wer nur die Regeln liest, lädt den Renderer nie.
+- **`assets-src/svg/board/symbols/` dupliziert die acht Farb-Symbole** aus `diggers/symbols/`. Ein dritter Atlas nur für acht winzige Sprites wäre ein Draw-Batch mehr gewesen.
+- **Die Sequenzen sind Platzhalter** (`basic_*` je Ergebnisart) — die acht Hit-Sequenzen sind M4. Der `DigDirector` hat den Ablauf drumherum bereits vollständig: Kamera, Anticipation, Aufdecken, Ring, Banner, Rückweg.
+
+**Offene SOLL-Follow-ups:** keine.
+
+**Manuelle Checks für Luka vor M3:**
+
+- [ ] **Die Jenga-Sekunde beurteilen** — der Digger läuft hin, drei Schaufelstöße, dann zittert die Platte. Fühlt sich das nach „gleich passiert etwas" an, oder ist es zu kurz? Das ist Design-Priorität 1 und die einzige Frage, die kein Test beantwortet.
+- [ ] **Look-Check** (`docs/screens/m2-*.png`) gegen Art Direction §1/§4.1/§5/§6.
+- [ ] **Auf echtem Gerät messen**: 6 × 6 mit 8 Spielern, 60 fps auf iPhone 11 / Pixel 4a. Das Dev-Panel zeigt p50 und Draw-Calls (`?dev=1`).
+- [ ] **Entscheiden, ob der Digger richtig steht** — er wartet unter der Platte und schaut hinauf. Verdeckt er zu viel, oder fehlt ihm der Bezug zur Platte?
+- [ ] Weiterhin offen aus A0/A1: **Repo pushen**, Pages auf „GitHub Actions" stellen, **PWA auf echtem Gerät installieren**, **eine Runde zu viert spielen**.
 
 ## Audit A1 — 2026-09-04
 

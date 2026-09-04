@@ -102,12 +102,12 @@ jobs:
           fi
           echo "✓ src/core/ nutzt ausschliesslich core/rng.ts"
 
-      # `.board` ist die schaerfste der drei Regeln: Wer das Board nicht anfassen kann,
-      # kommt an `mines` gar nicht heran. Ein blosses `.treasure` bleibt erlaubt —
-      # `ReplayCell.treasure` stammt aus `replayView()` und darf gelesen werden.
+      # `context.board` ist der einzige Weg zum privaten Board — wer ihn nicht gehen
+      # kann, kommt an `mines` gar nicht heran. Bewusst erlaubt bleiben `.treasure`
+      # (ReplayCell, kommt aus replayView) und `.board` (die PIXI-Buehne).
       - name: Kein Screen sieht das private Board
         run: |
-          if grep -rn --include='*.ts' -E '\.board\b|[Bb]oard\.(mines|treasure)\b|\{ *(mines|treasure) *[,}]' \
+          if grep -rn --include='*.ts' -E 'context\.board\b|[Bb]oard\.(mines|treasure)\b|\{ *(mines|treasure) *[,}]' \
                src/ui src/game 2>/dev/null \
              | grep -vE ':[0-9]+:[[:space:]]*(\*|//|/\*)'; then
             echo "::error::Screens duerfen nur fsm.view() / placeViewFor() / replay() sehen (ADR-2)."

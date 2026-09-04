@@ -64,13 +64,20 @@ export default tseslint.config(
         'error',
         {
           /*
-           * Das private Board ist gar nicht erst erreichbar. Wer `fsm.context.board`
-           * nicht anfassen kann, kann auch `board.mines` nicht lesen — die Regel greift
-           * damit eine Ebene frueher als das eigentliche Verbot und laesst
-           * `replayCell.treasure` in Ruhe, das aus `replayView()` stammt und
-           * oeffentlich sein darf.
+           * `context.board` ist der **einzige** Weg zum privaten Board — wer ihn nicht
+           * gehen kann, kommt an `mines` gar nicht heran. Die Regel greift damit eine
+           * Ebene frueher als das eigentliche Verbot.
+           *
+           * Bewusst eng gefasst auf `context`: `stage.board` ist die PIXI-Buehne und
+           * `replayCell.treasure` stammt aus `replayView()` — beides ist oeffentlich und
+           * soll nicht mitgefangen werden.
            */
-          selector: "MemberExpression[property.name='board']",
+          selector: "MemberExpression[object.property.name='context'][property.name='board']",
+          message:
+            'Das private Board bleibt im Store — nutze fsm.view(), fsm.placeViewFor() oder fsm.replay() (CLAUDE.md, ADR-2).',
+        },
+        {
+          selector: "MemberExpression[object.name='context'][property.name='board']",
           message:
             'Das private Board bleibt im Store — nutze fsm.view(), fsm.placeViewFor() oder fsm.replay() (CLAUDE.md, ADR-2).',
         },
