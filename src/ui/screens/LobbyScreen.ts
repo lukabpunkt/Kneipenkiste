@@ -10,6 +10,7 @@ import { INTERROGATION_PRESETS, MAX_PLAYERS, MIN_PLAYERS, PACK_TIMER_PRESETS } f
 import type { GameModeId, InterrogationSec, PackTimerSec } from '@/config/rules';
 import { GAME_MODES } from '@/config/rules';
 import { t } from '@/core/i18n';
+import { preloadStage } from '../stageHost';
 import { createBadge } from '../components/badge';
 import { ICON_HOME, createButton, createIconButton, symbolSvg } from '../components/button';
 import type { ScreenContext, ScreenInstance } from '../router';
@@ -220,7 +221,13 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
 
   renderAll();
 
-  return { el };
+  return {
+    el,
+    activate() {
+      /* Die Halle laedt waehrend der Lobby nach — bis zum Verhoer ist sie da. */
+      preloadStage();
+    },
+  };
 }
 
 interface PickerOption {

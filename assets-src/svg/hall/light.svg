@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ampel an der Schranke: rot, gelb, gruen. Gelb bleibt beim Schmuggler-Stall stehen. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 116" width="48" height="116">
+  <rect x="4" y="4" width="40" height="108" rx="12" fill="#4A506A" stroke="#1A1024" stroke-width="7"/>
+  <circle cx="24" cy="28" r="11" fill="#FF2D55"/>
+  <circle cx="24" cy="58" r="11" fill="#FFB800"/>
+  <circle cx="24" cy="88" r="11" fill="#2ED573"/>
+</svg>

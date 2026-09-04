@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Die Schranke: Drehkreuz mit Pfosten. Hier passieren die nicht geoeffneten Koffer. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200" width="160" height="200">
+  <rect x="16" y="40" width="26" height="150" rx="10" fill="#8C93A8" stroke="#1A1024" stroke-width="8"/>
+  <rect x="118" y="40" width="26" height="150" rx="10" fill="#8C93A8" stroke="#1A1024" stroke-width="8"/>
+  <g stroke="#1A1024" stroke-width="8" stroke-linecap="round">
+    <path d="M42 96 H118" />
+    <path d="M42 130 H118" />
+  </g>
+  <rect x="42" y="88" width="76" height="16" rx="8" fill="#FFB800" stroke="#1A1024" stroke-width="7"/>
+  <rect x="42" y="122" width="76" height="16" rx="8" fill="#FFB800" stroke="#1A1024" stroke-width="7"/>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Uniformjacke: grau-blau mit Epauletten. Torso-Overlay, deshalb feste Farbe. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 112" width="96" height="112">
+  <path d="M48 8 C66 8 76 20 78 38 C80 54 84 70 84 82 C84 99 68 105 48 105 C28 105 12 99 12 82 C12 70 16 54 18 38 C20 20 30 8 48 8 Z"
+        fill="#4A506A" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M48 10 V104" stroke="#1A1024" stroke-width="5"/>
+  <circle cx="38" cy="46" r="4" fill="#FFB800"/>
+  <circle cx="38" cy="66" r="4" fill="#FFB800"/>
+  <circle cx="38" cy="86" r="4" fill="#FFB800"/>
+  <rect x="14" y="24" width="20" height="9" rx="4" fill="#8C93A8" stroke="#1A1024" stroke-width="5"/>
+  <rect x="62" y="24" width="20" height="9" rx="4" fill="#8C93A8" stroke="#1A1024" stroke-width="5"/>
+</svg>

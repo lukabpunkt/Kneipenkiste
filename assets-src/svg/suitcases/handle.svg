@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Griff oben. Bleibt immer ink, damit er sich von jeder Spielerfarbe abhebt. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 28" width="64" height="28">
+  <path d="M10 26 L10 16 A22 22 0 0 1 54 16 L54 26" fill="none" stroke="#1A1024" stroke-width="9" stroke-linecap="round"/>
+</svg>

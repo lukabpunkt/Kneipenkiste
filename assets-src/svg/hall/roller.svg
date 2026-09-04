@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Eine Bandrolle. Dreht sich, solange das Band laeuft. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <circle cx="20" cy="20" r="16" fill="#8C93A8" stroke="#1A1024" stroke-width="6"/>
+  <path d="M20 6 V34 M6 20 H34" stroke="#4A506A" stroke-width="5"/>
+</svg>

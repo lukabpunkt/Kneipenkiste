@@ -98,7 +98,9 @@
     "dogBark": "Waldi bellt.",
     "dogQuiet": "Waldi geht weiter.",
     "officerNote": "Beamter",
-    "hintsRunning": "Das Gepäck rollt ein …"
+    "hintsRunning": "Das Gepäck rollt ein …",
+    "stageDescription": "Zollhalle mit {count} Koffern auf dem Förderband.",
+    "stageFailed": "Die Halle konnte nicht geladen werden."
   },
   "hints": {
     "wobble": "wackelte",

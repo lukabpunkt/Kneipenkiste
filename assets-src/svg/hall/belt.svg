@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Foerderband: Gummi mit Querrippen, Stahlrahmen. Kachelbar in X. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 72" width="200" height="72">
+  <rect y="8" width="200" height="46" fill="#2E2B3F"/>
+  <g stroke="#45415C" stroke-width="5">
+    <path d="M20 8 V54 M60 8 V54 M100 8 V54 M140 8 V54 M180 8 V54"/>
+  </g>
+  <rect y="0" width="200" height="10" rx="5" fill="#8C93A8" stroke="#1A1024" stroke-width="5"/>
+  <rect y="52" width="200" height="12" rx="6" fill="#8C93A8" stroke="#1A1024" stroke-width="5"/>
+</svg>

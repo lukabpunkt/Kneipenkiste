@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gesicht "too_wide_smile" — das verdaechtig breite Grinsen. Zu viele Zaehne, zu wenig Grund. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <ellipse cx="27" cy="24" rx="13" ry="15" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <ellipse cx="69" cy="24" rx="13" ry="15" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <circle cx="29" cy="27" r="6" fill="#1A1024"/>
+  <circle cx="71" cy="27" r="6" fill="#1A1024"/>
+  <path d="M26 46 Q48 66 70 46 Z" fill="#FFFFFF" stroke="#1A1024" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M37 49 V56 M48 50 V59 M59 49 V56" stroke="#1A1024" stroke-width="3"/>
+</svg>

@@ -39,6 +39,9 @@ import { createTitleScreen } from '@/ui/screens/TitleScreen';
 /** Screens, bei denen das Handy in der Mitte liegt und nicht dunkel werden darf. */
 const PUBLIC_STATES: readonly GameState[] = ['HALL', 'INSPECT', 'GATE', 'DISTRIBUTE'];
 
+/** In diesen States steht die PIXI-Buehne; ausserhalb wird sie abgeraeumt. */
+const STAGE_STATES: readonly GameState[] = ['HALL', 'INSPECT', 'GATE'];
+
 export interface App {
   session: SessionController;
   destroy(): void;
@@ -133,6 +136,15 @@ export function createApp(host: HTMLElement): App {
 
     if (PUBLIC_STATES.includes(transition.to)) void acquireWakeLock();
     else void releaseWakeLock();
+
+    /*
+     * Die Buehne lebt nur waehrend Hall/Inspect/Gate. Sie beim Verlassen abzuraeumen ist
+     * kein Aufraeumen aus Ordnungsliebe: Ein PIXI-Ticker, der im Result weiterlaeuft,
+     * kostet auf einem Handy spuerbar Akku.
+     */
+    if (!STAGE_STATES.includes(transition.to)) {
+      void import('@/game').then((game) => game.disposeStage());
+    }
 
     /* Selbstuebergaenge (INSPECT → INSPECT) tauschen keinen Screen. */
     if (transition.from === transition.to) return;

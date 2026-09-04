@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Die gelbe Linie. Dahinter warten die Reisenden. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 24" width="400" height="24">
+  <rect y="6" width="400" height="12" fill="#FFB800"/>
+  <rect y="6" width="400" height="3" fill="#D18E00"/>
+</svg>

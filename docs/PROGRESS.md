@@ -4,7 +4,7 @@
 |---|---|---|---|
 | M0 Setup & Regelkern | ✅ fertig (⏳ 3 manuelle Checks offen) | `v0.0.1` | A0 bestanden |
 | M1 UI-Flow (DOM-Halle) | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.1.0` | A1 bestanden |
-| M2 PIXI-Halle, Koffer, Charaktere | ⬜ offen | – | – |
+| M2 PIXI-Halle, Koffer, Charaktere | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.2.0` | A2 bestanden |
 | M3 Hinweise, Schranke, Audio | ⬜ offen | – | – |
 | M4 Röntgen-Sequenzen | ⬜ offen | – | – |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
@@ -92,3 +92,47 @@ JS 77,2 KB → **24,8 KB gzip**, CSS 24,6 KB → 5,6 KB gzip (Budget 450 KB JS).
 **Manuelle Checks für Luka vor M2:**
 - [ ] Eine Runde zu fünft auf einem echten Handy spielen: Versteht der Tisch die Screens ohne Erklärung? Ist klar, dass nur der Beamte tippt?
 - [ ] Ist das Verhör mit 45 s zu lang oder zu kurz? (Wert steht in `rules.ts`, Änderung braucht nur einen ADR.)
+
+## Audit A2 — 2026-09-05
+
+**Ergebnis:** BESTANDEN (alle automatisierbaren MUSS-Checks grün; 2 Checks brauchen Lukas Auge bzw. Gerät)
+
+| Check | Status | Notiz |
+|---|---|---|
+| 8 Spieler, HALL: p50 ≤ 16.7 ms, p95 ≤ 33 ms | ✅ | Gemessen: **p50 16.7 ms** (vsync-gelockte 60 fps), **p95 18.6 ms** über 240 Frames. Der Test erkennt Software-Rendering und bewertet Frame-Zeiten dann nicht — sonst misst er SwiftShader statt das Spiel. |
+| Draw-Batches ≤ 3 | ✅ | **3** echte WebGL-Draw-Calls, gezählt über umschlossene `drawElements`/`drawArrays`. Ein Batch je sichtbarer Atlas. |
+| Heap flach über 30 s | ✅ | 10.0 MB → 10.0 MB. |
+| Bloom nur während des Scans | ✅ | `XrayMonitor.scan()` setzt den Blur beim Start und `filters = []` im `onComplete`. |
+| Tap-Zuverlässigkeit: 50 Taps → 50 korrekte `suitcaseTap` | ✅ | 50 von 50, in der richtigen Reihenfolge. Gemessen wird der Hit-Test: Die Sonde trennt dafür die Bühne vom Screen, weil im Spiel schon der erste Tap das Board sperrt und k höchstens drei Öffnungen zulässt. |
+| DOM-HUD blockiert keine Koffer-Taps | ✅ | Eigener Test: Alle Koffer liegen innerhalb des HUD-Rechtecks, jeder Tap kommt trotzdem an (`pointer-events: none` auf dem HUD, `auto` nur auf Bedienelementen). |
+| Canvas-Umhängen Hall → Inspect → Gate ohne Neuinitialisierung | ✅ | Der Aufbau-Zähler bleibt über alle drei Screens bei **1** (ADR-6). |
+| Scan-Ergebnis erst ab 100 %; Stall bei 50 % | ✅ | Label-Test `revealed ≥ scanComplete` plus die Prüfung, dass der Stall wirklich in der Mitte liegt. Im E2E steht während des ganzen Scans nur „Röntgen läuft …". Screenshot `docs/screens/m2-xray-scanning.png`. |
+| Alle 8 Farben als Koffer + Anhänger unterscheidbar | ✅ | Jede Farbe trägt ihr eigenes Symbol auf Anhänger und Torso (`symbolSvg`), acht verschiedene Formen — die Unterscheidung hängt nicht an der Farbe. Screenshot `docs/screens/m2-hall-8.png`. |
+| Layout 3–7 Koffer ohne Überlappung | ✅ | `layoutSuitcases` ist reine Geometrie und ohne Renderer testbar: Trefferflächen ≥ 56 px **und** garantiert überlappungsfrei, für 1 bis 7 Koffer, gerechnet für das schmalste Referenzgerät. |
+| Koffer-Tippfläche ≥ 56 px | ✅ | Im Browser gemessen, engster Fall (7 Koffer). Führte zu ADR-13. |
+| Preload während der Lobby | ✅ | `preloadStage()` in `LobbyScreen.activate()`; Einstiegs-Chunk 26 KB gzip, Hall-Chunk 149 KB lädt im Hintergrund (ADR-14). |
+| Low-Effects | ✅ | `detectLowEffects()` (Speicher/Kerne) plus die Einstellung; schaltet Bloom, Atmen und Blinzeln ab. |
+| Look-Check gegen Art Direction §1/§4/§5/§6 | ⏳ manuell | Screenshots liegen in `docs/screens/m2-*.png`. |
+| Deuteranopie-Simulation | ⏳ manuell | Symbole sind da und unterscheidbar; die Simulation selbst braucht Lukas Auge. |
+
+### Was gebaut wurde
+- **98 SVGs**, sechs Atlanten (@1x/@2x, größter 2048×1024): Shotling-Rig aus Drinkshot plus 11 Zoll-Gesichter, Reisenden-Zubehör (Sonnenhut, Kamera, Hawaiihemd), Beamter (Mütze, Jacke, Klemmbrett, Pfeife, Schnurrbart), Waldi, Koffer, Halle, 8 Schmuggelware-Sets mit Gesichtern, saubere und peinliche Ware, 14 Röntgen-Silhouetten.
+- **Rendering:** `HallApp` (Singleton, Canvas-Umhängen, eine Uhr, Draw-Call-Zähler), `Hall`, `Suitcase`, `XrayMonitor`, `Shotling`/`Traveler`/`Officer`, `Waldi`, `Camera`, `HallView` mit fünf Modi.
+- **Directors** in der M2-Fassung: `HintDirector` (Einrollen, Hinweis-Bewegung, Waldi), `InspectDirector` (Fahrt ins Gerät, Scan, Reaktion vor Konsequenz, Banner), `GateDirector` (Stall, Stempel-Reaktionen).
+
+### Was gefunden und behoben wurde
+Sechs Fehler, alle erst am Bild sichtbar:
+1. **Sieben Tippflächen à 56 px passen nicht in eine Reihe** (gemessen: 26 px). Führte zu ADR-13.
+2. **Die Dev-Sonde merkte sich den ersten Canvas-Host** — nach dem Screenwechsel lieferte sie (0, 0), und kein Tap traf.
+3. **Ein weißes Band unter dem Hallenboden**, weil die Welt den Host nicht ganz füllt. Wand und Boden zeichnen jetzt über die Welt hinaus.
+4. **Die Sprechblase war unsichtbar** (paper auf paper), seit der Screen seinen Text hell färbt.
+5. **Die Kamera hielt den Zielpunkt fest, statt ihn zu zentrieren** — der Röntgenmonitor hing halb aus dem Bild (ADR-15).
+6. **Die Gepäckanhänger waren abgeschnitten** und lagen unter den Hinweis-Icons; jetzt kürzen lange Namen auf ein Kürzel, und die Icons sitzen über dem Koffer.
+
+**Offene SOLL-Follow-ups:** keine.
+
+**Manuelle Checks für Luka vor M3:**
+- [ ] Look-Check: Sieht die Halle nach Art Direction §1 aus („Cartoon der 60er, ein Farbklecks: der Röntgenmonitor")? Screenshots in `docs/screens/m2-*.png`.
+- [ ] Deuteranopie-Simulation über `m2-hall-8.png`: Sind alle acht Koffer unterscheidbar?
+
+**Hinweis zur Testumgebung:** Auf diesem Rechner (8 GB, parallel laufende VM) beendet macOS den Preview-Server während langer E2E-Läufe per SIGKILL. Die Suiten laufen deshalb lokal in Blöcken; in der CI mit mehr Speicher läuft `npm run test:e2e` in einem Stück.

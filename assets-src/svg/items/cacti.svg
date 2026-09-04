@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kaktus im Topf. Zwei Arme, ein Grinsen. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 96" width="72" height="96">
+  <rect x="24" y="18" width="24" height="56" rx="12" fill="#2ED573" stroke="#1A1024" stroke-width="6"/>
+  <path d="M24 40 H14 A8 8 0 0 0 6 48 V58" fill="none" stroke="#2ED573" stroke-width="12" stroke-linecap="round"/>
+  <path d="M48 34 H58 A8 8 0 0 1 66 42 V52" fill="none" stroke="#2ED573" stroke-width="12" stroke-linecap="round"/>
+  <path d="M14 74 H58 L54 92 H18 Z" fill="#FF7F50" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="31" cy="36" r="3" fill="#1A1024"/>
+  <circle cx="41" cy="36" r="3" fill="#1A1024"/>
+  <path d="M30 48 Q36 54 42 48" fill="none" stroke="#1A1024" stroke-width="4" stroke-linecap="round"/>
+</svg>

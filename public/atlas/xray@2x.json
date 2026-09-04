@@ -1,0 +1,351 @@
+{
+  "frames": {
+    "cuckoo": {
+      "frame": {
+        "x": 3,
+        "y": 3,
+        "w": 128,
+        "h": 184
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 8,
+        "w": 128,
+        "h": 184
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "flamingos": {
+      "frame": {
+        "x": 3,
+        "y": 193,
+        "w": 112,
+        "h": 182
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 6,
+        "w": 112,
+        "h": 182
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "pineapples": {
+      "frame": {
+        "x": 3,
+        "y": 381,
+        "w": 104,
+        "h": 180
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 4,
+        "w": 104,
+        "h": 180
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "gnomes": {
+      "frame": {
+        "x": 3,
+        "y": 567,
+        "w": 88,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 20,
+        "y": 8,
+        "w": 88,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 176
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "pass": {
+      "frame": {
+        "x": 3,
+        "y": 733,
+        "w": 104,
+        "h": 152
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 12,
+        "w": 104,
+        "h": 152
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 176
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "cacti": {
+      "frame": {
+        "x": 97,
+        "y": 567,
+        "w": 144,
+        "h": 148
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 36,
+        "w": 144,
+        "h": 148
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "teddy": {
+      "frame": {
+        "x": 113,
+        "y": 381,
+        "w": 120,
+        "h": 140
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 12,
+        "w": 120,
+        "h": 140
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 160
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "toothbrush": {
+      "frame": {
+        "x": 113,
+        "y": 527,
+        "w": 144,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 8,
+        "w": 144,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "duck_bow": {
+      "frame": {
+        "x": 121,
+        "y": 193,
+        "w": 146,
+        "h": 126
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 24,
+        "w": 146,
+        "h": 126
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 160
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "ducks": {
+      "frame": {
+        "x": 137,
+        "y": 3,
+        "w": 146,
+        "h": 122
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 16,
+        "w": 146,
+        "h": 122
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 144
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "sombreros": {
+      "frame": {
+        "x": 239,
+        "y": 325,
+        "w": 176,
+        "h": 108
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 12,
+        "w": 176,
+        "h": 108
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "cheese": {
+      "frame": {
+        "x": 239,
+        "y": 439,
+        "w": 128,
+        "h": 80
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 24,
+        "w": 128,
+        "h": 80
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "mug": {
+      "frame": {
+        "x": 273,
+        "y": 131,
+        "w": 110,
+        "h": 92
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 20,
+        "w": 110,
+        "h": 92
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "socks": {
+      "frame": {
+        "x": 289,
+        "y": 3,
+        "w": 87,
+        "h": 92
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 28,
+        "y": 12,
+        "w": 87,
+        "h": 92
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 112
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "app": "http://github.com/odrick/free-tex-packer-core",
+    "version": "0.3.9",
+    "image": "xray@2x.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 512,
+      "h": 1024
+    },
+    "scale": 2
+  }
+}

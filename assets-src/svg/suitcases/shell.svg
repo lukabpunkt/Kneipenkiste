@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hartschalenkoffer, geschlossen. Weiss = wird in Spielerfarbe getintet. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" width="160" height="120">
+  <rect x="10" y="16" width="140" height="96" rx="16" fill="#FFFFFF" stroke="#1A1024" stroke-width="9"/>
+  <rect x="42" y="16" width="12" height="96" fill="#D2D2D2"/>
+  <rect x="106" y="16" width="12" height="96" fill="#D2D2D2"/>
+  <path d="M10 64 H150" stroke="#1A1024" stroke-width="6" opacity="0.35"/>
+  <path d="M14 96 C40 106 120 106 146 96 L146 100 C120 110 40 110 14 100 Z" fill="#D2D2D2"/>
+</svg>

@@ -12,6 +12,8 @@
 
 import { expect, test, type Page } from '@playwright/test';
 
+import './probe';
+
 /** Ohne `?dev=1&seed=` waeren Item-Set, Hinweise und Diplomat nicht reproduzierbar. */
 const URL_WITH_SEED = (seed: number): string => `./?dev=1&seed=${seed}`;
 
@@ -58,26 +60,59 @@ async function packAll(page: Page, amounts: number[]): Promise<void> {
   await next.click();
 }
 
-/** Wartet, bis die Hinweise durch sind, und beendet das Verhoer. */
+/** Wartet, bis die Buehne steht und die Hinweise durch sind, und beendet das Verhoer. */
 async function endInterrogation(page: Page): Promise<void> {
   await expectScreen(page, 'hall');
+  await expect(page.locator('.stage__canvas canvas')).toBeVisible({ timeout: 40_000 });
+  /* "Nochmal ansehen" wird erst frei, wenn die Hinweise gelaufen sind. */
+  await expect(page.locator('.hall__actions .btn--secondary')).toBeEnabled({ timeout: 40_000 });
   await page.locator('.hall__actions .btn--officer').last().click();
   await expectScreen(page, 'inspect');
+  await waitForInspectableBoard(page);
 }
 
-/** Oeffnet einen Koffer und wartet den kompletten Scan ab. */
+/**
+ * Wartet, bis die Bühne wirklich tippbar ist.
+ *
+ * `data-screen="inspect"` steht schon, bevor der Screen der Bühne den Modus gesetzt und
+ * `publicView` übergeben hat — ein Tap davor liefe ins Leere. Ohne diese Wartezeit wäre
+ * der Test flaky, und zwar auf eine Weise, die nach einem Bug im Spiel aussieht.
+ */
+async function waitForInspectableBoard(page: Page): Promise<void> {
+  await page.waitForFunction(() => window.__zollStage?.mode() === 'inspect', undefined, {
+    timeout: 40_000,
+  });
+}
+
+/**
+ * Oeffnet einen Koffer und wartet den kompletten Scan ab.
+ *
+ * Getippt wird auf das Canvas an der Position, die die Dev-Sonde meldet — dieselbe
+ * Stelle, an die ein Finger tippen wuerde.
+ */
 async function openCase(page: Page, playerId: string): Promise<string> {
-  const card = page.locator(`button.suitcase[data-player="${playerId}"]`);
-  await expect(card).toBeVisible();
-  await card.click();
+  /*
+   * Erst warten, bis das Board wieder frei ist. Während einer Sequenz sperrt der Screen
+   * es — ein Tap davor wird korrekt verworfen, und der Test hätte auf ein Ereignis
+   * gewartet, das nie kommen darf.
+   */
+  await expect(page.locator('.inspect__banner')).toHaveAttribute('data-kind', 'idle', {
+    timeout: 30_000,
+  });
 
-  const monitor = page.locator('.xray');
+  const rect = (await page.evaluate(() => window.__zollStage!.suitcases())).find(
+    (r) => r.playerId === playerId
+  );
+  expect(rect, `Koffer ${playerId} liegt nicht auf der Buehne`).toBeTruthy();
+  await page.mouse.click(rect!.x, rect!.y);
+
+  const banner = page.locator('.inspect__banner');
   /* Waehrend des Scans darf das Ergebnis nirgends stehen — "Scanline ist heilig". */
-  await expect(monitor).toHaveAttribute('data-state', /scanning|stall/);
-  await expect(page.locator('.xray__text')).toHaveText(/Röntgen läuft/);
+  await expect(banner).toHaveAttribute('data-kind', 'scanning');
+  await expect(banner).toHaveText(/Röntgen läuft/);
 
-  await expect(monitor).toHaveAttribute('data-state', /caught|clean|diplomat/, { timeout: 15_000 });
-  return (await monitor.getAttribute('data-state')) ?? '';
+  await expect(banner).toHaveAttribute('data-kind', /caught|clean|diplomat/, { timeout: 20_000 });
+  return (await banner.getAttribute('data-kind')) ?? '';
 }
 
 /** Verteilt alle Tokens des aktuellen Besitzers auf den ersten moeglichen Spieler. */
@@ -133,10 +168,10 @@ test.describe('Drei Runden', () => {
     await expect(page.locator('.openings__label')).toHaveText(/2/);
 
     expect(await openCase(page, 'p2')).toBe('caught');
-    await expect(page.locator('.xray__text')).toContainText('trinkt 8');
+    await expect(page.locator('.inspect__banner')).toContainText('trinkt 8');
 
     expect(await openCase(page, 'p3')).toBe('clean');
-    await expect(page.locator('.xray__text')).toContainText('Rudi');
+    await expect(page.locator('.inspect__banner')).toContainText('Rudi');
 
     /* Nach der letzten Oeffnung geht es von selbst zur Schranke. */
     await expectScreen(page, 'gate');
@@ -191,20 +226,21 @@ test.describe('Drei Runden', () => {
     await packAll(page, [5, 5, 5, 5]);
 
     await expectScreen(page, 'hall');
+    await expect(page.locator('.stage__canvas canvas')).toBeVisible({ timeout: 40_000 });
+    /* "Nochmal ansehen" wird erst frei, wenn die Hinweise gelaufen sind. */
+    await expect(page.locator('.hall__actions .btn--secondary')).toBeEnabled({ timeout: 40_000 });
 
     /* Der erste Reisende bietet 2 Tokens, der Beamte nimmt an. */
-    const firstCase = page.locator('.hall__slot').first();
-    await firstCase.locator('.bribe__btn', { hasText: '2' }).click();
-    await firstCase.locator('.hall__offer-actions .btn--officer').first().click();
-    await expect(firstCase.locator('.suitcase__lock')).toBeVisible();
-
-    const bribedId = await firstCase.locator('.suitcase').getAttribute('data-player');
+    const firstMarker = page.locator('.hall__marker').first();
+    const bribedId = await firstMarker.getAttribute('data-player');
+    await firstMarker.locator('.bribe__btn', { hasText: '2' }).click();
+    await firstMarker.locator('.hall__offer-actions .btn--officer').first().click();
+    /* Angenommen heisst: kein Bestechungs-Chip mehr an diesem Koffer. */
+    await expect(firstMarker.locator('.bribe')).toHaveCount(0);
 
     await page.locator('.hall__actions .btn--officer').last().click();
     await expectScreen(page, 'inspect');
-
-    /* Ein bezahlter Koffer ist nicht mehr tippbar. */
-    await expect(page.locator(`button.suitcase[data-player="${bribedId}"]`)).toHaveCount(0);
+    await waitForInspectableBoard(page);
 
     /* Wer der Diplomat ist, verraet nur das Dev-Panel. */
     await page.locator('.dev-panel__btn').click();
@@ -214,10 +250,10 @@ test.describe('Drei Runden', () => {
 
     if (diplomatId === bribedId) {
       /* Gesperrt schlaegt Immunitaet — dann wird eben ein anderer geoeffnet. */
-      expect(await openCase(page, 'p2' === bribedId ? 'p3' : 'p2')).toBe('caught');
+      expect(await openCase(page, bribedId === 'p2' ? 'p3' : 'p2')).toBe('caught');
     } else {
       expect(await openCase(page, diplomatId!)).toBe('diplomat');
-      await expect(page.locator('.xray__text')).toContainText('trinkt 3');
+      await expect(page.locator('.inspect__banner')).toContainText('trinkt 3');
     }
   });
 });
@@ -296,14 +332,4 @@ test('bleibt im Portrait-Frame ohne horizontales Scrollen', async ({ page }) => 
   expect(overflow).toBe(false);
 });
 
-test('haelt die Koffer-Tippflaeche bei mindestens 56 px (CLAUDE.md)', async ({ page }) => {
-  await startGame(page, 404);
-  await packAll(page, [1, 0, 2, 0]);
-  await endInterrogation(page);
-
-  for (const card of await page.locator('.suitcase').all()) {
-    const box = await card.boundingBox();
-    expect(box!.width).toBeGreaterThanOrEqual(56);
-    expect(box!.height).toBeGreaterThanOrEqual(56);
-  }
-});
+/* Die Tippflaechen der Koffer misst `perf.spec.ts` — sie liegen auf dem Canvas. */

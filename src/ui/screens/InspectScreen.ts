@@ -1,24 +1,27 @@
 /**
  * Kontrolle (GDD §5, Screen 7) — der Röntgen-Moment (Design-Pfeiler 4).
  *
- * Der Beamte tippt bis zu k Koffer an. M1 ersetzt die Röntgen-Sequenz durch einen
- * Text-Reveal — aber **die Regel bleibt**: Waehrend des Scans steht dort "Röntgen läuft",
- * das Ergebnis erscheint erst danach. Wer hier das Ergebnis frueher zeigt, nimmt dem
- * Spiel seinen besten Moment, egal ob als Text oder als Scanline (Art Direction §7).
+ * Der Beamte tippt einen Koffer an, der fährt ins Gerät, und der Monitor baut sein Bild
+ * zeilenweise auf. **Das Ergebnis erscheint nie vor 100 %** — durchgesetzt wird das im
+ * `XrayMonitor` über eine wachsende Maske, nicht hier. Dieser Screen darf das Banner
+ * deshalb erst setzen, wenn der Director ihm das Signal gibt.
+ *
+ * Getippt wird auf dem Canvas: Die Trefferflächen liegen in der Bühne (≥ 56 px), das HUD
+ * darüber ist durchlässig.
  */
 
-import { BANNER_MS } from '@/config/rules';
 import { XRAY } from '@/config/choreo';
+import { BANNER_MS } from '@/config/rules';
 import { t } from '@/core/i18n';
 import type { InspectResult, ItemSet, PlayerId } from '@/core/types';
 import { createBadge } from '../components/badge';
 import { createOfficerButton } from '../components/button';
 import { createOpeningsChip } from '../components/chips';
-import { createSuitcaseCard } from '../components/suitcaseCard';
 import { vibrate } from '../haptics';
+import { createStageHost } from '../stageHost';
 import type { ScreenContext, ScreenInstance } from '../router';
 
-/** Wie die Ware in dieser Runde heisst — pro Runde nur ein Set (ADR-5). */
+/** Wie die Ware in dieser Runde heißt — pro Runde nur ein Set (ADR-5). */
 export function itemSetName(itemSet: ItemSet, amount: number): string {
   return t(`items.${itemSet}`, { count: amount });
 }
@@ -37,21 +40,22 @@ export function createInspectScreen(ctx: ScreenContext): ScreenInstance {
   openings.className = 'inspect__openings';
 
   header.append(
-    createBadge({ name: ctx.session.nameOf(officerId), colorId: officerColor, small: true, note: t('hall.officerNote') }),
+    createBadge({
+      name: ctx.session.nameOf(officerId),
+      colorId: officerColor,
+      small: true,
+      note: t('hall.officerNote'),
+    }),
     openings
   );
 
-  /** Der Monitor: waehrend des Scans absichtlich nichtssagend. */
-  const monitor = document.createElement('div');
-  monitor.className = 'xray';
-  monitor.setAttribute('aria-live', 'polite');
+  const stageHost = createStageHost(ctx, ctx.view('INSPECT'));
 
-  const monitorText = document.createElement('p');
-  monitorText.className = 'xray__text';
-  monitor.append(monitorText);
-
-  const board = document.createElement('div');
-  board.className = 'inspect__board';
+  /** Die Aufforderung bzw. das Banner — im HUD, damit es über der Bühne steht. */
+  const banner = document.createElement('p');
+  banner.className = 'inspect__banner';
+  banner.setAttribute('aria-live', 'polite');
+  stageHost.hud.append(banner);
 
   const actions = document.createElement('div');
   actions.className = 'inspect__actions';
@@ -67,64 +71,40 @@ export function createInspectScreen(ctx: ScreenContext): ScreenInstance {
   });
 
   actions.append(waveAll);
-  el.append(header, monitor, board, actions);
+  el.append(header, stageHost.el, actions);
 
+  let stage: Awaited<ReturnType<typeof stageHost.ready>> | undefined;
   let busy = false;
 
-  function render(): void {
+  function renderChip(): void {
     const view = ctx.view('INSPECT');
-
     openings.replaceChildren(
       createOpeningsChip({ left: view.openingsLeft, max: view.maxOpenings, colorId: officerColor })
     );
-
-    board.replaceChildren();
-    for (const suitcase of view.suitcases) {
-      const done = view.openings.find((o) => o.suitcaseOf === suitcase.playerId);
-
-      board.append(
-        createSuitcaseCard({
-          playerId: suitcase.playerId,
-          name: ctx.session.nameOf(suitcase.playerId),
-          colorId: ctx.session.colorOf(suitcase.playerId),
-          hints: suitcase.hints,
-          sniffed: suitcase.sniffed,
-          locked: suitcase.locked,
-          opened: suitcase.opened,
-          ...(done ? { reveal: revealText(done, view.itemSet) } : {}),
-          ...(suitcase.inspectable && !busy ? { onTap: () => open(suitcase.playerId) } : {}),
-        })
-      );
+    if (!busy) {
+      banner.textContent = t('inspect.pickSuitcase');
+      banner.dataset.kind = 'idle';
     }
-
-    if (!busy) monitorText.textContent = t('inspect.pickSuitcase');
   }
 
-  /** Was das Roentgenbild am Ende zeigt — Menge inklusive, denn jetzt ist sie oeffentlich. */
-  function revealText(result: InspectResult, itemSet: ItemSet): string {
-    if (result.kind === 'clean') return t('inspect.revealClean');
-    if (result.kind === 'diplomat') return t('inspect.revealDiplomat');
-    return itemSetName(itemSet, result.amount);
-  }
-
-  /** Banner nach dem Scan: wer trinkt, wie viel. */
+  /** Was der Tisch nach dem Scan liest — jetzt ist die Menge öffentlich. */
   function bannerText(result: InspectResult): string {
     switch (result.kind) {
       case 'caught':
-        return t('inspect.bannerCaught', {
+        return `${itemSetName(ctx.view('INSPECT').itemSet, result.amount)} · ${t('inspect.bannerCaught', {
           name: ctx.session.nameOf(result.suitcaseOf),
           sips: result.drinkers[0]?.sips ?? 0,
-        });
+        })}`;
       case 'clean':
-        return t('inspect.bannerClean', {
+        return `${t('inspect.revealClean')} · ${t('inspect.bannerClean', {
           officer: ctx.session.nameOf(officerId),
           sips: result.drinkers[0]?.sips ?? 0,
-        });
+        })}`;
       case 'diplomat':
-        return t('inspect.bannerDiplomat', {
+        return `${t('inspect.revealDiplomat')} · ${t('inspect.bannerDiplomat', {
           officer: ctx.session.nameOf(officerId),
           sips: result.drinkers[0]?.sips ?? 0,
-        });
+        })}`;
     }
   }
 
@@ -135,7 +115,7 @@ export function createInspectScreen(ctx: ScreenContext): ScreenInstance {
     });
 
   async function open(suitcaseOf: PlayerId): Promise<void> {
-    if (busy) return;
+    if (busy || !stage) return;
     busy = true;
     waveAll.disabled = true;
 
@@ -145,53 +125,63 @@ export function createInspectScreen(ctx: ScreenContext): ScreenInstance {
       return;
     }
 
-    render();
-
-    /*
-     * Der Scan. Bis er durch ist, steht hier nichts als "Röntgen läuft" — der Stall
-     * bei 50 % ist in M1 nur eine Pause, aber er ist da, weil der Rhythmus stimmen muss.
-     */
-    monitor.dataset.state = 'scanning';
-    monitorText.textContent = t('inspect.scanning');
-    await wait((XRAY.travelIn + XRAY.powerUp) * 1000);
-    await wait(XRAY.scanDuration * XRAY.stallAt * 1000);
-
-    monitor.dataset.state = 'stall';
-    vibrate('scanStall');
-    await wait(XRAY.stallDuration * 1000);
-
-    monitor.dataset.state = 'scanning';
-    await wait(XRAY.scanDuration * (1 - XRAY.stallAt) * 1000);
-
-    /* Jetzt — und keinen Frame frueher — steht das Ergebnis da. */
     const result = ctx.fsm.context.pendingResult;
     if (!result) return;
 
-    monitor.dataset.state = result.kind;
-    monitorText.textContent = `${revealText(result, ctx.view('INSPECT').itemSet)} · ${bannerText(result)}`;
-    vibrate(result.kind === 'caught' ? 'alarm' : 'confirm');
-
-    render();
-    await wait(BANNER_MS);
+    renderChip();
+    banner.textContent = t('inspect.scanning');
+    banner.dataset.kind = 'scanning';
 
     /*
-     * Das Board wieder freigeben — und zwar **vor** dem `resultShown`. Bleibt eine
-     * Oeffnung uebrig, wechselt die FSM nicht den State und der Router baut den Screen
-     * nicht neu auf: Ohne dieses `render()` waere danach kein Koffer mehr tippbar.
+     * Der Director hält die Reihenfolge ein: Scan → Gesicht → Konsequenz → Banner.
+     * Der Screen wartet auf das Banner-Label, statt selbst zu timen — so bleiben Bühne
+     * und Text auch dann synchron, wenn sich die Choreografie ändert.
      */
+    const timeline = stage.inspect.play(result, ctx.view('INSPECT').itemSet);
+
+    await wait((XRAY.travelIn + XRAY.powerUp + XRAY.scanDuration + XRAY.stallDuration) * 1000);
+    vibrate(result.kind === 'caught' ? 'alarm' : 'confirm');
+
+    banner.textContent = bannerText(result);
+    banner.dataset.kind = result.kind;
+
+    await timeline;
+    await wait(BANNER_MS * 0.4);
+
     busy = false;
     waveAll.disabled = false;
-    render();
+    stage.view.applyView(ctx.view('INSPECT'));
+    renderChip();
     ctx.fsm.send({ type: 'resultShown' });
   }
 
-  render();
+  renderChip();
 
   return {
     el,
+
+    activate() {
+      void stageHost
+        .ready()
+        .then((ready) => {
+          stage = ready;
+          ready.view.setMode('inspect');
+          ready.view.applyView(ctx.view('INSPECT'));
+          ready.view.events.on('suitcaseTap', ({ suitcaseOf }) => void open(suitcaseOf));
+          renderChip();
+        })
+        .catch((error: unknown) => {
+          console.warn('[inspect] Bühne konnte nicht starten', error);
+          banner.textContent = t('hall.stageFailed');
+        });
+    },
+
     destroy() {
       for (const timer of timers) clearTimeout(timer);
       timers = [];
+      stage?.inspect.stop();
+      stage?.view.events.clear();
+      stageHost.release();
     },
   };
 }

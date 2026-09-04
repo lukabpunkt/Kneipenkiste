@@ -98,7 +98,9 @@
     "dogBark": "Waldi barks.",
     "dogQuiet": "Waldi moves on.",
     "officerNote": "Officer",
-    "hintsRunning": "The luggage rolls in …"
+    "hintsRunning": "The luggage rolls in …",
+    "stageDescription": "Customs hall with {count} cases on the belt.",
+    "stageFailed": "The hall could not be loaded."
   },
   "hints": {
     "wobble": "wobbled",

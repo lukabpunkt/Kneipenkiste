@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Eine der zwei Schnallen. Klicken beim Schliessen nacheinander. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 22" width="28" height="22">
+  <rect x="2" y="2" width="24" height="18" rx="4" fill="#8C93A8" stroke="#1A1024" stroke-width="5"/>
+  <path d="M9 11 H19" stroke="#1A1024" stroke-width="4" stroke-linecap="round"/>
+</svg>

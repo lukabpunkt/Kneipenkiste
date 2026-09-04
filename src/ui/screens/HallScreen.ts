@@ -1,29 +1,31 @@
 /**
  * Zollhalle (GDD §5, Screen 6) — **das Verhör ist das Spiel** (Design-Pfeiler 1).
  *
- * Das Handy liegt in der Mitte. Der Screen inszeniert nur: Hinweise laufen einmal ab,
- * hinterlassen ihr Icon, danach laeuft der Countdown und der Beamte fragt. Gelogen wird
- * am Tisch, nicht hier.
+ * Das Handy liegt in der Mitte. Die Bühne inszeniert, gelogen wird am Tisch.
+ *
+ * Seit M2 rendert die Halle in PIXI; darüber liegt ein DOM-HUD mit Countdown,
+ * Sprechblase und den Knöpfen des Beamten. Das HUD ist durchlässig, nur seine
+ * Bedienelemente fangen Zeiger ab — sonst läge eine Glasscheibe über den Koffern.
  *
  * Zwei Regeln, die dieser Screen einhalten muss:
- * - Er bekommt ausschliesslich `publicView` — Mengen und `truthful` existieren hier nicht.
- * - Nach der Hinweis-Animation sieht ein Koffer mit Hinweis aus wie einer ohne, bis auf
- *   das kleine Icon (Art Direction §7).
- *
- * M1 zeigt die Hinweise als DOM-Karten; die Animationen kommen mit der PIXI-Halle in M2/M3.
+ * - Er bekommt ausschließlich `publicView` — Mengen und `truthful` existieren hier nicht.
+ * - Ein Koffer mit Hinweis sieht nach der Animation aus wie einer ohne, bis auf das
+ *   kleine Icon (Art Direction §7). Deshalb setzt der Screen das Icon **erst**, wenn der
+ *   Director den Hinweis abgespielt hat — und die Icon-Leiste behält ihre Höhe.
  */
 
-import { HINTS } from '@/config/choreo';
+import { HUD } from '@/config/choreo';
 import { HINT_REPLAY_LIMIT } from '@/config/rules';
 import { t, tList } from '@/core/i18n';
 import type { BribeAmount, PlayerId } from '@/core/types';
+import type { PublicHint } from '@/core/publicView';
 import { createBadge } from '../components/badge';
-import { createOfficerButton, createButton } from '../components/button';
+import { createButton, createOfficerButton } from '../components/button';
 import { createBribeChip } from '../components/chips';
 import { createCountdownRing } from '../components/countdownRing';
-import { createSuitcaseCard } from '../components/suitcaseCard';
-import { HUD } from '@/config/choreo';
+import { hintIcon } from '../components/suitcaseCard';
 import { vibrate } from '../haptics';
+import { createStageHost } from '../stageHost';
 import type { ScreenContext, ScreenInstance } from '../router';
 
 export function createHallScreen(ctx: ScreenContext): ScreenInstance {
@@ -61,11 +63,15 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
     countdown.el
   );
 
-  /* --- Die Kofferreihe --- */
-  const board = document.createElement('div');
-  board.className = 'hall__board';
+  /* --- Die Bühne --- */
+  const stageHost = createStageHost(ctx, ctx.view('HALL'));
 
-  /* --- Sprechblase mit Fragevorschlaegen --- */
+  /** Hinweis-Icons und Bestechungs-Chips, ausgerichtet an den Koffern. */
+  const markers = document.createElement('div');
+  markers.className = 'hall__markers';
+  stageHost.hud.append(markers);
+
+  /* --- Sprechblase mit Fragevorschlägen --- */
   const speech = document.createElement('p');
   speech.className = 'hall__speech';
   speech.setAttribute('aria-live', 'polite');
@@ -78,10 +84,11 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
   const replay = createButton({
     label: t('hall.replayHints'),
     variant: 'secondary',
+    disabled: true,
     onClick: () => {
       if (replaysLeft <= 0) return;
       replaysLeft -= 1;
-      replay.disabled = replaysLeft <= 0;
+      replay.disabled = true;
       void playHints();
     },
   });
@@ -93,42 +100,65 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
   });
 
   actions.append(replay, end);
-  el.append(header, board, speech, actions);
+  el.append(header, stageHost.el, speech, actions);
 
-  /* --- Rendern --- */
+  /* ------------------------------------------------------------------ */
+  /* Marker über den Koffern                                             */
+  /* ------------------------------------------------------------------ */
 
-  /** Welche Hinweise schon "gelaufen" sind — davor zeigt der Koffer kein Icon. */
-  let revealedHints = 0;
+  /** Welche Hinweise schon gelaufen sind — davor zeigt der Koffer kein Icon. */
+  const shownHints: PublicHint[] = [];
 
-  function render(): void {
+  /**
+   * Setzt Icons und Bestechungs-Chips an die Bildschirmposition ihres Koffers.
+   *
+   * Sie liegen im DOM, nicht auf der Bühne: Ein Icon aus Text und Vektor bleibt bei jeder
+   * Auflösung scharf, und ein Chip muss antippbar sein, ohne den Hit-Test der Koffer zu
+   * stören. Die Position kommt aus `worldToScreen` und wird bei jedem Resize neu geholt.
+   */
+  function renderMarkers(): void {
+    const stage = stageHostStage;
+    if (!stage) return;
+
     const view = ctx.view('HALL');
-    board.replaceChildren();
-
-    /*
-     * Die Hinweise werden nacheinander freigeschaltet. Bis ein Hinweis dran war, sieht
-     * sein Koffer aus wie jeder andere — genau das ist der Punkt.
-     */
-    const shown = view.hints.slice(0, revealedHints);
+    markers.replaceChildren();
+    const point = { x: 0, y: 0 };
 
     for (const suitcase of view.suitcases) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'hall__slot';
+      const node = stage.view.suitcaseOf(suitcase.playerId);
+      if (!node) continue;
 
-      wrapper.append(
-        createSuitcaseCard({
-          playerId: suitcase.playerId,
-          name: ctx.session.nameOf(suitcase.playerId),
-          colorId: ctx.session.colorOf(suitcase.playerId),
-          hints: shown.filter((h) => h.suitcaseOf === suitcase.playerId).map((h) => h.type),
-          sniffed: view.dogHint?.suitcaseOf === suitcase.playerId && revealedHints >= view.hints.length,
-          locked: suitcase.locked,
-        })
-      );
+      /*
+       * Über den Koffer, nicht auf ihn: Auf Höhe des Standpunkts läge das Icon genau auf
+       * dem Gepäckanhänger und verdeckte den Namen.
+       */
+      stage.app.worldToScreen(node.view.x, node.view.y - node.bounds.height - 6, point);
 
-      /* Bestechung: jeder Reisende darf bieten — auch die sauberen (GDD §3.7). */
+      const marker = document.createElement('div');
+      marker.className = 'hall__marker';
+      marker.style.left = `${point.x}px`;
+      marker.style.top = `${point.y}px`;
+      marker.dataset.player = suitcase.playerId;
+
+      /*
+       * Die Icon-Zeile behält ihre Höhe, auch wenn sie leer ist. Sonst rutschten die
+       * Chips der Koffer ohne Hinweis nach oben — und das wäre selbst ein Hinweis.
+       */
+      const icons = document.createElement('div');
+      icons.className = 'hall__icons';
+      for (const hint of shownHints.filter((h) => h.suitcaseOf === suitcase.playerId)) {
+        icons.append(hintIcon(hint.type));
+      }
+      if (view.dogHint?.suitcaseOf === suitcase.playerId && hintsDone) {
+        const dog = hintIcon('dog');
+        dog.dataset.reliable = 'true';
+        icons.append(dog);
+      }
+      marker.append(icons);
+
       if (view.modes.bribery && !suitcase.locked) {
         const offer = view.bribes.find((b) => b.from === suitcase.playerId);
-        wrapper.append(
+        marker.append(
           offer && offer.accepted === null
             ? bribeOffer(suitcase.playerId, offer.amount)
             : createBribeChip({
@@ -136,20 +166,20 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
                 disabled: offer !== undefined,
                 onOffer: (amount) => {
                   ctx.fsm.bribe(suitcase.playerId, amount);
-                  render();
+                  refresh();
                 },
               })
         );
       }
 
-      board.append(wrapper);
+      markers.append(marker);
     }
 
-    if (view.dogHint && revealedHints >= view.hints.length) {
+    if (view.dogHint && hintsDone) {
       const dog = document.createElement('p');
       dog.className = 'hall__dog';
       dog.textContent = view.dogHint.barks ? t('hall.dogBark') : t('hall.dogQuiet');
-      board.append(dog);
+      markers.append(dog);
     }
   }
 
@@ -171,7 +201,7 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
         className: 'btn--compact',
         onClick: () => {
           ctx.fsm.answerBribe(from, true);
-          render();
+          refresh();
         },
       }),
       createOfficerButton({
@@ -181,7 +211,7 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
         className: 'btn--compact',
         onClick: () => {
           ctx.fsm.answerBribe(from, false);
-          render();
+          refresh();
         },
       })
     );
@@ -190,37 +220,58 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
     return box;
   }
 
-  /* --- Ablauf: erst Hinweise, dann Verhoer --- */
+  function refresh(): void {
+    stageHostStage?.view.applyView(ctx.view('HALL'));
+    renderMarkers();
+  }
 
-  let timers: ReturnType<typeof setTimeout>[] = [];
+  /* ------------------------------------------------------------------ */
+  /* Ablauf: erst die Hinweise, dann das Verhör                          */
+  /* ------------------------------------------------------------------ */
+
+  let stageHostStage: Awaited<ReturnType<typeof stageHost.ready>> | undefined;
   let questionTimer: ReturnType<typeof setInterval> | undefined;
+  /* Im Closure, nicht auf Modulebene: Sonst teilten sich zwei Runden denselben Observer. */
+  let resizeObserver: ResizeObserver | undefined;
   let ended = false;
+  let hintsDone = false;
 
-  const wait = (ms: number): Promise<void> =>
-    new Promise((resolve) => {
-      timers.push(globalThis.setTimeout(resolve, ms));
-    });
-
-  /**
-   * Spielt die Hinweise nacheinander ab. In M1 heisst "abspielen": Icon erscheint.
-   * Die 1.5-s-Animationen kommen in M3 — das Timing steht schon jetzt in `choreo.ts`,
-   * damit der Rhythmus derselbe bleibt.
-   */
   async function playHints(): Promise<void> {
-    const total = ctx.view('HALL').hints.length;
-    revealedHints = 0;
-    render();
+    const stage = stageHostStage;
+    if (!stage) return;
+
+    shownHints.length = 0;
+    hintsDone = false;
+    renderMarkers();
     status.textContent = t('hall.hintsRunning');
 
-    for (let i = 0; i < total; i++) {
-      await wait((HINTS.duration + HINTS.gap) * 1000);
-      if (ended) return;
-      revealedHints = i + 1;
-      render();
+    const view = ctx.view('HALL');
+    stage.view.setMode('hints');
+
+    await stage.hints.rollIn(view);
+    if (ended) return;
+
+    await stage.hints.play(view.hints, (hint) => {
+      shownHints.push(hint);
+      renderMarkers();
       vibrate('tap');
+    });
+    if (ended) return;
+
+    if (view.dogHint) {
+      await stage.hints.dogHint(view.dogHint.suitcaseOf, view.dogHint.barks);
+      if (ended) return;
     }
 
+    hintsDone = true;
+    renderMarkers();
+
+    stage.view.setMode('interrogation');
     status.textContent = t('hall.interrogation');
+    replay.disabled = replaysLeft <= 0;
+
+    countdown.start();
+    rotateQuestions();
   }
 
   function rotateQuestions(): void {
@@ -243,23 +294,34 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
     ctx.fsm.send({ type: 'endInterrogation' });
   }
 
-  render();
-
   return {
     el,
+
     activate() {
-      void playHints().then(() => {
-        if (ended) return;
-        countdown.start();
-        rotateQuestions();
-      });
+      void stageHost
+        .ready()
+        .then((stage) => {
+          if (ended) return;
+          stageHostStage = stage;
+          stage.view.applyView(ctx.view('HALL'));
+          /* Marker beim Resize nachziehen — sie hängen an Weltkoordinaten. */
+          resizeObserver = new ResizeObserver(() => renderMarkers());
+          resizeObserver.observe(stageHost.el);
+          return playHints();
+        })
+        .catch((error: unknown) => {
+          console.warn('[hall] Bühne konnte nicht starten', error);
+          status.textContent = t('hall.stageFailed');
+        });
     },
+
     destroy() {
       ended = true;
       countdown.stop();
-      for (const timer of timers) clearTimeout(timer);
-      timers = [];
+      resizeObserver?.disconnect();
       if (questionTimer !== undefined) clearInterval(questionTimer);
+      stageHostStage?.hints.stop();
+      stageHost.release();
     },
   };
 }

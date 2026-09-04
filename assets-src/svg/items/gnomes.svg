@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gartenzwerg. Rote Zipfelmuetze, weisser Bart, unschuldiger Blick. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 88" width="64" height="88">
+  <path d="M32 4 L54 40 H10 Z" fill="#FF4757" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="32" cy="48" r="16" fill="#FFE0BD" stroke="#1A1024" stroke-width="6"/>
+  <path d="M16 50 C16 68 48 68 48 50 C48 62 40 74 32 74 C24 74 16 62 16 50 Z" fill="#FFF8E7" stroke="#1A1024" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="26" cy="46" r="3" fill="#1A1024"/>
+  <circle cx="38" cy="46" r="3" fill="#1A1024"/>
+  <circle cx="32" cy="54" r="4" fill="#FF7F50"/>
+  <path d="M18 76 H46 L50 84 H14 Z" fill="#3B82F6" stroke="#1A1024" stroke-width="5" stroke-linejoin="round"/>
+</svg>

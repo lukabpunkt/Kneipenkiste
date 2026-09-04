@@ -656,10 +656,11 @@ button.suitcase:active {
 /* Dev-Panel                                                           */
 /* ------------------------------------------------------------------ */
 
+/* Oben rechts, nicht unten: Unten sitzt auf jedem Screen der wichtigste Knopf. */
 .dev-panel {
   position: fixed;
   right: 4px;
-  bottom: 4px;
+  top: 4px;
   z-index: var(--z-toast);
   max-width: 60%;
   padding: 4px 6px;

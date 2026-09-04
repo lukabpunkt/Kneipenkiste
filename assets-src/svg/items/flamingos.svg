@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Aufblasbarer Flamingo. Steht auf einem Bein, als waere nichts. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 96" width="72" height="96">
+  <ellipse cx="34" cy="66" rx="26" ry="16" fill="#FF6B9D" stroke="#1A1024" stroke-width="6"/>
+  <path d="M42 54 C42 30 26 30 26 18" fill="none" stroke="#FF6B9D" stroke-width="12" stroke-linecap="round"/>
+  <path d="M42 54 C42 30 26 30 26 18" fill="none" stroke="#1A1024" stroke-width="5" stroke-linecap="round" opacity="0.001"/>
+  <circle cx="24" cy="14" r="11" fill="#FF6B9D" stroke="#1A1024" stroke-width="6"/>
+  <path d="M14 16 L4 22 L14 24 Z" fill="#1A1024"/>
+  <circle cx="22" cy="11" r="2.5" fill="#1A1024"/>
+  <path d="M34 82 V92" stroke="#1A1024" stroke-width="6" stroke-linecap="round"/>
+</svg>

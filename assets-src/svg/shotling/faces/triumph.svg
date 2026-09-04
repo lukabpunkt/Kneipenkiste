@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gesicht "triumph" — erwischt! Zusammengekniffene Freudenaugen, breites Grinsen. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <path d="M14 30 Q27 16 40 30" stroke="#1A1024" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M56 30 Q69 16 82 30" stroke="#1A1024" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M30 46 Q48 62 66 46 Z" fill="#1A1024"/>
+</svg>

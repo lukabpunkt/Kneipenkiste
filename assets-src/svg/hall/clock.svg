@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Die Hallenuhr. Tickt im Verhoer hoerbar mit. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="88" height="88">
+  <circle cx="44" cy="44" r="38" fill="#FFF8E7" stroke="#1A1024" stroke-width="8"/>
+  <path d="M44 44 V22 M44 44 L60 52" stroke="#1A1024" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="44" cy="44" r="4" fill="#FF2D55"/>
+</svg>

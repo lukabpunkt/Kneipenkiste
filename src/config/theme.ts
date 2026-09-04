@@ -153,6 +153,129 @@ export const STAGE = {
 } as const;
 
 /* ------------------------------------------------------------------ */
+/* Buehnen-Layout in Welteinheiten (Art Direction §6)                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Die Halle in der 1000x1000-Welt. Alle Positionen stehen hier, damit ein Blick genuegt,
+ * um die Buehne zu verstehen — und damit "der Koffer sitzt zu hoch" eine Zahl ist.
+ */
+export const LAYOUT = {
+  /** Wand oben, Boden darunter. */
+  wallBottom: 430,
+  /** Split-Flap-Tafel "ANKUNFT". */
+  board: { x: 210, y: 92, width: 300 },
+  clock: { x: 618, y: 90, size: 92 },
+  pictogram: { x: 470, y: 88, size: 84 },
+
+  /** Foerderband. Breit genug fuer zwei Kofferreihen (ADR-13). */
+  belt: { top: 366, height: 132, left: 0, right: 706 },
+  /** Das Roentgengeraet am Ende des Bandes. */
+  machine: { x: 830, y: 388, width: 264, height: 224 },
+  /** Der Monitor darueber, zur Kamera gedreht. */
+  monitor: { x: 830, y: 190, width: 268, height: 206 },
+
+  /**
+   * Die Koffer auf dem Band.
+   *
+   * Bis vier Koffer eine Reihe, ab fuenf zwei — anders liegen die Tippflaechen auf einem
+   * 390 px breiten Handy naeher beieinander als 56 px und ueberlappen sich (ADR-13).
+   *
+   * Die hintere Reihe steht auf dem Band, die vordere davor auf dem Boden. Der Abstand
+   * ist kein Geschmack, sondern Arithmetik: Zwei Trefferflaechen von je 56 px brauchen
+   * uebereinander 286 Welteinheiten, und so hoch ist kein Foerderband.
+   */
+  suitcases: {
+    rowFront: 592,
+    rowBack: 440,
+    left: 96,
+    right: 630,
+    maxWidth: 158,
+    /** Ab dieser Anzahl wird auf zwei Reihen verteilt. */
+    twoRowsFrom: 5,
+    backScale: 0.88,
+  },
+
+  /** Die gelbe Linie, hinter der die Reisenden warten. */
+  yellowLine: 672,
+  /**
+   * Fusspunkte der Reisenden — **eine** Reihe.
+   *
+   * Die Art Direction sah bei 7–8 Spielern zwei Reihen vor. Seit die Koffer selbst zwei
+   * Reihen brauchen (ADR-13), waere das die dritte uebereinander, und die Huete der
+   * hinteren Leute lagen auf den vorderen Koffern. Eine breitere Reihe mit leichter
+   * Ueberlappung liest sich als Schlange und kostet nichts — die Reisenden sind kein
+   * Tippziel.
+   */
+  travelers: { row: 862, left: 96, right: 726 },
+  /** Der Beamte steht rechts neben dem Geraet. */
+  officer: { x: 846, y: 880 },
+  /** Waldi liegt links unten. */
+  dog: { x: 112, y: 968 },
+  /** Die Schranke, rechts unten — im Gate-Modus schwenkt die Kamera darauf. */
+  gate: { x: 912, y: 872, width: 150 },
+
+  /** Charakter-Hoehe in Welteinheiten. */
+  travelerHeight: 176,
+  officerHeight: 210,
+} as const;
+
+/* ------------------------------------------------------------------ */
+/* Rendering (Architektur §8)                                          */
+/* ------------------------------------------------------------------ */
+
+export const RENDER = {
+  maxResolution: 2,
+  antialias: false,
+  powerPreference: 'high-performance',
+  /** Low-Effects-Auto-Erkennung. */
+  lowEffects: {
+    deviceMemoryMax: 3,
+    hardwareConcurrencyMax: 4,
+    frameMedianMaxMs: 22,
+    probeDurationMs: 2000,
+  },
+  /** Frame-Budget auf dem Referenzgeraet (Audit A2). */
+  budgetMs: { update: 4, render: 8 },
+} as const;
+
+/* ------------------------------------------------------------------ */
+/* Charaktere (Art Direction §5)                                       */
+/* ------------------------------------------------------------------ */
+
+/** Gesichter des Reisenden. */
+export const TRAVELER_FACES = [
+  'neutral',
+  'blink',
+  'happy',
+  'too_wide_smile',
+  'sweat_1',
+  'sweat_2',
+  'sweat_3',
+  'whistle',
+  'outraged',
+  'smug_bow',
+  'x_eyes',
+  'ouch',
+  'panic',
+  'scared',
+  'wave',
+  'spiral',
+] as const;
+export type TravelerFace = (typeof TRAVELER_FACES)[number];
+
+/** Gesichter des Beamten. */
+export const OFFICER_FACES = ['stern', 'suspicious', 'blush', 'triumph', 'facepalm'] as const;
+export type OfficerFace = (typeof OFFICER_FACES)[number];
+
+/** Wie oft der Beamte einen Schnurrbart traegt (Art Direction §5.2). */
+export const MUSTACHE_CHANCE = 0.5;
+
+/** Blinzeln: alle 2–5 s fuer 120 ms. */
+export const BLINK_INTERVAL_MS = [2000, 5000] as const;
+export const BLINK_DURATION_MS = 120;
+
+/* ------------------------------------------------------------------ */
 /* Partikel-Budget (Art Direction §8)                                  */
 /* ------------------------------------------------------------------ */
 

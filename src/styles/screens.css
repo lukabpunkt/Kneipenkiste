@@ -349,11 +349,19 @@
 /* Halle, Kontrolle, Schranke — die hellen, oeffentlichen Screens      */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Die öffentlichen Screens. Der Rahmen bleibt dunkel wie die Menüs — hell ist nur die
+ * Bühne selbst, und der Kontrast dazwischen macht sie zur Bühne (Art Direction §2).
+ */
 .screen--hall,
 .screen--inspect,
 .screen--gate {
-  background: var(--c-hall-wall);
-  color: var(--c-ink);
+  color: var(--c-paper);
+}
+
+.screen--gate {
+  padding: calc(var(--space-2) + var(--safe-top)) var(--space-2)
+    calc(var(--space-2) + var(--safe-bottom));
 }
 
 .hall__header,
@@ -372,37 +380,128 @@
   text-align: center;
 }
 
-/*
- * Die Kofferreihe steht auf dem Band. Sie scrollt waagerecht, wenn acht Koffer nicht
- * nebeneinander passen — jeder behaelt so seine 56 px Tippflaeche (CLAUDE.md).
- */
-.hall__board,
-.inspect__board,
-.gate__lane {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: center;
-  gap: var(--space-3);
-  padding: var(--space-3);
+/* ------------------------------------------------------------------ */
+/* Die PIXI-Bühne (Architektur §7)                                     */
+/* ------------------------------------------------------------------ */
+
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
   border-radius: var(--radius-md);
-  background: var(--c-hall-floor);
-  box-shadow: inset 0 -6px 0 var(--c-hall-floor-line);
+  overflow: hidden;
+  background: var(--c-hall-wall);
 }
 
-.hall__slot {
+.stage__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.stage__canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * Das HUD liegt über der Bühne und ist **durchlässig**. Nur seine Bedienelemente fangen
+ * Zeiger ab — sonst läge eine unsichtbare Glasscheibe über den Koffern und kein Tap käme
+ * an (Audit A2: "DOM-HUD blockiert keine Koffer-Taps").
+ */
+.stage__hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.stage__hud button,
+.stage__hud input,
+.stage__hud a {
+  pointer-events: auto;
+}
+
+/* Marker über den Koffern: Hinweis-Icons und Bestechungs-Chips. */
+.hall__marker {
+  position: absolute;
+  transform: translate(-50%, -100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
 }
 
-.hall__speech {
+/* Die Icon-Zeile behält ihre Höhe, auch wenn sie leer ist — sonst wäre die
+   Verschiebung der Chips selbst ein Hinweis (Art Direction §7). */
+.hall__icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 22px;
+}
+
+.hall__dog {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-2);
+  transform: translateX(-50%);
   margin: 0;
+  padding: 2px var(--space-3);
+  border-radius: 999px;
+  background: var(--c-paper);
+  color: var(--c-ink);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+}
+
+.inspect__banner {
+  position: absolute;
+  left: 50%;
+  top: var(--space-2);
+  transform: translateX(-50%);
+  max-width: 92%;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 3px solid var(--c-ink);
+  border-radius: var(--radius-sm);
+  background: var(--c-paper);
+  color: var(--c-ink);
+  font-weight: 800;
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+
+.inspect__banner[data-kind='caught'] {
+  background: var(--c-alarm);
+  color: var(--c-paper);
+}
+
+.inspect__banner[data-kind='clean'] {
+  background: var(--c-busted);
+  color: var(--c-paper);
+}
+
+.inspect__banner[data-kind='diplomat'] {
+  background: var(--c-customs);
+}
+
+.inspect__banner[data-kind='scanning'] {
+  background: var(--c-xray-bg);
+  color: var(--c-xray-glow);
+}
+
+.hall__speech {
+  flex: none;
+  margin: 0;
+  min-height: 3.2em;
   padding: var(--space-3) var(--space-4);
   border: 3px solid var(--c-ink);
   border-radius: var(--radius-md);
   background: var(--c-paper);
+  /* Ausdrücklich `ink`: Der Screen färbt seinen Text `paper`, und das wäre hier
+     paper auf paper — unsichtbar (Art Direction §2: Texte auf heller Fläche in ink). */
+  color: var(--c-ink);
   font-weight: 800;
   text-align: center;
 }
@@ -410,13 +509,19 @@
 .hall__actions,
 .inspect__actions {
   display: flex;
+  flex: none;
   gap: var(--space-3);
-  margin-top: auto;
 }
 
+/*
+ * Kleinere Schrift als der Standard-CTA: "Verhör beenden" bricht sonst um, und ein
+ * zweizeiliger Knopf auf einem Handy in der Tischmitte liest sich schlecht.
+ */
 .hall__actions .btn,
 .inspect__actions .btn {
   flex: 1;
+  font-size: var(--fs-md);
+  line-height: 1.15;
 }
 
 .hall__offer {
@@ -503,12 +608,11 @@
 
 /* Schranke */
 
-.gate__headline {
-  font-size: var(--fs-xl);
-  color: var(--c-steel-dark);
-}
-
 .gate__next {
+  position: absolute;
+  left: 50%;
+  top: var(--space-2);
+  transform: translateX(-50%);
   margin: 0;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-sm);
@@ -527,6 +631,11 @@
 }
 
 .gate__banner {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-3);
+  transform: translateX(-50%);
+  max-width: 92%;
   margin: 0;
   padding: var(--space-3);
   border: 3px solid var(--c-ink);

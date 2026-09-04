@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Eine einzige Ente mit Schleife. Legal, weil nur eine. "Das ist Rudi. Er reist mit mir." -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <ellipse cx="40" cy="58" rx="34" ry="17" fill="#FFD32A" stroke="#1A1024" stroke-width="6"/>
+  <circle cx="54" cy="32" r="18" fill="#FFD32A" stroke="#1A1024" stroke-width="6"/>
+  <path d="M70 32 L79 36 L70 40 Z" fill="#FF7F50" stroke="#1A1024" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="57" cy="27" r="3.5" fill="#1A1024"/>
+  <path d="M46 16 L54 12 L52 20 Z M62 16 L54 12 L56 20 Z" fill="#FF6B9D" stroke="#1A1024" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="54" cy="16" r="3" fill="#C94A78" stroke="#1A1024" stroke-width="3"/>
+</svg>

@@ -37,3 +37,12 @@ Kontext: Das Debug-Panel muss Mengen, Diplomat und `truthful` aufdecken können 
 
 ## ADR-12 · 2026-09-04 · Seed-Steuerung nur im Dev-Build
 Kontext: E2E-Tests brauchen reproduzierbare Runden, produktiv müssen Hinweise, Diplomat und Item-Set über `crypto` fallen (CLAUDE.md). Entscheidung: `?dev=1&seed=123` injiziert einen `createSeededRng` in die FSM; ohne `dev=1` wird der Parameter ignoriert. Konsequenz: Die drei M1.7-Szenarien sind deterministisch, eine URL kann das Spiel aber nicht manipulieren.
+
+## ADR-13 · 2026-09-05 · Koffer in zwei Reihen, Reisende in einer
+Kontext: Art Direction §6 sah eine Kofferreihe (max 7, Scale 0.85) und bei 7–8 Spielern zwei Reisenden-Reihen vor. Auf einem 390 px breiten Handy sind 7 Tippflächen à 56 px aber 392 px breit — sie passen geometrisch nicht nebeneinander, und mit Abständen unter 56 px würden sie sich überlappen: Ein Tap öffnete dann den falschen Koffer. Entscheidung: Ab **fünf** Koffern zwei Reihen — die hintere auf dem Band, die vordere davor auf dem Boden (zwei Trefferflächen übereinander brauchen 286 Welteinheiten, mehr als ein Förderband hoch ist). Dafür stehen die **Reisenden in einer** Reihe, leicht überlappend wie eine Schlange; sie sind kein Tippziel. Konsequenz: Jede Trefferfläche misst auf jedem Referenzgerät ≥ 56 px und überlappt keine andere — nachgerechnet in `xray.test.ts`, gemessen in `perf.spec.ts`. Art Direction §6 ist entsprechend zu lesen.
+
+## ADR-14 · 2026-09-05 · Sechs Atlanten statt einem, Halle als eigener Chunk
+Kontext: Ein einziger Atlas wäre bei @2x über 2048 px gegangen, und PIXI + GSAP wogen 175 KB gzip im Einstiegs-Chunk — der Titel hätte auf sie gewartet. Entscheidung: Sechs Atlanten (shotlings, hall, suitcases, items, xray, dog), und `src/game/` wird ausschließlich per `await import('@/game')` geladen; die Lobby stößt den Preload an. Konsequenz: Einstieg 26 KB gzip, Hall-Chunk 149 KB lädt im Hintergrund. Die Draw-Calls bleiben trotzdem bei 3, weil nie zwei Kategorien in derselben Ebene liegen.
+
+## ADR-15 · 2026-09-05 · Die Kamera zentriert, statt den Punkt festzuhalten
+Kontext: `Camera.focus()` hielt den Zielpunkt an seiner Bildschirmposition und zoomte darum herum. Beim Schwenk auf den Röntgenmonitor hing der halb außerhalb des Bildes. Entscheidung: `focus()` nimmt den Weltpunkt in die Bildmitte; die Kamera bleibt auf dem Monitor, bis das Banner gestanden hat. Konsequenz: Der Kern-Moment des Spiels läuft in der Bildmitte ab, nicht am Rand.

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Split-Flap-Tafel "ANKUNFT". Der Text kommt zur Laufzeit darueber. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" width="280" height="80">
+  <rect x="4" y="4" width="272" height="72" rx="10" fill="#1A1024" stroke="#4A506A" stroke-width="8"/>
+  <path d="M4 40 H276" stroke="#4A506A" stroke-width="3"/>
+  <g fill="#2E2B3F">
+    <rect x="16" y="14" width="44" height="52" rx="4"/>
+    <rect x="68" y="14" width="44" height="52" rx="4"/>
+    <rect x="120" y="14" width="44" height="52" rx="4"/>
+    <rect x="172" y="14" width="44" height="52" rx="4"/>
+    <rect x="224" y="14" width="40" height="52" rx="4"/>
+  </g>
+</svg>

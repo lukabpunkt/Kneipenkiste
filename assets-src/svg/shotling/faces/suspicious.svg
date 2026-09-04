@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gesicht "suspicious" — ein Auge zusammengekniffen. Der Blick, den jeder Reisende fuerchtet. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <ellipse cx="27" cy="28" rx="13" ry="14" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <circle cx="29" cy="30" r="6" fill="#1A1024"/>
+  <path d="M56 30 Q69 22 82 30" stroke="#1A1024" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M12 10 L42 18" stroke="#1A1024" stroke-width="6" stroke-linecap="round"/>
+  <path d="M84 16 L58 12" stroke="#1A1024" stroke-width="6" stroke-linecap="round"/>
+  <path d="M38 52 Q48 48 58 53" stroke="#1A1024" stroke-width="5" stroke-linecap="round" fill="none"/>
+</svg>
