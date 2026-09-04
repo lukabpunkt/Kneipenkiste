@@ -57,13 +57,14 @@ afterEach(() => {
 /* ------------------------------------------------------------------ */
 
 describe('Registrierung', () => {
-  it('kennt alle elf Inszenierungen aus GDD §4.4', () => {
-    expect(ALL_OUTCOMES).toHaveLength(11);
+  it('registriert jede Inszenierung aus der Liste', () => {
+    // Elf aus GDD §4.4, dazu die Nachzuegler aus dem Backlog nach 1.0.
+    expect(ALL_OUTCOMES.length).toBeGreaterThanOrEqual(11);
     for (const sequence of ALL_OUTCOMES) {
       expect(outcomeById(sequence.id)?.id).toBe(sequence.id);
     }
-    // Plus `basic_outcome` als Rueckfall.
-    expect(allSequences()).toHaveLength(12);
+    // Plus `basic_outcome` als Rueckfall — und sonst nichts.
+    expect(allSequences()).toHaveLength(ALL_OUTCOMES.length + 1);
   });
 
   it('hat fuer jeden Outcome mindestens eine Sequenz', () => {
@@ -72,14 +73,25 @@ describe('Registrierung', () => {
     }
   });
 
-  it('verteilt die Sequenzen wie im GDD vorgesehen', () => {
+  it('hat für jeden Fall genug Varianten (GDD §4.4)', () => {
     const count = (outcome: Outcome): number =>
       ALL_OUTCOMES.filter((sequence) => sequence.outcome === outcome).length;
-    expect(count('allShare')).toBe(2);
-    expect(count('soloSteal')).toBe(3);
-    expect(count('multiSteal')).toBe(3);
-    expect(count('allSteal')).toBe(2);
-    expect(count('jackpot')).toBe(1);
+
+    /*
+     * "Mindestens 2 Varianten pro Fall bis Release" (GDD §4.4) — mit einer Ausnahme:
+     * Der Jackpot kommt selten genug, dass ihn niemand zweimal an einem Abend sieht.
+     * Die Zahlen wachsen mit dem Backlog; geprueft wird die Untergrenze, nicht der
+     * Stand von gestern.
+     */
+    expect(count('allShare')).toBeGreaterThanOrEqual(2);
+    expect(count('soloSteal')).toBeGreaterThanOrEqual(3);
+    expect(count('multiSteal')).toBeGreaterThanOrEqual(3);
+    expect(count('allSteal')).toBeGreaterThanOrEqual(2);
+    expect(count('jackpot')).toBeGreaterThanOrEqual(1);
+
+    // Und die Summe deckt sich mit der Liste — keine Sequenz faellt durchs Raster.
+    const total = OUTCOMES.reduce((sum, outcome) => sum + count(outcome), 0);
+    expect(total).toBe(ALL_OUTCOMES.length);
   });
 
   it('vergibt jede ID genau einmal und jedes Gewicht groesser null', () => {

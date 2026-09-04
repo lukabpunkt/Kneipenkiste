@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Bananenschale (Backlog, steal_multi_banana). Liegt flach auf dem Tisch, drei
+     Schalenblaetter — weniger liest sich nicht als Banane, mehr wird Matsch. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 72" width="120" height="72">
+  <path d="M60 40c-26 0-44 14-52 24 18 6 40 6 52 4 12 2 34 2 52-4-8-10-26-24-52-24z"
+        fill="#ffd32a" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M60 42c-6-16-2-30 2-38 6 10 8 24 4 38z" fill="#ffd32a" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M60 44c-14-8-26-10-36-8 8 8 22 12 36 8z" fill="#d4a800" stroke="#1A1024" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M60 44c14-8 26-10 36-8-8 8-22 12-36 8z" fill="#d4a800" stroke="#1A1024" stroke-width="5" stroke-linejoin="round"/>
+</svg>

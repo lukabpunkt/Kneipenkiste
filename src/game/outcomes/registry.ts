@@ -12,21 +12,33 @@
 
 import { basicOutcome } from './basic';
 import { groupHug } from './share/GroupHug';
+import { slowClap } from './share/SlowClap';
 import { toast } from './share/Toast';
 import { getaway } from './soloSteal/Getaway';
+import { helicopter } from './soloSteal/Helicopter';
 import { magician } from './soloSteal/Magician';
 import { moonwalk } from './soloSteal/Moonwalk';
 import { anvil } from './multiSteal/Anvil';
+import { banana } from './multiSteal/Banana';
 import { standoff } from './multiSteal/Standoff';
 import { tugOfWar } from './multiSteal/TugOfWar';
 import { allStealAlarm } from './allSteal/Alarm';
 import { brawl } from './allSteal/Brawl';
+import { pieFight } from './allSteal/PieFight';
 import { jackpotBurst } from './jackpot/Burst';
 import { moleReveal } from './overlays/MoleReveal';
 import { perjurySealBreak } from './overlays/PerjurySealBreak';
 import { outcomeById, registerOutcome, registerOverlay } from './OutcomeSequence';
 
-/** Die elf Inszenierungen aus GDD §4.4, in der Reihenfolge der Roadmap M4.2. */
+/**
+ * Alle Inszenierungen, in der Reihenfolge der Roadmap M4.2 — die elf aus GDD §4.4, dahinter
+ * die vier aus dem Backlog nach 1.0.
+ *
+ * Die Nachzuegler stehen bewusst hinten und nicht bei ihren Geschwistern: So sieht man
+ * beim Lesen, was zur ersten Fassung gehoerte und was danach kam. Fuer die Auswahl macht
+ * die Reihenfolge keinen Unterschied — die zieht gewichtet (alle Gewichte 1, bis der
+ * Playtest sagt, welche traegt).
+ */
 export const ALL_OUTCOMES = [
   groupHug,
   toast,
@@ -39,6 +51,11 @@ export const ALL_OUTCOMES = [
   brawl,
   allStealAlarm,
   jackpotBurst,
+  // Backlog nach 1.0:
+  slowClap,
+  helicopter,
+  banana,
+  pieFight,
 ] as const;
 
 export const ALL_OVERLAYS = [perjurySealBreak, moleReveal] as const;

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fluchthubschrauber (Backlog, steal_solo_helicopter). Seitenansicht, Chibi-Proportion:
+     kurzer dicker Rumpf, viel zu grosser Rotor. Der Rotor ist ein eigener Frame, damit er
+     sich drehen kann. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 140" width="260" height="140">
+  <!-- Heckausleger -->
+  <path d="M150 62h84a8 8 0 0 1 0 16h-84z" fill="#4a506a" stroke="#1A1024" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="236" cy="54" r="16" fill="#8c93a8" stroke="#1A1024" stroke-width="7"/>
+  <!-- Rumpf -->
+  <path d="M42 44h74a44 44 0 0 1 40 30v14a14 14 0 0 1-14 14H42a30 30 0 0 1-30-30V74a30 30 0 0 1 30-30z"
+        fill="#5b1e3a" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <!-- Kanzel -->
+  <path d="M30 60h34v34H36a18 18 0 0 1-18-18v-2a14 14 0 0 1 12-14z" fill="#18dcff" stroke="#1A1024" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Kufen -->
+  <path d="M40 112h96" fill="none" stroke="#1A1024" stroke-width="9" stroke-linecap="round"/>
+  <path d="M58 102v10M118 102v10" fill="none" stroke="#1A1024" stroke-width="8" stroke-linecap="round"/>
+  <!-- Mast -->
+  <rect x="88" y="26" width="14" height="22" rx="6" fill="#8c93a8" stroke="#1A1024" stroke-width="6"/>
+</svg>

@@ -347,7 +347,7 @@ export class RevealDirector {
       counters: this.counters,
       fx: room.fx,
       rng,
-      play: (cue, when) => audio.play(cue, when),
+      play: (cue, when, detune) => audio.play(cue, when, detune),
       positionOf: (playerId) => room.crooks.get(playerId)?.position ?? this.stageCenter(),
       headOf: (playerId) => {
         const crook = room.crooks.get(playerId);

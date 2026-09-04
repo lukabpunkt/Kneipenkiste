@@ -44,7 +44,11 @@ export interface OutcomeContext {
   /** Muenzregen, Konfetti, Sternchen, Rauch — die geteilten Bausteine (Roadmap M4.4). */
   fx: FxKit;
   rng: SeededRng;
-  play(cue: AudioCue, when?: number): void;
+  /**
+   * Spielt einen Cue. `detune` in Halbtoenen — derselbe Klang sechsmal hintereinander
+   * klingt nach Maschinengewehr, minimal verstimmt nach sechs verschiedenen Haenden.
+   */
+  play(cue: AudioCue, when?: number, detune?: number): void;
   /** Wo ein Spieler steht — fuer Zaehler und Requisiten. */
   positionOf(playerId: string): { x: number; y: number };
   /** Ungefaehre Kopfhoehe eines Spielers (Weltkoordinaten). */

@@ -96,9 +96,33 @@
         "y": 0.5
       }
     },
-    "cards/seal": {
+    "props/banana": {
       "frame": {
         "x": 3,
+        "y": 1901,
+        "w": 220,
+        "h": 142
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 10,
+        "y": 2,
+        "w": 220,
+        "h": 142
+      },
+      "sourceSize": {
+        "w": 240,
+        "h": 144
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "cards/seal": {
+      "frame": {
+        "x": 229,
         "y": 1901,
         "w": 140,
         "h": 142
@@ -120,9 +144,33 @@
         "y": 0.5
       }
     },
+    "props/pie": {
+      "frame": {
+        "x": 375,
+        "y": 1901,
+        "w": 190,
+        "h": 141
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 5,
+        "y": 26,
+        "w": 190,
+        "h": 141
+      },
+      "sourceSize": {
+        "w": 200,
+        "h": 168
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
     "props/waterpistol": {
       "frame": {
-        "x": 149,
+        "x": 571,
         "y": 1901,
         "w": 211,
         "h": 140
@@ -168,54 +216,6 @@
         "y": 0.5
       }
     },
-    "props/glass": {
-      "frame": {
-        "x": 366,
-        "y": 1901,
-        "w": 84,
-        "h": 123
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 14,
-        "y": 10,
-        "w": 84,
-        "h": 123
-      },
-      "sourceSize": {
-        "w": 112,
-        "h": 144
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "cards/helmet": {
-      "frame": {
-        "x": 456,
-        "y": 1901,
-        "w": 192,
-        "h": 109
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 16,
-        "y": 27,
-        "w": 192,
-        "h": 109
-      },
-      "sourceSize": {
-        "w": 224,
-        "h": 144
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
     "props/bars": {
       "frame": {
         "x": 521,
@@ -242,7 +242,7 @@
     },
     "props/car": {
       "frame": {
-        "x": 654,
+        "x": 788,
         "y": 1869,
         "w": 421,
         "h": 169
@@ -312,10 +312,130 @@
         "y": 0.5
       }
     },
+    "props/vacuum": {
+      "frame": {
+        "x": 1117,
+        "y": 1383,
+        "w": 301,
+        "h": 232
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 19,
+        "y": 4,
+        "w": 301,
+        "h": 232
+      },
+      "sourceSize": {
+        "w": 320,
+        "h": 240
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "cards/symbols/bolt": {
+      "frame": {
+        "x": 1063,
+        "y": 3,
+        "w": 44,
+        "h": 72
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 24,
+        "y": 12,
+        "w": 44,
+        "h": 72
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "props/confetti": {
+      "frame": {
+        "x": 1063,
+        "y": 81,
+        "w": 28,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 4,
+        "w": 28,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 56
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "front/bubble": {
+      "frame": {
+        "x": 1117,
+        "y": 1621,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "props/helicopter": {
+      "frame": {
+        "x": 1215,
+        "y": 1819,
+        "w": 495,
+        "h": 187
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 46,
+        "w": 495,
+        "h": 187
+      },
+      "sourceSize": {
+        "w": 520,
+        "h": 280
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
     "props/sign_deal": {
       "frame": {
-        "x": 1081,
-        "y": 1858,
+        "x": 1315,
+        "y": 1621,
         "w": 304,
         "h": 183
       },
@@ -338,8 +458,8 @@
     },
     "props/anvil": {
       "frame": {
-        "x": 1391,
-        "y": 1858,
+        "x": 1625,
+        "y": 1621,
         "w": 236,
         "h": 164
       },
@@ -362,8 +482,8 @@
     },
     "props/popcorn": {
       "frame": {
-        "x": 1633,
-        "y": 1858,
+        "x": 1867,
+        "y": 3,
         "w": 114,
         "h": 164
       },
@@ -384,33 +504,9 @@
         "y": 0.5
       }
     },
-    "props/cloth": {
-      "frame": {
-        "x": 1753,
-        "y": 3,
-        "w": 230,
-        "h": 160
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 5,
-        "y": 15,
-        "w": 230,
-        "h": 160
-      },
-      "sourceSize": {
-        "w": 240,
-        "h": 200
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
     "cards/symbols/circle": {
       "frame": {
-        "x": 1989,
+        "x": 1987,
         "y": 3,
         "w": 56,
         "h": 56
@@ -434,7 +530,7 @@
     },
     "cards/symbols/square": {
       "frame": {
-        "x": 1989,
+        "x": 1987,
         "y": 65,
         "w": 56,
         "h": 56
@@ -458,7 +554,7 @@
     },
     "props/tear": {
       "frame": {
-        "x": 1989,
+        "x": 1987,
         "y": 127,
         "w": 52,
         "h": 74
@@ -480,168 +576,24 @@
         "y": 0.5
       }
     },
-    "cards/symbols/bolt": {
+    "props/shoe": {
       "frame": {
-        "x": 1989,
-        "y": 207,
-        "w": 44,
-        "h": 72
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 24,
-        "y": 12,
-        "w": 44,
-        "h": 72
-      },
-      "sourceSize": {
-        "w": 96,
-        "h": 96
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "props/confetti": {
-      "frame": {
-        "x": 1989,
-        "y": 285,
-        "w": 28,
+        "x": 1867,
+        "y": 173,
+        "w": 100,
         "h": 48
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 6,
-        "y": 4,
-        "w": 28,
+        "y": 6,
+        "w": 100,
         "h": 48
       },
       "sourceSize": {
-        "w": 40,
-        "h": 56
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "front/bubble": {
-      "frame": {
-        "x": 1753,
-        "y": 169,
-        "w": 192,
-        "h": 192
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 192,
-        "h": 192
-      },
-      "sourceSize": {
-        "w": 192,
-        "h": 192
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "props/smoke": {
-      "frame": {
-        "x": 1951,
-        "y": 339,
-        "w": 93,
-        "h": 63
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 8,
-        "y": 5,
-        "w": 93,
-        "h": 63
-      },
-      "sourceSize": {
-        "w": 120,
-        "h": 88
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "props/splash": {
-      "frame": {
-        "x": 1951,
-        "y": 408,
-        "w": 80,
-        "h": 87
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 7,
-        "y": 4,
-        "w": 80,
-        "h": 87
-      },
-      "sourceSize": {
-        "w": 96,
-        "h": 96
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "props/star": {
-      "frame": {
-        "x": 1951,
-        "y": 501,
-        "w": 76,
-        "h": 74
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 2,
-        "y": 2,
-        "w": 76,
-        "h": 74
-      },
-      "sourceSize": {
-        "w": 80,
-        "h": 80
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "props/heart": {
-      "frame": {
-        "x": 1951,
-        "y": 581,
-        "w": 74,
-        "h": 72
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 3,
-        "y": 2,
-        "w": 74,
-        "h": 72
-      },
-      "sourceSize": {
-        "w": 80,
-        "h": 80
+        "w": 112,
+        "h": 64
       },
       "pivot": {
         "x": 0.5,
@@ -650,8 +602,8 @@
     },
     "cards/symbols/cross": {
       "frame": {
-        "x": 1951,
-        "y": 659,
+        "x": 1973,
+        "y": 207,
         "w": 72,
         "h": 72
       },
@@ -674,8 +626,8 @@
     },
     "props/coin": {
       "frame": {
-        "x": 1951,
-        "y": 737,
+        "x": 1973,
+        "y": 285,
         "w": 72,
         "h": 70
       },
@@ -696,58 +648,10 @@
         "y": 0.5
       }
     },
-    "props/shoe": {
-      "frame": {
-        "x": 1753,
-        "y": 367,
-        "w": 100,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 6,
-        "y": 6,
-        "w": 100,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 112,
-        "h": 64
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "cards/symbols/star": {
-      "frame": {
-        "x": 1859,
-        "y": 367,
-        "w": 70,
-        "h": 66
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 13,
-        "y": 14,
-        "w": 70,
-        "h": 66
-      },
-      "sourceSize": {
-        "w": 96,
-        "h": 96
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
     "front/bubble_tail": {
       "frame": {
-        "x": 1753,
-        "y": 421,
+        "x": 1867,
+        "y": 227,
         "w": 96,
         "h": 80
       },
@@ -768,10 +672,154 @@
         "y": 0.5
       }
     },
+    "props/smoke": {
+      "frame": {
+        "x": 1867,
+        "y": 313,
+        "w": 93,
+        "h": 63
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 5,
+        "w": 93,
+        "h": 63
+      },
+      "sourceSize": {
+        "w": 120,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "props/star": {
+      "frame": {
+        "x": 1966,
+        "y": 361,
+        "w": 76,
+        "h": 74
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 2,
+        "y": 2,
+        "w": 76,
+        "h": 74
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 80
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "props/glass": {
+      "frame": {
+        "x": 1867,
+        "y": 382,
+        "w": 84,
+        "h": 123
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 14,
+        "y": 10,
+        "w": 84,
+        "h": 123
+      },
+      "sourceSize": {
+        "w": 112,
+        "h": 144
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "props/splash": {
+      "frame": {
+        "x": 1957,
+        "y": 441,
+        "w": 80,
+        "h": 87
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 7,
+        "y": 4,
+        "w": 80,
+        "h": 87
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "props/heart": {
+      "frame": {
+        "x": 1867,
+        "y": 511,
+        "w": 74,
+        "h": 72
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 2,
+        "w": 74,
+        "h": 72
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 80
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "cards/symbols/star": {
+      "frame": {
+        "x": 1947,
+        "y": 534,
+        "w": 70,
+        "h": 66
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 13,
+        "y": 14,
+        "w": 70,
+        "h": 66
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
     "cards/symbols/diamond": {
       "frame": {
-        "x": 1855,
-        "y": 439,
+        "x": 1867,
+        "y": 589,
         "w": 68,
         "h": 68
       },
@@ -794,8 +842,8 @@
     },
     "cards/seal_shard": {
       "frame": {
-        "x": 1753,
-        "y": 507,
+        "x": 1941,
+        "y": 606,
         "w": 66,
         "h": 70
       },
@@ -818,8 +866,8 @@
     },
     "cards/symbols/heart": {
       "frame": {
-        "x": 1825,
-        "y": 513,
+        "x": 1867,
+        "y": 663,
         "w": 60,
         "h": 56
       },
@@ -842,8 +890,8 @@
     },
     "cards/symbols/triangle": {
       "frame": {
-        "x": 1825,
-        "y": 575,
+        "x": 1867,
+        "y": 725,
         "w": 60,
         "h": 54
       },
@@ -864,24 +912,72 @@
         "y": 0.5
       }
     },
-    "props/vacuum": {
+    "props/cloth": {
       "frame": {
-        "x": 1117,
-        "y": 3,
-        "w": 301,
-        "h": 232
+        "x": 1716,
+        "y": 1791,
+        "w": 230,
+        "h": 160
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
-        "x": 19,
-        "y": 4,
-        "w": 301,
-        "h": 232
+        "x": 5,
+        "y": 15,
+        "w": 230,
+        "h": 160
       },
       "sourceSize": {
-        "w": 320,
-        "h": 240
+        "w": 240,
+        "h": 200
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "props/rotor": {
+      "frame": {
+        "x": 1424,
+        "y": 785,
+        "w": 468,
+        "h": 52
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 2,
+        "w": 468,
+        "h": 52
+      },
+      "sourceSize": {
+        "w": 480,
+        "h": 56
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "cards/helmet": {
+      "frame": {
+        "x": 1113,
+        "y": 3,
+        "w": 192,
+        "h": 109
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 27,
+        "w": 192,
+        "h": 109
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 144
       },
       "pivot": {
         "x": 0.5,

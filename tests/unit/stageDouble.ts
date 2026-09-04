@@ -288,6 +288,7 @@ export function stageDouble(result: RoundResult, playerIds: readonly string[]): 
     play(cue: AudioCue, when = 0) {
       cues.push({ cue, when });
     },
+
     positionOf: (playerId: string) => crooks.get(playerId)?.position ?? { x: 0, y: 0 },
     headOf: (playerId: string) => {
       const at = crooks.get(playerId)?.position ?? { x: 0, y: 0 };

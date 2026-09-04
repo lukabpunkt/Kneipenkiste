@@ -120,7 +120,7 @@ export async function mountOutcomePreview(host: HTMLElement): Promise<void> {
       counters,
       fx: room.fx,
       rng,
-      play: (cue, when) => playCue(cue, when),
+      play: (cue, when, detune) => playCue(cue, when, detune),
       positionOf: (id) => room.crooks.get(id)?.position ?? center,
       headOf: (id) => {
         const crook = room.crooks.get(id);

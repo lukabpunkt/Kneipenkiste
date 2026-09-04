@@ -208,7 +208,7 @@
 | Partikel-Budget | ✅ | Alle Effekte laufen über `FxKit` und die Pools; ist das Budget aus Art Direction §8 erschöpft, gibt der Pool `undefined` zurück und der Partikel entfällt. Der Jackpot fordert mit 90 Konfetti + 40 Münzen am meisten an. |
 | In 1 s auf 5,8" lesbar, wer trinkt und warum | ⏳ manuell | Screenshots in `docs/screens/m4-*.png`. Braucht ein Auge und eine Stoppuhr. |
 | „Lustig-Test": ≥ 2 von 3 grinsen | ⏳ manuell | Braucht drei Menschen. |
-| Video `docs/screens/m4-outcomes.mp4` | ⏳ offen (SOLL) | Sechs Standbilder statt Video; ein Bildschirmmitschnitt der Dev-Preview ist in einer Minute gemacht, aber besser mit echtem Ton. |
+| Video `docs/screens/m4-outcomes.mp4` | ✅ (als GIF) | `docs/screens/m4-outcomes.gif` — sechs Inszenierungen aus der Dev-Preview am Stück (Alleingang, Amboss, Schlägerei, Jackpot, Umarmung, Duell). **GIF statt MP4**, weil auf diesem Rechner kein ffmpeg liegt und ein Bildschirmmitschnitt aus dem Browser heraus nicht reproduzierbar wäre. Für den Ton bleibt das Ohr zuständig. |
 
 **Befunde während der Umsetzung**
 
@@ -219,7 +219,7 @@
 - **Die Bühnen-Attrappe war die eigentliche Arbeit.** Elf Sequenzen ohne Renderer prüfbar zu machen hieß, Crooks, Tresor, Kamera und FX durch Objekte zu ersetzen, die mitschreiben — die Timelines selbst laufen echt. Ohne sie wäre „Dauer 2–8 s" eine Behauptung geblieben.
 - **Das Dev-Panel verdeckte die Bühne.** Als Raster mit großen Knöpfen nahm es zwei Drittel des Bildes ein. Jetzt eine seitlich schiebbare Zeile am unteren Rand.
 
-**Offene SOLL-Follow-ups:** Video `docs/screens/m4-outcomes.mp4`.
+**Offene SOLL-Follow-ups:** keine (Video als GIF nachgereicht, siehe Tabelle).
 
 **Manuelle Checks für Luka vor M5:**
 
@@ -270,7 +270,7 @@
 - **Der Title-Loop lag zuerst auf halber Höhe** und verschwand hinter den Buttons. Er läuft jetzt am unteren Rand entlang, wo er die ganze Breite hat.
 - **Die Nachtschicht-Uhr hatte einen Rand zu viel.** Mit Zifferblattrand standen zwei Kreise übereinander und lasen sich als Doppelanzeige. Es bleiben zwölf Striche und der Zeiger.
 
-**Offene SOLL-Follow-ups:** Video `docs/screens/m4-outcomes.mp4` (aus M4).
+**Offene SOLL-Follow-ups:** keine.
 
 **Manuelle Checks für Luka vor M6:**
 
@@ -322,7 +322,7 @@
 - **Die Versionsnummer stand seit M0 auf `0.0.1`** und wurde auf dem Title-Screen angezeigt. Jetzt `1.0.0-rc.1`.
 - **Das `TODO(M5.6)` in der CI war noch offen.** Der Bundle-Schritt prüfte nur die Summe, nicht die Lazy-Regel. Beides macht jetzt `npm run check:bundle`.
 
-**Offene SOLL-Follow-ups:** Video `docs/screens/m4-outcomes.mp4` (aus M4).
+**Offene SOLL-Follow-ups:** keine.
 
 **Manuelle Checks für Luka — der Weg zu `v1.0.0`:**
 
@@ -335,3 +335,27 @@
 - [ ] Weiterhin offen aus M2–M5: echtes iPhone 11 / Pixel 4a (60 fps), Look-Check gegen Art Direction §1, Urteil über die synthetisierten Sounds, Title-Loop über zehn Minuten.
 
 **Zahlen:** 662 Unit-Tests · E2E auf vier Geräteprofilen · 3 Perf-Tests · Lighthouse Mobile 99/100/100/100 · Einstieg 33,3 KB gzip, gesamt 267,2 KB · 32 ADRs.
+
+
+## Backlog nach 1.0 — 2026-09-05
+
+Kein Meilenstein, kein Audit — Arbeit aus der Backlog-Liste in `04-ROADMAP.md`.
+
+**Vier weitere Inszenierungen** (Ziel laut Backlog: 20; Stand jetzt 15):
+
+| ID | Dauer | Warum diese |
+|---|---|---|
+| `share_slow_clap` | 5,3 s | Dritte für „alle teilen". Einer klatscht allein, langsam, fast höhnisch; pro Schlag steigt einer ein und der Abstand schrumpft — bis Kassel klingelt und der Applaus mitten in der Bewegung abreißt. Die Pausen zwischen den ersten Schlägen sind der Gag; wer sie kürzt, bekommt Beifall statt Spott. |
+| `steal_solo_helicopter` | 4,1 s | Vierte für den Alleingang und die einzige Flucht **nach oben**. Getaway fährt nach links, Moonwalk gleitet nach links, der Magier verschwindet auf der Stelle — eine vierte Flucht in dieselbe Richtung wäre die dritte Wiederholung gewesen. Der Hubschrauber bleibt fast die ganze Zeit außerhalb des Bildes: Was man nicht sieht, ist größer. |
+| `steal_multi_banana` | 4,5 s | Vierte für mehrere Diebe. Die drei bestehenden bestrafen von außen (Amboss), von innen (Tauziehen) oder gegenseitig (Duell) — diese bestraft **niemand**. Die Schale liegt von Anfang an sichtbar da; wer sie früh entdeckt, freut sich zweimal. |
+| `steal_all_pie_fight` | 4,2 s | Dritte für „alle stehlen". Die Schlägerei versteckt alles in einer Staubwolke, der Alarm sperrt alle weg — diese zeigt es. Jede Torte trägt die Farbe des Werfers, damit man sieht, **wer** wen erwischt hat. |
+
+Alle vier durchlaufen dieselben Prüfungen wie die elf aus M4: Dauer 2–8 s, Trinker-Zähler-Moment, Reset-Invariante, Kassel-Kommentar, Sound-Cue, Hit-Stop (der Guard-Test lehnt jede Sequenzdatei ohne `hitStop()` ab), Atlas-Abgleich der Frame-Namen.
+
+**Befunde**
+
+- **Klatschen ging am Rig zuerst nicht auf.** Die Arme hängen an den Schultern und drehen sich um diesen Punkt — nach außen gedreht liest sich das als „Arme breit", nicht als Applaus. Jetzt holen sie nach außen aus und schlagen nach innen zusammen, wo sich die Hände vor der Brust treffen.
+- **`ctx.play()` konnte nicht verstimmen.** Sechs identische Klatscher hintereinander klingen nach Maschinengewehr. Die Kontext-Schnittstelle reicht jetzt `detune` durch — der `AudioManager` konnte es die ganze Zeit.
+- **Zwei Registry-Tests zählten den Stand von gestern.** Sie prüften „genau elf" statt einer Untergrenze und fielen um, sobald etwas dazukam. Jetzt prüfen sie die Untergrenze je Fall aus GDD §4.4 und dass die Summe zur Liste passt.
+
+**Zahlen:** 682 Unit-Tests · 15 Inszenierungen (3,7–5,3 s) + 2 Overlays · 45 Atlas-Frames im front-Atlas · gesamt 268,6 KB gzip.
