@@ -65,6 +65,18 @@ jobs:
           fi
           # TODO(M5.5): pruefen, dass der Board-Chunk lazy geladen wird und nicht in index.html steht.
 
+      # Der Test-Seed macht die Kistenposition vorhersagbar — im Deploy-Build waere das
+      # das Ende des Spiels: `?seed=1` an die Live-URL, und jeder weiss, wo die Kiste
+      # liegt. Der Zweig faellt nur dann weg, wenn `import.meta.env` in Punkt-Notation
+      # gelesen wird (siehe src/vite-env.d.ts) — was hier nachgeprueft wird.
+      - name: Kein Test-Seed im Deploy-Build (ADR-11)
+        run: |
+          if grep -rlE "(get|has)\([\"']seed[\"']\)" dist/assets/*.js; then
+            echo "::error::Der ?seed=-Hook ist im Produktions-Build gelandet."
+            exit 1
+          fi
+          echo "✓ Der Test-Seed existiert nur im Dev- und E2E-Build"
+
       - name: Coverage-Report hochladen
         if: always()
         uses: actions/upload-artifact@v4
@@ -90,11 +102,15 @@ jobs:
           fi
           echo "✓ src/core/ nutzt ausschliesslich core/rng.ts"
 
-      - name: Kein Screen sieht board.mines oder board.treasure
+      # `.board` ist die schaerfste der drei Regeln: Wer das Board nicht anfassen kann,
+      # kommt an `mines` gar nicht heran. Ein blosses `.treasure` bleibt erlaubt —
+      # `ReplayCell.treasure` stammt aus `replayView()` und darf gelesen werden.
+      - name: Kein Screen sieht das private Board
         run: |
-          if grep -rn --include='*.ts' -E '\.(mines|treasure)\b' src/ui src/game 2>/dev/null \
+          if grep -rn --include='*.ts' -E '\.board\b|[Bb]oard\.(mines|treasure)\b|\{ *(mines|treasure) *[,}]' \
+               src/ui src/game 2>/dev/null \
              | grep -vE ':[0-9]+:[[:space:]]*(\*|//|/\*)'; then
-            echo "::error::Screens duerfen nur publicView()/replayView() sehen (ADR-2)."
+            echo "::error::Screens duerfen nur fsm.view() / placeViewFor() / replay() sehen (ADR-2)."
             exit 1
           fi
           echo "✓ Das private Board bleibt im Store"
