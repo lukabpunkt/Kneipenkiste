@@ -7,14 +7,16 @@
  */
 
 import { t } from '@/core/i18n';
-import { mostBetrayed } from '@/core/session';
+import { mostBetrayed, traitorOfTheEvening } from '@/core/session';
+import { shareText } from '@/core/share';
 import type { Drinker, RoundResult } from '@/core/types';
 import { vaultSpec } from '@/core/vault';
-import { countUp, growBar } from '@/ui/animate';
+import { countUp, growBar, safeAnimate } from '@/ui/animate';
 import { colorById, hex } from '@/config/theme';
 import { createPlayerBadge } from '@/ui/components/badge';
 import { createButton } from '@/ui/components/button';
 import { openSheet } from '@/ui/components/sheet';
+import { showToast } from '@/ui/components/toast';
 import { createVaultWidget } from '@/ui/components/vaultWidget';
 import type { ScreenContext, ScreenInstance } from '@/ui/router';
 
@@ -106,6 +108,12 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
     onClick: () => openStats(),
   });
 
+  const share = createButton({
+    label: t('share.cta'),
+    variant: 'ghost',
+    onClick: () => void shareRound(),
+  });
+
   const changePlayers = createButton({
     label: t('result.changePlayers'),
     variant: 'ghost',
@@ -127,10 +135,39 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
     },
   });
 
-  actions.append(stats, changePlayers);
+  actions.append(stats, share, changePlayers);
   el.append(banner, sub, drinkers, preview, actions, next);
 
   /* ---------------------------------------------------------------- */
+
+  /**
+   * Teilt den Satz zur Runde ueber das Betriebssystem (GDD §3.8).
+   *
+   * Drei Stufen, weil die Web-Share-API nur auf dem Handy und nur im sicheren Kontext
+   * existiert: teilen, sonst kopieren, sonst den Satz wenigstens zeigen. Ein Knopf, der
+   * kommentarlos nichts tut, ist schlimmer als keiner.
+   */
+  async function shareRound(): Promise<void> {
+    const text = shareText({ result: result!, players: ctx.session.state.players });
+
+    try {
+      if (typeof navigator.share === 'function') {
+        await navigator.share({ title: t('share.title'), text });
+        return;
+      }
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+        showToast(t('share.copied'));
+        return;
+      }
+    } catch {
+      /*
+       * Abbrechen ist der Normalfall, kein Fehler: Wer das Share-Blatt zumacht, hat sich
+       * entschieden. Wir zeigen den Satz trotzdem — dann war der Tap nicht umsonst.
+       */
+    }
+    showToast(text, { durationMs: 6000 });
+  }
 
   function openStats(): void {
     const content = document.createElement('div');
@@ -215,6 +252,24 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
       footer.append(note(t('result.mostBetrayed'), ctx.session.playerById(betrayedId)?.name ?? ''));
     }
 
+    /*
+     * Der Titel des Abends steht als Abzeichen da, nicht als Zeile: Er ist die einzige
+     * Auszeichnung im Spiel, und Auszeichnungen sehen anders aus als Statistik.
+     */
+    const traitorId = traitorOfTheEvening(session);
+    const traitor = traitorId ? ctx.session.playerById(traitorId) : undefined;
+    if (traitor) {
+      const award = document.createElement('div');
+      award.className = 'score__award';
+      award.append(createPlayerBadge({ colorId: traitor.colorId, size: 'sm' }));
+
+      const text = document.createElement('span');
+      text.className = 'score__awardText';
+      text.textContent = `${t('result.traitor')}: ${traitor.name}`;
+      award.append(text);
+      footer.append(award);
+    }
+
     if (footer.childElementCount > 0) content.append(footer);
 
     openSheet({ title: t('result.stats'), content });
@@ -223,6 +278,21 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
   return {
     el,
     activate() {
+      /*
+       * Das Banner faehrt von links ein (Art Direction §4.6). Es steht schon im DOM,
+       * bevor der Wipe aufgeht — die Bewegung startet deshalb hier und nicht beim Bau,
+       * sonst waere sie hinter dem Wipe schon vorbei.
+       */
+      void safeAnimate(
+        banner,
+        [
+          { transform: 'translateX(-115%) rotate(-4deg)', opacity: 0 },
+          { transform: 'translateX(4%) rotate(1deg)', opacity: 1, offset: 0.72 },
+          { transform: 'translateX(0) rotate(0deg)', opacity: 1 },
+        ],
+        { duration: 520, easing: 'cubic-bezier(.34,1.56,.64,1)' }
+      );
+
       // Die Vorschau zeigt erst den alten Stand und wechselt dann sichtbar auf den neuen —
       // sonst merkt niemand, dass der Tresor gewachsen oder geleert wurde.
       globalThis.setTimeout(() => {

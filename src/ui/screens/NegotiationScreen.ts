@@ -92,10 +92,11 @@ export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
       button.addEventListener('click', () => {
         if (!ctx.fsm.toggleOath(player.id)) return;
         const sworn = ctx.fsm.context.setup?.oaths.includes(player.id) ?? false;
-        setBadgeSworn(badge, sworn);
+        setBadgeSworn(badge, sworn, true);
         button.classList.toggle('is-sworn', sworn);
         button.setAttribute('aria-pressed', String(sworn));
-        vibrate('tap');
+        // Der Schwur ist die einzige Geste dieses Screens — er bekommt das Siegel-Muster.
+        vibrate(sworn ? 'seal' : 'tap');
       });
 
       badges.append(button);
@@ -120,13 +121,21 @@ export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
   let kasselTimer: ReturnType<typeof setInterval> | undefined;
   let done = false;
 
-  /** Kassel wirft hoechstens alle 10 s einen Satz ein (GDD §3.3) — Deko, kein Hinweis. */
+  /**
+   * Kassel wirft hoechstens alle 10 s einen Satz ein (GDD §3.3) — Deko, kein Hinweis.
+   *
+   * In den letzten zehn Sekunden wechselt er den Ton: Aus Geplauder wird Druck. Das ist
+   * derselbe Umschlag wie bei Ring und Musik, nur in Worten — drei Kanaele, eine Ansage.
+   */
   function startKassel(): void {
     const lines = tList('kassel.negotiation');
+    const lateLines = tList('kassel.negotiationLate');
     if (lines.length === 0) return;
     let index = Math.floor(ctx.fsm.context.setup?.seed ?? 0) % lines.length;
     const show = (): void => {
-      kassel.textContent = lines[index % lines.length] ?? '';
+      const late = ring.secondsLeft <= COUNTDOWN_WARN_SEC && lateLines.length > 0;
+      const pool = late ? lateLines : lines;
+      kassel.textContent = pool[index % pool.length] ?? '';
       kassel.classList.remove('is-new');
       void kassel.offsetWidth;
       kassel.classList.add('is-new');

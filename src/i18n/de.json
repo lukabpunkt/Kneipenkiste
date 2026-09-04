@@ -143,7 +143,8 @@
     "trustIndex": "Vertrauen",
     "betrayalStreak": "Verrats-Streak",
     "mostBetrayed": "Meistbetrogen",
-    "noStatsYet": "Noch keine Runde gespielt."
+    "noStatsYet": "Noch keine Runde gespielt.",
+    "traitor": "Verräter des Abends"
   },
   "kassel": {
     "negotiation": [
@@ -185,6 +186,12 @@
       "Meine Nieten!",
       "Das war er also, der Tresor.",
       "Ich brauche einen neuen."
+    ],
+    "negotiationLate": [
+      "Noch zehn Sekunden.",
+      "Entscheidet euch.",
+      "Die Uhr läuft, meine Herrschaften.",
+      "Gleich wird abgerechnet."
     ]
   },
   "rules": {
@@ -212,5 +219,16 @@
     "abortRoundBody": "Die Wahlen dieser Runde gehen verloren.",
     "abortConfirm": "Abbrechen",
     "abortKeep": "Weiterspielen"
+  },
+  "share": {
+    "title": "Der Tresor",
+    "allShare": "Bei {vault} Schlücken im Tresor haben alle geteilt. Ehre unter Dieben. 🤝",
+    "soloSteal": "{name} hat bei {vault} Schlücken im Tresor gestohlen. Allein. 🔓",
+    "multiSteal": "{count} von uns haben bei {vault} Schlücken im Tresor gleichzeitig gestohlen. 💥",
+    "allSteal": "Bei {vault} Schlücken im Tresor haben alle gestohlen. Es gab eine Schlägerei. 🥊",
+    "jackpot": "Der Tresor ist bei {vault} Schlücken geplatzt. 🎉",
+    "perjury": "{name} hat geschworen zu teilen und bei {vault} Schlücken gestohlen. Meineid. ⚖️",
+    "cta": "Teilen",
+    "copied": "In die Zwischenablage kopiert."
   }
 }

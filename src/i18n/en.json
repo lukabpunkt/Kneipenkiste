@@ -143,7 +143,8 @@
     "trustIndex": "Trust",
     "betrayalStreak": "Betrayal streak",
     "mostBetrayed": "Most betrayed",
-    "noStatsYet": "No round played yet."
+    "noStatsYet": "No round played yet.",
+    "traitor": "Traitor of the evening"
   },
   "kassel": {
     "negotiation": [
@@ -185,6 +186,12 @@
       "My rivets!",
       "So that was the vault.",
       "I'll need a new one."
+    ],
+    "negotiationLate": [
+      "Ten seconds left.",
+      "Make up your minds.",
+      "The clock is running, ladies and gentlemen.",
+      "Settling up shortly."
     ]
   },
   "rules": {
@@ -212,5 +219,16 @@
     "abortRoundBody": "This round's choices will be lost.",
     "abortConfirm": "Abandon",
     "abortKeep": "Keep playing"
+  },
+  "share": {
+    "title": "The Vault",
+    "allShare": "With {vault} sips in the vault, everyone shared. Honour among thieves. 🤝",
+    "soloSteal": "{name} stole with {vault} sips in the vault. Alone. 🔓",
+    "multiSteal": "{count} of us stole at the same time, with {vault} sips in the vault. 💥",
+    "allSteal": "With {vault} sips in the vault, everyone stole. There was a brawl. 🥊",
+    "jackpot": "The vault burst at {vault} sips. 🎉",
+    "perjury": "{name} swore to share and stole with {vault} sips at stake. Perjury. ⚖️",
+    "cta": "Share",
+    "copied": "Copied to clipboard."
   }
 }

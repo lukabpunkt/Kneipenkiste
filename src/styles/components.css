@@ -1313,8 +1313,27 @@
 }
 
 /* Kurz vor dem Platzen wackelt die Tür — „zu voll". */
+/* Zwei Dritteln voll: ein leises Zittern, kaum bewusst wahrnehmbar. */
+.vault.is-heavy .vault__door {
+  animation: vault-heavy 3.6s ease-in-out infinite;
+}
+
 .vault.is-stuffed .vault__door {
   animation: vault-stuffed 2.4s ease-in-out infinite;
+}
+
+@keyframes vault-heavy {
+  0%,
+  86%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  90% {
+    transform: translate3d(-1.5px, 0, 0) rotate(-0.4deg);
+  }
+  94% {
+    transform: translate3d(1.5px, 0, 0) rotate(0.4deg);
+  }
 }
 
 .vault.is-growing .vault__door {
@@ -1375,6 +1394,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .vault.is-heavy .vault__door,
   .vault.is-stuffed .vault__door,
   .vault.is-growing .vault__door,
   .vault.is-draining .vault__door,
@@ -2504,4 +2524,30 @@
   margin: 0;
   font-size: 11px;
   color: var(--color-gold);
+}
+
+/* ------------------------------------------------------------------ */
+/* Verräter des Abends (GDD §3.8)                                      */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Die einzige Auszeichnung im Spiel — und die sieht anders aus als eine Statistikzeile:
+ * Rahmen in Diebesrot, Badge daneben, damit man das Gesicht sieht und nicht nur den Namen.
+ */
+.score__award {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 3px solid var(--c-steal);
+  border-radius: var(--radius-md);
+  background: rgb(255 45 85 / 10%);
+}
+
+.score__awardText {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  letter-spacing: 0.02em;
+  color: var(--c-steal);
 }

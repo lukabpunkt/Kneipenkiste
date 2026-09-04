@@ -64,6 +64,36 @@ describe('plural()', () => {
   });
 });
 
+describe('Kassels Listen (Roadmap M4.5/M5.2)', () => {
+  /*
+   * Die Saetze zu jedem Ausgang liegen als Arrays vor, damit sich Kassel ueber einen
+   * Abend nicht wiederholt. Ein Array, das in einer Sprache fehlt, faellt sonst erst
+   * auf der Buehne auf — als stumme Sprechblase.
+   */
+  const LIST_KEYS = [
+    'kassel.negotiation',
+    'kassel.negotiationLate',
+    'kassel.perjury',
+    'kassel.allShare',
+    'kassel.soloSteal',
+    'kassel.multiSteal',
+    'kassel.allSteal',
+    'kassel.jackpot',
+  ] as const;
+
+  for (const locale of LOCALES) {
+    it(`${locale}: hat zu jedem Ausgang mindestens zwei Saetze`, () => {
+      setLocale(locale);
+      for (const key of LIST_KEYS) {
+        const lines = tList(key);
+        expect(lines.length, key).toBeGreaterThanOrEqual(2);
+        expect(lines.every((line) => line.trim().length > 0), key).toBe(true);
+      }
+      setLocale('de');
+    });
+  }
+});
+
 describe('tList()', () => {
   it('liefert Kassels Sprueche als Liste (Art Direction §9)', () => {
     const lines = tList('kassel.negotiation');

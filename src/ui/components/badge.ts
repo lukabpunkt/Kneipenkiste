@@ -10,6 +10,7 @@
  * Spielers. Es ist absichtlich auffaellig: Ein Schwur soll etwas wert sein.
  */
 
+import { safeAnimate } from '@/ui/animate';
 import { colorById, hex, textColorOn, UI_COLORS, type ColorId, type SymbolId } from '@/config/theme';
 
 const SYMBOL_PATHS: Record<SymbolId, string> = {
@@ -77,9 +78,37 @@ export function createPlayerBadge(options: PlayerBadgeOptions): HTMLElement {
   return wrapper;
 }
 
-/** Siegel setzen oder abnehmen (Eid-Modus, Negotiation-Screen). */
-export function setBadgeSworn(badge: HTMLElement, sworn: boolean): void {
+/**
+ * Siegel setzen oder abnehmen (Eid-Modus, Art Direction §4.4).
+ *
+ * `stamp` spielt den Stempel ab: Das Siegel kommt gross und schraeg von vorn, schlaegt
+ * auf und federt aus. Ein Eid ist eine oeffentliche Handlung am Tisch — er darf nicht
+ * einfach eingeblendet werden, er muss knallen. Beim Zuruecknehmen bleibt es still:
+ * Wer seinen Schwur zurueckzieht, bekommt dafuer keine Fanfare.
+ */
+export function setBadgeSworn(badge: HTMLElement, sworn: boolean, stamp = false): void {
   badge.classList.toggle('is-sworn', sworn);
+  if (!sworn || !stamp) return;
+
+  const seal = badge.querySelector<HTMLElement>('.badge__seal');
+  if (!seal) return;
+
+  void safeAnimate(
+    seal,
+    [
+      { transform: 'scale(2.6) rotate(-24deg)', opacity: 0 },
+      { transform: 'scale(0.88) rotate(4deg)', opacity: 1, offset: 0.45 },
+      { transform: 'scale(1.12) rotate(-2deg)', offset: 0.65 },
+      { transform: 'scale(1) rotate(0deg)' },
+    ],
+    { duration: 420, easing: 'cubic-bezier(.34,1.56,.64,1)' }
+  );
+  // Das Badge selbst zuckt einmal — der Aufschlag geht durch die Figur.
+  void safeAnimate(
+    badge,
+    [{ transform: 'scale(1)' }, { transform: 'scale(.93)', offset: 0.2 }, { transform: 'scale(1)' }],
+    { duration: 300, easing: 'cubic-bezier(.34,1.56,.64,1)' }
+  );
 }
 
 /** Zaehler am Badge — 0 blendet ihn aus (Verteil-UI, Art Direction §4.5). */

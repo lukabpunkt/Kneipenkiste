@@ -19,6 +19,9 @@ import { plural, t } from '@/core/i18n';
 import { createFlipCounter, type FlipCounter } from './flipCounter';
 import { prefersReducedMotion } from '@/ui/animate';
 
+/** Ab diesem Fuellstand zittert der Tresor (Art Direction §4.2). */
+const HEAVY_FILL = 0.66;
+
 export interface VaultWidgetOptions {
   vault: number;
   spec: VaultSpec;
@@ -64,8 +67,14 @@ export function createVaultWidget(options: VaultWidgetOptions): VaultWidget {
 
   let vault = options.vault;
   const applyFill = (value: number): void => {
-    el.style.setProperty('--vault-fill', String(vaultFill(value, options.spec)));
-    // Kurz vor dem Platzen wackelt der Tresor: "zu voll" (Art Direction §4.2).
+    const fill = vaultFill(value, options.spec);
+    el.style.setProperty('--vault-fill', String(fill));
+    /*
+     * Zwei Stufen statt einer (Art Direction §4.2): Ab zwei Dritteln zittert der Tresor
+     * leise — man soll spueren, dass es teuer wird, **bevor** die Zahl gefaehrlich
+     * aussieht. Am Jackpot wackelt er richtig.
+     */
+    el.classList.toggle('is-heavy', fill >= HEAVY_FILL && value < options.spec.jackpotAt);
     el.classList.toggle('is-stuffed', value >= options.spec.jackpotAt);
   };
   applyFill(vault);

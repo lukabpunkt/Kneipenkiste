@@ -174,6 +174,34 @@ export function mostBetrayed(session: Session): PlayerId | undefined {
   return best;
 }
 
+/**
+ * "Verraeter des Abends" (GDD §3.8, Roadmap M5.3).
+ *
+ * Wer am oeftesten gestohlen hat — und zwar **freiwillig**: Maulwurf-Runden zaehlen
+ * nicht, sonst waere der Titel eine Auszeichnung fuer Pech (ADR-7). Bei Gleichstand
+ * entscheidet der niedrigere Vertrauens-Index, danach die Zahl der Meineide; wer beides
+ * gleich hat, ist so schuldig wie der andere, und dann gewinnt die Spielerliste.
+ *
+ * `undefined`, solange niemand gestohlen hat — ein Abend ohne Verrat braucht keinen
+ * Verraeter, und einen zu erfinden waere die falsche Pointe.
+ */
+export function traitorOfTheEvening(session: Session): PlayerId | undefined {
+  let best: PlayerStats | undefined;
+  for (const stats of sessionStats(session)) {
+    if (stats.steals === 0) continue;
+    if (best === undefined || better(stats, best)) best = stats;
+  }
+  return best?.playerId;
+}
+
+function better(candidate: PlayerStats, champion: PlayerStats): boolean {
+  if (candidate.steals !== champion.steals) return candidate.steals > champion.steals;
+  const a = candidate.trustIndex ?? 100;
+  const b = champion.trustIndex ?? 100;
+  if (a !== b) return a < b;
+  return candidate.perjuries > champion.perjuries;
+}
+
 /* ------------------------------------------------------------------ */
 /* Persistenz (Architektur §4)                                         */
 /* ------------------------------------------------------------------ */

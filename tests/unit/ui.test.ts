@@ -191,6 +191,19 @@ describe('i18n-Abdeckung der Screens', () => {
     'common.continue',
     'orientation.headline',
     'orientation.body',
+    'result.traitor',
+    'modes.comboOathMole',
+    'modes.comboNightHighroller',
+    'modes.comboAllOn',
+    'share.title',
+    'share.cta',
+    'share.copied',
+    'share.allShare',
+    'share.soloSteal',
+    'share.multiSteal',
+    'share.allSteal',
+    'share.jackpot',
+    'share.perjury',
   ] as const;
 
   for (const locale of LOCALES) {
@@ -221,6 +234,7 @@ describe('i18n-Abdeckung der Screens', () => {
       'rules',
       'sealed',
       'settings',
+      'share',
       'silence',
       'title',
     ]);
