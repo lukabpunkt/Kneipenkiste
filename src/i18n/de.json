@@ -230,5 +230,9 @@
     "perjury": "{name} hat geschworen zu teilen und bei {vault} Schlücken gestohlen. Meineid. ⚖️",
     "cta": "Teilen",
     "copied": "In die Zwischenablage kopiert."
+  },
+  "onboarding": {
+    "negotiation": "Redet. Schwört. Lügt.",
+    "choice": "Niemand sieht das. Wirklich."
   }
 }

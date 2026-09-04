@@ -51,6 +51,12 @@ export interface RevealDirectorOptions {
   line?: (key: string) => string;
   /** Laeuft, sobald eine Karte offen liegt — der Screen protokolliert damit (ADR-18). */
   onCardRevealed?: (playerId: PlayerId, choice: 'share' | 'steal', isLast: boolean) => void;
+  /**
+   * Laeuft, wenn die Inszenierung des Ausgangs beginnt — der Screen haengt daran seine
+   * Haptik (Roadmap M5.5). Der Director vibriert nicht selbst: `src/game/` kennt die
+   * Buehne, nicht das Geraet.
+   */
+  onOutcome?: (outcome: RoundResult['outcome'], perjury: boolean) => void;
   /** Laeuft ganz am Ende der Show. */
   onFinished?: () => void;
 }
@@ -287,6 +293,15 @@ export class RevealDirector {
      * ein: Beides zusammen ergaebe zwei Blasen hintereinander, und die zweite kaeme
      * ausgerechnet dann, wenn die Zahlen zu lesen waeren (Roadmap M4.5).
      */
+    this.timeline.call(
+      () =>
+        this.options.onOutcome?.(
+          this.options.result.outcome,
+          this.options.result.perjurers.length > 0
+        ),
+      undefined,
+      at
+    );
     this.timeline.add(chosen.build(this.context()), at);
   }
 

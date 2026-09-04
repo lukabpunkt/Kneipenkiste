@@ -112,6 +112,55 @@ describe('tList()', () => {
   });
 });
 
+describe('DE und EN sind deckungsgleich (DoD M5)', () => {
+  /*
+   * "EN vollstaendig" laesst sich nicht durch Hinsehen pruefen — bei ueber 200 Keys
+   * faellt ein fehlender erst auf, wenn im Spiel "[missing: …]" steht. Also drei
+   * maschinelle Fragen: Gibt es jeden Key in beiden Sprachen? Ist keiner leer? Und
+   * benutzen beide dieselben Platzhalter?
+   */
+  it('kennt in beiden Sprachen exakt dieselben Keys', () => {
+    expect(flatKeys('en')).toEqual(flatKeys('de'));
+  });
+
+  it('hat in keiner Sprache einen leeren Text', () => {
+    for (const locale of LOCALES) {
+      setLocale(locale);
+      for (const key of flatKeys(locale)) {
+        const single = t(key);
+        // Listen liefert `t()` nicht — die pruefen wir ueber `tList`.
+        const lines = tList(key);
+        if (lines.length > 0) {
+          expect(lines.every((line) => line.trim().length > 0), `${locale}:${key}`).toBe(true);
+        } else {
+          expect(single.trim().length, `${locale}:${key}`).toBeGreaterThan(0);
+          expect(single.startsWith('[missing:'), `${locale}:${key}`).toBe(false);
+        }
+      }
+    }
+    setLocale('de');
+  });
+
+  it('benutzt in beiden Sprachen dieselben Platzhalter', () => {
+    const holes = (text: string): string[] =>
+      [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]!).sort();
+
+    for (const key of flatKeys('de')) {
+      setLocale('de');
+      const de = tList(key).length > 0 ? tList(key).join(' ') : t(key);
+      setLocale('en');
+      const en = tList(key).length > 0 ? tList(key).join(' ') : t(key);
+      /*
+       * Ein Platzhalter, der nur in einer Sprache steht, ist ein stiller Fehler: Der
+       * Satz bleibt lesbar, aber der Name oder die Zahl fehlt genau dort, wo sie die
+       * Pointe traegt.
+       */
+      expect(holes(en), key).toEqual(holes(de));
+    }
+    setLocale('de');
+  });
+});
+
 describe('flatKeys()', () => {
   it('listet Keys sortiert und behandelt Listen als Blatt', () => {
     const keys = flatKeys('de');

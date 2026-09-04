@@ -104,3 +104,63 @@ describe('Kein hardcodierter UI-Text (Standing Audit)', () => {
     expect(offenders).toEqual([]);
   });
 });
+
+describe('Reduzierte Bewegung (Standing Audit, A5)', () => {
+  /**
+   * Jede **Endlos**-Animation muss bei `prefers-reduced-motion: reduce` abschaltbar sein.
+   *
+   * Einmaliges Aufploppen ist in Ordnung — es ist vorbei, bevor es stoert. Was dauerhaft
+   * laeuft, ist etwas anderes: Ein wackelnder Knopf oder eine schleichende Figur machen
+   * die Seite fuer Menschen mit vestibulaeren Beschwerden unbenutzbar. Genau so ist
+   * `btn-wobble` durchgerutscht — der E2E-Test hat es gefunden, dieser hier haelt es fest.
+   *
+   * Geprueft wird auf **Keyframe-Namen**: Der Test liest, welche Animationen `infinite`
+   * laufen, und verlangt, dass jeder dieser Namen irgendwo in einem
+   * `prefers-reduced-motion`-Block auf `none` gesetzt wird — ueber den Selektor, der ihn
+   * gesetzt hat.
+   */
+  it('schaltet jede Endlos-Animation bei reduzierter Bewegung ab', () => {
+    const files = ['src/styles/components.css', 'src/styles/base.css'];
+
+    for (const file of files) {
+      // Kommentare raus: Sonst zieht der Selektor-Match den Kommentarblock davor mit.
+      const css = readFileSync(join(root, file), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+
+      /* Alle Regeln, die etwas endlos animieren — Selektor plus Keyframe-Name. */
+      const endless: { selector: string; name: string }[] = [];
+      for (const match of css.matchAll(
+        /([^{}]+)\{[^{}]*animation:\s*([\w-]+)[^;}]*\binfinite\b[^;}]*;/g
+      )) {
+        endless.push({ selector: match[1]!.trim(), name: match[2]! });
+      }
+      expect(endless.length, `${file}: keine Endlos-Animation gefunden?`).toBeGreaterThan(0);
+
+      /* Alles, was in einem reduced-motion-Block steht. */
+      const reduced = [...css.matchAll(/@media \(prefers-reduced-motion: reduce\)\s*\{/g)]
+        .map((match) => blockAt(css, match.index! + match[0].length - 1))
+        .join('\n');
+
+      for (const rule of endless) {
+        /*
+         * Der Selektor muss im Block vorkommen — nicht der Keyframe-Name: Man schaltet
+         * `animation: none` auf dem Element, nicht auf der Keyframe-Regel.
+         */
+        const last = rule.selector.split(',').pop()!.trim();
+        expect(reduced, `${file}: "${last}" (${rule.name}) laeuft auch bei reduzierter Bewegung`).toContain(last);
+      }
+    }
+  });
+});
+
+/** Liest den Inhalt eines Blocks ab der oeffnenden Klammer — inklusive verschachtelter. */
+function blockAt(css: string, openIndex: number): string {
+  let depth = 0;
+  for (let i = openIndex; i < css.length; i++) {
+    if (css[i] === '{') depth += 1;
+    else if (css[i] === '}') {
+      depth -= 1;
+      if (depth === 0) return css.slice(openIndex + 1, i);
+    }
+  }
+  return '';
+}

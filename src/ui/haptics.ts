@@ -18,6 +18,13 @@ export const HAPTIC_PATTERNS = {
   lastCard: [40, 60, 40],
   /** Ein Dieb liegt offen. */
   alarm: 60,
+  /**
+   * Der Tresor platzt. Das laengste Muster im Spiel — dreimal so lang wie alles andere,
+   * weil der Jackpot dreimal so selten ist.
+   */
+  jackpot: [30, 40, 30, 40, 90, 60, 140],
+  /** Der Stempel bei Meineid: zwei harte Schlaege, dazwischen nichts. */
+  perjury: [70, 90, 110],
 } as const;
 
 export type HapticPattern = keyof typeof HAPTIC_PATTERNS;

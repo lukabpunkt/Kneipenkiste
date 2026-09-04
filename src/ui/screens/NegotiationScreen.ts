@@ -18,6 +18,7 @@ import { vaultSpec } from '@/core/vault';
 import { createPlayerBadge, setBadgeSworn } from '@/ui/components/badge';
 import { createButton } from '@/ui/components/button';
 import { createCountdownRing } from '@/ui/components/countdownRing';
+import { showHint } from '@/ui/components/onboarding';
 import { createVaultWidget } from '@/ui/components/vaultWidget';
 import { vibrate } from '@/ui/haptics';
 import type { ScreenContext, ScreenInstance } from '@/ui/router';
@@ -158,6 +159,8 @@ export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
     activate() {
       ring.start();
       startKassel();
+      // Einmal pro Geraet: Darf ich hier luegen? Ja (Roadmap M5.5).
+      showHint(el, 'negotiation');
       // Das Handy liegt auf dem Tisch und wird 30 s nicht angefasst (GDD §5).
       void acquireWakeLock();
       /*

@@ -13,6 +13,7 @@ import { t } from '@/core/i18n';
 import { forcedChoice, isMole } from '@/core/modes';
 import type { Choice } from '@/core/types';
 import { createChoiceCards } from '@/ui/components/choiceCard';
+import { showHint } from '@/ui/components/onboarding';
 import { showToast } from '@/ui/components/toast';
 import { vibrate } from '@/ui/haptics';
 import type { ScreenContext, ScreenInstance } from '@/ui/router';
@@ -101,6 +102,12 @@ export function createChoiceScreen(ctx: ScreenContext): ScreenInstance {
     el,
     activate() {
       startThinkTimer();
+      /*
+       * Einmal pro Geraet: Nein, der Naechste sieht deine Wahl nicht (Roadmap M5.5).
+       * Die Frage stellt sich beim ersten Rumgeben jeder — und wer sie nicht beantwortet
+       * bekommt, tippt vorsichtiger, als das Spiel es verdient.
+       */
+      showHint(el, 'choice');
     },
     destroy() {
       settled = true;

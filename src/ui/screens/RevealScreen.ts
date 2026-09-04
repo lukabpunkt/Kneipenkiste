@@ -175,6 +175,15 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
         return options.length > 0 ? (options[rng.int(options.length)] ?? '') : t(`kassel.${key}`);
       },
       onCardRevealed,
+      /*
+       * Der Ausgang geht auch in die Hand (GDD §5): Der Jackpot bekommt das laengste
+       * Muster im Spiel, der Meineid zwei harte Schlaege. Alles andere bleibt bei der
+       * Haptik der letzten Karte — sonst nutzt sich der Effekt ab.
+       */
+      onOutcome: (outcome, perjury) => {
+        if (perjury) vibrate('perjury');
+        else if (outcome === 'jackpot') vibrate('jackpot');
+      },
       onFinished: finish,
     });
 

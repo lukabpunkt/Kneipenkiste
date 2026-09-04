@@ -230,5 +230,9 @@
     "perjury": "{name} swore to share and stole with {vault} sips at stake. Perjury. ⚖️",
     "cta": "Share",
     "copied": "Copied to clipboard."
+  },
+  "onboarding": {
+    "negotiation": "Talk. Swear. Lie.",
+    "choice": "Nobody sees this. Really."
   }
 }
