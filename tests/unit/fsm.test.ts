@@ -417,6 +417,33 @@ describe('Informationssicherheit der FSM', () => {
     expect(JSON.stringify(view)).not.toContain(String(TREASURE_CELL));
   });
 
+  it('gibt das Feld erst im Replay komplett frei (GDD §4.4)', () => {
+    const fsm = fsmWith(3);
+    fsm.send({ type: 'start' });
+    fsm.send({ type: 'mine' });
+
+    fsm.send({ type: 'tap' });
+    fsm.togglePlacement(0, 'mine');
+    fsm.togglePlacement(1, 'mine');
+    fsm.send({ type: 'bury' });
+    for (let i = 1; i < 3; i++) {
+      fsm.send({ type: 'tap' });
+      fsm.fillPlacements();
+      fsm.send({ type: 'bury' });
+    }
+    fsm.send({ type: 'begin' });
+
+    // Waehrend der Runde verraet `view()` nichts ueber die Minen ...
+    expect(JSON.stringify(fsm.view())).not.toContain('owners');
+
+    // ... im Replay stehen sie alle, auch die nie ausgeloesten.
+    const replay = fsm.replay();
+    expect(replay.cells).toHaveLength(25);
+    expect(replay.cells[0]?.mineOwners).toEqual(['p1']);
+    expect(replay.cells[0]?.neverTriggered).toBe(true);
+    expect(replay.cells.filter((cell) => cell.treasure)).toHaveLength(1);
+  });
+
   it('zeigt einem Spieler auf dem Place-Screen nur die eigenen Minen', () => {
     const fsm = fsmWith(3);
     fsm.send({ type: 'start' });

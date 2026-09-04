@@ -249,13 +249,30 @@ describe('Informationssicherheit im Code', () => {
     return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
   }
 
-  it('referenziert nirgends board.mines oder board.treasure', () => {
+  /**
+   * Drei Muster, die zusammen jeden realistischen Weg zum privaten Board abdecken:
+   *
+   * 1. `.board` — der Zugriff auf das Board selbst. Das ist die schaerfste der drei:
+   *    Wer `fsm.context.board` nicht anfassen kann, kommt an `mines` gar nicht heran.
+   * 2. `board.mines` / `board.treasure` — falls doch einmal ein Board hereingereicht wird.
+   * 3. `{ mines` / `{ treasure` — dieselben Felder ueber eine Destrukturierung.
+   *
+   * Bewusst **nicht** verboten ist ein blosses `.treasure`: `ReplayCell.treasure` kommt
+   * aus `replayView()` und darf am Rundenende gelesen werden (GDD §4.4).
+   */
+  const FORBIDDEN: readonly [RegExp, string][] = [
+    [/\.board\b/, 'Zugriff auf das private Board'],
+    [/\b[Bb]oard\.(mines|treasure)\b/, 'board.mines / board.treasure'],
+    [/\{\s*(mines|treasure)\s*[,}]/, 'Destrukturierung von mines / treasure'],
+  ];
+
+  it('referenziert nirgends das private Board', () => {
     const offenders: string[] = [];
 
     for (const file of outsideCore) {
       const code = stripComments(readFileSync(file, 'utf8'));
-      if (/\.mines\b/.test(code) || /\.treasure\b/.test(code) || /\bmines\s*:/.test(code)) {
-        offenders.push(relative(srcRoot, file));
+      for (const [pattern, what] of FORBIDDEN) {
+        if (pattern.test(code)) offenders.push(`${relative(srcRoot, file)} — ${what}`);
       }
     }
 
@@ -263,12 +280,18 @@ describe('Informationssicherheit im Code', () => {
   });
 
   it('beisst, wenn ein Screen doch zugreift', () => {
-    // Der Test oben ist nur so viel wert wie sein Muster — hier steht, dass es trifft.
-    const code = stripComments('const stack = board.mines[cell];');
-    expect(/\.mines\b/.test(code)).toBe(true);
+    // Der Test oben ist nur so viel wert wie seine Muster — hier steht, dass sie treffen.
+    const hits = (code: string): number =>
+      FORBIDDEN.filter(([pattern]) => pattern.test(stripComments(code))).length;
 
-    const commented = stripComments('// ADR-2: niemand liest hier board.mines\nconst x = 1;');
-    expect(/\.mines\b/.test(commented)).toBe(false);
+    expect(hits('const stack = board.mines[cell];')).toBeGreaterThan(0);
+    expect(hits('const cells = fsm.context.board;')).toBeGreaterThan(0);
+    expect(hits('const { mines, treasure } = someBoard;')).toBeGreaterThan(0);
+
+    // ... und dass sie das Erlaubte in Ruhe lassen:
+    expect(hits('// ADR-2: niemand liest hier board.mines')).toBe(0);
+    expect(hits('if (replayCell.treasure) show();')).toBe(0);
+    expect(hits('const view = fsm.replay();')).toBe(0);
   });
 
   it('haelt die einzigen Board-Ausgaenge in core/board.ts', () => {

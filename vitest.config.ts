@@ -15,7 +15,7 @@ export default defineConfig({
       provider: 'v8',
       reportsDirectory: 'coverage',
       reporter: ['text', 'json-summary', 'html'],
-      include: ['src/core/**/*.ts'],
+      include: ['src/core/**/*.ts', 'src/ui/devSeed.ts'],
       // `types.ts` enthaelt ausschliesslich Interfaces und Typ-Aliase — nach dem
       // Transpilieren bleibt davon keine ausfuehrbare Zeile uebrig.
       exclude: ['src/core/types.ts'],
@@ -26,6 +26,24 @@ export default defineConfig({
           functions: 95,
           lines: 95,
           statements: 95,
+        },
+        /*
+         * Der Test-Seed entscheidet, ob die Kistenposition vorhersagbar ist (ADR-11) —
+         * er wird wie Kernlogik behandelt, obwohl er in `ui/` liegt: jede Zeile, jede
+         * Funktion.
+         *
+         * Bei den Zweigen sind 65 % das Maximum des Erreichbaren, und das ist kein
+         * Nachlassen: Die fehlenden drei sind `import.meta.env.VITE_E2E` (wird nie
+         * ausgewertet, weil Vitest mit `DEV === true` laeuft und `||` kurzschliesst)
+         * und die `?? ''`-Fallbacks fuer `location.search` (in jsdom immer gesetzt).
+         * Ob der Hook im Deploy-Build wirklich verschwindet, kann ohnehin kein
+         * Unit-Test zeigen — das prueft der CI-Schritt am gebauten Bundle.
+         */
+        'src/ui/devSeed.ts': {
+          branches: 65,
+          functions: 100,
+          lines: 100,
+          statements: 100,
         },
         // Die FSM ist der einzige Ort mit Zustandsuebergaengen — hier gilt 100 %.
         'src/core/fsm.ts': {

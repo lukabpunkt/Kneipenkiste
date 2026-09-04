@@ -49,7 +49,13 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run build && npm run preview',
+    /*
+     * Gebaut wird der echte Produktionspfad — nur mit `VITE_E2E=1`, damit `?seed=`
+     * ueberhaupt existiert (ui/devSeed.ts). Der Deploy-Build setzt die Variable nicht;
+     * der Zweig faellt dort beim Tree-Shaking heraus, und `tests/unit/config.test.ts`
+     * haelt fest, dass das so bleibt.
+     */
+    command: 'npm run build:e2e && npm run preview',
     url: 'http://localhost:4173/Sprengmeister/',
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
