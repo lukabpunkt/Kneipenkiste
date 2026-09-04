@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Glas zum Anstoßen (GDD §4.4, share_toast). Hand-Slot. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 72" width="56" height="72">
+  <path d="M10 8h36l-7 30H17z" fill="#FFC93C" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="25" y="38" width="6" height="18" fill="#8C93A8" stroke="#1A1024" stroke-width="5"/>
+  <rect x="13" y="56" width="30" height="8" rx="4" fill="#8C93A8" stroke="#1A1024" stroke-width="5"/>
+</svg>

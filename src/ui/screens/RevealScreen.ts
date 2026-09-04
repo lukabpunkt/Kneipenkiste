@@ -18,7 +18,7 @@
 
 import { colorById, hex, textColorOn } from '@/config/theme';
 import { buildRevealScript } from '@/core/choreographer';
-import { t } from '@/core/i18n';
+import { t, tList } from '@/core/i18n';
 import { createSeededRng } from '@/core/rng';
 import type { Choice, RoundResult } from '@/core/types';
 import { vaultSpec } from '@/core/vault';
@@ -165,7 +165,15 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
       room,
       camera,
       rng,
-      line: (key) => t(`kassel.${key}`),
+      /*
+       * Kassels Kommentare liegen als Arrays in der i18n (Roadmap M4.5) — pro Outcome
+       * drei Saetze, damit er sich ueber einen Abend nicht wiederholt. Gezogen wird mit
+       * dem Runden-Seed: Dieselbe Runde klingt beim Nachspielen gleich.
+       */
+      line: (key) => {
+        const options = tList(`kassel.${key}`);
+        return options.length > 0 ? (options[rng.int(options.length)] ?? '') : t(`kassel.${key}`);
+      },
       onCardRevealed,
       onFinished: finish,
     });

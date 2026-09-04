@@ -7,7 +7,7 @@
  */
 
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { flatKeys } from '@/core/i18n';
 
@@ -87,6 +87,12 @@ describe('Kein hardcodierter UI-Text (Standing Audit)', () => {
 
     const offenders: string[] = [];
     for (const file of files) {
+      /*
+       * `src/ui/dev/` ist ausgenommen: Die Inszenierungs-Preview (`?dev=1&panel=outcomes`)
+       * beschriftet ihre Knoepfe mit Sequenz-IDs und wird nie ausgeliefert. Sie zu
+       * uebersetzen hiesse, Entwickler-Werkzeug in die Sprachdateien zu schreiben.
+       */
+      if (file.includes(`${sep}ui${sep}dev${sep}`)) continue;
       const source = stripComments(readFileSync(file, 'utf8'));
       for (const match of source.matchAll(
         /\.(?:textContent|innerText|innerHTML)\s*=\s*(?:'([^']*)'|"([^"]*)"|`([^`]*)`)/gs

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sternchen über dem Kopf: Treffer, Amboss, Prügelwolke (Art Direction §8). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <path d="m20 3 5 11 12 1.6-8.7 8.4 2.2 12L20 30.2 9.5 36l2.2-12L3 15.6 15 14z"
+        fill="#FFC93C" stroke="#1A1024" stroke-width="4" stroke-linejoin="round"/>
+</svg>

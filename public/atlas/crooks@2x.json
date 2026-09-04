@@ -24,34 +24,10 @@
         "y": 0.5
       }
     },
-    "crooks/sign_deal": {
+    "crooks/head": {
       "frame": {
         "x": 323,
         "y": 3,
-        "w": 304,
-        "h": 183
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 8,
-        "y": 8,
-        "w": 304,
-        "h": 183
-      },
-      "sourceSize": {
-        "w": 320,
-        "h": 192
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/head": {
-      "frame": {
-        "x": 3,
-        "y": 147,
         "w": 252,
         "h": 224
       },
@@ -72,34 +48,10 @@
         "y": 0.5
       }
     },
-    "crooks/arm": {
-      "frame": {
-        "x": 261,
-        "y": 147,
-        "w": 56,
-        "h": 120
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 4,
-        "w": 56,
-        "h": 120
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 128
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
     "crooks/shadow": {
       "frame": {
-        "x": 633,
-        "y": 3,
+        "x": 3,
+        "y": 147,
         "w": 248,
         "h": 88
       },
@@ -120,538 +72,10 @@
         "y": 0.5
       }
     },
-    "crooks/hats/cap": {
-      "frame": {
-        "x": 887,
-        "y": 3,
-        "w": 192,
-        "h": 88
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 32,
-        "y": 36,
-        "w": 192,
-        "h": 88
-      },
-      "sourceSize": {
-        "w": 224,
-        "h": 144
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/hats/helmet": {
-      "frame": {
-        "x": 1085,
-        "y": 3,
-        "w": 188,
-        "h": 98
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 18,
-        "y": 44,
-        "w": 188,
-        "h": 98
-      },
-      "sourceSize": {
-        "w": 224,
-        "h": 144
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/hats/beanie": {
-      "frame": {
-        "x": 633,
-        "y": 97,
-        "w": 176,
-        "h": 124
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 24,
-        "y": 16,
-        "w": 176,
-        "h": 124
-      },
-      "sourceSize": {
-        "w": 224,
-        "h": 144
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/hats/tophat": {
-      "frame": {
-        "x": 815,
-        "y": 97,
-        "w": 168,
-        "h": 108
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 28,
-        "y": 32,
-        "w": 168,
-        "h": 108
-      },
-      "sourceSize": {
-        "w": 224,
-        "h": 144
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/jaw": {
-      "frame": {
-        "x": 989,
-        "y": 97,
-        "w": 84,
-        "h": 56
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 6,
-        "y": 6,
-        "w": 84,
-        "h": 56
-      },
-      "sourceSize": {
-        "w": 96,
-        "h": 64
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/torso": {
-      "frame": {
-        "x": 323,
-        "y": 192,
-        "w": 164,
-        "h": 214
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 14,
-        "y": 6,
-        "w": 164,
-        "h": 214
-      },
-      "sourceSize": {
-        "w": 192,
-        "h": 224
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/symbols/circle": {
-      "frame": {
-        "x": 261,
-        "y": 273,
-        "w": 56,
-        "h": 56
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 20,
-        "y": 20,
-        "w": 56,
-        "h": 56
-      },
-      "sourceSize": {
-        "w": 96,
-        "h": 96
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/symbols/square": {
-      "frame": {
-        "x": 261,
-        "y": 335,
-        "w": 56,
-        "h": 56
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 20,
-        "y": 20,
-        "w": 56,
-        "h": 56
-      },
-      "sourceSize": {
-        "w": 96,
-        "h": 96
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/bag": {
-      "frame": {
-        "x": 493,
-        "y": 192,
-        "w": 126,
-        "h": 146
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 9,
-        "y": 9,
-        "w": 126,
-        "h": 146
-      },
-      "sourceSize": {
-        "w": 144,
-        "h": 160
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/hats/none": {
-      "frame": {
-        "x": 625,
-        "y": 192,
-        "w": 2,
-        "h": 2
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 2,
-        "h": 2
-      },
-      "sourceSize": {
-        "w": 2,
-        "h": 2
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/mask": {
-      "frame": {
-        "x": 3,
-        "y": 377,
-        "w": 162,
-        "h": 87
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 15,
-        "y": 9,
-        "w": 162,
-        "h": 87
-      },
-      "sourceSize": {
-        "w": 192,
-        "h": 128
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/faces/smug": {
-      "frame": {
-        "x": 171,
-        "y": 397,
-        "w": 146,
-        "h": 110
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 23,
-        "y": 2,
-        "w": 146,
-        "h": 110
-      },
-      "sourceSize": {
-        "w": 192,
-        "h": 128
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/faces/guilty": {
-      "frame": {
-        "x": 3,
-        "y": 470,
-        "w": 161,
-        "h": 92
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 23,
-        "y": 17,
-        "w": 161,
-        "h": 92
-      },
-      "sourceSize": {
-        "w": 192,
-        "h": 128
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "kassel/face": {
-      "frame": {
-        "x": 1279,
-        "y": 3,
-        "w": 157,
-        "h": 105
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 23,
-        "y": 6,
-        "w": 157,
-        "h": 105
-      },
-      "sourceSize": {
-        "w": 192,
-        "h": 128
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/faces/jaw_drop": {
-      "frame": {
-        "x": 1079,
-        "y": 107,
-        "w": 154,
-        "h": 119
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 19,
-        "y": 5,
-        "w": 154,
-        "h": 119
-      },
-      "sourceSize": {
-        "w": 192,
-        "h": 128
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/foot": {
-      "frame": {
-        "x": 989,
-        "y": 159,
-        "w": 80,
-        "h": 44
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 4,
-        "y": 0,
-        "w": 80,
-        "h": 44
-      },
-      "sourceSize": {
-        "w": 88,
-        "h": 48
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/symbols/cross": {
-      "frame": {
-        "x": 989,
-        "y": 209,
-        "w": 72,
-        "h": 72
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 12,
-        "y": 12,
-        "w": 72,
-        "h": 72
-      },
-      "sourceSize": {
-        "w": 96,
-        "h": 96
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/hats/crown": {
-      "frame": {
-        "x": 815,
-        "y": 211,
-        "w": 152,
-        "h": 96
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 36,
-        "y": 44,
-        "w": 152,
-        "h": 96
-      },
-      "sourceSize": {
-        "w": 224,
-        "h": 144
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "kassel/ledger": {
-      "frame": {
-        "x": 973,
-        "y": 287,
-        "w": 100,
-        "h": 116
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 6,
-        "y": 6,
-        "w": 100,
-        "h": 116
-      },
-      "sourceSize": {
-        "w": 112,
-        "h": 128
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/faces/innocent": {
-      "frame": {
-        "x": 625,
-        "y": 227,
-        "w": 150,
-        "h": 105
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 21,
-        "y": 11,
-        "w": 150,
-        "h": 105
-      },
-      "sourceSize": {
-        "w": 192,
-        "h": 128
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/faces/neutral": {
-      "frame": {
-        "x": 625,
-        "y": 338,
-        "w": 146,
-        "h": 93
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 23,
-        "y": 17,
-        "w": 146,
-        "h": 93
-      },
-      "sourceSize": {
-        "w": 192,
-        "h": 128
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "kassel/jacket": {
-      "frame": {
-        "x": 493,
-        "y": 409,
-        "w": 124,
-        "h": 174
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 34,
-        "y": 26,
-        "w": 124,
-        "h": 174
-      },
-      "sourceSize": {
-        "w": 192,
-        "h": 224
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
     "crooks/symbols/heart": {
       "frame": {
-        "x": 493,
-        "y": 344,
+        "x": 257,
+        "y": 147,
         "w": 60,
         "h": 56
       },
@@ -674,8 +98,8 @@
     },
     "crooks/symbols/triangle": {
       "frame": {
-        "x": 559,
-        "y": 344,
+        "x": 257,
+        "y": 209,
         "w": 60,
         "h": 54
       },
@@ -696,20 +120,308 @@
         "y": 0.5
       }
     },
-    "crooks/faces/ouch": {
+    "crooks/hats/cap": {
       "frame": {
-        "x": 323,
-        "y": 412,
-        "w": 145,
-        "h": 101
+        "x": 3,
+        "y": 241,
+        "w": 192,
+        "h": 88
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
-        "x": 26,
-        "y": 15,
-        "w": 145,
-        "h": 101
+        "x": 32,
+        "y": 36,
+        "w": 192,
+        "h": 88
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 144
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/symbols/bolt": {
+      "frame": {
+        "x": 201,
+        "y": 241,
+        "w": 44,
+        "h": 72
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 24,
+        "y": 12,
+        "w": 44,
+        "h": 72
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/hats/helmet": {
+      "frame": {
+        "x": 581,
+        "y": 3,
+        "w": 188,
+        "h": 98
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 18,
+        "y": 44,
+        "w": 188,
+        "h": 98
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 144
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/nose": {
+      "frame": {
+        "x": 775,
+        "y": 3,
+        "w": 185,
+        "h": 76
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 6,
+        "w": 185,
+        "h": 76
+      },
+      "sourceSize": {
+        "w": 240,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/hats/beanie": {
+      "frame": {
+        "x": 966,
+        "y": 3,
+        "w": 176,
+        "h": 124
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 24,
+        "y": 16,
+        "w": 176,
+        "h": 124
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 144
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/hats/tophat": {
+      "frame": {
+        "x": 775,
+        "y": 85,
+        "w": 168,
+        "h": 108
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 28,
+        "y": 32,
+        "w": 168,
+        "h": 108
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 144
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/hats/none": {
+      "frame": {
+        "x": 949,
+        "y": 85,
+        "w": 2,
+        "h": 2
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 2,
+        "h": 2
+      },
+      "sourceSize": {
+        "w": 2,
+        "h": 2
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/torso": {
+      "frame": {
+        "x": 581,
+        "y": 107,
+        "w": 164,
+        "h": 214
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 14,
+        "y": 6,
+        "w": 164,
+        "h": 214
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 224
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/mask": {
+      "frame": {
+        "x": 323,
+        "y": 233,
+        "w": 162,
+        "h": 87
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 15,
+        "y": 9,
+        "w": 162,
+        "h": 87
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/jaw": {
+      "frame": {
+        "x": 491,
+        "y": 269,
+        "w": 84,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 6,
+        "w": 84,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/arm": {
+      "frame": {
+        "x": 251,
+        "y": 269,
+        "w": 56,
+        "h": 120
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 4,
+        "w": 56,
+        "h": 120
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/faces/guilty": {
+      "frame": {
+        "x": 313,
+        "y": 326,
+        "w": 161,
+        "h": 92
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 23,
+        "y": 17,
+        "w": 161,
+        "h": 92
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "kassel/face": {
+      "frame": {
+        "x": 3,
+        "y": 335,
+        "w": 157,
+        "h": 105
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 23,
+        "y": 6,
+        "w": 157,
+        "h": 105
       },
       "sourceSize": {
         "w": 192,
@@ -722,8 +434,8 @@
     },
     "crooks/faces/happy": {
       "frame": {
-        "x": 170,
-        "y": 513,
+        "x": 166,
+        "y": 395,
         "w": 140,
         "h": 74
       },
@@ -746,8 +458,8 @@
     },
     "crooks/faces/blink": {
       "frame": {
-        "x": 3,
-        "y": 568,
+        "x": 166,
+        "y": 475,
         "w": 140,
         "h": 71
       },
@@ -770,8 +482,8 @@
     },
     "crooks/faces/wave": {
       "frame": {
-        "x": 316,
-        "y": 519,
+        "x": 166,
+        "y": 552,
         "w": 140,
         "h": 70
       },
@@ -792,10 +504,154 @@
         "y": 0.5
       }
     },
+    "crooks/faces/jaw_drop": {
+      "frame": {
+        "x": 3,
+        "y": 446,
+        "w": 154,
+        "h": 119
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 19,
+        "y": 5,
+        "w": 154,
+        "h": 119
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/hats/crown": {
+      "frame": {
+        "x": 3,
+        "y": 571,
+        "w": 152,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 36,
+        "y": 44,
+        "w": 152,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 144
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/faces/innocent": {
+      "frame": {
+        "x": 1148,
+        "y": 3,
+        "w": 150,
+        "h": 105
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 21,
+        "y": 11,
+        "w": 150,
+        "h": 105
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/faces/smug": {
+      "frame": {
+        "x": 1304,
+        "y": 3,
+        "w": 146,
+        "h": 110
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 23,
+        "y": 2,
+        "w": 146,
+        "h": 110
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/faces/neutral": {
+      "frame": {
+        "x": 1148,
+        "y": 114,
+        "w": 146,
+        "h": 93
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 23,
+        "y": 17,
+        "w": 146,
+        "h": 93
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/faces/ouch": {
+      "frame": {
+        "x": 949,
+        "y": 133,
+        "w": 145,
+        "h": 101
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 26,
+        "y": 15,
+        "w": 145,
+        "h": 101
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
     "crooks/faces/x_eyes": {
       "frame": {
-        "x": 149,
-        "y": 593,
+        "x": 751,
+        "y": 199,
         "w": 138,
         "h": 87
       },
@@ -816,10 +672,106 @@
         "y": 0.5
       }
     },
+    "crooks/bag": {
+      "frame": {
+        "x": 751,
+        "y": 292,
+        "w": 126,
+        "h": 146
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 9,
+        "y": 9,
+        "w": 126,
+        "h": 146
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 160
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "kassel/jacket": {
+      "frame": {
+        "x": 581,
+        "y": 327,
+        "w": 124,
+        "h": 174
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 34,
+        "y": 26,
+        "w": 124,
+        "h": 174
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 224
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/foot": {
+      "frame": {
+        "x": 480,
+        "y": 444,
+        "w": 80,
+        "h": 44
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 0,
+        "w": 80,
+        "h": 44
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/leg": {
+      "frame": {
+        "x": 480,
+        "y": 331,
+        "w": 52,
+        "h": 106
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 4,
+        "w": 52,
+        "h": 106
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 112
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
     "crooks/shirt_stripes": {
       "frame": {
-        "x": 3,
-        "y": 645,
+        "x": 312,
+        "y": 424,
         "w": 124,
         "h": 148
       },
@@ -842,8 +794,8 @@
     },
     "crooks/hats/party": {
       "frame": {
-        "x": 781,
-        "y": 313,
+        "x": 442,
+        "y": 494,
         "w": 120,
         "h": 122
       },
@@ -864,24 +816,96 @@
         "y": 0.5
       }
     },
-    "crooks/leg": {
+    "kassel/ledger": {
       "frame": {
-        "x": 907,
-        "y": 313,
-        "w": 52,
-        "h": 106
+        "x": 312,
+        "y": 578,
+        "w": 100,
+        "h": 116
       },
       "rotated": false,
       "trimmed": true,
       "spriteSourceSize": {
         "x": 6,
-        "y": 4,
-        "w": 52,
-        "h": 106
+        "y": 6,
+        "w": 100,
+        "h": 116
       },
       "sourceSize": {
-        "w": 64,
-        "h": 112
+        "w": 112,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/symbols/cross": {
+      "frame": {
+        "x": 161,
+        "y": 628,
+        "w": 72,
+        "h": 72
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 12,
+        "w": 72,
+        "h": 72
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/symbols/circle": {
+      "frame": {
+        "x": 239,
+        "y": 628,
+        "w": 56,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 20,
+        "y": 20,
+        "w": 56,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "crooks/symbols/square": {
+      "frame": {
+        "x": 239,
+        "y": 690,
+        "w": 56,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 20,
+        "y": 20,
+        "w": 56,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
       },
       "pivot": {
         "x": 0.5,
@@ -890,8 +914,8 @@
     },
     "crooks/symbols/star": {
       "frame": {
-        "x": 623,
-        "y": 437,
+        "x": 3,
+        "y": 673,
         "w": 70,
         "h": 66
       },
@@ -914,8 +938,8 @@
     },
     "crooks/symbols/diamond": {
       "frame": {
-        "x": 699,
-        "y": 437,
+        "x": 79,
+        "y": 673,
         "w": 68,
         "h": 68
       },
@@ -926,30 +950,6 @@
         "y": 14,
         "w": 68,
         "h": 68
-      },
-      "sourceSize": {
-        "w": 96,
-        "h": 96
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "crooks/symbols/bolt": {
-      "frame": {
-        "x": 623,
-        "y": 509,
-        "w": 44,
-        "h": 72
-      },
-      "rotated": false,
-      "trimmed": true,
-      "spriteSourceSize": {
-        "x": 24,
-        "y": 12,
-        "w": 44,
-        "h": 72
       },
       "sourceSize": {
         "w": 96,

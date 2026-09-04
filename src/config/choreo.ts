@@ -75,7 +75,13 @@ export const ALARM_MS = 600;
 export const OUTCOME_BUDGET_MS = 5000;
 
 /** Feinstruktur eines Karten-Beats (Art Direction §5.1, GDD §4.3). */
-export const CARD = {
+export const CARD: {
+  panMs: number;
+  liftMs: number;
+  flipMs: number;
+  flashMs: number;
+  lastCardTimeScale: number;
+} = {
   /** Kamera faehrt auf die Karte, bevor sie sich hebt. */
   panMs: 400,
   /** Anticipation: Die Karte hebt sich vom Tisch. */

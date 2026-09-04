@@ -2279,3 +2279,49 @@
 .dev__button:active {
   background: var(--c-bg-panel-raised);
 }
+
+/* ------------------------------------------------------------------ */
+/* Dev-Preview der Inszenierungen (?dev=1&panel=outcomes, Roadmap M4)  */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Ein schmaler Streifen am unteren Rand — die Buehne ist der Gegenstand der Preview
+ * und darf nicht von ihrem eigenen Bedienfeld verdeckt werden.
+ */
+.dev--outcomes {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 90;
+  display: grid;
+  gap: 4px;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--color-ink) 82%, transparent);
+}
+
+/* Eine einzige Zeile, die man seitlich schiebt — die Buehne bleibt frei. */
+.dev--outcomes .dev__controls {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.dev--outcomes .dev__button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.dev--outcomes .dev__button {
+  min-height: 0;
+  padding: 4px 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  border-radius: 6px;
+}
+
+.dev__status {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-gold);
+}

@@ -281,11 +281,12 @@ export class RevealDirector {
         : scripted;
     const chosen = outcomeById(id) ?? basicOutcome;
 
-    this.timeline.call(
-      () => this.options.room.kassel.say(this.line(this.options.result.outcome), 2400),
-      undefined,
-      at
-    );
+    /*
+     * Kassels Kommentar setzt die Sequenz selbst ueber `ctx.say()` — jede weiss, wann in
+     * ihrem Ablauf die Pointe sitzt. Der Director wirft ihn nicht mehr pauschal am Anfang
+     * ein: Beides zusammen ergaebe zwei Blasen hintereinander, und die zweite kaeme
+     * ausgerechnet dann, wenn die Zahlen zu lesen waeren (Roadmap M4.5).
+     */
     this.timeline.add(chosen.build(this.context()), at);
   }
 
@@ -329,18 +330,25 @@ export class RevealDirector {
       sharers: crooksOf(result.sharers),
       cards: room.cards,
       counters: this.counters,
+      fx: room.fx,
       rng,
       play: (cue, when) => audio.play(cue, when),
-      positionOf: (playerId) => {
+      positionOf: (playerId) => room.crooks.get(playerId)?.position ?? this.stageCenter(),
+      headOf: (playerId) => {
         const crook = room.crooks.get(playerId);
-        if (!crook) return { x: STAGE.worldSize / 2, y: STAGE.worldSize / 2 };
-        return { x: crook.view.position.x, y: crook.view.position.y - 190 };
+        if (!crook) return this.stageCenter();
+        return { x: crook.position.x, y: crook.position.y - crook.headOffset };
       },
+      say: (key, holdMs) => room.kassel.say(this.line(key), holdMs),
     };
   }
 
   private line(key: string): string {
     return this.options.line?.(key) ?? '';
+  }
+
+  private stageCenter(): { x: number; y: number } {
+    return { x: STAGE.worldSize / 2, y: STAGE.worldSize / 2 };
   }
 
   /* ---------------------------------------------------------------- */

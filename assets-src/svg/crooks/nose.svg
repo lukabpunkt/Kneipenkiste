@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Pinocchio-Nase (GDD §4.4, perjury_seal_break). Waechst nach rechts aus dem Gesicht;
+     der Anker liegt links, damit sie am Kopf klebt und nicht mitwandert. Ungetintet in
+     Kopffarbe — sie gehoert zum Gesicht, nicht zur Maske. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 44" width="120" height="44">
+  <path d="M6 22c0-9 7-16 16-16 14 0 34 3 66 12 6 2 6 6 0 8-32 9-52 12-66 12-9 0-16-7-16-16z"
+        fill="#F2C79B" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M30 14c14 1 30 4 46 8" fill="none" stroke="#1A1024" stroke-width="4"
+        stroke-linecap="round" opacity="0.35"/>
+</svg>

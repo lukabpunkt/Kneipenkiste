@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Herzchen für die Gruppenumarmung (GDD §4.4, share_group_hug). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <path d="M20 35S4 24 4 14a8 8 0 0 1 16-5 8 8 0 0 1 16 5c0 10-16 21-16 21z"
+        fill="#FF6B9D" stroke="#1A1024" stroke-width="4" stroke-linejoin="round"/>
+</svg>

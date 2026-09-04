@@ -57,6 +57,20 @@ function boot(): void {
   const mount = document.querySelector<HTMLElement>('#app');
   if (!mount) throw new Error('#app fehlt in index.html.');
 
+  /*
+   * `npm run preview:outcomes` haengt die Inszenierungs-Preview neben Router und FSM
+   * (Roadmap M4.1). Sie liegt in einem eigenen Chunk und wird nur hier geladen — die
+   * ausgelieferte App kennt sie nicht.
+   */
+  const params = new URLSearchParams(location.search);
+  if (params.has('dev') && params.get('panel') === 'outcomes') {
+    setLocale(createSessionStore().state.settings.locale ?? detectLocale());
+    void import('@/ui/dev/outcomePreview').then(({ mountOutcomePreview }) =>
+      mountOutcomePreview(mount)
+    );
+    return;
+  }
+
   const session = createSessionStore();
   const settings = session.state.settings;
 

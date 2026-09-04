@@ -5,8 +5,10 @@
  * Scherben, ein Donner. Das Overlay legt sich **über** die Dieb-Inszenierung, es ersetzt
  * sie nicht — wer schwört und stiehlt, wird zweimal angesehen.
  *
- * In M3 sind die Effekte bewusst schlicht (Scherben aus dem Atlas, kein Partikelsystem).
- * Pinocchio-Nase und Kassels Stempel kommen in M4.
+ * M4 gibt dem Moment seine zwei Pointen: Dem Meineidigen waechst in drei Schueben die
+ * Luegennase, und Kassel knallt ihm den MEINEID-Stempel auf die Brust. Beides ist
+ * Anklage, kein Schmuck — der Eid-Modus lebt davon, dass ein gebrochener Eid sichtbar
+ * teurer aussieht als ein ehrlicher Diebstahl.
  */
 
 import gsap from 'gsap';
@@ -29,6 +31,8 @@ export const perjurySealBreak: OverlaySequence = {
 
     ctx.play('thunder');
     ctx.play('stamp', 0.18);
+    // Kassel kommentiert den Bruch — er ist der Buchhalter des Eids (GDD §7).
+    ctx.say('perjury', 2200);
 
     // Der Blitz: Der Raum blitzt kurz weiss auf, dann bleibt Rot.
     timeline.add(ctx.room.flash(UI_COLORS.paper, 0.35, 120), 0);
@@ -38,6 +42,16 @@ export const perjurySealBreak: OverlaySequence = {
     timeline.call(() => crook.setFace('guilty'), undefined, 0.1);
     timeline.to(crook.view.scale, { y: crook.view.scale.y * 0.9, duration: 0.08 }, 0.1);
     timeline.to(crook.view.scale, { y: crook.view.scale.y, duration: 0.24, ease: 'elastic.out(1, 0.4)' });
+
+    /*
+     * Die Nase waechst, waehrend die Scherben noch fliegen: Erst der Bruch, dann die
+     * Luege, dann der Stempel — drei Schlaege statt eines Knalls (Art Direction §7,
+     * Staffelung).
+     */
+    timeline.add(crook.growNose(), 0.34);
+    timeline.add(crook.stamp(), 0.78);
+    timeline.add(ctx.camera.shake(6, 160), 0.78);
+    timeline.add(ctx.room.flash(UI_COLORS.steal, 0.22, 140), 0.78);
 
     if (!shardTexture) return timeline;
 

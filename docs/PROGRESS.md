@@ -156,3 +156,76 @@
 - [ ] Auf einem echten Gerät mit Ton: Trägt der Herzschlag bei der letzten Karte? Sind die synthetisierten Platzhalter-Sounds gut genug, um bis M6 zu bleiben — oder braucht es echte Samples?
 
 **Zahlen:** 582 Unit-Tests · 32 E2E-Tests · 3 Perf-Tests · Show 22,7 s bei 5 Spielern („Normal") · p50 16,7 ms während der Show · 2 Draw-Calls · 26 Sound-Cues, synthetisiert.
+
+## M4 — Ergebnis-Inszenierungen — 2026-09-04 (Tag `v0.4.0`)
+
+**Stand:** 11 Inszenierungen + 2 Overlays gebaut, registriert, getestet und einzeln in der Dev-Preview abspielbar. Kassel kommentiert jeden Ausgang aus einem i18n-Array. Der Trinker-Zähler-Moment schließt jede Sequenz ab.
+
+**Was neu ist**
+
+- `src/game/outcomes/<typ>/*.ts` — die elf Sequenzen aus GDD §4.4.
+- `src/game/outcomes/juice.ts` — `hitStop()`, das siebte Animationsprinzip (ADR-22).
+- `src/game/outcomes/registry.ts` — `ALL_OUTCOMES`, `ALL_OVERLAYS`, `registerAll()`.
+- `src/game/Crook.ts` — `growNose()` und `stamp()` für den Meineid; `assets-src/svg/crooks/nose.svg` ist neu.
+- `src/ui/dev/outcomePreview.ts` — `npm run preview:outcomes` spielt jede Sequenz und jedes Overlay einzeln ab, ohne eine Runde durchzuspielen.
+- `tests/unit/stageDouble.ts` — Bühnen-Attrappe: echte GSAP-Timelines, gefälschte Figuren. So laufen alle elf Sequenzen ohne Renderer durch.
+- `tests/unit/outcomeRegistry.test.ts` — 64 Fälle.
+
+## Audit A4 — 2026-09-04
+
+**Ergebnis:** BESTANDEN (alle automatisierbaren MUSS-Checks grün; Lesbarkeit und „Lustig-Test" brauchen Menschen)
+
+**Pro Sequenz** (Dauer über die Bühnen-Attrappe, 4 Spieler; auf der echten Bühne kommen je nach Spielerzahl ein bis zwei Zehntel dazu):
+
+| ID | Dauer | Zähler | Reset | Hit-Stop | Notiz |
+|---|---|---|---|---|---|
+| `share_group_hug` | 4,6 s | ✅ | ✅ | ✅ | Anticipation in den Knien, Overshoot beim Ankommen, Halt in der Umarmung, Kassels Träne, dann die Rechnung. |
+| `share_toast` | 4,5 s | ✅ | ✅ | ✅ | Gläser hoch, Halt oben im Klirren, ein einzelner Crook bekommt Schluckauf. |
+| `steal_solo_getaway` | 3,7 s | ✅ | ✅ | ✅ | Zugriff mit Halt, Fluchtauto, Reifenqualm, Kinnladen der Teiler, das Schild „WIR HATTEN EINEN DEAL". |
+| `steal_solo_moonwalk` | 3,8 s | ✅ | ✅ | ✅ | Anticipation gegen die Laufrichtung, Gleiten mit Körperwippe, Halt im Moment des Groschens. |
+| `steal_solo_magician` | 4,2 s | ✅ | ✅ | ✅ | Tuch über den Tresor, Halt auf dem leeren Tresor, Applaus, der mitten im Takt kippt. |
+| `steal_multi_tugofwar` | 5,3 s | ✅ | ✅ | ✅ | Popcorn-Publikum, dreimal härteres Ziehen, Sack platzt, Halt, Münzen fliegen in die Münder. |
+| `steal_multi_anvil` | 5,2 s | ✅ | ✅ | ✅ | Amboss in der Farbe des Gegenspielers, Anticipation oben, Squash, Halt, Follow-Through per Bounce. |
+| `steal_multi_standoff` | 4,3 s | ✅ | ✅ | ✅ | Kameraschwenk die Reihe ab, alle spritzen gleichzeitig, Reaktion kommt eine Spur zu spät. |
+| `steal_all_brawl` | 5,1 s | ✅ | ✅ | ✅ | Staubwolke aus neun Puffs (ADR-24), genau ein Schuh fliegt raus, Halt vor der Pointe, Kassel mit der Kelle. |
+| `steal_all_alarm` | 4,5 s | ✅ | ✅ | ✅ | Alle greifen zu, Sirene, Gitter fällt in einem Zug, Halt beim Einrasten, dann federt es nach. |
+| `jackpot_burst` | 4,6 s | ✅ | ✅ | ✅ | Tresor bläht sich, platzt, Halt mitten im Knall, 90 Konfetti + 40 Münzen, alle tanzen. |
+| `perjury_seal_break` (Overlay) | 1,2 s | — | ✅ | — | Blitz, drei Scherben, Lügennase in drei Schüben, MEINEID-Stempel auf die Brust. |
+| `mole_reveal` (Overlay) | 0,7 s | — | ✅ | — | Bergbauhelm fällt auf die Karte, Schulterzucken: Befehl ist Befehl. |
+
+| Check | Status | Notiz |
+|---|---|---|
+| Dauer 2–8 s | ✅ | Alle elf zwischen 3,7 s und 5,3 s — Testfall pro Sequenz gegen `ANIM.outcomeMinMs`/`outcomeMaxMs`. |
+| Endet mit dem Trinker-Zähler-Moment | ✅ | Jede Sequenz ruft `buildSipCounters()`; der Test spielt sie bis ans Ende und prüft, dass eine Zahl fällt, sobald jemand trinkt. Beim Alleingang bleibt der Zähler leer — dort entscheidet erst DISTRIBUTE, wer trinkt (GDD §3.6), und die Übergabe „Handy an {Dieb}" steht im E2E-Durchlauf. |
+| Reset-Invariante | ✅ | Der Test bricht jede Sequenz bei 60 % ab — dort räumt eine Inszenierung am schlechtesten auf — und prüft danach Alpha, Rotation, Skalierung, Requisiten, Geldsack und Sitzposition jeder Figur. |
+| Alle sieben Animationsprinzipien | ✅ / ⏳ | Der Hit-Stop wird erzwungen: Ein Test lehnt jede Sequenzdatei ohne `hitStop()` ab (ADR-22). Anticipation, Squash & Stretch, Overshoot, Follow-Through, Staffelung und Sound-Sync stehen in jeder Sequenz und sind im Code kommentiert — ob sie *wirken*, ist Augenmaß und bleibt manuell. |
+| Alle IDs registriert, in Dev-Preview abspielbar | ✅ | `registerAll()` nimmt alle elf plus `basic_outcome` als Rückfall; `npm run preview:outcomes` zeigt für jede einen Knopf, dazu beide Overlays und `reset`. |
+| No-Repeat-Fenster 3 pro Typ, 1 000 Runden | ✅ | Test zieht 1 000-mal für jeden der fünf Typen; keine Wiederholung im Fenster, sobald es mehr Alternativen als das Fenster gibt. Beim Jackpot mit nur einer Sequenz darf und muss dieselbe wiederkommen. Über 1 000 Runden kommt jede Sequenz dran. |
+| Gewichte | ✅ | Alle elf mit Gewicht 1 — bewusst gleich verteilt, bis die Spieltests zeigen, welche Inszenierung trägt und welche nervt. Der Test lehnt Gewicht ≤ 0 ab. |
+| Overlays kombinierbar mit jeder Dieb-Sequenz | ✅ | Beide Overlays werden gegen jede der acht Dieb-Sequenzen gebaut; jedes bleibt unter dem Outcome-Budget. |
+| Kassel-Kommentare pro Outcome | ✅ | Fünf i18n-Arrays à drei Sätze plus drei für den Meineid, gezogen mit dem Runden-Seed — dieselbe Runde klingt beim Nachspielen gleich (ADR-23). |
+| Kein Frame-Drop während der Sequenzen | ✅ | `perf.spec.ts` misst über die komplette Show inklusive Auszahlung: **p50 16,7 ms · p95 16,7 ms · 2 Draw-Calls** auf iPhone 12 und Pixel 5 (emuliert). |
+| Partikel-Budget | ✅ | Alle Effekte laufen über `FxKit` und die Pools; ist das Budget aus Art Direction §8 erschöpft, gibt der Pool `undefined` zurück und der Partikel entfällt. Der Jackpot fordert mit 90 Konfetti + 40 Münzen am meisten an. |
+| In 1 s auf 5,8" lesbar, wer trinkt und warum | ⏳ manuell | Screenshots in `docs/screens/m4-*.png`. Braucht ein Auge und eine Stoppuhr. |
+| „Lustig-Test": ≥ 2 von 3 grinsen | ⏳ manuell | Braucht drei Menschen. |
+| Video `docs/screens/m4-outcomes.mp4` | ⏳ offen (SOLL) | Sechs Standbilder statt Video; ein Bildschirmmitschnitt der Dev-Preview ist in einer Minute gemacht, aber besser mit echtem Ton. |
+
+**Befunde während der Umsetzung**
+
+- **`props/sign_deal` gab es nicht.** Das Schild lag im crooks-Atlas, `spawnProp()` sucht im front-Atlas — der Alleingang wäre zur Laufzeit gestorben. Gefunden hat es kein Auge, sondern ein neuer Test, der jeden Frame-Namen in `src/game/` gegen die Atlas-Manifeste abgleicht (ADR-25).
+- **Zehn von elf Sequenzen hatten keinen Hit-Stop.** Sie waren flüssig und lasen sich trotzdem weich: Ohne den Moment, in dem nichts passiert, ist ein Amboss nur ein fallendes Objekt. Nachgezogen und per Test abgesichert (ADR-22).
+- **Kassel hätte sich selbst ins Wort gefallen.** Der Director warf seinen Satz pauschal am Anfang der Auszahlung ein, jede neue Sequenz noch einen an ihrer Pointe — der zweite wäre ausgerechnet über den Trinkzahlen gelandet (ADR-23).
+- **Die Prügelwolke zeigte ihren eigenen Rahmen.** Fünf Rauchsprites auf 4,4-facher Größe: Der Atlas trimmt auf die Silhouette, die weiche Kante liegt auf dem Frame-Rand, und beim Vergrößern sampelt PIXI darüber hinaus (ADR-24).
+- **Die Bühnen-Attrappe war die eigentliche Arbeit.** Elf Sequenzen ohne Renderer prüfbar zu machen hieß, Crooks, Tresor, Kamera und FX durch Objekte zu ersetzen, die mitschreiben — die Timelines selbst laufen echt. Ohne sie wäre „Dauer 2–8 s" eine Behauptung geblieben.
+- **Das Dev-Panel verdeckte die Bühne.** Als Raster mit großen Knöpfen nahm es zwei Drittel des Bildes ein. Jetzt eine seitlich schiebbare Zeile am unteren Rand.
+
+**Offene SOLL-Follow-ups:** Video `docs/screens/m4-outcomes.mp4`.
+
+**Manuelle Checks für Luka vor M5:**
+
+- [ ] `npm run preview:outcomes` auf dem Handy öffnen und jede der elf Sequenzen einmal ansehen: Ist in einer Sekunde klar, wer trinkt und warum? Welche zieht, welche nervt beim dritten Mal?
+- [ ] „Lustig-Test" aus A4: Drei Personen sehen die Inszenierungen. Grinsen mindestens zwei?
+- [ ] Gewichte: Alle elf stehen auf 1. Nach dem ersten echten Abend entscheiden, welche häufiger kommen soll — Balancing gehört nach `rules.ts`, die Gewichte stehen in `registry.ts`.
+- [ ] Weiterhin offen aus M2/M3: echtes iPhone 11 / Pixel 4a (60 fps), Look-Check gegen Art Direction §1, Spannungs-Test mit drei Personen, Urteil über die synthetisierten Platzhalter-Sounds.
+
+**Zahlen:** 646 Unit-Tests · 32 E2E-Tests · 3 Perf-Tests · 11 Inszenierungen (3,7–5,3 s) + 2 Overlays · 89 Atlas-Frames in 3 Texturen · p50 16,7 ms während der Show · 2 Draw-Calls.

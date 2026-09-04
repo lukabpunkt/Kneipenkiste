@@ -152,13 +152,37 @@
       "Heute wirkt hier jemand sehr ehrlich."
     ],
     "fee": "Gebühr! Danke.",
-    "perjury": "Meineid. Wie enttäuschend.",
+    "perjury": [
+      "Notiert.",
+      "Ein Eid ist ein Eid.",
+      "Das kostet extra."
+    ],
     "cardsPlease": "Die Karten, bitte.",
-    "allShare": "Rührend. Wirklich.",
-    "soloSteal": "Sauber gearbeitet.",
-    "multiSteal": "Zwei Genies, ein Gedanke.",
-    "allSteal": "Ich hole den Besen.",
-    "jackpot": "Meine Nieten!"
+    "allShare": [
+      "Rührend. Wirklich.",
+      "Ich hatte auf mehr Drama gehofft.",
+      "Gebühr! Danke."
+    ],
+    "soloSteal": [
+      "Sauber gearbeitet.",
+      "Und weg ist er.",
+      "Ich habe nichts gesehen."
+    ],
+    "multiSteal": [
+      "Zwei Genies, ein Gedanke.",
+      "Das musste ja schiefgehen.",
+      "Teilt euch das schön auf."
+    ],
+    "allSteal": [
+      "Ich hole den Besen.",
+      "Alle. Wirklich alle.",
+      "Das nenne ich Einigkeit."
+    ],
+    "jackpot": [
+      "Meine Nieten!",
+      "Das war er also, der Tresor.",
+      "Ich brauche einen neuen."
+    ]
   },
   "rules": {
     "headline": "Regeln",

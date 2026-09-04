@@ -40,9 +40,9 @@ export function buildSipCounters(ctx: OutcomeContext, startDelayMs = 0): gsap.co
   let index = 0;
   for (const [playerId, sips] of total) {
     if (sips <= 0) continue;
-    const at = ctx.positionOf(playerId);
+    const at = ctx.headOf(playerId);
     // Gestaffelt, damit die Zahlen nacheinander lesbar sind, nicht als Wolke.
-    timeline.add(ctx.counters.pop(at.x, at.y - 40, sips, startDelayMs + index * 140), 0);
+    timeline.add(ctx.counters.pop(at.x, at.y - 30, sips, startDelayMs + index * 140), 0);
     ctx.play('coin_shimmer', (startDelayMs + index * 140) / 1000);
     index += 1;
   }
@@ -85,6 +85,9 @@ export const basicOutcome: OutcomeSequence = {
     } else if (result.outcome === 'allShare') {
       ctx.play('cash_register', 0.2);
     }
+
+    // Auch der Rueckfall bekommt Kassels Kommentar — sonst schweigt die Buehne (M4.5).
+    timeline.call(() => ctx.say(result.outcome, 2400), undefined, 0.2);
 
     timeline.add(buildSipCounters(ctx, 260), 0);
     timeline.to({}, { duration: HOLD_MS / 1000 });

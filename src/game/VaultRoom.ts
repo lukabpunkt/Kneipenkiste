@@ -22,6 +22,7 @@ import type { SeededRng } from '@/core/rng';
 import type { Choice, Player, PlayerId } from '@/core/types';
 import { Crook } from './Crook';
 import { DecisionCard } from './DecisionCard';
+import { FxKit } from './fx/FxKit';
 import { Kassel } from './Kassel';
 import { layoutStage, type StageLayoutResult } from './layout';
 import type { StageAssets } from './StageApp';
@@ -60,6 +61,8 @@ export class VaultRoom {
   readonly frontSheet: Spritesheet;
   readonly crooks = new Map<PlayerId, Crook>();
   readonly cards = new Map<PlayerId, DecisionCard>();
+  /** Muenzregen, Konfetti, Sternchen, Rauch, Herzchen (Art Direction §8). */
+  readonly fx: FxKit;
 
   private readonly assets: StageAssets;
   private readonly rng: SeededRng;
@@ -74,6 +77,9 @@ export class VaultRoom {
   private readonly kasselLayer = new Container();
   private readonly crookLayer = new Container();
   private readonly cardLayer = new Container();
+  /** Requisiten der Inszenierungen — Fluchtauto, Amboss, Gitter. Vor allem anderen. */
+  private readonly propLayer = new Container();
+  private readonly props: Sprite[] = [];
 
   private readonly wall: TilingSprite;
   private readonly lasers: Sprite[] = [];
@@ -152,11 +158,15 @@ export class VaultRoom {
 
     this.backLayer.addChild(this.wall, ...this.lasers, this.vault.view, this.table);
     this.kasselLayer.addChild(this.kassel.view);
+    this.fx = new FxKit({ assets: options.assets, rng: this.rng, lowEffects: this.lowEffects });
+
     this.view.addChild(
       this.backLayer,
       this.kasselLayer,
       this.crookLayer,
       this.cardLayer,
+      this.propLayer,
+      this.fx.view,
       this.kassel.bubble.view
     );
 
@@ -253,6 +263,28 @@ export class VaultRoom {
      */
     this.crookLayer.children.sort((a, b) => a.position.y - b.position.y);
     this.cardLayer.children.sort((a, b) => a.position.y - b.position.y);
+  }
+
+  /**
+   * Stellt eine Requisite auf die Buehne (Fluchtauto, Amboss, Gitter, Tuch).
+   *
+   * Sie liegt vor den Karten und wird von `reset()` abgeraeumt — eine Inszenierung muss
+   * sich nicht darum kuemmern, was sie hinterlaesst (Audit A4: Reset-Invariante).
+   */
+  spawnProp(frame: string, x: number, y: number, scale = 1): Sprite {
+    const sprite = new Sprite(this.texture(this.frontSheet, frame));
+    sprite.anchor.set(0.5);
+    sprite.position.set(x, y);
+    sprite.scale.set(scale);
+    this.propLayer.addChild(sprite);
+    this.props.push(sprite);
+    return sprite;
+  }
+
+  private clearProps(): void {
+    for (const prop of this.props) prop.destroy();
+    this.props.length = 0;
+    this.propLayer.removeChildren();
   }
 
   /** Wo die Karte eines Spielers liegt — die Kamera fragt danach. */
@@ -371,6 +403,7 @@ export class VaultRoom {
     this.vignette.visible = !low;
     for (const crook of this.crooks.values()) crook.setLowEffects(low);
     this.kassel.setLowEffects(low);
+    this.fx.setLowEffects(low);
   }
 
   /** Ausgangszustand zwischen zwei Runden. */
@@ -385,12 +418,16 @@ export class VaultRoom {
     }
     this.vault.reset();
     this.kassel.reset();
+    this.fx.reset();
+    this.clearProps();
     for (const crook of this.crooks.values()) crook.reset();
     for (const card of this.cards.values()) card.reset();
   }
 
   destroy(): void {
     gsap.killTweensOf([this.alarmFlash, this.spotlight.scale, ...this.lasers]);
+    this.clearProps();
+    this.fx.destroy();
     this.clearFigures();
     this.vault.destroy();
     this.kassel.destroy();

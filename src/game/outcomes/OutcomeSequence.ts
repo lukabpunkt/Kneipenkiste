@@ -26,6 +26,7 @@ import type { AudioCue } from '@/audio/AudioManager';
 import type { Camera } from '../Camera';
 import type { Crook } from '../Crook';
 import type { DecisionCard } from '../DecisionCard';
+import type { FxKit } from '../fx/FxKit';
 import type { SipCounterPool } from '../fx/SipCounter';
 import type { VaultRoom } from '../VaultRoom';
 
@@ -40,10 +41,16 @@ export interface OutcomeContext {
   /** Karte je Spieler — Overlays brauchen sie. */
   cards: Map<string, DecisionCard>;
   counters: SipCounterPool;
+  /** Muenzregen, Konfetti, Sternchen, Rauch — die geteilten Bausteine (Roadmap M4.4). */
+  fx: FxKit;
   rng: SeededRng;
   play(cue: AudioCue, when?: number): void;
   /** Wo ein Spieler steht — fuer Zaehler und Requisiten. */
   positionOf(playerId: string): { x: number; y: number };
+  /** Ungefaehre Kopfhoehe eines Spielers (Weltkoordinaten). */
+  headOf(playerId: string): { x: number; y: number };
+  /** Kassels Saetze fuer diesen Outcome (i18n-Array, zufaellig gewaehlt). */
+  say(key: string, holdMs?: number): void;
 }
 
 export interface OutcomeSequence {

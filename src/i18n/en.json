@@ -152,13 +152,37 @@
       "Someone here looks awfully honest today."
     ],
     "fee": "Fee! Thank you.",
-    "perjury": "Perjury. How disappointing.",
+    "perjury": [
+      "Noted.",
+      "An oath is an oath.",
+      "That'll cost extra."
+    ],
     "cardsPlease": "Cards, please.",
-    "allShare": "Touching. Truly.",
-    "soloSteal": "Clean work.",
-    "multiSteal": "Two geniuses, one idea.",
-    "allSteal": "I'll get the broom.",
-    "jackpot": "My rivets!"
+    "allShare": [
+      "Touching. Truly.",
+      "I was hoping for more drama.",
+      "Fee! Thank you."
+    ],
+    "soloSteal": [
+      "Clean work.",
+      "And off he goes.",
+      "I saw nothing."
+    ],
+    "multiSteal": [
+      "Two geniuses, one idea.",
+      "That was never going to work.",
+      "Do share it nicely."
+    ],
+    "allSteal": [
+      "I'll get the broom.",
+      "Everyone. Truly everyone.",
+      "Now that's unity."
+    ],
+    "jackpot": [
+      "My rivets!",
+      "So that was the vault.",
+      "I'll need a new one."
+    ]
   },
   "rules": {
     "headline": "Rules",
