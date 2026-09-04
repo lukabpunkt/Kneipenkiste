@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "description": "Mobile-First Pass-the-Phone-Trinkspiel über Vertrauen und Verrat",
+  "description": "Mobile-First Pass-the-Phone-Trinkspiel \u00fcber Vertrauen und Verrat",
   "scripts": {
     "dev": "vite --host",
     "build": "tsc --noEmit && vite build",
@@ -16,13 +16,14 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test tests/e2e/flow.spec.ts",
+    "test:e2e": "playwright test tests/e2e/flow.spec.ts tests/e2e/a11y.spec.ts tests/e2e/resilience.spec.ts",
     "test:perf": "playwright test tests/e2e/perf.spec.ts",
     "build:atlas": "node scripts/build-atlas.mjs",
     "build:audio": "node scripts/build-audio-sprite.mjs",
     "build:icons": "node scripts/build-icons.mjs",
     "preview:outcomes": "vite --host --open \"/?dev=1&panel=outcomes\"",
-    "check:colors": "node scripts/check-colors.mjs"
+    "check:colors": "node scripts/check-colors.mjs",
+    "check:bundle": "node scripts/check-bundle.mjs"
   },
   "dependencies": {
     "gsap": "^3.13.0",

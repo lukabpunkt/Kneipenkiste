@@ -168,7 +168,16 @@ export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
        * Aufdeckung darf nichts mehr nachgeladen werden — sonst haengt die Show genau in
        * dem Moment, in dem alle hinschauen.
        */
-      void import('@/game/StageApp').then((m) => m.preloadStageAssets());
+      /*
+       * Fehler bewusst verschlucken: Ist das Netz weg, bevor der Chunk da ist, faellt
+       * hier nichts aus — die Aufdeckung versucht es selbst noch einmal und schaltet
+       * notfalls auf die DOM-Karten um. Ohne `catch` waere es eine unbehandelte
+       * Rejection, und die steht als Fehler in der Konsole eines Spielers, dem gerade
+       * nur das WLAN weggebrochen ist (Audit A5).
+       */
+      void import('@/game/StageApp')
+        .then((m) => m.preloadStageAssets())
+        .catch(() => undefined);
     },
     destroy() {
       done = true;
