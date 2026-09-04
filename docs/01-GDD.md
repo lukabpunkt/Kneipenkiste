@@ -38,7 +38,7 @@ Eine **Session** = beliebig viele Runden; der Tresorstand, das Scoreboard und di
 ### 3.1 Spieler & Farben
 
 - 3–8 Spieler. Bei 2 Spielern startet das Spiel nicht ("Zu zweit ist das kein Dilemma, das ist eine Beziehung. Holt noch jemanden.").
-- Farben, Symbole und Namensregeln **identisch zu Drinkshot** (Rot `#FF4757`, Blau `#3B82F6`, Grün `#2ED573`, Gelb `#FFD32A`, Lila `#A55EEA`, Orange `#FF7F50`, Pink `#FF6B9D`, Türkis `#18DCFF`; Symbole Kreis, Dreieck, Quadrat, Stern, Raute, Herz, Blitz, Kreuz).
+- Farben, Symbole und Namensregeln **identisch zu Drinkshot** (Rot `#FF4757`, Blau `#3B82F6`, Grün `#2ED573`, Gelb `#FFD32A`, Lila `#AF73EE`, Orange `#FF7F50`, Pink `#FF6B9D`, Türkis `#18DCFF`; Symbole Kreis, Dreieck, Quadrat, Stern, Raute, Herz, Blitz, Kreuz).
 - Die Charaktere sind die **Shotlings** aus Drinkshot, hier mit Ganoven-Maske (Domino-Maske) in Spielerfarbe und optional Ringelshirt/Beanie. Interner Name der Variante: **Crooks**.
 
 ### 3.2 Der Tresor (Einsatz-Ökonomie)

@@ -24,7 +24,7 @@ Tresor/
 ├─ index.html · vite.config.ts · tsconfig.json · package.json
 ├─ public/ (manifest, icons, fonts, atlas/, audio/)
 ├─ assets-src/svg/{crooks,cards,vault,room,props,kassel}/ · audio-src/
-├─ scripts/ (build-atlas.mjs, build-audio-sprite.mjs)
+├─ scripts/ (build-atlas.mjs, build-audio-sprite.mjs, build-icons.mjs)
 ├─ src/
 │  ├─ main.ts
 │  ├─ config/
@@ -32,6 +32,7 @@ Tresor/
 │  │  ├─ rules.ts          # V_0, Wachstum, Deckel, Gebühr, Modi-Parameter, Spielerlimits
 │  │  └─ choreo.ts         # Reveal-Timing-Presets, Tempo-Kurve, Stocken-Regeln
 │  ├─ core/
+│  │  ├─ types.ts         # Datenmodell aus §4 (ADR-6: eigene Datei, sonst Zyklus)
 │  │  ├─ store.ts · fsm.ts · rng.ts · i18n.ts
 │  │  ├─ payout.ts         # resolveRound(): Auszahlung für n, V, Wahlen, Modi → RoundResult  (REINE FUNKTION)
 │  │  ├─ vault.ts          # Tresor-Ökonomie: nextVault(), isJackpot()
@@ -73,8 +74,9 @@ Tresor/
 ## 3. Game-State-Machine
 
 ```
-TITLE ─start─► LOBBY ─open(players≥3)─► NEGOTIATION ─timeout|allReady─► PASS(i=0)
-                 ▲                          (Nachtschicht: SILENCE 10 s statt NEGOTIATION)
+TITLE ─start─► LOBBY ─open(players≥3)─► NEGOTIATION ─proceed(timeout|allReady)─► PASS(i=0)
+                 ▲                          (Nachtschicht: SILENCE 10 s statt NEGOTIATION,
+                 │                           eigener State mit denselben Kanten — ADR-9)
                  │                                                          │ tap
                  │                                                       CHOICE(i) ─choose─► i<n-1 ? PASS(i+1) : SEALED
                  │                                                                                         │ tap → resolveRound()
@@ -126,6 +128,7 @@ interface RoundResult extends RoundSetup {
   perjurers: string[];         // geschworen + gestohlen
   drinkers: { playerId: string; sips: number; reason: 'fee'|'jackpot'|'distributed'|'split'|'perjury' }[];
   distributorId?: string;      // bei soloSteal: der Dieb (füllt drinkers nach DISTRIBUTE)
+  distributableSips?: number;  // bei soloSteal: sein Budget (V, bei Meineid V−2)
   revealOrder: string[];       // vollständige Karten-Reihenfolge (Teiler zuerst)
   outcomeSequenceId: string;
   overlayIds: string[];        // z. B. ['perjury_seal_break', 'mole_reveal']

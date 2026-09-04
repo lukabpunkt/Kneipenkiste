@@ -1,0 +1,189 @@
+{
+  "app": {
+    "title": "Der Tresor",
+    "tagline": "Teilen oder Stehlen."
+  },
+  "common": {
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "confirm": "Los",
+    "continue": "Weiter",
+    "sips_one": "Schluck",
+    "sips_other": "Schlücke",
+    "sipsCount_one": "{count} Schluck",
+    "sipsCount_other": "{count} Schlücke",
+    "players_one": "{count} Spieler",
+    "players_other": "{count} Spieler",
+    "round": "Runde {index}",
+    "vault": "Tresor",
+    "share": "TEILEN",
+    "steal": "STEHLEN",
+    "on": "An",
+    "off": "Aus"
+  },
+  "orientation": {
+    "headline": "Dreh das Handy hoch.",
+    "body": "Der Tresor steht hochkant."
+  },
+  "title": {
+    "play": "Spielen",
+    "rules": "Regeln",
+    "settings": "Einstellungen",
+    "sound": "Ton",
+    "disclaimer": "Ab 18. Trinkt verantwortungsvoll — oder gar nicht."
+  },
+  "lobby": {
+    "headline": "Wer ist dabei?",
+    "addPlayer": "Spieler hinzufügen",
+    "namePlaceholder": "Name",
+    "cta": "Tresor öffnen",
+    "tooFewPlayers": "Zu zweit ist das kein Dilemma, das ist eine Beziehung. Holt noch jemanden.",
+    "tooManyPlayers": "Mehr als acht passen nicht um den Tisch.",
+    "hardness": "Härte",
+    "hardnessSoft": "Sanft",
+    "hardnessNormal": "Normal",
+    "hardnessHard": "Hart",
+    "negotiationTime": "Verhandlung",
+    "revealPace": "Aufdeckung",
+    "paceShort": "Kurz",
+    "paceNormal": "Normal",
+    "paceLong": "Lang",
+    "thinkTimer": "Bedenkzeit",
+    "seconds": "{count} s"
+  },
+  "modes": {
+    "headline": "Modi",
+    "hint": "Beliebig kombinierbar.",
+    "oath": "Eid",
+    "oathHint": "Wer schwört und stiehlt, begeht Meineid — und zahlt dafür.",
+    "mole": "Maulwurf",
+    "moleHint": "Einer muss stehlen. Niemand weiß, wer.",
+    "nightShift": "Nachtschicht",
+    "nightShiftHint": "Keine Verhandlung. Zehn Sekunden Stille.",
+    "highroller": "Highroller",
+    "highrollerHint": "Größerer Tresor, schnelleres Wachstum, kein Deckel."
+  },
+  "negotiation": {
+    "headline": "Verhandelt.",
+    "sub": "{count} Sekunden.",
+    "allReady": "Alle bereit",
+    "vaultLabel": "Im Tresor",
+    "vaultLine": "Im Tresor: {count}",
+    "tableHeadline": "Diese Runde",
+    "tableNoThief": "Alle teilen",
+    "tableSoloThief": "Ein Dieb",
+    "tableMultiThief": "Zwei oder mehr",
+    "tableAllThieves": "Alle stehlen",
+    "tableThiefDistributes": "verteilt alles",
+    "tableEachDrinks": "je {count}",
+    "tableNextVault": "Tresor danach: {vault}",
+    "swear": "Ich schwöre zu teilen",
+    "sworn": "Geschworen",
+    "coachmark": "Redet. Schwört. Lügt."
+  },
+  "silence": {
+    "headline": "Nachtschicht.",
+    "body": "Keiner sagt ein Wort.",
+    "sub": "{count} Sekunden."
+  },
+  "pass": {
+    "headline": "Handy an {name}.",
+    "body": "Tippe, wenn nur du aufs Display schaust."
+  },
+  "choice": {
+    "headline": "Deine Entscheidung.",
+    "sub": "Niemand sieht sie.",
+    "coachmark": "Niemand sieht das. Wirklich.",
+    "sealed": "Versiegelt",
+    "moleHeadline": "Du bist der Maulwurf.",
+    "moleSub": "Tu unschuldig.",
+    "moleLocked": "Nicht für dich.",
+    "thinkTimer": "Noch {count} s",
+    "autoShared": "Zeit um. Du hast geteilt."
+  },
+  "sealed": {
+    "headline": "Alle Karten versiegelt.",
+    "body": "Legt das Handy in die Mitte.",
+    "cta": "Tresor öffnen"
+  },
+  "reveal": {
+    "skipHint": "Tippen zum Umdrehen"
+  },
+  "distribute": {
+    "headline": "Du verteilst {count}.",
+    "sub": "Tippen: +1. Halten: −1.",
+    "remaining_one": "Noch {count} zu verteilen",
+    "remaining_other": "Noch {count} zu verteilen",
+    "cta": "Auszahlen",
+    "handover": "Handy an {name}."
+  },
+  "result": {
+    "allShare": "Ehre unter Dieben",
+    "soloSteal": "Der Alleingang",
+    "multiSteal": "Zu viele Köche",
+    "allSteal": "Schlägerei",
+    "jackpot": "JACKPOT",
+    "perjury": "MEINEID!",
+    "mole": "Der Maulwurf",
+    "drinks": "{name} trinkt {count}",
+    "distributionLine": "{name} verteilt: {detail}",
+    "fee": "Gebühr",
+    "vaultGrows": "Der Tresor wächst auf {vault}",
+    "vaultReset": "Der Tresor wurde geleert",
+    "vaultBurst": "Der Tresor ist geplatzt",
+    "nextRound": "Nächste Runde",
+    "changePlayers": "Spieler ändern",
+    "changeModes": "Modus ändern",
+    "stats": "Statistik",
+    "scoreboard": "Getrunken",
+    "trustIndex": "Vertrauen",
+    "betrayalStreak": "Verrats-Streak",
+    "mostBetrayed": "Meistbetrogen",
+    "noStatsYet": "Noch keine Runde gespielt."
+  },
+  "kassel": {
+    "negotiation": [
+      "Die Karten, bitte.",
+      "Ich habe da so ein Gefühl…",
+      "Vertrauen ist gut. Ich bin Banker.",
+      "Der Tresor hat noch nie so gut ausgesehen.",
+      "Wer hat letzte Runde gestohlen?",
+      "Heute wirkt hier jemand sehr ehrlich."
+    ],
+    "fee": "Gebühr! Danke.",
+    "perjury": "Meineid. Wie enttäuschend.",
+    "cardsPlease": "Die Karten, bitte.",
+    "allShare": "Rührend. Wirklich.",
+    "soloSteal": "Sauber gearbeitet.",
+    "multiSteal": "Zwei Genies, ein Gedanke.",
+    "allSteal": "Ich hole den Besen.",
+    "jackpot": "Meine Nieten!"
+  },
+  "rules": {
+    "headline": "Regeln",
+    "vaultTitle": "Der Tresor",
+    "vaultBody": "In der Mitte liegen Schlücke. Teilen alle, wächst der Tresor — und jeder zahlt 1 Schluck Gebühr.",
+    "negotiateTitle": "Verhandeln",
+    "negotiateBody": "Ihr habt {count} Sekunden. Redet, schwört, lügt. Das Handy hält nur die Zeit.",
+    "chooseTitle": "Geheim wählen",
+    "chooseBody": "Das Handy geht rum. Jeder wählt allein: TEILEN oder STEHLEN. Kein Zurück.",
+    "payoutTitle": "Auszahlung",
+    "payoutBody": "Ein Dieb verteilt den ganzen Tresor. Mehrere Diebe saufen ihn unter sich aus. Teiler kommen dann trocken davon."
+  },
+  "settings": {
+    "headline": "Einstellungen",
+    "sound": "Ton",
+    "music": "Musik",
+    "haptics": "Vibration",
+    "lowEffects": "Weniger Effekte",
+    "language": "Sprache",
+    "reset": "Session zurücksetzen"
+  },
+  "dialog": {
+    "abortRound": "Runde abbrechen?",
+    "abortRoundBody": "Die Wahlen dieser Runde gehen verloren.",
+    "abortConfirm": "Abbrechen",
+    "abortKeep": "Weiterspielen"
+  }
+}

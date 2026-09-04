@@ -1,0 +1,65 @@
+/*
+ * Gemeinsame Komponenten-Stile (Button, Badge, Karten, Sheets).
+ * Wird in M1 gefuellt — die Komponenten selbst entstehen dort (Roadmap M1.1).
+ * Alle Werte kommen aus `tokens.css`.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Screen-Grundgeruest                                                 */
+/* ------------------------------------------------------------------ */
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-5);
+}
+
+/* ------------------------------------------------------------------ */
+/* Title (M0-Platzhalter, M1 baut den echten Screen)                   */
+/* ------------------------------------------------------------------ */
+
+.screen--title {
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.title__logo {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  color: var(--c-gold);
+  text-shadow: var(--sticker-shadow);
+  letter-spacing: 0.02em;
+}
+
+.title__tagline {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  color: var(--c-paper);
+}
+
+.title__vault {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  color: var(--c-steel);
+}
+
+.title__disclaimer {
+  margin: var(--space-5) 0 0;
+  max-width: 26ch;
+  font-size: var(--fs-sm);
+  color: rgb(255 248 231 / 60%);
+}
+
+.title__version {
+  position: absolute;
+  bottom: var(--space-4);
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: rgb(255 248 231 / 35%);
+}

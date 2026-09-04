@@ -1,0 +1,189 @@
+{
+  "app": {
+    "title": "The Vault",
+    "tagline": "Split or Steal."
+  },
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Go",
+    "continue": "Continue",
+    "sips_one": "sip",
+    "sips_other": "sips",
+    "sipsCount_one": "{count} sip",
+    "sipsCount_other": "{count} sips",
+    "players_one": "{count} player",
+    "players_other": "{count} players",
+    "round": "Round {index}",
+    "vault": "Vault",
+    "share": "SPLIT",
+    "steal": "STEAL",
+    "on": "On",
+    "off": "Off"
+  },
+  "orientation": {
+    "headline": "Turn your phone upright.",
+    "body": "The vault stands tall."
+  },
+  "title": {
+    "play": "Play",
+    "rules": "Rules",
+    "settings": "Settings",
+    "sound": "Sound",
+    "disclaimer": "18+. Drink responsibly — or not at all."
+  },
+  "lobby": {
+    "headline": "Who's in?",
+    "addPlayer": "Add player",
+    "namePlaceholder": "Name",
+    "cta": "Open the vault",
+    "tooFewPlayers": "With two people this isn't a dilemma, it's a relationship. Get someone else.",
+    "tooManyPlayers": "More than eight won't fit around the table.",
+    "hardness": "Stakes",
+    "hardnessSoft": "Gentle",
+    "hardnessNormal": "Normal",
+    "hardnessHard": "Harsh",
+    "negotiationTime": "Negotiation",
+    "revealPace": "Reveal",
+    "paceShort": "Short",
+    "paceNormal": "Normal",
+    "paceLong": "Long",
+    "thinkTimer": "Think time",
+    "seconds": "{count} s"
+  },
+  "modes": {
+    "headline": "Modes",
+    "hint": "Combine them freely.",
+    "oath": "Oath",
+    "oathHint": "Swear and steal anyway, and you'll pay for the perjury.",
+    "mole": "Mole",
+    "moleHint": "Someone has to steal. Nobody knows who.",
+    "nightShift": "Night Shift",
+    "nightShiftHint": "No negotiation. Ten seconds of silence.",
+    "highroller": "Highroller",
+    "highrollerHint": "Bigger vault, faster growth, no ceiling."
+  },
+  "negotiation": {
+    "headline": "Negotiate.",
+    "sub": "{count} seconds.",
+    "allReady": "Everyone's ready",
+    "vaultLabel": "In the vault",
+    "vaultLine": "In the vault: {count}",
+    "tableHeadline": "This round",
+    "tableNoThief": "Everyone splits",
+    "tableSoloThief": "One thief",
+    "tableMultiThief": "Two or more",
+    "tableAllThieves": "Everyone steals",
+    "tableThiefDistributes": "hands out everything",
+    "tableEachDrinks": "{count} each",
+    "tableNextVault": "Vault after: {vault}",
+    "swear": "I swear to split",
+    "sworn": "Sworn",
+    "coachmark": "Talk. Swear. Lie."
+  },
+  "silence": {
+    "headline": "Night shift.",
+    "body": "Nobody says a word.",
+    "sub": "{count} seconds."
+  },
+  "pass": {
+    "headline": "Pass to {name}.",
+    "body": "Tap when nobody else can see the screen."
+  },
+  "choice": {
+    "headline": "Your call.",
+    "sub": "Nobody sees it.",
+    "coachmark": "Nobody sees this. Really.",
+    "sealed": "Sealed",
+    "moleHeadline": "You're the mole.",
+    "moleSub": "Act innocent.",
+    "moleLocked": "Not for you.",
+    "thinkTimer": "{count} s left",
+    "autoShared": "Time's up. You split."
+  },
+  "sealed": {
+    "headline": "All cards sealed.",
+    "body": "Put the phone in the middle.",
+    "cta": "Open the vault"
+  },
+  "reveal": {
+    "skipHint": "Tap to flip"
+  },
+  "distribute": {
+    "headline": "You hand out {count}.",
+    "sub": "Tap: +1. Hold: −1.",
+    "remaining_one": "{count} left to hand out",
+    "remaining_other": "{count} left to hand out",
+    "cta": "Pay out",
+    "handover": "Pass to {name}."
+  },
+  "result": {
+    "allShare": "Honour Among Thieves",
+    "soloSteal": "The Solo Job",
+    "multiSteal": "Too Many Cooks",
+    "allSteal": "Brawl",
+    "jackpot": "JACKPOT",
+    "perjury": "PERJURY!",
+    "mole": "The Mole",
+    "drinks": "{name} drinks {count}",
+    "distributionLine": "{name} hands out: {detail}",
+    "fee": "Fee",
+    "vaultGrows": "The vault grows to {vault}",
+    "vaultReset": "The vault was emptied",
+    "vaultBurst": "The vault burst",
+    "nextRound": "Next round",
+    "changePlayers": "Change players",
+    "changeModes": "Change modes",
+    "stats": "Stats",
+    "scoreboard": "Sips taken",
+    "trustIndex": "Trust",
+    "betrayalStreak": "Betrayal streak",
+    "mostBetrayed": "Most betrayed",
+    "noStatsYet": "No round played yet."
+  },
+  "kassel": {
+    "negotiation": [
+      "Cards, please.",
+      "I have a feeling about this…",
+      "Trust is lovely. I'm a banker.",
+      "The vault has never looked better.",
+      "Who stole last round?",
+      "Someone here looks awfully honest today."
+    ],
+    "fee": "Fee! Thank you.",
+    "perjury": "Perjury. How disappointing.",
+    "cardsPlease": "Cards, please.",
+    "allShare": "Touching. Truly.",
+    "soloSteal": "Clean work.",
+    "multiSteal": "Two geniuses, one idea.",
+    "allSteal": "I'll get the broom.",
+    "jackpot": "My rivets!"
+  },
+  "rules": {
+    "headline": "Rules",
+    "vaultTitle": "The vault",
+    "vaultBody": "Sips sit in the middle. If everyone splits, the vault grows — and everyone pays a 1-sip fee.",
+    "negotiateTitle": "Negotiate",
+    "negotiateBody": "You get {count} seconds. Talk, swear, lie. The phone only keeps time.",
+    "chooseTitle": "Choose in secret",
+    "chooseBody": "The phone goes around. Everyone decides alone: SPLIT or STEAL. No going back.",
+    "payoutTitle": "Payout",
+    "payoutBody": "One thief hands out the whole vault. Several thieves drink it between them. Splitters walk away dry."
+  },
+  "settings": {
+    "headline": "Settings",
+    "sound": "Sound",
+    "music": "Music",
+    "haptics": "Vibration",
+    "lowEffects": "Fewer effects",
+    "language": "Language",
+    "reset": "Reset session"
+  },
+  "dialog": {
+    "abortRound": "Abandon round?",
+    "abortRoundBody": "This round's choices will be lost.",
+    "abortConfirm": "Abandon",
+    "abortKeep": "Keep playing"
+  }
+}
