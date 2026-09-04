@@ -12,6 +12,8 @@ import './styles/components.css';
 import { createFsm } from '@/core/fsm';
 import { detectLocale, setLocale, t } from '@/core/i18n';
 import { createSessionStore } from '@/core/session';
+import { setAudioEnabled, setMusicVolume, suspendAudio, resumeAudio } from '@/audio/AudioManager';
+import { installAudioUnlock, updateSoundtrack } from '@/audio/soundtrack';
 import { confirmSheet } from '@/ui/components/sheet';
 import { showToast } from '@/ui/components/toast';
 import { secureSource } from '@/ui/devSeed';
@@ -61,6 +63,8 @@ function boot(): void {
 
   setLocale(settings.locale ?? detectLocale());
   setHapticsEnabled(settings.haptics);
+  setAudioEnabled(settings.sound);
+  setMusicVolume(settings.music);
   applyStaticTranslations();
 
   const fsm = createFsm({
@@ -84,6 +88,22 @@ function boot(): void {
   const router = createRouter({
     host: mount,
     context: { fsm, session, dev: new URLSearchParams(location.search).has('dev') },
+    onNavigate: (screen) => updateSoundtrack(screen),
+  });
+
+  /*
+   * Ton gibt es erst nach einer echten Nutzergeste (iOS) — bis dahin ist der Loop nur
+   * vorgemerkt. `installAudioUnlock` holt ihn beim ersten Tap nach.
+   */
+  installAudioUnlock(() => router.current);
+
+  /*
+   * Beim Tab-Wechsel wird der AudioContext angehalten: Ein Loop, der in einem
+   * weggelegten Tab weiterspielt, ist auf dem Handy ein Fehler, kein Feature.
+   */
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) suspendAudio();
+    else resumeAudio();
   });
 
   router.register('title', createTitleScreen);

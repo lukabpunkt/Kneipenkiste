@@ -11,6 +11,7 @@ import { setLocale, t } from '@/core/i18n';
 import type { SessionStore } from '@/core/session';
 import { createButton } from '@/ui/components/button';
 import { openSheet, type SheetHandle } from '@/ui/components/sheet';
+import { setAudioEnabled, setMusicVolume } from '@/audio/AudioManager';
 import { setHapticsEnabled } from '@/ui/haptics';
 
 export interface SettingsSheetOptions {
@@ -26,12 +27,15 @@ export function openSettingsSheet(options: SettingsSheetOptions): SheetHandle {
   content.className = 'settings';
 
   content.append(
-    toggleRow(t('settings.sound'), session.state.settings.sound, (value) =>
-      session.setSettings({ sound: value })
-    ),
-    sliderRow(t('settings.music'), session.state.settings.music, (value) =>
-      session.setSettings({ music: value })
-    ),
+    // Ton und Musik wirken sofort, nicht erst in der naechsten Runde.
+    toggleRow(t('settings.sound'), session.state.settings.sound, (value) => {
+      session.setSettings({ sound: value });
+      setAudioEnabled(value);
+    }),
+    sliderRow(t('settings.music'), session.state.settings.music, (value) => {
+      session.setSettings({ music: value });
+      setMusicVolume(value);
+    }),
     toggleRow(t('settings.haptics'), session.state.settings.haptics, (value) => {
       session.setSettings({ haptics: value });
       setHapticsEnabled(value);

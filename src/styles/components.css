@@ -745,7 +745,8 @@
   gap: 6px;
 }
 
-.dev-panel__actions button {
+.dev-panel__actions button,
+.dev-panel__sequences button {
   padding: 2px 6px;
   border: 1px solid var(--grass);
   border-radius: 4px;
@@ -753,6 +754,19 @@
   color: var(--grass);
   cursor: pointer;
   font: inherit;
+}
+
+/*
+ * Die Sequenz-Vorschau (`?dev=1&panel=sequences`). Eine Spalte, damit die IDs lesbar
+ * bleiben; scrollbar, weil bis Release mindestens 16 Eintraege dazukommen.
+ */
+.dev-panel__sequences {
+  display: flex;
+  overflow-y: auto;
+  flex-direction: column;
+  max-height: 40vh;
+  margin-top: 6px;
+  gap: 3px;
 }
 
 /* ================================================================== */

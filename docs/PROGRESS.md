@@ -5,7 +5,7 @@
 | M0 Setup & Board-Logik | ✅ fertig | `v0.0.1` | A0 bestanden |
 | M1 UI-Flow (DOM-Feld) | ✅ fertig | `v0.1.0` | A1 bestanden |
 | M2 PIXI-Feld, Tiles, Diggers | ✅ fertig | `v0.2.0` | A2 bestanden |
-| M3 Sequenzen Teil 1 | ⬜ offen | – | – |
+| M3 Sequenzen Teil 1 | ✅ fertig | `v0.3.0` | A3 bestanden |
 | M4 Hit-Sequenzen | ⬜ offen | – | – |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
 | M6 Playtest & Release | ⬜ offen | – | – |
@@ -41,7 +41,7 @@
 
 **(4) Drei Anläufe, bis der Test-Seed wirklich aus dem Deploy-Build verschwand.** Alle drei Fallstricke lagen beim Bundler, nicht im Verhalten: Bracket-Notation wird nicht ersetzt (schon in A1 gefunden), ein Default-Parameter lässt den Wert durch eine Variable laufen, und auch ein Funktionsaufruf im `if` wird nicht zuverlässig inlined. Erst eine Modul-Konstante löst sich zu `false` auf und nimmt den Zweig mit. Der CI-Guard aus A1 hat jeden dieser Anläufe gefangen — er ist der einzige Test, der das überhaupt zeigen kann.
 
-**(5) Der Preview-Server war stundenlang der falsche.** Auf Port 4173 lief der Server eines Schwesterprojekts; die E2E-Tests bekamen dessen Seite ausgeliefert und scheiterten an Meldungen, die mit diesem Projekt nichts zu tun hatten. Sprengmeister hat jetzt einen eigenen Port (4183). Drei Spiele auf einem Rechner brauchen drei Ports.
+**(5) Der Preview-Server war stundenlang der falsche.** Auf Port 4173 lief der Server eines Schwesterprojekts; die E2E-Tests bekamen dessen Seite ausgeliefert und scheiterten an Meldungen, die mit diesem Projekt nichts zu tun hatten. Sprengmeister hat jetzt einen eigenen Port (4183 — seit M3 **4193**, siehe A3). Drei Spiele auf einem Rechner brauchen drei Ports.
 
 **(6) Das Feld ist ein Canvas — Tests brauchen ein Fenster hinein.** `src/game/testBridge.ts` legt lesend offen, was ohnehin auf dem Bildschirm steht: Plattenzustand, Ringfarben, Draw-Calls, Sperre. Bewusst **nicht** offengelegt: ungeöffnete Minen und die Kistenposition (ADR-2). Die Brücke existiert nur im Dev- und E2E-Build; CI prüft das am Bundle.
 

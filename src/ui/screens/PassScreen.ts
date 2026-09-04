@@ -13,6 +13,7 @@ import { PASS_LOCK_MS } from '@/config/rules';
 import { colorById, hex, textColorOn } from '@/config/theme';
 import { t } from '@/core/i18n';
 import { createPlayerBadge } from '@/ui/components/badge';
+import { play } from '@/audio/AudioManager';
 import { vibrate } from '@/ui/haptics';
 import type { ScreenFactory } from '@/ui/router';
 
@@ -53,6 +54,8 @@ export const createPassScreen: ScreenFactory = ({ fsm, router }) => {
   const proceed = (): void => {
     if (!unlocked) return;
     vibrate('tap');
+    // Der Wisch begleitet die Uebergabe — er gehoert zum Weiterreichen, nicht zum Tap.
+    play('pass_whoosh');
     if (!fsm.send({ type: 'tap' })) return;
     void router.go('place');
   };

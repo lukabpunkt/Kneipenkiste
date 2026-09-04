@@ -68,8 +68,16 @@ export class Tile {
   private readonly ground: Sprite;
   /** Inhalt des Lochs: Tier, Bombe, Kiste. */
   private readonly content = new Container();
-  /** Legerfarben-Ringe und Hinweis-Icon liegen ueber allem. */
+  /** Legerfarben-Ringe liegen ueber allem. */
   private readonly marks = new Container();
+  /**
+   * Der Platz des Temperatur-Icons — **immer vorhanden, auch leer.**
+   *
+   * Eine Sequenz baut ihre Timeline, bevor die Platte aufgeht; das Icon entsteht aber
+   * erst beim Aufdecken. Ein fester Container laesst sich schon vorher animieren, ein
+   * Sprite, das es noch nicht gibt, nicht.
+   */
+  private readonly hintSlot = new Container();
 
   private currentState: TileState = 'covered';
 
@@ -97,13 +105,64 @@ export class Tile {
     this.deco.position.set(-size * 0.42, size * 0.42);
 
     this.plate.addChild(this.deco);
-    this.view.addChild(this.ground, this.plate, this.content, this.marks);
+    this.view.addChild(this.ground, this.plate, this.content, this.marks, this.hintSlot);
 
     this.ground.visible = false;
   }
 
   get state(): TileState {
     return this.currentState;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Was die Sequenzen anfassen duerfen                                */
+  /* ---------------------------------------------------------------- */
+
+  /**
+   * Der Inhalt des Lochs (Tier, Bombe, Kiste) — als Container, nicht als Sprite.
+   *
+   * Sequenzen bewegen hier ausschliesslich **Darstellung**. Sie erfahren dabei nicht,
+   * was drin liegt: Der Container ist bei einem leeren Feld und bei einem verbrauchten
+   * eigenen Trittstein derselbe, mit demselben Tier darin (ADR-2).
+   */
+  get contentView(): Container {
+    return this.content;
+  }
+
+  /**
+   * Die Legerfarben-Ringe. Bei einer Explosion ist das die wichtigste Information des
+   * ganzen Spiels (Design-Prioritaet 2) — deshalb duerfen Sequenzen sie aufziehen,
+   * aber nur zeitlich: Was drinsteht, entscheidet allein `crater()`/`dud()`.
+   */
+  get marksView(): Container {
+    return this.marks;
+  }
+
+  /** Der Platz des Temperatur-Icons. Leer, solange die Platte zu ist. */
+  get hintView(): Container {
+    return this.hintSlot;
+  }
+
+  /** Der Deckel. */
+  get plateView(): Sprite {
+    return this.plate;
+  }
+
+  /**
+   * Den bereits weggeblendeten Deckel noch einmal zeigen, damit eine Sequenz ihn
+   * wegkippen lassen kann. Ohne Sequenz — Replay, Low-Effects — bleibt er einfach weg.
+   */
+  liftLid(): Sprite {
+    this.plate.visible = true;
+    return this.plate;
+  }
+
+  /** Ende der Kippbewegung: Deckel weg, Ausgangswerte zurueck. */
+  dropLid(): void {
+    this.plate.visible = false;
+    this.plate.rotation = 0;
+    this.plate.alpha = 1;
+    this.plate.position.set(0, 0);
   }
 
   /** Weltposition der Plattenmitte — der Digger laeuft hierhin. */
@@ -126,7 +185,15 @@ export class Tile {
     this.plate.position.set(0, 0);
     this.ground.visible = false;
     this.content.removeChildren();
+    this.content.position.set(0, 0);
+    this.content.rotation = 0;
+    this.content.alpha = 1;
+    this.content.scale.set(1);
     this.marks.removeChildren();
+    this.marks.scale.set(1);
+    this.marks.alpha = 1;
+    this.hintSlot.removeChildren();
+    this.hintSlot.scale.set(1);
     this.view.scale.set(1);
     this.view.alpha = 1;
   }
@@ -308,12 +375,19 @@ export class Tile {
    * ueber demselben Krater auseinander.
    */
   private showHint(hint: Hint): void {
+    this.hintSlot.removeChildren();
+    this.hintSlot.scale.set(1);
     if (hint === 'none') return;
+
     const icon = new Sprite(this.sheet.textures[HINT_FRAME[hint]]);
     icon.anchor.set(1, 1);
     icon.scale.set((this.size * 0.34) / icon.texture.width);
-    icon.position.set(this.size * 0.44, this.size * 0.44);
-    this.marks.addChild(icon);
+    this.hintSlot.addChild(icon);
+    /*
+     * Der Slot traegt die Position, das Icon sitzt in seinem Ursprung: So skaliert eine
+     * Sequenz den Slot von 0 auf 1, ohne dass das Icon dabei durchs Bild wandert.
+     */
+    this.hintSlot.position.set(this.size * 0.44, this.size * 0.44);
   }
 
   /** Nur fuer Tests und das Dev-Panel. */

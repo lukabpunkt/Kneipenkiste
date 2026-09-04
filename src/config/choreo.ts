@@ -65,7 +65,7 @@ export const BANNER = {
 export const EXPLOSION = {
   /**
    * Label, an dem in jeder Hit-Timeline der Explosions-Frame sitzt. Der Test in
-   * `sequenceRegistry.test.ts` misst von hier aus zum `colorRing`-Label.
+   * `sequences.test.ts` misst von hier aus zum `colorRing`-Label.
    */
   frameLabel: 'boom',
   ringLabel: 'colorRing',

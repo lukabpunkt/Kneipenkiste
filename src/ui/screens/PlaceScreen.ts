@@ -16,6 +16,7 @@ import { createButton } from '@/ui/components/button';
 import { createStageHost, type StageHost } from '@/ui/components/stageHost';
 import { createTimerRing, type TimerRing } from '@/ui/components/timerRing';
 import { showToast } from '@/ui/components/toast';
+import { play } from '@/audio/AudioManager';
 import { vibrate } from '@/ui/haptics';
 import { acquireWakeLock, releaseWakeLock } from '@/ui/wakeLock';
 import type { ScreenFactory } from '@/ui/router';
@@ -137,6 +138,8 @@ export const createPlaceScreen: ScreenFactory = ({ fsm, router }) => {
     if (!fsm.canBury()) return;
     ring?.stop();
     vibrate('bury');
+    // Die Platten stampfen sich fest — ein Schlag, kein Klick.
+    play('plate_stomp');
 
     const last = fsm.context.playerIndex === fsm.context.players.length - 1;
     globalThis.setTimeout(() => {
@@ -156,9 +159,11 @@ export const createPlaceScreen: ScreenFactory = ({ fsm, router }) => {
           if (!fsm.togglePlacement(cell, tool)) {
             // Kontingent voll: Der Screen sagt es, die Logik bleibt unangetastet.
             vibrate('tap');
+            play('ui_tap');
             return;
           }
           vibrate('bury');
+          play('mine_place');
           switchToolIfExhausted();
           render();
         });

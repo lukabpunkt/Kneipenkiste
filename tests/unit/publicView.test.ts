@@ -15,6 +15,9 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { debugRevealAll, dig, placeView, publicView, replayView } from '@/core/board';
+import { DEFAULT_MODES } from '@/config/rules';
+import { createSeededRng } from '@/core/rng';
+import { simulateRound } from '@/core/simulate';
 import { buildBoard, modes } from './helpers';
 
 const seed = 4711;
@@ -300,6 +303,108 @@ describe('Informationssicherheit im Code', () => {
     const board = readFileSync(join(srcRoot, 'core/board.ts'), 'utf8');
     for (const exported of ['publicView', 'placeView', 'replayView']) {
       expect(board).toContain(`export function ${exported}`);
+    }
+  });
+});
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * Audit A3: **1 000 simulierte Runden, und in keiner darf der Bildschirm mehr wissen
+ * als `publicView`.**
+ *
+ * Die Tests weiter oben zeigen das an gebauten Faellen — hier laeuft es gegen echte
+ * Runden mit echten Stapeln, Kettenreaktionen und Kistenfunden. Geprueft wird die eine
+ * Frage, an der das Spiel haengt: Laesst sich aus dem, was ein Screen bekommt,
+ * herauslesen, ob unter einer geoeffneten Platte einmal die eigene Mine des Graebers lag?
+ */
+describe('Simulierte Runden: der Bildschirm sieht genau publicView (Audit A3)', () => {
+  const ROUNDS = 1000;
+
+  /** Die Felder, aus denen ein Screen eine offene Platte zeichnet. */
+  const RENDER_KEYS = ['cell', 'by', 'kind', 'hint', 'blamed', 'critter', 'byChain'] as const;
+
+  it('gibt einer offenen Platte nie mehr Felder, als der Screen zeichnet', () => {
+    for (let round = 0; round < ROUNDS; round++) {
+      const { board } = simulateRound({
+        playerIds: ['a', 'b', 'c', 'd'],
+        modes: { ...DEFAULT_MODES, doubleAgent: round % 3 === 0, chainReaction: round % 4 === 0 },
+        rnd: createSeededRng(round + 1),
+        seed: round + 1,
+        roundIndex: round,
+      });
+
+      for (const opened of Object.values(publicView(board).opened)) {
+        for (const key of Object.keys(opened)) {
+          expect(RENDER_KEYS, `unbekanntes Feld "${key}"`).toContain(key);
+        }
+      }
+    }
+  });
+
+  it('macht den verbrauchten Trittstein von einem leeren Feld nicht unterscheidbar', () => {
+    let ownMineCells = 0;
+    let plainEmptyCells = 0;
+
+    for (let round = 0; round < ROUNDS; round++) {
+      const { board, result } = simulateRound({
+        playerIds: ['a', 'b', 'c', 'd'],
+        modes: { ...DEFAULT_MODES, doubleAgent: round % 3 === 0 },
+        rnd: createSeededRng(round + 1),
+        seed: round + 1,
+        roundIndex: round,
+      });
+
+      const view = publicView(board);
+      for (const dig of result.digs) {
+        const opened = view.opened[dig.cell];
+        if (!opened) continue;
+
+        const usedOwn = dig.ownMineConsumed || dig.ownDudConsumed;
+        if (dig.kind !== 'empty') continue;
+
+        if (usedOwn) ownMineCells++;
+        else plainEmptyCells++;
+
+        /*
+         * Die drei Dinge, die ein Screen zeichnet: Zustand, Ringe, Hinweis. Bei einem
+         * verbrauchten Trittstein muessen sie exakt so aussehen wie bei einem leeren
+         * Feld — kein Ring, kein anderer Zustand, kein zusaetzliches Feld.
+         */
+        expect(opened.kind).toBe('empty');
+        expect(opened.blamed).toEqual([]);
+        expect(opened.by).toBe(dig.by);
+        // Und das interne Flag taucht nirgends im oeffentlichen Blick auf.
+        expect(Object.keys(opened)).not.toContain('ownMineConsumed');
+      }
+    }
+
+    /*
+     * Der Test muss beissen koennen: Ohne beide Faelle in nennenswerter Zahl haette er
+     * oben nur ueber leere Schleifen geurteilt.
+     */
+    expect(ownMineCells, 'keine verbrauchten Trittsteine simuliert').toBeGreaterThan(20);
+    expect(plainEmptyCells).toBeGreaterThan(100);
+  });
+
+  it('zeigt genau die Zellen, die aufgegraben oder mitgerissen wurden', () => {
+    for (let round = 0; round < ROUNDS; round++) {
+      const { board, result } = simulateRound({
+        playerIds: ['a', 'b', 'c'],
+        modes: { ...DEFAULT_MODES, chainReaction: true },
+        rnd: createSeededRng(round + 500),
+        seed: round + 500,
+        roundIndex: round,
+      });
+
+      const expected = new Set<number>();
+      for (const dig of result.digs) {
+        expected.add(dig.cell);
+        for (const reveal of dig.chainReveals) expected.add(reveal.cell);
+      }
+
+      const shown = new Set(Object.keys(publicView(board).opened).map(Number));
+      expect(shown).toEqual(expected);
     }
   });
 });

@@ -11,7 +11,7 @@
  */
 
 import { Container, type Spritesheet } from 'pixi.js';
-import type { BoardSize } from '@/config/rules';
+import { MODE_IDS, type BoardSize, type Modes } from '@/config/rules';
 import { diggerHeightFor, type ColorId } from '@/config/theme';
 import type { Cell, DigResult, PlaceView, Player, PlayerId, PublicView, ReplayView } from '@/core/types';
 import { getBoardApp, loadBoardAssets, type BoardAppHandle } from './BoardApp';
@@ -19,11 +19,14 @@ import { BoardView, type BoardMode } from './BoardView';
 import { Camera } from './Camera';
 import { DigDirector, type DigPlayback } from './DigDirector';
 import { Digger } from './Digger';
+import { registerAllSequences, resetHistory } from './sequences';
 
 export interface BoardStageOptions {
   players: readonly Player[];
   size: BoardSize;
   seed: number;
+  /** Die aktiven Modi — sie filtern die Sequenz-Registry. */
+  modes: Modes;
   lowEffects?: boolean;
 }
 
@@ -84,10 +87,21 @@ export class BoardStage {
     });
 
     this.camera = new Camera(this.cameraLayer);
+    /*
+     * Die Sequenzen werden hier angemeldet, nicht per Import-Nebenwirkung: Der
+     * Board-Chunk ist der erste Ort, an dem sie ueberhaupt gebraucht werden, und der
+     * Aufruf ist idempotent.
+     */
+    registerAllSequences();
+
     this.director = new DigDirector({
       board: this.board,
       camera: this.camera,
       diggerOf: (id) => this.diggers.get(id),
+      diggers: () => this.allDiggers(),
+      modes: () => options.modes,
+      colorOf,
+      seed: options.seed,
       ...(options.lowEffects === undefined ? {} : { lowEffects: options.lowEffects }),
     });
 
@@ -161,10 +175,17 @@ export class BoardStage {
     this.board.resetTiles();
     this.board.setLocked(false);
     for (const digger of this.diggers.values()) digger.reset();
+    // Jede Runde faengt mit einem leeren No-Repeat-Fenster an (Architektur §6).
+    resetHistory();
   }
 
   diggerOf(playerId: PlayerId): Digger | undefined {
     return this.diggers.get(playerId);
+  }
+
+  /** Alle Diggers in Sitzreihenfolge. */
+  allDiggers(): readonly Digger[] {
+    return [...this.diggers.values()];
   }
 
   /** Frame-Zeiten und Draw-Calls fuer Dev-Panel und Perf-Test. */
@@ -185,10 +206,14 @@ export class BoardStage {
 
 /**
  * Woran sich entscheidet, ob eine Buehne wiederverwendet werden kann. Spielerzahl und
- * Feldgroesse aendern das Layout; der Seed bestimmt die Deko-Verteilung.
+ * Feldgroesse aendern das Layout; der Seed bestimmt die Deko-Verteilung. Die Modi stehen
+ * mit drin, weil der Director sie an die Sequenz-Registry weiterreicht (`excludeInModes`)
+ * — eine wiederverwendete Buehne wuerde sonst mit den Modi der Vorrunde filtern.
  */
 function signatureOf(options: BoardStageOptions): string {
-  return `${options.size}:${options.seed}:${options.players.map((p) => `${p.id}/${p.colorId}`).join(',')}`;
+  const modes = MODE_IDS.filter((mode) => options.modes[mode]).join('+');
+  const players = options.players.map((p) => `${p.id}/${p.colorId}`).join(',');
+  return `${options.size}:${options.seed}:${modes}:${players}`;
 }
 
 /* ------------------------------------------------------------------ */

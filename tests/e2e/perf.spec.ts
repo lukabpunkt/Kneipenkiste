@@ -126,4 +126,48 @@ test.describe('Feld-Performance (Audit A2)', () => {
     console.info(`[perf] Heap ${(before / 1e6).toFixed(1)} → ${(after / 1e6).toFixed(1)} MB`);
     expect(after).toBeLessThan(before * 2);
   });
+
+  test('bricht waehrend der Sequenzen nicht ein (Roadmap M3.8)', async ({ page }) => {
+    test.setTimeout(120_000);
+
+    /*
+     * Der Leerlauf-Test oben misst ein stehendes Feld. Hier laeuft das Gegenteil: Kamera,
+     * Digger, Platte, Ringe und Sequenz gleichzeitig — der einzige Moment, in dem das
+     * Spiel wirklich etwas zu tun hat. Genau hier faellt eine teure Sequenz auf.
+     */
+    await openLobby(page, { players: 8, seed: 14 });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await buryMines(page, 8);
+    await startDigging(page);
+    await waitForBoard(page);
+
+    // Leerlauf-Messungen aussortieren: erst graben, dann ablesen.
+    const during: number[] = [];
+    for (let cell = 0; cell < 6; cell++) {
+      if (!(await page.locator('[data-screen="dig"]').isVisible())) break;
+      await tapCell(page, cell, 6, 8);
+      await page.waitForTimeout(1200);
+      during.push(...(await frameTimes(page)));
+    }
+
+    expect(during.length).toBeGreaterThan(60);
+    const p50 = quantile(during, 0.5);
+    const p95 = quantile(during, 0.95);
+    const software = await isSoftwareRenderer(page);
+
+    console.info(
+      `[perf] Sequenzen p50 ${p50.toFixed(1)} ms · p95 ${p95.toFixed(1)} ms · ` +
+        `draws ${await drawCalls(page)} · ${software ? 'Software-Renderer' : 'GPU'}`
+    );
+
+    // Auch mit voller Inszenierung bleiben es hoechstens 3 Batches.
+    expect(await drawCalls(page)).toBeLessThanOrEqual(3);
+
+    if (software) {
+      expect(p50).toBeLessThan(100);
+      return;
+    }
+    expect(p50).toBeLessThanOrEqual(16.7);
+    expect(p95).toBeLessThanOrEqual(33);
+  });
 });

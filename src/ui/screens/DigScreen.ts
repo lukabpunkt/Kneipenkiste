@@ -17,6 +17,7 @@ import { t } from '@/core/i18n';
 import { createDevPanel, devMode, type DevPanel } from '@/ui/components/devPanel';
 import { seedActive } from '@/ui/devSeed';
 import { createBannerHost, type KillLine } from '@/ui/components/drinkBanner';
+import { tickTurn } from '@/audio/AudioManager';
 import { createStageHost } from '@/ui/components/stageHost';
 import { createTimerRing, type TimerRing } from '@/ui/components/timerRing';
 import { createTokenStack } from '@/ui/components/tokenStack';
@@ -71,9 +72,15 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
 
   /* ---------------------------------------------------------------- */
 
+  /**
+   * Ein Tick pro Zug (GDD §6). Er macht aus einer Reihe von Grabungen einen Takt — man
+   * hoert, dass die Runde laeuft, ohne dass jemand mitzaehlen muss.
+   */
   function renderTurn(): void {
     const player = fsm.currentPlayer();
-    if (player) turnBanner.setPlayer(player.name, player.colorId);
+    if (!player) return;
+    turnBanner.setPlayer(player.name, player.colorId);
+    tickTurn();
   }
 
   function renderBoard(): void {

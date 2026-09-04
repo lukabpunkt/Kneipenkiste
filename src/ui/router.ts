@@ -62,6 +62,8 @@ export interface Router {
 export interface RouterOptions {
   host: HTMLElement;
   context: Omit<ScreenContext, 'router'>;
+  /** Wird nach jedem Screenwechsel gerufen — der Soundtrack haengt daran (GDD §6). */
+  onNavigate?: (id: ScreenId) => void;
 }
 
 /**
@@ -112,6 +114,7 @@ export function createRouter(options: RouterOptions): Router {
     host.append(instance.el);
     current = id;
     focusScreen(instance.el);
+    options.onNavigate?.(id);
   };
 
   /**

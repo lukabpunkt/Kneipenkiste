@@ -72,6 +72,7 @@ export function createStageHost(options: StageHostOptions = {}): StageHost {
         players: [...fsm.context.players],
         size,
         seed: fsm.context.seed,
+        modes: fsm.context.settings.modes,
         lowEffects: fsm.context.settings.lowEffects,
       });
 

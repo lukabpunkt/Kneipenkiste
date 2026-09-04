@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
+/** Muss zu `preview.port` in `vite.config.ts` passen (dort steht, warum nicht 4173). */
+const PORT = process.env.PREVIEW_PORT ?? '4193';
+const BASE_URL = `http://localhost:${PORT}/Sprengmeister/`;
+
 /**
  * Mobile-Emulation ist Pflicht (CLAUDE.md "Mobile First").
  * Ab M1 laeuft `flow.spec.ts`, ab M3 `perf.spec.ts` (Architektur §8).
@@ -28,7 +32,7 @@ export default defineConfig({
   timeout: 120_000,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
   use: {
-    baseURL: 'http://localhost:4183/Sprengmeister/',
+    baseURL: BASE_URL,
     trace: 'on-first-retry',
   },
   projects: [
@@ -56,7 +60,7 @@ export default defineConfig({
      * haelt fest, dass das so bleibt.
      */
     command: 'npm run build:e2e && npm run preview',
-    url: 'http://localhost:4183/Sprengmeister/',
+    url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },

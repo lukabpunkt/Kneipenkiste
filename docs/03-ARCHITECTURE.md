@@ -52,13 +52,15 @@ Sprengmeister/
 │  │  ├─ fx/ (ParticlePool, Smoke, DirtBurst, ColorRing, SpeechBubble, KillFeedToast)
 │  │  └─ sequences/
 │  │     ├─ Sequence.ts          # Interfaces + Registries (hit, dud, treasure, empty) + gewichtete Auswahl + No-Repeat
-│  │     ├─ empty/Worm.ts, Beetle.ts, Bone.ts, Boot.ts
+│  │     ├─ index.ts             # meldet alle Sequenzen an (ein Aufruf statt Import-Nebenwirkungen)
+│  │     ├─ preview.ts           # Dev-Vorschau (`?dev=1&panel=sequences`), nur dynamisch geladen
+│  │     ├─ empty/index.ts       # Worm, Beetle, Bone, Boot — Varianten desselben Ablaufs, deshalb eine Datei
 │  │     ├─ hit/ClassicLaunch.ts, SootFace.ts, HelmetRocket.ts, ShovelPretzel.ts, TreeLanding.ts, CraterHop.ts, ChainDance.ts, DudThenBoom.ts
 │  │     ├─ dud/Pfff.ts
 │  │     └─ treasure/Fanfare.ts, TooHeavy.ts, Greed.ts
 │  ├─ audio/ · i18n/ · styles/
 ├─ tests/
-│  ├─ unit/board.test.ts, payout.test.ts, modes.test.ts, turn.test.ts, fsm.test.ts, sequenceRegistry.test.ts, publicView.test.ts
+│  ├─ unit/board.test.ts, payout.test.ts, modes.test.ts, turn.test.ts, fsm.test.ts, sequences.test.ts, audio.test.ts, publicView.test.ts
 │  └─ e2e/flow.spec.ts, perf.spec.ts
 └─ .github/workflows/ci.yml, deploy.yml
 ```
@@ -176,7 +178,11 @@ Invarianten (Property-Test 10 000 Runden mit Zufallszügen): Runde endet immer; 
 ## 6. DigDirector & Sequenzen
 
 ```ts
-interface SequenceContext { result: DigResult; tile: Tile; digger: Digger; others: Digger[]; field: Field; camera: Camera; fx: FxKit; audio: AudioManager; rng: SeededRng; blamedColors: ColorId[] }
+// Die Buehne kommt als schmale Interfaces herein, nicht als PIXI-Klassen (ADR-14):
+// `SequenceTile`/`SequenceDigger`/`SequenceCamera`, Anzeigeobjekte als `Animatable`
+// (x, y, alpha, rotation, scale). Dadurch kann eine Sequenz den Spielzustand strukturell
+// nicht verschieben — und sie laesst sich ohne WebGL messen.
+interface SequenceContext { result: DigResult; tile: SequenceTile; digger: SequenceDigger; others: SequenceDigger[]; camera: SequenceCamera; audio: (cue: AudioCue, when?: number, detune?: number) => void; rng: SeededRng; blamedColors: ColorId[]; lowEffects: boolean }
 
 interface DigSequence {
   id: string;
@@ -191,7 +197,7 @@ interface DigSequence {
 Ablauf `DigDirector.play(result)`:
 1. `BoardView.locked = true`, Kamera-Zoom auf Platte, Digger `walkTo(tile)` (250 ms), 3 Schaufelstöße, 200 ms Zittern (Anticipation gesamt ~ 900 ms, aus `choreo.ts`).
 2. Sequenz aus Registry (gewichtet, No-Repeat 3 pro Kind, Filter `minStack`/`excludeInModes`), `build()` → Timeline.
-3. Bei `crater`/`greed`: **ColorRing der Leger ≤ 300 ms nach Explosions-Frame** (Pflicht, Test über Timeline-Labels), Drink-Banner + Kill-Feed-Toast parallel, Haptik.
+3. Bei `crater`/`greed`: **ColorRing der Leger ≤ 300 ms nach Explosions-Frame** (Pflicht, Test über Timeline-Labels), Drink-Banner + Kill-Feed-Toast parallel, Haptik. Die Banner-Standzeit hängt am Explosions-Frame, läuft also **gleichzeitig** zur Sequenz; nach einem leeren Feld entfällt sie ganz (ADR-15).
 4. Kettenreaktion: Nachbarkrater nacheinander (80 ms Versatz), Leger-Ringe, kein Banner.
 5. Board-Update (`Tile` in Endzustand), Digger zurück zur Bank (rußig bleibt), `locked = false`, Event `digShown`.
 6. `treasure`/`greed`: nach Sequenz kein Unlock, Event `roundOver`.

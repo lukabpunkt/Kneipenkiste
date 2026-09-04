@@ -265,6 +265,12 @@ export class BoardView {
     return this.tiles[cell];
   }
 
+  /** Die Platte in der Feldmitte — die Sequenz-Vorschau spielt immer dort. */
+  get centerCell(): Cell {
+    const middle = Math.floor(this.size / 2);
+    return middle * this.size + middle;
+  }
+
   /** Weltposition einer Platte — Kamera und Digger brauchen sie. */
   positionOf(cell: Cell): { x: number; y: number } {
     const tile = this.tiles[cell];

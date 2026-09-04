@@ -6,6 +6,8 @@
  * gesamte Trick, warum er sich wie ein echter Knopf anfuehlt.
  */
 
+import { play } from '@/audio/AudioManager';
+
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 
 export interface ButtonOptions {
@@ -45,7 +47,17 @@ export function createButton(options: ButtonOptions): HTMLButtonElement {
   label.textContent = options.label;
   button.append(label);
 
-  if (options.onClick) button.addEventListener('click', options.onClick);
+  /*
+   * Der Klick klingt fuer jeden Knopf gleich — ausser fuer den Primary-CTA: Der ist der
+   * Knopf, der die Runde weiterbringt, und bekommt deshalb den bestaetigenden Ton.
+   * Der Cue haengt am Button selbst, nicht an den Aufrufern: So gibt es keinen stummen
+   * Knopf, den jemand zu vertonen vergessen hat.
+   */
+  const confirm = (options.variant ?? 'primary') === 'primary';
+  button.addEventListener('click', (event) => {
+    play(confirm ? 'ui_confirm' : 'ui_tap');
+    options.onClick?.(event);
+  });
 
   return button;
 }

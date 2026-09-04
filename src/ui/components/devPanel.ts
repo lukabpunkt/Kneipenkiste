@@ -10,6 +10,10 @@
  * - **Seed.** Damit ein Fehler zweimal passiert.
  * - **Spielerzahl.** 8 Diggers auf 6 × 6 ist der Fall, der weh tut.
  *
+ * Mit `?dev=1&panel=sequences` (`npm run preview:sequences`) kommt eine fuenfte Sache
+ * dazu: eine Liste aller angemeldeten Sequenzen, jede einzeln abspielbar. Ohne sie
+ * muesste man auf `treasure_greed` warten, bis es zufaellig passiert.
+ *
  * Das Panel existiert nur, wenn `?dev=1` gesetzt ist — im normalen Spiel wird es nie
  * gebaut, und `Reveal mines` ist damit nicht erreichbar.
  */
@@ -26,6 +30,11 @@ export interface DevPanel {
 /** Ist der Dev-Modus aktiv? */
 export function devMode(search = globalThis.location?.search ?? ''): boolean {
   return new URLSearchParams(search).has('dev');
+}
+
+/** Ist die Sequenz-Vorschau angefordert (`?dev=1&panel=sequences`)? */
+export function sequencePanelRequested(search = globalThis.location?.search ?? ''): boolean {
+  return devMode(search) && new URLSearchParams(search).get('panel') === 'sequences';
 }
 
 /**
@@ -59,6 +68,32 @@ export function createDevPanel(fsm: Fsm, stageOf: () => BoardStage | undefined):
 
   actions.append(revealButton, seedLabel);
   el.append(stats, actions);
+
+  /*
+   * Die Liste der Sequenzen und der Code, der sie abspielt, werden **dynamisch**
+   * geladen: Wer das Panel nie oeffnet, bekommt beides nie in den Speicher.
+   */
+  if (sequencePanelRequested()) {
+    const list = document.createElement('div');
+    list.className = 'dev-panel__sequences';
+    el.append(list);
+
+    void Promise.all([import('@/game/sequences'), import('@/game/sequences/preview')]).then(
+      ([registry, preview]) => {
+        registry.registerAllSequences();
+        for (const sequence of registry.allSequences()) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = sequence.id;
+          button.addEventListener('click', () => {
+            const stage = stageOf();
+            if (stage) void preview.previewSequence(stage, sequence.id);
+          });
+          list.append(button);
+        }
+      }
+    );
+  }
 
   let timer: ReturnType<typeof setInterval> | undefined;
   let revealed = false;
