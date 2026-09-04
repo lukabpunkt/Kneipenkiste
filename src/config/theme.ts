@@ -157,13 +157,27 @@ export const UI_TIMING = MOTION;
 /* Animations-Konstanten der Inszenierungen (Art Direction §7)         */
 /* ------------------------------------------------------------------ */
 
-export const ANIM = {
+export const ANIM: {
+  hitStopMs: number;
+  squashScaleX: number;
+  squashScaleY: number;
+  squashMs: number;
+  followThroughMs: readonly [number, number];
+  shakeMs: number;
+  shakeAmplitudePx: number;
+  sequenceMaxMs: number;
+  treasureMaxMs: number;
+  colorRingMaxDelayMs: number;
+} = {
   hitStopMs: 80,
   squashScaleX: 1.3,
   squashScaleY: 0.7,
   squashMs: 60,
   followThroughMs: [100, 150] as const,
-  /** Screen-Shake bei der Explosion (Art Direction §6). */
+  /**
+   * Screen-Shake bei der Explosion (Art Direction §6). Kein `as const`-Literal: Ein
+   * Doppelstapel schlaegt haerter zu und skaliert den Wert (`DigDirector`).
+   */
   shakeMs: 250,
   shakeAmplitudePx: 12,
   /** Erlaubte Dauer einer DigSequence (Audit A3/A4). Treasure darf laenger. */
@@ -196,24 +210,44 @@ export const PARTICLE_BUDGET = {
 /* ------------------------------------------------------------------ */
 
 /**
- * Feld-Geometrie in Welteinheiten (Art Direction §6). Bei 5 × 5 sind die Platten
- * groesser als bei 6 × 6 — das Feld selbst behaelt seine Kantenlaenge.
+ * Feld-Geometrie in Welteinheiten (Art Direction §6, ADR-12).
+ *
+ * Die Werte folgen **rueckwaerts aus der Touch-Regel**: Bei 390 px Geraetebreite bleiben
+ * dem Canvas rund 370 px, und jede Platte muss davon mindestens 56 px bekommen (GDD §5).
+ * Bei 6 × 6 heisst das 6 × 56 px + 5 × 6 px = 366 px — praktisch die volle Breite. In
+ * Welteinheiten (Breite 1000) sind das die Zahlen hier; sie fuellen das Feld absichtlich
+ * fast randlos aus. Die Tippflaeche gewinnt gegen die Randbreite.
  */
 export const FIELD_LAYOUT = {
-  5: { plate: 150, gap: 14 },
-  6: { plate: 124, gap: 12 },
+  5: { plate: 185, gap: 18 },
+  6: { plate: 153, gap: 16 },
 } as const;
 
 export const STAGE = {
-  /** Logische Weltgroesse, aufloesungsunabhaengig. */
+  /**
+   * Logische Weltgroesse, aufloesungsunabhaengig — **Hochformat** (ADR-12).
+   *
+   * Eine quadratische Welt kann Feld und Digger-Bank nicht beide tragen: Entweder die
+   * Platten fallen unter 56 px, oder die Diggers stehen auf dem Feld. Hochformat loest
+   * beides — die Breite gehoert dem Feld, die zusaetzliche Hoehe den Baenken.
+   */
   worldSize: 1000,
+  worldHeight: 1500,
+  /**
+   * Oberkante des Plattenfeldes. Der Streifen darueber traegt Zaun, Baum und Schild —
+   * bei 6–8 Spielern zusaetzlich die hintere Digger-Bank.
+   */
+  fieldTop: { single: 155, double: 255 },
   /** Kamera faehrt auf die aktive Platte (Art Direction §6). */
   plateZoom: 1.12,
   panMs: 400,
   /** Ab so vielen Spielern sitzt die Digger-Bank in zwei Reihen (oben + unten). */
   twoBenchesFrom: 6,
-  /** Digger-Hoehe in Welteinheiten, abhaengig von der Spielerzahl. */
-  diggerHeight: { min: 120, max: 160 } as const,
+  /**
+   * Digger-Hoehe in Welteinheiten. Passt in den Streifen unter dem Feld: Bei acht
+   * Spielern werden sie kleiner, damit die Bank nicht zugestopft wirkt.
+   */
+  diggerHeight: { min: 140, max: 180 } as const,
   headRatio: 0.45,
   blinkIntervalMs: [2000, 5000] as const,
   blinkDurationMs: 120,

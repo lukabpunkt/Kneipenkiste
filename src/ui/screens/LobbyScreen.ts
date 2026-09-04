@@ -285,6 +285,15 @@ export const createLobbyScreen: ScreenFactory = ({ fsm, session, router }) => {
     activate() {
       session.ensureMinimumPlayers((index) => t('lobby.namePlaceholder', { index }));
       sync();
+      /*
+       * Board-Chunk und Atlanten laden, waehrend die Spielerliste eingestellt wird
+       * (Roadmap M2.6). Bis zur ersten Platte vergehen mehrere Screens — diese Zeit
+       * reicht, und der Place-Screen zeigt dann kein Ladefeld mehr.
+       *
+       * Dynamisch, damit PixiJS nicht im Einstiegs-Chunk landet: Wer nur die Regeln
+       * liest, laedt es nie.
+       */
+      void import('@/game/BoardApp').then(({ preloadBoardAssets }) => preloadBoardAssets());
     },
   };
 };

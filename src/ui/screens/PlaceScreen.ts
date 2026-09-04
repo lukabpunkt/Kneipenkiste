@@ -12,8 +12,8 @@
 
 import { loadoutFor } from '@/config/rules';
 import { t } from '@/core/i18n';
-import { createBoardGrid } from '@/ui/components/boardGrid';
 import { createButton } from '@/ui/components/button';
+import { createStageHost, type StageHost } from '@/ui/components/stageHost';
 import { createTimerRing, type TimerRing } from '@/ui/components/timerRing';
 import { showToast } from '@/ui/components/toast';
 import { vibrate } from '@/ui/haptics';
@@ -58,22 +58,7 @@ export const createPlaceScreen: ScreenFactory = ({ fsm, router }) => {
     );
   }
 
-  const grid = createBoardGrid({
-    size: fsm.view().size,
-    mode: 'place',
-    colorOf: (id) => fsm.context.players.find((p) => p.id === id)?.colorId,
-    nameOf: (id) => fsm.context.players.find((p) => p.id === id)?.name,
-    onTileTap: (cell) => {
-      if (!fsm.togglePlacement(cell, tool)) {
-        // Kontingent voll: Der Screen sagt es, die Logik bleibt unangetastet.
-        vibrate('tap');
-        return;
-      }
-      vibrate('bury');
-      switchToolIfExhausted();
-      render();
-    },
-  });
+  const stage: StageHost = createStageHost();
 
   const tooltip = document.createElement('p');
   tooltip.className = 'place__tooltip';
@@ -89,9 +74,10 @@ export const createPlaceScreen: ScreenFactory = ({ fsm, router }) => {
   const timerSlot = document.createElement('div');
   timerSlot.className = 'place__timer';
 
-  el.append(header, tools, grid.el, tooltip, timerSlot, bury);
+  el.append(header, tools, stage.el, tooltip, timerSlot, bury);
 
   let ring: TimerRing | null = null;
+  let detachTap: (() => void) | undefined;
 
   /* ---------------------------------------------------------------- */
 
@@ -134,7 +120,7 @@ export const createPlaceScreen: ScreenFactory = ({ fsm, router }) => {
     const view = fsm.placeViewFor(player.id);
     const placed = view.ownMines.length + view.ownDuds.length;
 
-    grid.renderPlace(view, tool);
+    stage.board?.renderPlace(view);
     counter.textContent = t('place.counter', { placed, total });
 
     for (const chip of tools.querySelectorAll<HTMLElement>('.chip--tool')) {
@@ -151,7 +137,6 @@ export const createPlaceScreen: ScreenFactory = ({ fsm, router }) => {
     if (!fsm.canBury()) return;
     ring?.stop();
     vibrate('bury');
-    grid.el.classList.add('is-stomping');
 
     const last = fsm.context.playerIndex === fsm.context.players.length - 1;
     globalThis.setTimeout(() => {
@@ -164,8 +149,23 @@ export const createPlaceScreen: ScreenFactory = ({ fsm, router }) => {
     el,
 
     activate() {
-      render();
       void acquireWakeLock();
+
+      void stage.mount(fsm, 'place').then((board) => {
+        detachTap = board.onTileTap((cell) => {
+          if (!fsm.togglePlacement(cell, tool)) {
+            // Kontingent voll: Der Screen sagt es, die Logik bleibt unangetastet.
+            vibrate('tap');
+            return;
+          }
+          vibrate('bury');
+          switchToolIfExhausted();
+          render();
+        });
+        render();
+      });
+
+      render();
 
       const seconds = fsm.context.settings.placeTimerSec;
       if (seconds > 0) {
@@ -187,6 +187,8 @@ export const createPlaceScreen: ScreenFactory = ({ fsm, router }) => {
 
     destroy() {
       ring?.stop();
+      detachTap?.();
+      stage.unmount();
       void releaseWakeLock();
     },
   };

@@ -3,21 +3,21 @@
  *
  * Ablauf eines Taps, und die Reihenfolge ist verbindlich (CLAUDE.md, Architektur §3):
  *
- * 1. Feld sperren. Taps waehrenddessen werden **ignoriert, nicht gepuffert**.
- * 2. `tileTap` an die FSM — dort faellt die Entscheidung, genau einmal.
- * 3. Das Feld auf den neuen `publicView` bringen.
- * 4. Das Ergebnis zeigen: Schluecke **und** Schuldiger im selben Banner
- *    (Design-Prioritaet 2 — der Schuldige wartet nie hinter dem Gag).
- * 5. `digShown` an die FSM: naechster Spieler, oder Rundenende.
+ * 1. `tileTap` an die FSM — dort faellt die Entscheidung, genau einmal.
+ * 2. `DigDirector.play()` inszeniert das fertige Ergebnis: Kamera, Anticipation,
+ *    Aufdecken, Farbring, Banner. Das Feld ist waehrenddessen gesperrt; Taps werden
+ *    **ignoriert, nicht gepuffert**.
+ * 3. `digShown` an die FSM: naechster Spieler, oder Rundenende.
  *
- * In M1 ist Schritt 4 ein Banner. In M2 haengt sich dort der `DigDirector` ein und
- * spielt die Anticipation und die Sequenz ab; alles andere bleibt, wie es ist.
+ * Der Screen inszeniert selbst nichts. Er haelt Banner, Timer und Token-Anzeige — was
+ * auf dem Feld passiert, gehoert dem Director.
  */
 
 import { t } from '@/core/i18n';
+import { createDevPanel, devMode, type DevPanel } from '@/ui/components/devPanel';
 import { seedActive } from '@/ui/devSeed';
 import { createBannerHost, type KillLine } from '@/ui/components/drinkBanner';
-import { createBoardGrid } from '@/ui/components/boardGrid';
+import { createStageHost } from '@/ui/components/stageHost';
 import { createTimerRing, type TimerRing } from '@/ui/components/timerRing';
 import { createTokenStack } from '@/ui/components/tokenStack';
 import { createTurnBanner } from '@/ui/components/turnBanner';
@@ -38,13 +38,11 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
   const turnBanner = createTurnBanner();
   const bannerHost = createBannerHost();
 
-  const grid = createBoardGrid({
-    size: fsm.view().size,
-    mode: 'dig',
-    colorOf,
-    nameOf,
-    onTileTap: (cell) => void handleTap(cell),
-  });
+  /*
+   * Der Director ruft `showBanner` im Moment des Aufdeckens auf — Schluecke und
+   * Schuldiger erscheinen also **mit** der Explosion, nicht danach (Design-Prioritaet 2).
+   */
+  const stage = createStageHost({ showBanner: (result) => void present(result) });
 
   const tokenStack = createTokenStack({ colorOf, nameOf });
 
@@ -55,8 +53,7 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
   minesLeft.className = 'dig__mines-left';
 
   footer.append(minesLeft, tokenStack.el);
-
-  el.append(turnBanner.el, bannerHost.el, grid.el, footer);
+  el.append(turnBanner.el, bannerHost.el, stage.el, footer);
 
   if (seedActive()) {
     const note = document.createElement('p');
@@ -66,6 +63,9 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
   }
 
   let ring: TimerRing | null = null;
+  let detachTap: (() => void) | undefined;
+  let dev: DevPanel | undefined;
+  let busy = false;
   /** Token-Konten, wie sie sich waehrend der Runde ansammeln (Anzeige, nicht Wahrheit). */
   const tokens: Record<PlayerId, number> = {};
 
@@ -78,7 +78,7 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
 
   function renderBoard(): void {
     const view = fsm.view();
-    grid.renderPublic(view);
+    stage.board?.renderPublic(view);
     minesLeft.textContent = t('dig.minesRemaining', { count: view.minesRemaining });
     tokenStack.render(tokens);
   }
@@ -93,60 +93,59 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
     ring = createTimerRing({
       seconds,
       onDone: () => {
-        if (grid.locked) return;
+        if (busy) return;
         showToast(t('dig.timeUp'), { variant: 'info' });
         // Auch der erzwungene Zug laeuft ueber die FSM und sicheren Zufall.
-        void afterTap(() => fsm.digRandom());
+        void run(() => fsm.digRandom());
       },
     });
     turnBanner.setTimer(ring.el);
     ring.start();
   }
 
-  async function handleTap(cell: Cell): Promise<void> {
-    await afterTap(() => fsm.send({ type: 'tileTap', cell }));
-  }
-
   /**
-   * Der gemeinsame Weg fuer den Tap und den abgelaufenen Timer: sperren, entscheiden
-   * lassen, zeigen, weitergeben.
+   * Der gemeinsame Weg fuer den Tap und den abgelaufenen Timer: entscheiden lassen,
+   * inszenieren, weitergeben.
    */
-  async function afterTap(dig: () => boolean): Promise<void> {
-    if (grid.locked) return;
-    grid.setLocked(true);
+  async function run(dig: () => boolean): Promise<void> {
+    const board = stage.board;
+    if (busy || !board) return;
+    busy = true;
     ring?.stop();
 
     if (!dig()) {
-      grid.setLocked(false);
+      busy = false;
       startTimer();
       return;
     }
 
     const result = fsm.context.lastDig;
     if (!result) {
-      grid.setLocked(false);
+      busy = false;
       return;
     }
 
-    renderBoard();
-    await present(result);
+    // Der Director sperrt das Feld selbst und gibt es danach wieder frei.
+    await board.play(result, fsm.view());
+
+    minesLeft.textContent = t('dig.minesRemaining', { count: fsm.view().minesRemaining });
 
     const roundOver = result.roundOver;
     fsm.send({ type: 'digShown' });
+    busy = false;
 
     if (roundOver) {
       void router.go(fsm.state === 'DISTRIBUTE' ? 'distribute' : 'result');
       return;
     }
 
-    grid.setLocked(false);
     renderTurn();
     startTimer();
   }
 
   /**
-   * Das Ergebnis zeigen. Ein Banner pro Grabung, und **Schluecke und Schuldiger stehen
-   * darin zusammen** — nie nacheinander (Design-Prioritaet 2).
+   * Das Banner zu einer Grabung. Ein Banner pro Ergebnis, und **Schluecke und
+   * Schuldiger stehen darin zusammen** — nie nacheinander (Design-Prioritaet 2).
    */
   async function present(result: DigResult): Promise<void> {
     const digger = playerById(result.by);
@@ -221,10 +220,10 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
 
       /*
        * `empty` — und damit auch der stumme eigene Trittstein. Kein Banner, kein Ton,
-       * kein Frame Unterschied (ADR-2). Nur die kurze Pause, die jede Grabung hat.
+       * kein Frame Unterschied (ADR-2).
        */
       case 'empty':
-        await new Promise((resolve) => globalThis.setTimeout(resolve, 500));
+        return;
     }
   }
 
@@ -234,13 +233,26 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
     activate() {
       void acquireWakeLock();
       renderTurn();
-      renderBoard();
-      startTimer();
+
+      if (devMode()) {
+        dev = createDevPanel(fsm, () => stage.board);
+        el.append(dev.el);
+        dev.start();
+      }
+
+      void stage.mount(fsm, 'dig').then((board) => {
+        detachTap = board.onTileTap((cell: Cell) => void run(() => fsm.send({ type: 'tileTap', cell })));
+        renderBoard();
+        startTimer();
+      });
     },
 
     destroy() {
       ring?.stop();
+      detachTap?.();
+      dev?.stop();
       bannerHost.clear();
+      stage.unmount();
       void releaseWakeLock();
     },
   };

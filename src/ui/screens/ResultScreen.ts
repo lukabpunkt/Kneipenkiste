@@ -12,8 +12,8 @@ import { t } from '@/core/i18n';
 import { totalSips } from '@/core/payout';
 import { deadliestLayer, mostBlasted, sessionStats } from '@/core/session';
 import { createPlayerBadge } from '@/ui/components/badge';
-import { createBoardGrid } from '@/ui/components/boardGrid';
 import { createButton } from '@/ui/components/button';
+import { createStageHost } from '@/ui/components/stageHost';
 import { openSheet } from '@/ui/components/sheet';
 import type { ScreenFactory } from '@/ui/router';
 import type { PlayerId } from '@/core/types';
@@ -25,7 +25,6 @@ export const createResultScreen: ScreenFactory = ({ fsm, session, router }) => {
   const result = fsm.context.result;
   const playerById = (id: PlayerId) => fsm.context.players.find((p) => p.id === id);
   const nameOf = (id: PlayerId) => playerById(id)?.name;
-  const colorOf = (id: PlayerId) => playerById(id)?.colorId;
 
   /* --- Banner --------------------------------------------------- */
 
@@ -43,17 +42,7 @@ export const createResultScreen: ScreenFactory = ({ fsm, session, router }) => {
 
   /* --- Feld-Replay ---------------------------------------------- */
 
-  const grid = createBoardGrid({
-    size: fsm.view().size,
-    mode: 'replay',
-    colorOf,
-    nameOf,
-  });
-  /*
-   * `fsm.replay()` ist der einzige Board-Ausgang, der alles zeigt — und hier ist er
-   * erlaubt: Die Runde ist vorbei, es gibt nichts mehr zu verraten.
-   */
-  grid.renderReplay(fsm.replay());
+  const stage = createStageHost();
 
   /* --- Trinker und Kill-Feed ------------------------------------ */
 
@@ -146,7 +135,7 @@ export const createResultScreen: ScreenFactory = ({ fsm, session, router }) => {
     })
   );
 
-  el.append(banner, grid.el, drinkers, killFeed, actions);
+  el.append(banner, stage.el, drinkers, killFeed, actions);
 
   /* ---------------------------------------------------------------- */
 
@@ -212,5 +201,22 @@ export const createResultScreen: ScreenFactory = ({ fsm, session, router }) => {
     openSheet({ title: t('result.stats'), content });
   }
 
-  return { el };
+  return {
+    el,
+
+    activate() {
+      /*
+       * `fsm.replay()` ist der einzige Board-Ausgang, der alles zeigt — und hier ist er
+       * erlaubt: Die Runde ist vorbei, es gibt nichts mehr zu verraten. Das ist der
+       * zweite grosse Moment (GDD §4.4, §7).
+       */
+      void stage.mount(fsm, 'replay').then((board) => {
+        board.renderReplay(fsm.replay());
+      });
+    },
+
+    destroy() {
+      stage.unmount();
+    },
+  };
 };
