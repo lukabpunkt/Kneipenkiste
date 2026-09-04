@@ -446,9 +446,16 @@
   line-height: 1;
   letter-spacing: 0.02em;
   color: var(--c-gold);
+  /*
+   * Nur Schlagschatten, **keine** Tintenkontur (Audit A5).
+   *
+   * Die Sticker-Kontur trennt Schrift von bunten Flaechen — auf dem tiefdunklen
+   * Title-Hintergrund trennt sie nichts, sie ist dort schlicht unsichtbar. Sichtbar ist
+   * sie nur fuer die Kontrastpruefung: axe wertet eine 4-px-Kontur als das, was man am
+   * Rand der Glyphe sieht, und rechnet Tinte gegen Fast-Schwarz — 1,07:1. Der Schatten
+   * traegt den Sticker-Look hier allein.
+   */
   text-shadow: var(--sticker-shadow);
-  -webkit-text-stroke: var(--sticker-stroke) var(--c-ink);
-  paint-order: stroke fill;
   animation: logo-wobble 4s ease-in-out infinite;
 }
 

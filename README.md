@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel über Vertrauen und Verrat für 3–8
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M4 fertig (`v0.4.0`) — die elf Ergebnis-Inszenierungen aus GDD §4.4 stehen. Der Alleingänger springt ins Fluchtauto, dem Doppel-Dieb fällt ein Amboss auf den Kopf, bei „alle stehlen" fällt das Gitter, und der Jackpot lässt den Tresor platzen. Zwei Overlays legen sich darüber: Meineid (Lügennase und Stempel) und Maulwurf. `npm run preview:outcomes` spielt jede Sequenz einzeln ab. Aktueller Stand in [`docs/PROGRESS.md`](docs/PROGRESS.md).
+**Status:** M5 fertig (`v0.5.0`) — Politur, Modi-Feinschliff und Barrierefreiheit. Der Title hat seinen Loop, es gibt Musik, der Eid wird gestempelt, das Ergebnis-Banner fährt ein, und die Runde lässt sich als Satz teilen. Lighthouse Mobile: Performance 99 · Accessibility 100 · Best Practices 100. Aktueller Stand in [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ## Entwickeln
 
@@ -22,6 +22,7 @@ npm run dev            # Vite mit --host, auch vom Handy im WLAN erreichbar
 | `npm run test:e2e` · `test:perf`                      | Playwright auf iPhone 12 (WebKit) und Pixel 5 (Chromium) |
 | `npm run build:atlas` · `build:audio` · `build:icons` | Assets aus `assets-src/` bzw. `audio-src/`               |
 | `npm run check:colors`                                | Farb-Audit: Deuteranopie/Protanopie über CIE Lab (A2)    |
+| `npm run check:bundle`                                | Bundle-Budget nach `npm run build` (A5)                  |
 | `npm run preview:outcomes`                            | Jede Inszenierung und jedes Overlay einzeln abspielen    |
 
 ## Aufbau

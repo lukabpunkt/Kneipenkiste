@@ -229,3 +229,55 @@
 - [ ] Weiterhin offen aus M2/M3: echtes iPhone 11 / Pixel 4a (60 fps), Look-Check gegen Art Direction §1, Spannungs-Test mit drei Personen, Urteil über die synthetisierten Platzhalter-Sounds.
 
 **Zahlen:** 646 Unit-Tests · 32 E2E-Tests · 3 Perf-Tests · 11 Inszenierungen (3,7–5,3 s) + 2 Overlays · 89 Atlas-Frames in 3 Texturen · p50 16,7 ms während der Show · 2 Draw-Calls.
+
+## M5 — Polish, Modi-Feinschliff, Juice & Accessibility — 2026-09-05 (Tag `v0.5.0`)
+
+**Stand:** Der Title hat seinen Loop, das Spiel hat Musik, jeder Screen hat seinen Moment. Beide Sprachen sind deckungsgleich, reduzierte Bewegung wird überall respektiert, und drei Fehlerfälle sind als Test festgehalten.
+
+**Was neu ist**
+
+- `assets-src/svg/dom/crook-sneak.svg` + Title-Loop in CSS — der Crook aus GDD §5.
+- `src/audio/music.ts` — drei synthetisierte Loops an einem Lookahead-Scheduler (ADR-26).
+- `src/core/share.ts` — der Satz zur Runde als reine Funktion; `traitorOfTheEvening()` in `session.ts`.
+- `src/ui/components/onboarding.ts` — zwei Sätze, je einmal pro Gerät.
+- `src/ui/dev/`, `scripts/check-bundle.mjs` (ADR-28), `tests/e2e/a11y.spec.ts`, `tests/e2e/resilience.spec.ts`, `tests/unit/share.test.ts`.
+
+## Audit A5 — 2026-09-05
+
+**Ergebnis:** BESTANDEN (alle MUSS-Checks grün; zwei Punkte brauchen echte Geräte)
+
+| Check | Status | Notiz |
+|---|---|---|
+| Lighthouse Mobile Perf/A11y/Best Practices ≥ 90 | ✅ | **Performance 99 · Accessibility 100 · Best Practices 100 · SEO 100** (Lighthouse 13.4, Mobile-Preset, Produktions-Build). FCP 1,3 s · LCP 1,9 s · TBT 0 ms. Desktop-Preset: 100/100/100/100. |
+| PWA installierbar | ✅ | Manifest, Icons und Service Worker stehen seit M1; der E2E-Fall "liefert ein installierbares Manifest" prüft Name, Start-URL, Display und Icon-Größen bei jedem Lauf. |
+| JS ≤ 450 KB gzip, Reveal-Chunk lazy | ✅ | **Einstieg 32,9 KB, gesamt 266,8 KB gzip.** `npm run check:bundle` folgt der statischen Import-Kette ab `index.html`, nicht nur der einen Datei aus dem `<script>`-Tag — nur so sieht man, ob die Bühne zurück in den Start gerutscht ist (ADR-28). Der Check fällt zusätzlich um, wenn ein Bühnen-Chunk statisch am Einstieg hängt. |
+| Kontrast ≥ 4,5:1 | ✅ | Lighthouse `color-contrast` grün. Der einzige Befund war der Titel: Die 4-px-Sticker-Kontur wird von axe als effektive Vordergrundfarbe gewertet — Tinte gegen Fast-Schwarz, 1,07:1. Die Kontur bleibt dort, wo sie etwas leistet (bunte Flächen), über dunklem Grund trägt der Schlagschatten allein (ADR-27). Optisch identisch. Die Spielerfarben prüft weiterhin `npm run check:colors`. |
+| Reduced-Motion | ✅ | E2E fand einen echten Fehler: Der Wackel-Knopf lief auch bei `reduce` weiter. Behoben — und ein Guard-Test liest jetzt das CSS und verlangt für **jede** Endlos-Animation eine Abschaltregel. Einmaliges Aufploppen bleibt erlaubt; was dauerhaft läuft, nicht. Zusätzlich prüft ein E2E-Fall über `document.getAnimations()`, dass auf dem Title bei `reduce` nichts mehr läuft — und dass sich der ganze Weg bis zur Aufdeckung trotzdem spielen lässt. |
+| Tastatur-Navigation (SOLL) | ✅ | Der Router setzt den Fokus nach jedem Wechsel in den neuen Screen (E2E-Fall), jeder Screen hat genau eine H1, jede Taste einen Namen — auch die Icon-Knöpfe über `aria-label`. Kassels Kommentare laufen über `aria-live="polite"`: Er ist Deko und darf den Countdown nicht unterbrechen. |
+| EN vollständig | ✅ | Drei maschinelle Fragen statt Hinsehen: identische Key-Mengen in beiden Sprachen, kein leerer Text, dieselben Platzhalter. Der letzte Punkt ist der stille Fehler — ein `{name}`, das nur in einer Sprache steht, lässt den Satz lesbar, nur fehlt der Name genau dort, wo er die Pointe trägt. |
+| Alle Modus-Kombinationen spielbar | ✅ | Eid + Maulwurf und Nachtschicht + Highroller laufen im E2E-Flow; die Payout-Property-Tests ziehen alle 16 Kombinationen über 10 000 Runden. Neu ist die **Ansage im UI**: Ein Satz unter den Modi erklärt, was zusammen passiert (GDD §3.7). |
+| Title-Loop 10 min ohne Leak | ⏳ manuell | Der Loop ist reines CSS auf zwei DOM-Knoten — es gibt nichts, was wachsen könnte, und der Screen wird beim Verlassen ersetzt. Eine echte Zehn-Minuten-Messung auf einem Gerät steht aus. |
+| Share-Text korrekt | ✅ | `core/share.ts` ist eine reine Funktion und wird wie eine Regel getestet: fünf Ausgänge, fünf verschiedene Sätze, Meineid schlägt den Alleingang, keine offenen Platzhalter, beide Sprachen, und ein Spieler, der nicht mehr in der Liste steht, bringt nichts zum Absturz. Geteilt wird über die Web-Share-API, Zwischenablage als Rückfall, Toast als letzter. |
+| Fehlerfälle (Offline, Atlas-Fehler) | ✅ | `resilience.spec.ts`: Netzabbruch mitten in der Runde (die Aufdeckung läuft aus dem Speicher weiter), fehlender Atlas (DOM-Kartenreihe übernimmt, die Runde endet regulär in der Verteil-UI), unbrauchbarer `localStorage` (Safari Private Mode). Der erste Fall fand einen echten Fehler — siehe unten. |
+
+**Befunde während der Umsetzung**
+
+- **Der Wackel-Knopf ignorierte reduzierte Bewegung.** `btn--wobble` hatte als einzige Endlos-Animation keine `prefers-reduced-motion`-Regel. Gefunden hat es nicht das Auge, sondern `document.getAnimations()` im E2E — und ein Guard-Test hält es jetzt fest.
+- **Vorladen ohne `catch` ist ein Fehler in fremder Konsole.** Bricht während der Verhandlung das WLAN weg, scheitert der Bühnen-Import. Die Aufdeckung fällt danach sauber auf die DOM-Karten zurück — die unbehandelte Rejection blieb trotzdem stehen (ADR-29).
+- **Die Sticker-Kontur kostete zwölf A11y-Punkte.** Über dunklem Grund ist sie unsichtbar — außer für den Kontrastprüfer, der sie als Vordergrundfarbe wertet (ADR-27).
+- **Kassel hätte zweimal geredet.** Der Director warf pauschal einen Satz ein, jede M4-Sequenz noch einen an ihrer Pointe — der zweite wäre über den Trinkzahlen gelandet (ADR-23, in M4 behoben, hier durch die Musik-Umstellung nochmals berührt).
+- **Ein fremder Dev-Server saß auf Port 4173.** Ein `vite preview` aus einem anderen Projekt hielt den Port und beantwortete alles mit 404 — das erklärt die sporadisch scheiternden E2E-Läufe der letzten beiden Meilensteine. Prozess beendet; die Läufe sind seitdem stabil.
+- **Der Title-Loop lag zuerst auf halber Höhe** und verschwand hinter den Buttons. Er läuft jetzt am unteren Rand entlang, wo er die ganze Breite hat.
+- **Die Nachtschicht-Uhr hatte einen Rand zu viel.** Mit Zifferblattrand standen zwei Kreise übereinander und lasen sich als Doppelanzeige. Es bleiben zwölf Striche und der Zeiger.
+
+**Offene SOLL-Follow-ups:** Video `docs/screens/m4-outcomes.mp4` (aus M4).
+
+**Manuelle Checks für Luka vor M6:**
+
+- [ ] Title-Loop zehn Minuten auf einem echten Gerät laufen lassen: Bleibt der Speicher flach, bleibt die Bildrate stabil?
+- [ ] Musik anhören. Die drei Loops sind synthetisiert (ADR-19/26) — trägt der Heist-Jazz über einen Abend, oder nervt er nach zwei Runden? Lautstärke gegen die Cues abgleichen.
+- [ ] Onboarding: Zwei Sätze, je einmal. Reicht das, oder fehlt ein dritter (Verteil-UI)? `localStorage.removeItem('tresor.onboarding.v1')` zeigt sie wieder.
+- [ ] Teilen-Text auf dem Handy antippen: Kommt das System-Share-Blatt, und liest sich der Satz in WhatsApp gut?
+- [ ] Weiterhin offen aus M2–M4: echtes iPhone 11 / Pixel 4a (60 fps), Look-Check gegen Art Direction §1, Spannungs-Test mit drei Personen, „Lustig-Test" der elf Inszenierungen, Gewichtung der Sequenzen nach dem ersten Abend.
+
+**Zahlen:** 662 Unit-Tests · 32 E2E (Flow) + 10 (A11y) + 6 (Resilienz) · 3 Perf-Tests (p50 16,7 ms auch mit laufender Musik) · Lighthouse Mobile 99/100/100/100 · Einstieg 32,9 KB gzip, gesamt 266,8 KB · 3 Musik-Loops, 26 Cues, alle synthetisiert.

@@ -46,6 +46,8 @@ Kontrastregeln wie Drinkshot (≥ 4.5:1, `ink` auf Gold/Grün/Cyan).
 
 Identisch zu Drinkshot (*Luckiest Guy* Display, *Nunito* Body, self-hosted). Zusätzlich für den Tresor-Zähler ein **Flip-Counter-Look** (Split-Flap-Anzeige wie am Bahnhof): Ziffern in Luckiest Guy auf dunklen Klappen, jede Änderung als Klapp-Animation (120 ms, `back.out`), Sound `vault_dial`.
 
+**Sticker-Kontur nur über bunten Flächen.** Die 4-px-Tintenkontur (`-webkit-text-stroke`) trennt Schrift von Spielerfarben, Bannern und Karten. Über dem tiefdunklen Hintergrund trennt sie nichts — dort trägt der Schlagschatten den Look allein. Grund ist nicht nur Optik: Kontrastprüfer werten eine so dicke Kontur als das, was man am Rand der Glyphe sieht, und rechnen Tinte gegen Fast-Schwarz (1,07:1). Der Titel hatte deshalb Lighthouse-A11y 88 statt 100 (ADR-27).
+
 ---
 
 ## 4. UI-Komponenten (Ergänzungen zum Drinkshot-System)
