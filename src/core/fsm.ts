@@ -16,6 +16,7 @@ import { MIN_PLAYERS, type Settings } from '@/config/rules';
 import {
   createBoard,
   dig as digCell,
+  replayView,
   fillRandomMines,
   minesComplete,
   placeMine as placeMineOn,
@@ -37,6 +38,7 @@ import type {
   Player,
   PlayerId,
   PublicView,
+  ReplayView,
   RoundResult,
 } from './types';
 import type { MineKind } from './board';
@@ -155,6 +157,12 @@ export interface Fsm {
   view(): PublicView;
   /** Der Blick des Place-Screens auf die eigenen Sprengkoerper. */
   placeViewFor(playerId: PlayerId): PlaceView;
+  /**
+   * Das Feld-Replay (GDD §4.4). Der dritte und letzte Board-Ausgang — und der einzige,
+   * der alles zeigt. Erlaubt ist er, weil die Runde an dieser Stelle vorbei ist: Es
+   * gibt nichts mehr zu verraten, nur noch etwas zu erklaeren.
+   */
+  replay(): ReplayView;
 
   on(state: GameState, hooks: StateHooks): () => void;
   subscribe(listener: (transition: Transition) => void): () => void;
@@ -462,6 +470,10 @@ export function createFsm(options: FsmOptions): Fsm {
 
     placeViewFor(playerId) {
       return placeView(context.board, playerId);
+    },
+
+    replay() {
+      return replayView(context.board);
     },
 
     on(target, stateHooks) {

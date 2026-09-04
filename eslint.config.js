@@ -63,14 +63,22 @@ export default tseslint.config(
       'no-restricted-syntax': [
         'error',
         {
-          selector: "MemberExpression[property.name='mines']",
+          /*
+           * Das private Board ist gar nicht erst erreichbar. Wer `fsm.context.board`
+           * nicht anfassen kann, kann auch `board.mines` nicht lesen — die Regel greift
+           * damit eine Ebene frueher als das eigentliche Verbot und laesst
+           * `replayCell.treasure` in Ruhe, das aus `replayView()` stammt und
+           * oeffentlich sein darf.
+           */
+          selector: "MemberExpression[property.name='board']",
           message:
-            'Screens und Buehne duerfen `board.mines` nicht lesen — nutze publicView()/replayView() aus core/board.ts.',
+            'Das private Board bleibt im Store — nutze fsm.view(), fsm.placeViewFor() oder fsm.replay() (CLAUDE.md, ADR-2).',
         },
         {
-          selector: "MemberExpression[property.name='treasure']",
+          // Zweites Netz, falls doch einmal ein Board hereingereicht wird.
+          selector: 'MemberExpression[object.name=/[Bb]oard$/][property.name=/^(mines|treasure)$/]',
           message:
-            'Screens und Buehne duerfen `board.treasure` nicht lesen — nutze publicView()/replayView() aus core/board.ts.',
+            'Screens und Buehne duerfen `board.mines` / `board.treasure` nicht lesen — nutze publicView()/replayView() aus core/board.ts.',
         },
       ],
     },

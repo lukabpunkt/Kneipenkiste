@@ -1,57 +1,136 @@
 /**
- * Einstiegspunkt.
+ * Einstiegspunkt: Session laden, FSM bauen, Screens registrieren, los.
  *
- * In M0 gibt es noch keinen Router und keine Screens (Roadmap M1) — die App bootet die
- * Session, setzt die Sprache und zeigt den Titel, damit "Titel auf Handy" und die
- * PWA-Installation aus Audit A0 pruefbar sind. Ab M1 uebernimmt hier `ui/router.ts`.
+ * Die Screens kennen einander nicht — sie schicken Events an die FSM und sagen dem
+ * Router, wohin. Diese Datei ist der einzige Ort, der beides zusammenbringt.
  */
 
 import './styles/tokens.css';
 import './styles/base.css';
+import './styles/components.css';
 
+import { createFsm } from '@/core/fsm';
 import { detectLocale, setLocale, t } from '@/core/i18n';
 import { createSessionStore } from '@/core/session';
+import { confirmSheet } from '@/ui/components/sheet';
+import { showToast } from '@/ui/components/toast';
+import { secureSource } from '@/ui/devSeed';
+import { setHapticsEnabled } from '@/ui/haptics';
+import { createRouter, type ScreenId } from '@/ui/router';
+import { watchWakeLock } from '@/ui/wakeLock';
+import { createBuriedScreen } from '@/ui/screens/BuriedScreen';
+import { createDigScreen } from '@/ui/screens/DigScreen';
+import { createDistributeScreen } from '@/ui/screens/DistributeScreen';
+import { createLobbyScreen } from '@/ui/screens/LobbyScreen';
+import { createPassScreen } from '@/ui/screens/PassScreen';
+import { createPlaceScreen } from '@/ui/screens/PlaceScreen';
+import { createResultScreen } from '@/ui/screens/ResultScreen';
+import { createTitleScreen } from '@/ui/screens/TitleScreen';
 
-declare const __APP_VERSION__: string;
+/** Aus diesen Screens fuehrt der Zurueck-Knopf nur ueber einen Dialog (Architektur §3). */
+const ABORTABLE: readonly ScreenId[] = ['pass', 'place', 'buried', 'dig'];
 
-setLocale(detectLocale());
-
-/** Alle `data-i18n`-Knoten im statischen HTML (Landscape-Overlay). */
-function translateStaticNodes(): void {
-  for (const node of document.querySelectorAll<HTMLElement>('[data-i18n]')) {
+function applyStaticTranslations(root: ParentNode = document): void {
+  for (const node of root.querySelectorAll<HTMLElement>('[data-i18n]')) {
     const key = node.dataset['i18n'];
     if (key) node.textContent = t(key);
   }
 }
 
-function renderBootScreen(host: HTMLElement): void {
-  host.replaceChildren();
-
-  const screen = document.createElement('div');
-  screen.className = 'boot';
-
-  const logo = document.createElement('h1');
-  logo.className = 'boot__logo';
-  logo.textContent = t('app.title');
-
-  const tagline = document.createElement('p');
-  tagline.className = 'boot__tagline';
-  tagline.textContent = t('app.tagline');
-
-  const version = document.createElement('p');
-  version.className = 'boot__version';
-  version.textContent = `v${__APP_VERSION__}`;
-
-  screen.append(logo, tagline, version);
-  host.append(screen);
+function registerServiceWorker(): void {
+  if (import.meta.env.DEV) return;
+  void import('virtual:pwa-register').then(({ registerSW }) => {
+    const update = registerSW({
+      immediate: true,
+      onNeedRefresh() {
+        showToast(t('app.title'), {
+          durationMs: 8000,
+          action: { label: t('common.continue'), onClick: () => void update(true) },
+        });
+      },
+    });
+  });
 }
 
-const host = document.querySelector<HTMLElement>('#app');
-if (!host) throw new Error('#app fehlt in index.html.');
+function boot(): void {
+  const mount = document.querySelector<HTMLElement>('#app');
+  if (!mount) throw new Error('#app fehlt in index.html.');
 
-// Die Session wird schon hier geladen: Wer die App neu startet, findet seine Runde wieder.
-const session = createSessionStore();
-setLocale(session.state.settings.locale);
+  const session = createSessionStore();
+  const settings = session.state.settings;
 
-translateStaticNodes();
-renderBootScreen(host);
+  setLocale(settings.locale ?? detectLocale());
+  setHapticsEnabled(settings.haptics);
+  applyStaticTranslations();
+
+  const fsm = createFsm({
+    players: [...session.state.players],
+    settings,
+    // Produktiv `crypto.getRandomValues`; nur im Dev- und E2E-Build kann `?seed=`
+    // eine reproduzierbare Quelle einsetzen (siehe ui/devSeed.ts).
+    secure: secureSource(),
+  });
+
+  /*
+   * Die Session ist die Buchhaltung, die FSM der Spielverlauf. Genau ein Ort verbindet
+   * sie: Sobald eine Runde im Result angekommen ist, wandert sie in die Historie —
+   * mit Verteilung, falls es eine gab, sonst waere die Zeile unvollstaendig.
+   */
+  fsm.subscribe(({ to, context }) => {
+    if (to !== 'RESULT' || !context.result) return;
+    session.recordRound(context.result);
+  });
+
+  const router = createRouter({
+    host: mount,
+    context: { fsm, session, dev: new URLSearchParams(location.search).has('dev') },
+  });
+
+  router.register('title', createTitleScreen);
+  router.register('lobby', createLobbyScreen);
+  router.register('pass', createPassScreen);
+  router.register('place', createPlaceScreen);
+  router.register('buried', createBuriedScreen);
+  router.register('dig', createDigScreen);
+  router.register('distribute', createDistributeScreen);
+  router.register('result', createResultScreen);
+
+  setupBackButton(router, () => {
+    if (!fsm.send({ type: 'cancel' })) return;
+    void router.go('lobby', { direction: 'back' });
+  });
+
+  watchWakeLock();
+  registerServiceWorker();
+
+  void router.go('title');
+}
+
+/**
+ * Zurueck-Knopf des Browsers abfangen (Architektur §3).
+ *
+ * Ein versehentlicher Wisch darf keine laufende Runde wegwerfen — und ohne
+ * History-Eintrag verlaesst er die App komplett. Deshalb ein Dummy-Eintrag, der nach
+ * jedem `popstate` sofort wieder nachgeschoben wird.
+ */
+function setupBackButton(router: { current: ScreenId | null }, abort: () => void): void {
+  history.pushState({ sprengmeister: true }, '');
+
+  globalThis.addEventListener('popstate', () => {
+    history.pushState({ sprengmeister: true }, '');
+
+    const current = router.current;
+    if (current === null || !ABORTABLE.includes(current)) return;
+
+    void confirmSheet({
+      title: t('dialog.abortRound'),
+      body: t('dialog.abortRoundBody'),
+      confirmLabel: t('dialog.abortConfirm'),
+      cancelLabel: t('dialog.abortKeep'),
+    }).then((confirmed) => {
+      if (confirmed) abort();
+    });
+  });
+}
+
+boot();
