@@ -8,6 +8,7 @@
  */
 
 import { hex, MOTION, UI_COLORS } from '@/config/theme';
+import { startMusic, stopMusic, type MusicTrack } from '@/audio/music';
 import type { Fsm } from '@/core/fsm';
 import type { SessionStore } from '@/core/session';
 import { prefersReducedMotion, safeAnimate } from '@/ui/animate';
@@ -84,6 +85,29 @@ function focusScreen(el: HTMLElement): void {
   }
 }
 
+/**
+ * Welcher Musik-Loop zu welchem Screen gehoert (GDD §6, Roadmap M5.1).
+ *
+ * Die Zuordnung steht hier und nicht in den Screens: Der Router ist die einzige Stelle,
+ * die jeden Wechsel sieht. Verteilt auf zehn Screens haetten wir zehn `start`- und zehn
+ * `stop`-Aufrufe, die sich gegenseitig ins Wort fallen.
+ *
+ * `undefined` heisst **Stille**, und die ist Absicht: Waehrend das Handy herumgeht und
+ * jemand heimlich waehlt, soll man die eigene Entscheidung hoeren, nicht einen Loop.
+ */
+const MUSIC_FOR: Record<ScreenId, MusicTrack | undefined> = {
+  title: 'lobby',
+  lobby: 'lobby',
+  negotiation: 'negotiation',
+  silence: 'negotiation',
+  pass: undefined,
+  choice: undefined,
+  sealed: undefined,
+  reveal: 'reveal',
+  distribute: 'lobby',
+  result: 'lobby',
+};
+
 /** Leitet die Richtung aus der Position in `SCREEN_ORDER` ab. */
 function directionBetween(from: ScreenId | null, to: ScreenId): 'forward' | 'back' {
   if (from === null) return 'forward';
@@ -105,6 +129,10 @@ export function createRouter(options: RouterOptions): Router {
 
     instance?.destroy?.();
     host.replaceChildren();
+
+    const track = MUSIC_FOR[id];
+    if (track) startMusic(track);
+    else stopMusic();
 
     instance = factory({ ...options.context, router });
     instance.el.dataset['screen'] = id;

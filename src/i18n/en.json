@@ -62,7 +62,10 @@
     "nightShift": "Night Shift",
     "nightShiftHint": "No negotiation. Ten seconds of silence.",
     "highroller": "Highroller",
-    "highrollerHint": "Bigger vault, faster growth, no ceiling."
+    "highrollerHint": "Bigger vault, faster growth, no ceiling.",
+    "comboOathMole": "Chaos mode: the mole may swear and still has to steal — no perjury penalty for them.",
+    "comboNightHighroller": "Late shift: big vaults, no negotiation. Short and expensive.",
+    "comboAllOn": "Everything on. Good luck."
   },
   "negotiation": {
     "headline": "Negotiate.",

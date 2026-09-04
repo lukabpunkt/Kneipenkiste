@@ -470,6 +470,155 @@
   color: rgb(255 248 231 / 58%);
 }
 
+/* ------------------------------------------------------------------ */
+/* Title-Loop: Der Crook wird vom Spot erwischt (GDD §5)               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Ein Zyklus dauert 14 s und erzaehlt vier Takte: schleichen, erwischt werden,
+ * erstarren, abhauen. Die Zeiten der drei Animationen sind aufeinander abgestimmt —
+ * wer eine aendert, muss die anderen mitziehen.
+ */
+.titleLoop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/*
+ * Er laeuft am **unteren Rand** entlang, nicht auf halber Hoehe: Dort stehen Logo und
+ * Buttons, und ein Crook, der hinter dem "Regeln"-Knopf verschwindet, ist kein Gag,
+ * sondern ein Darstellungsfehler. Unten hat er die ganze Breite, und dass er hinter dem
+ * Ton-Knopf durchgeht, liest sich als Tiefe.
+ */
+.titleLoop__crook {
+  position: absolute;
+  bottom: calc(var(--space-2) + var(--safe-bottom));
+  left: 0;
+  width: 74px;
+  opacity: 0.8;
+  animation: sneak-walk 14s linear infinite;
+}
+
+.titleLoop__crook svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Die Beine laufen doppelt so schnell wie der Koerper wandert. */
+.titleLoop__crook .sneak__legFront {
+  transform-origin: 96px 132px;
+  animation: sneak-leg 0.62s ease-in-out infinite;
+}
+
+.titleLoop__crook .sneak__legBack {
+  transform-origin: 68px 132px;
+  animation: sneak-leg 0.62s ease-in-out infinite reverse;
+}
+
+/* Der Sack schwingt hinterher — Follow-Through (Art Direction §7). */
+.titleLoop__crook .sneak__bag {
+  transform-origin: 118px 108px;
+  animation: sneak-bag 1.24s ease-in-out infinite;
+}
+
+/*
+ * Der Spot faehrt ihm entgegen und haelt genau dort, wo der Crook bei Sekunde 7 steht.
+ * Ein Kegel aus zwei Radialverlaeufen: Der harte innere Kreis ist das Licht, der weiche
+ * aeussere der Streuschein.
+ */
+.titleLoop__spot {
+  position: absolute;
+  bottom: -22vmin;
+  left: 50%;
+  width: 52vmin;
+  height: 52vmin;
+  margin-left: -26vmin;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgb(255 241 196 / 30%) 0%,
+    rgb(255 241 196 / 14%) 46%,
+    rgb(255 241 196 / 0%) 72%
+  );
+  animation: spot-sweep 14s ease-in-out infinite;
+}
+
+@keyframes sneak-walk {
+  /* Takt 1: Er schleicht von links herein. */
+  0% {
+    transform: translate3d(-30vw, 0, 0) scaleX(1);
+  }
+  42% {
+    transform: translate3d(46vw, 0, 0) scaleX(1);
+  }
+  /* Takt 2: erwischt. Kurzer Schreck-Hupfer, dann steht er. */
+  46% {
+    transform: translate3d(46vw, -14px, 0) scaleX(1);
+  }
+  50%,
+  62% {
+    transform: translate3d(46vw, 0, 0) scaleX(1);
+  }
+  /* Takt 3: Er dreht sich um … */
+  66% {
+    transform: translate3d(46vw, 0, 0) scaleX(-1);
+  }
+  /* Takt 4: … und ist weg. */
+  86%,
+  100% {
+    transform: translate3d(-32vw, 0, 0) scaleX(-1);
+  }
+}
+
+@keyframes sneak-leg {
+  0%,
+  100% {
+    transform: rotate(-16deg);
+  }
+  50% {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes sneak-bag {
+  0%,
+  100% {
+    transform: rotate(-9deg);
+  }
+  50% {
+    transform: rotate(9deg);
+  }
+}
+
+@keyframes spot-sweep {
+  0% {
+    transform: translate3d(30vw, 0, 0) scale(0.9);
+    opacity: 0.5;
+  }
+  40% {
+    transform: translate3d(6vw, 0, 0) scale(0.95);
+    opacity: 0.6;
+  }
+  /* Treffer: Der Kegel zieht sich zusammen und wird hell. */
+  46%,
+  62% {
+    transform: translate3d(0, 0, 0) scale(0.72);
+    opacity: 1;
+  }
+  75% {
+    transform: translate3d(-8vw, 0, 0) scale(0.9);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate3d(30vw, 0, 0) scale(0.9);
+    opacity: 0.5;
+  }
+}
+
 @keyframes logo-wobble {
   0%,
   100% {
@@ -483,6 +632,23 @@
 @media (prefers-reduced-motion: reduce) {
   .title__logo {
     animation: none;
+  }
+
+  /*
+   * Der ganze Loop faellt weg — nicht nur verlangsamt. Wer Bewegung reduziert haben
+   * will, will keine Figur, die alle vierzehn Sekunden durchs Bild laeuft (Audit A5).
+   * Der Spot bleibt als stehendes Licht: Er ist Stimmung, keine Bewegung.
+   */
+  .titleLoop__crook,
+  .titleLoop__crook .sneak__legFront,
+  .titleLoop__crook .sneak__legBack,
+  .titleLoop__crook .sneak__bag {
+    display: none;
+  }
+
+  .titleLoop__spot {
+    animation: none;
+    opacity: 0.7;
   }
 }
 
@@ -899,6 +1065,20 @@
 .modes__hint {
   font-size: var(--fs-sm);
   color: rgb(255 248 231 / 62%);
+}
+
+/*
+ * Der Kombinations-Hinweis (GDD §3.7): steht unter den Modi, in Gold, damit man sieht,
+ * dass er zu allen gehoert und nicht zum letzten.
+ */
+.modes__combo {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: rgb(255 201 60 / 10%);
+  border-left: 3px solid var(--c-gold);
+  font-size: var(--fs-sm);
+  color: var(--c-gold);
 }
 
 .rules__track {

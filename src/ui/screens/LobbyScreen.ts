@@ -20,6 +20,7 @@ import {
   type ThinkTimerSec,
 } from '@/config/rules';
 import { t } from '@/core/i18n';
+import { safeAnimate } from '@/ui/animate';
 import { createButton } from '@/ui/components/button';
 import { createPlayerBadge } from '@/ui/components/badge';
 import { showToast } from '@/ui/components/toast';
@@ -61,7 +62,7 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
         return;
       }
       vibrate('tap');
-      renderPlayers();
+      renderPlayers(player.id);
     },
   });
 
@@ -104,7 +105,11 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
 
   /* ---------------------------------------------------------------- */
 
-  function renderPlayers(): void {
+  /**
+   * Zeichnet die Spielerliste. `popId` bekommt einen kurzen Auftritt — beim Hinzufuegen
+   * soll man sehen, **welche** Zeile neu ist, nicht nur dass die Liste laenger wurde.
+   */
+  function renderPlayers(popId?: string): void {
     const players = ctx.session.state.players;
     list.replaceChildren();
 
@@ -132,12 +137,38 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
       remove.innerHTML = REMOVE_ICON;
       remove.setAttribute('aria-label', `${t('common.close')} ${player.name}`);
       remove.addEventListener('click', () => {
-        ctx.session.removePlayer(player.id);
-        renderPlayers();
+        vibrate('tap');
+        /*
+         * Erst zusammenfahren, dann loeschen. Eine Zeile, die einfach verschwindet, laesst
+         * einen kurz zweifeln, ob man die richtige erwischt hat.
+         */
+        void safeAnimate(
+          row,
+          [
+            { transform: 'translateX(0)', opacity: 1 },
+            { transform: 'translateX(-24%)', opacity: 0 },
+          ],
+          { duration: 160, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' }
+        ).then(() => {
+          ctx.session.removePlayer(player.id);
+          renderPlayers();
+        });
       });
 
       row.append(badge, field, remove);
       list.append(row);
+
+      if (player.id === popId) {
+        void safeAnimate(
+          row,
+          [
+            { transform: 'scale(.86) translateY(10px)', opacity: 0 },
+            { transform: 'scale(1.04)', opacity: 1, offset: 0.7 },
+            { transform: 'scale(1)', opacity: 1 },
+          ],
+          { duration: 320, easing: 'cubic-bezier(.34,1.56,.64,1)' }
+        );
+      }
     }
 
     addButton.disabled = players.length >= MAX_PLAYERS;
@@ -149,7 +180,20 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
     hint.classList.toggle('is-visible', !enough);
   }
 
-  function renderModes(): void {
+  /**
+   * Was passiert, wenn zwei Modi zusammenkommen (GDD §3.7, Roadmap M5.4).
+   *
+   * Ein Satz, sonst nichts: Wer in der Lobby steht, will spielen, nicht lesen. Die
+   * Reihenfolge ist Absicht — "alles an" schlaegt die Einzelkombinationen.
+   */
+  function comboHint(active: Readonly<Record<ModeId, boolean>>): string {
+    if (MODE_IDS.every((id) => active[id])) return t('modes.comboAllOn');
+    if (active.oath && active.mole) return t('modes.comboOathMole');
+    if (active.nightShift && active.highroller) return t('modes.comboNightHighroller');
+    return '';
+  }
+
+  function renderModes(stamped?: ModeId): void {
     modes.replaceChildren();
     const active = ctx.session.state.settings.modes;
 
@@ -180,9 +224,26 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
           Record<ModeId, boolean>
         >);
         vibrate('tap');
-        renderModes();
+        renderModes(id);
       });
       modes.append(option);
+
+      // Der frisch getippte Modus bekommt den Stempel-Punch — Bestaetigung ohne Text.
+      if (id === stamped) {
+        void safeAnimate(
+          option,
+          [{ transform: 'scale(.94)' }, { transform: 'scale(1.03)', offset: 0.6 }, { transform: 'scale(1)' }],
+          { duration: 260, easing: 'cubic-bezier(.34,1.56,.64,1)' }
+        );
+      }
+    }
+
+    const combo = comboHint(active);
+    if (combo) {
+      const line = document.createElement('p');
+      line.className = 'modes__combo';
+      line.textContent = combo;
+      modes.append(line);
     }
   }
 

@@ -1,8 +1,13 @@
 /**
  * Title-Screen (GDD §5, Screen 0).
  *
- * Logo mit sich drehendem Zahlenrad, drei Buttons, Sound-Toggle. Der schleichende Crook
- * aus GDD §5 kommt in M5 dazu — bis dahin traegt das Idle-Rad die Bewegung.
+ * Logo mit sich drehendem Zahlenrad, drei Buttons, Sound-Toggle — und hinter allem der
+ * Loop aus GDD §5: Ein Crook schleicht durchs Bild, der Spotlight wandert ihm entgegen
+ * und erwischt ihn. Er erstarrt, schaut ertappt heraus und macht sich aus dem Staub.
+ *
+ * Der Loop ist **reines DOM plus CSS** (CLAUDE.md: Menues sind DOM). PixiJS fuer eine
+ * Silhouette zu starten waere die teuerste Animation im Spiel — und der Title-Screen ist
+ * genau der, auf dem das Handy noch nichts geladen hat.
  *
  * Hier passiert ausserdem der **Audio-Unlock**: Mobile Browser erlauben Ton erst nach
  * einer echten Nutzergeste. Der erste Tap auf "Spielen" ist diese Geste.
@@ -17,6 +22,7 @@ import type { ScreenContext, ScreenInstance } from '@/ui/router';
 import { createRulesSheet } from './RulesSheet';
 import { createSettingsSheet } from './SettingsSheet';
 import doorSvg from '../../../assets-src/svg/dom/vault-door.svg?raw';
+import crookSvg from '../../../assets-src/svg/dom/crook-sneak.svg?raw';
 
 /** Merkt sich, dass der 18+-Hinweis schon einmal quittiert wurde. */
 function disclaimerSeen(): boolean {
@@ -38,6 +44,23 @@ function markDisclaimerSeen(): void {
 export function createTitleScreen(ctx: ScreenContext): ScreenInstance {
   const el = document.createElement('section');
   el.className = 'screen screen--title';
+
+  /*
+   * Der Loop liegt hinter allem und ist fuer Screenreader unsichtbar: Er erzaehlt nichts,
+   * was nicht auch im Text steht (Audit A5).
+   */
+  const loop = document.createElement('div');
+  loop.className = 'titleLoop';
+  loop.setAttribute('aria-hidden', 'true');
+
+  const spot = document.createElement('div');
+  spot.className = 'titleLoop__spot';
+
+  const sneak = document.createElement('div');
+  sneak.className = 'titleLoop__crook';
+  sneak.innerHTML = crookSvg;
+
+  loop.append(spot, sneak);
 
   const logo = document.createElement('div');
   logo.className = 'title__mark';
@@ -103,7 +126,7 @@ export function createTitleScreen(ctx: ScreenContext): ScreenInstance {
   version.className = 'title__version';
   version.textContent = `v${__APP_VERSION__}`;
 
-  el.append(logo, heading, tagline, actions, sound, version);
+  el.append(loop, logo, heading, tagline, actions, sound, version);
 
   async function toLobby(): Promise<void> {
     ctx.fsm.send({ type: 'start' });

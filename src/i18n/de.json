@@ -62,7 +62,10 @@
     "nightShift": "Nachtschicht",
     "nightShiftHint": "Keine Verhandlung. Zehn Sekunden Stille.",
     "highroller": "Highroller",
-    "highrollerHint": "Größerer Tresor, schnelleres Wachstum, kein Deckel."
+    "highrollerHint": "Größerer Tresor, schnelleres Wachstum, kein Deckel.",
+    "comboOathMole": "Chaos-Modus: Der Maulwurf darf schwören und muss trotzdem stehlen — ohne Meineid-Strafe.",
+    "comboNightHighroller": "Späte Schicht: Große Tresore, keine Verhandlung. Kurz und teuer.",
+    "comboAllOn": "Alles an. Viel Glück."
   },
   "negotiation": {
     "headline": "Verhandelt.",

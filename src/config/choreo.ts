@@ -162,3 +162,27 @@ export function stallsFor(isLast: boolean): readonly number[] {
 export function fixedShowMs(hasAlarm: boolean): number {
   return INTRO_MS + (hasAlarm ? ALARM_MS : 0) + OUTCOME_BUDGET_MS + OUTRO_MS;
 }
+
+/* ------------------------------------------------------------------ */
+/* Musik (GDD §6, Roadmap M5.1)                                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Die drei Loops. Sie sind bewusst duenn: Ein Trinkspiel laeuft nebenbei, und Musik, die
+ * sich in den Vordergrund draengt, wird nach zwei Runden ausgeschaltet.
+ *
+ * `stepMs` ist die Laenge eines Sechzehntels bei Intensitaet 0; `stepMsFast` die bei
+ * Intensitaet 1. Der Verhandlungs-Loop wandert in den letzten zehn Sekunden dazwischen
+ * (GDD §6: "Tempo steigt in den letzten 10 s").
+ */
+export const MUSIC = {
+  lobby: { stepMs: 250, stepMsFast: 250, gain: 0.16 },
+  negotiation: { stepMs: 300, stepMsFast: 190, gain: 0.2 },
+  reveal: { stepMs: 480, stepMsFast: 320, gain: 0.14 },
+  /** Wie weit der Scheduler vorausplant. Kuerzer klingt bei Lastspitzen zerhackt. */
+  lookaheadMs: 320,
+  /** Wie oft der Scheduler nachschaut. */
+  tickMs: 90,
+  /** Ein- und Ausblenden, damit kein Loop hart einsetzt. */
+  fadeMs: 700,
+} as const;

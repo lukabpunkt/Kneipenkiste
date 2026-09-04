@@ -13,8 +13,13 @@ export interface CountdownRingOptions {
   seconds: number;
   /** Laeuft ab, wenn die Zeit um ist. */
   onDone: () => void;
-  /** Jede volle Sekunde in der Tick-Phase — spaeter der Tick-Sound (M3). */
-  onTick?: (secondsLeft: number) => void;
+  /**
+   * Jede volle Sekunde. `ticking` ist true in den letzten fuenf — dort gehoert der
+   * Tick-Sound hin (Art Direction §4.3). Die uebrigen Sekunden meldet der Ring
+   * trotzdem: Die Verhandlungsmusik zieht ueber die letzten zehn an (GDD §6), und
+   * dafuer braucht sie den Stand, bevor es hektisch wird.
+   */
+  onTick?: (secondsLeft: number, ticking: boolean) => void;
 }
 
 export interface CountdownRing {
@@ -76,7 +81,7 @@ export function createCountdownRing(options: CountdownRingOptions): CountdownRin
     const whole = Math.ceil(left);
     if (whole !== lastWhole && whole >= 0) {
       lastWhole = whole;
-      if (whole <= COUNTDOWN_TICK_SEC) options.onTick?.(whole);
+      options.onTick?.(whole, whole <= COUNTDOWN_TICK_SEC);
     }
 
     if (left <= 0) {

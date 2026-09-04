@@ -9,7 +9,9 @@
  * echte Ergebnis — sie kann nicht luegen (Audit A1).
  */
 
-import { KASSEL_LINE_INTERVAL_MS } from '@/config/rules';
+import { COUNTDOWN_WARN_SEC, KASSEL_LINE_INTERVAL_MS } from '@/config/rules';
+import { play } from '@/audio/AudioManager';
+import { setMusicIntensity } from '@/audio/music';
 import { t, tList } from '@/core/i18n';
 import { previewPayouts, type PayoutPreviewRow } from '@/core/payout';
 import { vaultSpec } from '@/core/vault';
@@ -43,6 +45,15 @@ export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
   const ring = createCountdownRing({
     seconds: settings.negotiationSec,
     onDone: () => proceed(),
+    /*
+     * Die letzten zehn Sekunden ziehen an: Die Uhr im Loop tickt schneller, die letzten
+     * fuenf bekommen zusaetzlich einen hoerbaren Tick (Art Direction §4.3). Beides ist
+     * Zugabe — der Ring allein sagt schon alles (GDD §6: stumm voll spielbar).
+     */
+    onTick: (secondsLeft, ticking) => {
+      setMusicIntensity(1 - Math.min(1, secondsLeft / COUNTDOWN_WARN_SEC));
+      if (ticking && secondsLeft > 0) play('vault_dial', 0, secondsLeft <= 3 ? 4 : 0);
+    },
   });
 
   stage.append(ring.el, widget.el);
@@ -150,6 +161,8 @@ export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
     destroy() {
       done = true;
       ring.stop();
+      // Sonst startet die naechste Runde mit dem hektischen Tempo der letzten.
+      setMusicIntensity(0);
       if (kasselTimer !== undefined) clearInterval(kasselTimer);
       void releaseWakeLock();
     },

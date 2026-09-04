@@ -396,5 +396,19 @@ export function resumeAudio(): void {
   if (unlocked) void context?.resume();
 }
 
+/**
+ * Zugang zum Klangapparat fuer `music.ts` (Roadmap M5.1).
+ *
+ * Die Musik braucht denselben Kontext und denselben Musik-Bus wie das Ducking — sonst
+ * liefe sie am Herzschlag der letzten Karte vorbei. Sie liegt trotzdem in einer eigenen
+ * Datei: Cues sind Einzelschuesse, Musik ist ein Scheduler, und beides in einer Datei
+ * waere zweimal so schwer zu lesen. Gibt `undefined` zurueck, solange nichts entsperrt
+ * oder der Ton aus ist — der Aufrufer laesst es dann einfach.
+ */
+export function musicNodes(): { ctx: AudioContext; bus: GainNode } | undefined {
+  if (!ready() || !musicBus) return undefined;
+  return { ctx: context!, bus: musicBus };
+}
+
 /** Testhilfe: alle Cue-Namen. */
 export const AUDIO_CUES = Object.keys(CUES) as AudioCue[];

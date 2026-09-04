@@ -6,6 +6,7 @@
  * und das Schweigen selbst ist der Effekt.
  */
 
+import { play } from '@/audio/AudioManager';
 import { t } from '@/core/i18n';
 import { openingPhase } from '@/core/modes';
 import { createCountdownRing } from '@/ui/components/countdownRing';
@@ -34,7 +35,14 @@ export function createSilenceScreen(ctx: ScreenContext): ScreenInstance {
   stage.className = 'negotiation__stage';
 
   const widget = createVaultWidget({ vault, spec: vaultSpec(settings), size: 'lg' });
-  const ring = createCountdownRing({ seconds: phase.seconds, onDone: () => proceed() });
+  const ring = createCountdownRing({
+    seconds: phase.seconds,
+    onDone: () => proceed(),
+    // Bei zehn Sekunden Stille ist jeder Tick hoerbar — nicht erst die letzten fuenf.
+    onTick: (secondsLeft) => {
+      if (secondsLeft > 0) play('vault_dial', 0, secondsLeft <= 3 ? 4 : 0);
+    },
+  });
   stage.append(ring.el, widget.el);
 
   el.append(headline, stage, body);
