@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gesicht "relief" — "Puh, nichts passiert": geschlossene Bogenaugen, Ausatem-Mund. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <path d="M15 30 Q27 18 39 30" stroke="#1A1024" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M57 30 Q69 18 81 30" stroke="#1A1024" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <ellipse cx="48" cy="50" rx="9" ry="7" fill="#1A1024"/>
+</svg>

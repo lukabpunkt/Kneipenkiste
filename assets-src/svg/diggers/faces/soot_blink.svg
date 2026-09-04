@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gesicht "soot_blink" — nach der Explosion: schwarzes Gesicht, weisse Blinzelaugen.
+     Das Schwarz kommt vom soot_overlay; hier sind nur die Augen, damit sie darauf liegen. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <ellipse cx="27" cy="26" rx="15" ry="16" fill="#FFF8E7" stroke="#1A1024" stroke-width="4"/>
+  <ellipse cx="69" cy="26" rx="15" ry="16" fill="#FFF8E7" stroke="#1A1024" stroke-width="4"/>
+  <circle cx="30" cy="29" r="6" fill="#1A1024"/>
+  <circle cx="72" cy="29" r="6" fill="#1A1024"/>
+  <path d="M38 52 Q48 48 58 52" stroke="#FFF8E7" stroke-width="5" stroke-linecap="round" fill="none"/>
+</svg>

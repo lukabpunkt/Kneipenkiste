@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- HEISS: Flamme auf hellem Kreis. Die Formensprache trennt Temperaturen von
+     Spielerfarben — `temp.hot` ist derselbe Farbwert wie Spielerfarbe Rot (Art Dir. §2). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <circle cx="32" cy="32" r="27" fill="#FFF8E7" stroke="#1A1024" stroke-width="6"/>
+  <path d="M32 12 C42 24 46 30 46 38 A14 14 0 0 1 18 38 C18 30 24 28 26 22 C28 30 32 28 32 12 Z"
+        fill="#FF4757" stroke="#1A1024" stroke-width="4" stroke-linejoin="round"/>
+</svg>

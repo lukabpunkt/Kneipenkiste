@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Platten-Deko 1: ein Halm und ein Kiesel. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 32" width="48" height="32">
+  <path d="M18 28 C18 18 20 12 24 6" fill="none" stroke="#1A1024" stroke-width="7" stroke-linecap="round"/>
+  <path d="M18 28 C18 18 20 12 24 6" fill="none" stroke="#5CB342" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="36" cy="24" rx="7" ry="5" fill="#8C5E33" stroke="#1A1024" stroke-width="4"/>
+</svg>

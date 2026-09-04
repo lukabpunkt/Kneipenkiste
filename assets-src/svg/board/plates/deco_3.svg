@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Platten-Deko 3: drei kurze Halme rechts. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 32" width="48" height="32">
+  <g fill="none" stroke="#1A1024" stroke-width="6" stroke-linecap="round">
+    <path d="M26 28 L22 14"/><path d="M34 28 L34 12"/><path d="M42 28 L46 16"/>
+  </g>
+  <g fill="none" stroke="#5CB342" stroke-width="3" stroke-linecap="round">
+    <path d="M26 28 L22 14"/><path d="M34 28 L34 12"/><path d="M42 28 L46 16"/>
+  </g>
+</svg>

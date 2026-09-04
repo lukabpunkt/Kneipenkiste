@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- "Blindgaenger"-Schild (GDD §4.1, dud_pfff): erscheint ueber der Platte. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 72" width="160" height="72">
+  <rect x="6" y="6" width="148" height="46" rx="16" fill="#FFF8E7" stroke="#1A1024" stroke-width="7"/>
+  <path d="M70 52 L80 68 L90 52 Z" fill="#FFF8E7" stroke="#1A1024" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M70 52 L90 52" stroke="#FFF8E7" stroke-width="8"/>
+</svg>

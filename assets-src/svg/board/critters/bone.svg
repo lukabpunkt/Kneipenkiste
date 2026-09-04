@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Knochen (Art Direction §5.1): ein Hund holt ihn kurz ab.
+     Zwei Durchgaenge: erst die ganze Silhouette in ink, dann dieselbe Form in paper
+     darueber. So bleibt die Outline aussen und verschwindet nicht zwischen den Teilen. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <g stroke="#1A1024" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M18 24 L46 40" fill="none" stroke-width="18"/>
+    <circle cx="15" cy="19" r="9" fill="#1A1024"/><circle cx="18" cy="30" r="9" fill="#1A1024"/>
+    <circle cx="49" cy="34" r="9" fill="#1A1024"/><circle cx="46" cy="45" r="9" fill="#1A1024"/>
+  </g>
+  <g fill="#FFF8E7">
+    <path d="M18 24 L46 40" fill="none" stroke="#FFF8E7" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="15" cy="19" r="6.5"/><circle cx="18" cy="30" r="6.5"/>
+    <circle cx="49" cy="34" r="6.5"/><circle cx="46" cy="45" r="6.5"/>
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Bank am Feldrand (Art Direction §5): darauf sitzen die Diggers, die nicht dran sind. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 72" width="256" height="72">
+  <rect x="8" y="20" width="240" height="18" rx="7" fill="#B98352" stroke="#1A1024" stroke-width="6"/>
+  <g fill="#8C5E33" stroke="#1A1024" stroke-width="6" stroke-linejoin="round">
+    <rect x="28" y="38" width="16" height="28" rx="4"/><rect x="212" y="38" width="16" height="28" rx="4"/>
+  </g>
+</svg>

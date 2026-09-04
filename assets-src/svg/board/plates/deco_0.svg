@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Platten-Deko 0: zwei Grashalme links. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 32" width="48" height="32">
+  <g fill="none" stroke="#1A1024" stroke-width="7" stroke-linecap="round">
+    <path d="M14 28 C12 20 10 14 6 10"/><path d="M22 28 C22 18 24 12 27 6"/>
+  </g>
+  <g fill="none" stroke="#5CB342" stroke-width="3" stroke-linecap="round">
+    <path d="M14 28 C12 20 10 14 6 10"/><path d="M22 28 C22 18 24 12 27 6"/>
+  </g>
+</svg>

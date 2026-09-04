@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Russ-Maske (Art Direction §5): liegt ueber Kopf und Torso, wenn jemand gesprengt wurde.
+     Rand bewusst ausgefranst — Ruß ist kein sauberer Kreis. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <path d="M64 12 C82 12 96 20 106 34 C118 50 120 72 112 90 C104 108 86 118 64 118
+           C42 118 24 108 16 90 C8 72 10 50 22 34 C32 20 46 12 64 12 Z"
+        fill="#1A1024" opacity="0.85"/>
+  <g fill="#1A1024" opacity="0.85">
+    <circle cx="18" cy="46" r="9"/><circle cx="110" cy="52" r="8"/>
+    <circle cx="30" cy="106" r="7"/><circle cx="98" cy="104" r="6"/>
+  </g>
+</svg>

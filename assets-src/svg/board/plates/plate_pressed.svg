@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Erdplatte, gedrueckt: Kante auf 2 px, die Platte sitzt tiefer. Eigener Frame statt
+     Scale, damit die Outline-Staerke gleich bleibt (sonst wird sie beim Skalieren duenn). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 136" width="128" height="136">
+  <rect x="6" y="14" width="116" height="116" rx="14" fill="#8C5E33" stroke="#1A1024" stroke-width="6"/>
+  <rect x="6" y="10" width="116" height="116" rx="14" fill="#A8763F" stroke="#1A1024" stroke-width="6"/>
+</svg>
