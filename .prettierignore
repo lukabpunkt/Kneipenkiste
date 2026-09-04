@@ -1,0 +1,14 @@
+# Die Planungsdokumente sind die Wahrheit fuer Verhalten, Aussehen und Code (CLAUDE.md).
+# Prettier formatiert Markdown-Tabellen um und wuerde sie bei jedem Lauf anfassen —
+# sie werden von Hand gepflegt und bleiben, wie sie geschrieben wurden.
+docs/
+README.md
+CLAUDE.md
+
+dist/
+coverage/
+dev-dist/
+playwright-report/
+test-results/
+public/
+package-lock.json

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Sprengmeister</title>
+  <!--
+    App-Icon: eine Cartoon-Bombe, die halb aus der Erdplatte lugt (Art Direction §1).
+    Runde ACME-Bombe mit Lunte und Glanzpunkt — nichts, das an echte Landminen erinnert.
+    Dicke ink-Outlines, Cel-Shading, kein Verlauf.
+    Quelle für public/icons/* — gebaut mit `npm run build:icons`.
+  -->
+  <rect width="512" height="512" fill="#0F0E1A" />
+
+  <!-- Wiese -->
+  <path d="M0 300 Q128 268 256 292 Q384 316 512 288 L512 512 L0 512 Z" fill="#7ED957" />
+  <path d="M0 356 Q128 332 256 352 Q384 372 512 344 L512 512 L0 512 Z" fill="#5CB342" />
+
+  <!-- Erdplatte, leicht angehoben (die Bombe schiebt sie hoch) -->
+  <g transform="rotate(-6 256 396)">
+    <rect x="120" y="360" width="272" height="88" rx="18" fill="#8C5E33" stroke="#1A1024" stroke-width="12" />
+    <rect x="120" y="348" width="272" height="70" rx="16" fill="#B98352" stroke="#1A1024" stroke-width="12" />
+    <!-- Grasbüschel auf der Platte -->
+    <path d="M168 348 l-8 -22 l14 10 l6 -20 l8 22 z" fill="#5CB342" stroke="#1A1024" stroke-width="6" stroke-linejoin="round" />
+    <path d="M330 348 l-6 -18 l12 8 l5 -16 l7 18 z" fill="#5CB342" stroke="#1A1024" stroke-width="6" stroke-linejoin="round" />
+  </g>
+
+  <!-- Bombe -->
+  <circle cx="256" cy="238" r="106" fill="#1A1024" />
+  <circle cx="256" cy="238" r="96" fill="#2A2438" />
+  <!-- Cel-Shading: eine harte Kante, kein Verlauf -->
+  <path d="M256 142 A96 96 0 0 1 256 334 Z" fill="#15101F" opacity="0.55" />
+  <!-- Glanzpunkt -->
+  <ellipse cx="218" cy="200" rx="26" ry="18" fill="#FFF8E7" opacity="0.85" transform="rotate(-28 218 200)" />
+
+  <!-- Zündkappe -->
+  <rect x="230" y="122" width="52" height="34" rx="10" fill="#8C5E33" stroke="#1A1024" stroke-width="10" />
+
+  <!-- Lunte -->
+  <path
+    d="M256 124 C256 92 292 88 300 62"
+    fill="none"
+    stroke="#1A1024"
+    stroke-width="20"
+    stroke-linecap="round"
+  />
+  <path
+    d="M256 124 C256 92 292 88 300 62"
+    fill="none"
+    stroke="#D18E00"
+    stroke-width="10"
+    stroke-linecap="round"
+  />
+
+  <!-- Funke am Luntenende -->
+  <g stroke="#1A1024" stroke-width="8" stroke-linecap="round">
+    <line x1="300" y1="62" x2="300" y2="34" />
+    <line x1="300" y1="62" x2="330" y2="44" />
+    <line x1="300" y1="62" x2="272" y2="42" />
+  </g>
+  <g stroke="#FFB800" stroke-width="4" stroke-linecap="round">
+    <line x1="300" y1="62" x2="300" y2="34" />
+    <line x1="300" y1="62" x2="330" y2="44" />
+    <line x1="300" y1="62" x2="272" y2="42" />
+  </g>
+  <circle cx="300" cy="60" r="16" fill="#1A1024" />
+  <circle cx="300" cy="60" r="10" fill="#FFB800" />
+</svg>
