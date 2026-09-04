@@ -5,7 +5,7 @@
 | M0 Setup & Regelkern | ✅ fertig (⏳ 3 manuelle Checks offen) | `v0.0.1` | A0 bestanden |
 | M1 UI-Flow | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.1.0` | A1 bestanden |
 | M2 Bühne, Crooks, Tresor | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.2.0` | A2 bestanden |
-| M3 Reveal-Show | ⬜ offen | – | – |
+| M3 Reveal-Show | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.3.0` | A3 bestanden |
 | M4 Inszenierungen | ⬜ offen | – | – |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
 | M6 Playtest & Release | ⬜ offen | – | – |
@@ -122,3 +122,37 @@
 - [ ] Look-Check gegen Art Direction §1: Sieht der Raum nach „Ocean's Eleven als Samstagmorgen-Cartoon" aus? Sind Maske, Ringelshirt und Symbol auf Anhieb dem richtigen Spieler zuzuordnen?
 
 **Zahlen:** 545 Unit-Tests · 30 E2E-Tests · 3 Perf-Tests · 68 Atlas-Frames in 3 Texturen (739 KB @2x) · Einstiegs-Chunk 25 KB gzip, Bühnen-Chunk 92 KB gzip · 2 Draw-Calls · 60 fps mit 8 Crooks.
+
+## Audit A3 — 2026-09-04
+
+**Ergebnis:** BESTANDEN (alle automatisierbaren MUSS-Checks grün; 2 Checks brauchen echte Menschen)
+
+| Check | Status | Notiz |
+|---|---|---|
+| 1 000 simulierte Runden: aufgedeckte Karten == `choices`, Reihenfolge == `revealOrder`, Outcome == `result.outcome` | ✅ | `tests/unit/director.test.ts`: 1 000 Runden über 3–8 Spieler, alle drei Härten, alle Modus-Kombinationen und alle drei Presets. Geprüft wird pro Runde: jede Karte genau einmal, in der Reihenfolge des Ergebnisses; auf jeder Karte steht die getroffene Wahl; Teiler vor Dieben; Maulwurf als letzte Karte; genau eine `isLast`; Alarm genau dann, wenn es einen Dieb gibt. Alle fünf Outcomes kommen dabei vor. |
+| Timing-Presets ± 1 s; 8 Spieler „Lang" ≤ 40 s | ✅ | 18 Fälle (3 Presets × 6 Spielerzahlen) gegen die aus `choreo.ts` errechnete Soll-Dauer, Abweichung ≤ 1 s. Acht Spieler auf „Lang" landen bei 37,8 s. Gemessen im Browser: 5 Spieler, „Normal" → 22,7 s geplante Timeline, 24,3 s bis zum Result inklusive Outro und Wipe. |
+| Tap-to-Skip funktioniert ab Karte 2, nie bei letzter Karte/Outcome | ✅ | Die Regel liegt im Director (`skip()`), nicht im Screen: Er kennt den laufenden Beat und dessen Karten-Index. E2E deckt drei Karten auf, tippt dann **zwanzigmal** — die letzte Karte rückt nicht vor, und die Show läuft trotzdem vollständig zu Ende. |
+| Alarm nach erstem STEHLEN; Laser rot; letzte Karte mit 2 Stalls + Slow-Mo + Herzschlag | ✅ | Alarm-Beat sitzt im Skript direkt hinter der ersten offenen Diebeskarte (Unit-Test über 1 000 Runden). Die letzte Karte bekommt `STALLS_LAST` = [0.6, 0.85], `timeScale` 0.55, ein auf 55 % zusammenziehendes Spotlight, und der Herzschlag zieht über ihre Verweildauer von 70 auf 132 bpm an, während die Musik auf 25 % gedückt wird. |
+| Perf-Test grün | ✅ | Neuer Fall in `perf.spec.ts` misst **während** die Show läuft — acht Karten mit Stalls, Kamerafahrten, Alarm, Zähler: **p50 16,7 ms · p95 16,7 ms · 2 Draw-Calls**. Die stehende Bühne aus A2 bleibt als eigener Fall bestehen. |
+| Filter nur temporär aktiv | ✅ | Es gibt keine. Der Alarm-Blitz und der Meineid-Blitz laufen über einen getinteten Sprite aus dem `front`-Atlas, nicht über einen `ColorMatrixFilter` — das kostet keinen zusätzlichen Draw-Call und keine Render-Textur. |
+| Stumm voll spielbar; Sound-Sync Karten-Flip ± 50 ms | ✅ | Der `AudioManager` ist ohne entsperrten Kontext ein No-op und wirft nie (Unit-Test). Die Cues hängen als `.call()` an derselben GSAP-Timeline wie die Animation, nicht an einem eigenen Timer — sie können gar nicht auseinanderlaufen (ADR-19). Jedes Stocken bekommt seinen eigenen Tick; ohne ihn hört man das Zögern nicht. |
+| Tab-Wechsel → Pause/Resume ohne Sprung; Wake-Lock aktiv | ✅ | Der Screen hängt an `visibilitychange` und pausiert die Timeline samt Trommelwirbel und Herzschlag; `StageApp` stoppt zusätzlich Ticker und GSAP-Root. Wake-Lock läuft ab dem Sealed-Screen. |
+| Haptik bei letzter Karte | ✅ | Der Director meldet jede offene Karte mit `isLast`; der Screen vibriert dann mit dem `lastCard`-Muster statt mit dem normalen Tap. |
+| Spannungs-Test: 3 Personen sehen 5 Reveals | ⏳ manuell | Braucht Menschen, keinen Test. Screenshots der vier Momente in `docs/screens/m3-*.png`. |
+| „Zieht die letzte Karte wirklich an?" | ⏳ manuell | Dasselbe. |
+
+**Befunde während der Umsetzung**
+
+- **Die Kamerafahrt legte die Wandkante frei.** Beim Zoom auf eine Randkarte schiebt sich der Raum seitlich weg — die Wand deckte aber nur die Weltbreite ab, und am Bildrand stand ein schwarzer Streifen. Wand und Tisch reichen jetzt nach beiden Seiten über die Weltgrenzen hinaus.
+- **Zwei Tests, die die falsche Frage stellten.** Der Skip-Test erwartete nach einem einzelnen Dieb den Result-Screen — richtig wäre die Verteil-UI; und er las das Aufdeck-Protokoll, nachdem der Screen samt Protokoll schon ausgetauscht war. Beides Testfehler, kein Spielfehler: Die Skip-Regel selbst hat auf Anhieb gehalten.
+- **PixiJS lärmte in der Unit-Suite.** Jeder Test, der ein Modul mit PIXI-Berührung importiert, produzierte einen mehrzeiligen jsdom-Stacktrace. Canvas-Stub im Setup (ADR-21).
+- **Die Outcome-Auswahl saß am falschen Ort.** Architektur §5 sieht sie in `resolveRound()` vor — dann müsste der Regelkern die Registry kennen, und die liegt im Bühnen-Chunk. Sie ist in den Director gewandert; deterministisch bleibt es über denselben Seed (ADR-20).
+
+**Offene SOLL-Follow-ups:** keine.
+
+**Manuelle Checks für Luka vor M4:**
+
+- [ ] Spannungs-Test aus A3: Drei Personen sehen fünf Aufdeckungen mit unbekanntem Ergebnis. Sagen mindestens zwei, dass sie bei der letzten Karte angespannt waren? Gibt es bei einem Doppel-Dieb-Twist eine hörbare Reaktion?
+- [ ] Auf einem echten Gerät mit Ton: Trägt der Herzschlag bei der letzten Karte? Sind die synthetisierten Platzhalter-Sounds gut genug, um bis M6 zu bleiben — oder braucht es echte Samples?
+
+**Zahlen:** 582 Unit-Tests · 32 E2E-Tests · 3 Perf-Tests · Show 22,7 s bei 5 Spielern („Normal") · p50 16,7 ms während der Show · 2 Draw-Calls · 26 Sound-Cues, synthetisiert.

@@ -11,6 +11,7 @@
  * Halbkreis wie eine Reihe Schaufensterpuppen.
  */
 
+import gsap from 'gsap';
 import { Container, Sprite, type Spritesheet, type Texture } from 'pixi.js';
 import { colorById, STAGE, type ColorId, type FaceId, type HatId } from '@/config/theme';
 import type { SeededRng } from '@/core/rng';
@@ -215,6 +216,24 @@ export class Crook {
     this.hatId = hat;
     this.hat.visible = hat !== 'none';
     if (hat !== 'none') this.hat.texture = this.texture(`hats/${hat}`);
+  }
+
+  /**
+   * Schulterzucken: Beide Arme kurz hoch, Kopf leicht schief.
+   *
+   * Die einzige Geste, die der Crook von sich aus kann — sie traegt den Maulwurf-Reveal
+   * (GDD §4.4). "Befehl ist Befehl" liest man daran ab, nicht an einer Sprechblase.
+   */
+  shrug(): gsap.core.Timeline {
+    return gsap
+      .timeline()
+      .to(this.armL, { rotation: ARM_REST + 0.9, duration: 0.18, ease: 'back.out(2)' }, 0)
+      .to(this.armR, { rotation: -ARM_REST - 0.9, duration: 0.18, ease: 'back.out(2)' }, 0)
+      .to(this.head, { rotation: 0.16, duration: 0.18 }, 0)
+      .to({}, { duration: 0.5 })
+      .to(this.armL, { rotation: ARM_REST, duration: 0.28, ease: 'power2.inOut' })
+      .to(this.armR, { rotation: -ARM_REST, duration: 0.28, ease: 'power2.inOut' }, '<')
+      .to(this.head, { rotation: 0, duration: 0.28 }, '<');
   }
 
   /** Geldsack in die Hand geben (Alleingang, GDD §4.4). */

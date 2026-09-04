@@ -1,30 +1,30 @@
 /**
- * Aufdeckung — die PIXI-Buehne (Roadmap M2).
+ * Aufdeckung (GDD §4, Roadmap M3).
  *
- * Der Tresorraum steht: Wand, Laser, Tresor, Samttisch, Crooks im Halbkreis hinter ihren
- * Karten, Herr Kassel daneben. Die **Show** — Tempo-Kurve, Stalls, Slow-Mo, Kamerafahrten —
- * baut M3 als `RevealDirector` darauf auf. Hier laeuft noch der Platzhalter-Takt aus M1:
- * eine Karte pro Sekunde.
+ * Der Screen baut die Buehne auf, laesst den `RevealDirector` Regie fuehren und geht
+ * danach weiter. Er inszeniert selbst nichts und rechnet nichts aus: Das Ergebnis stand
+ * beim Betreten fest, das Drehbuch kommt aus `buildRevealScript()`.
  *
- * Zwei Dinge sind aber schon jetzt richtig, weil sie Gesetz sind (CLAUDE.md):
+ * Zwei Gesetze setzt er durch (CLAUDE.md):
  *
  * 1. Die Reihenfolge kommt aus `result.revealOrder` — Teiler zuerst, Diebe zuletzt,
  *    Maulwurf als letzter Dieb.
- * 2. Tap-to-Skip gilt ab der zweiten Karte und **nie** bei der letzten.
+ * 2. Tap-to-Skip gilt ab der zweiten Karte und **nie** bei der letzten oder waehrend
+ *    der Auszahlung. Die Entscheidung darueber trifft der Director.
  *
- * Faellt PIXI aus — kein WebGL, Atlas kaputt, Speicher voll —, uebernimmt die
- * DOM-Kartenreihe aus M1. Ein Trinkspiel darf nicht am Renderer sterben.
+ * Faellt PIXI aus — kein WebGL, Atlas kaputt, Speicher voll —, uebernimmt eine schlichte
+ * DOM-Kartenreihe. Ein Trinkspiel darf nicht am Renderer sterben.
  */
 
-import { SKIP_FROM_CARD_INDEX, STALLS_LAST, STALLS_NORMAL } from '@/config/choreo';
 import { colorById, hex, textColorOn } from '@/config/theme';
+import { buildRevealScript } from '@/core/choreographer';
 import { t } from '@/core/i18n';
 import { createSeededRng } from '@/core/rng';
 import type { Choice, RoundResult } from '@/core/types';
+import { vaultSpec } from '@/core/vault';
+import { symbolSvg } from '@/ui/components/badge';
 import { createDevPanel, type DevPanel } from '@/ui/components/devPanel';
 import { vaultFill } from '@/ui/components/vaultWidget';
-import { symbolSvg } from '@/ui/components/badge';
-import { vaultSpec } from '@/core/vault';
 import { vibrate } from '@/ui/haptics';
 import type { ScreenContext, ScreenInstance } from '@/ui/router';
 import { acquireWakeLock, releaseWakeLock } from '@/ui/wakeLock';
@@ -34,21 +34,18 @@ import { acquireWakeLock, releaseWakeLock } from '@/ui/wakeLock';
  * dabei, obwohl nur die Aufdeckung sie braucht (Architektur §1, ADR-15).
  */
 import type { Camera } from '@/game/Camera';
+import type { RevealDirector } from '@/game/RevealDirector';
 import type { StageAppHandle } from '@/game/StageApp';
 import type { VaultRoom } from '@/game/VaultRoom';
 
-/** Nur mit `?dev=1`: Haelt den Auto-Takt an, damit man die Buehne betrachten kann. */
+/** Nur mit `?dev=1`: Haelt die Show an, damit man die Buehne betrachten kann. */
 function holdMode(): boolean {
   const params = new URLSearchParams(location.search);
   return params.has('dev') && params.has('hold');
 }
 
-/** Abstand zwischen zwei Karten im Platzhalter-Takt (M3 ersetzt das durch die Kurve). */
-const STEP_MS = 1000;
-/** Die letzte Karte darf laenger stehen — sie ist der Moment. */
-const LAST_CARD_MS = 1600;
-/** Pause, bevor es zum Ergebnis geht. */
-const OUTRO_MS = 900;
+/** Pause, bevor der Screen wechselt — die letzte Zahl soll noch stehen bleiben. */
+const OUTRO_MS = 600;
 
 export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
   const result = ctx.fsm.context.result;
@@ -60,8 +57,8 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
    * Protokoll dessen, was die Buehne **tatsaechlich** aufgedeckt hat, als
    * `playerId:choice`-Liste. Das ist kein Debug-Rest, sondern die Pruefnaht fuer die
    * wichtigste Zusicherung des Spiels: gezeigte Karten == getroffene Wahlen, in der
-   * Reihenfolge aus `revealOrder` (ADR-3, Audit A1/A3). Auf einer PIXI-Buehne gibt es
-   * sonst nichts, woran ein Test das festmachen koennte.
+   * Reihenfolge aus `revealOrder` (ADR-3, ADR-18). Auf einer PIXI-Buehne gibt es sonst
+   * nichts, woran ein Test das festmachen koennte.
    */
   el.dataset['revealed'] = '';
 
@@ -85,32 +82,25 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
   let stage: StageAppHandle | undefined;
   let room: VaultRoom | undefined;
   let camera: Camera | undefined;
+  let director: RevealDirector | undefined;
   let tick: ((ticker: { deltaMS: number }) => void) | undefined;
   let devPanel: DevPanel | undefined;
   let destroyed = false;
-
-  let index = 0;
-  let timer: ReturnType<typeof setTimeout> | undefined;
   let finished = false;
 
-  const order = result.revealOrder;
-  const isLast = (i: number): boolean => i === order.length - 1;
+  const domFallback = createDomFallback(ctx, result);
 
-  /** Deckt Karte `i` auf und plant die naechste. */
-  const step = (): void => {
-    if (destroyed || finished || index >= order.length) return;
-    const playerId = order[index]!;
-    const choice: Choice = result.choices[playerId] ?? 'share';
-    const last = isLast(index);
-
-    revealCard(playerId, choice, last);
-
-    index += 1;
-    timer = globalThis.setTimeout(index >= order.length ? finish : step, last ? LAST_CARD_MS : STEP_MS);
+  /** Der Director meldet jede offene Karte — hier landet sie im Protokoll. */
+  const onCardRevealed = (playerId: string, choice: Choice, isLast: boolean): void => {
+    domFallback.reveal(playerId, choice, isLast);
+    const log = el.dataset['revealed'] ?? '';
+    el.dataset['revealed'] = log ? `${log},${playerId}:${choice}` : `${playerId}:${choice}`;
+    // Haptik bei der letzten Karte ist Pflicht (GDD §5) — sie trifft einen im Handy.
+    vibrate(isLast ? 'lastCard' : choice === 'steal' ? 'alarm' : 'tap');
   };
 
   const finish = (): void => {
-    if (finished) return;
+    if (finished || destroyed) return;
     finished = true;
     hint.hidden = true;
     globalThis.setTimeout(() => {
@@ -120,51 +110,40 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
     }, OUTRO_MS);
   };
 
-  /**
-   * Tap-to-Skip: Ab der zweiten Karte darf getippt werden, nie bei der letzten und nie
-   * nach dem Ende (GDD §4.3). `index` zeigt auf die naechste Karte.
-   */
-  const onTap = (): void => {
-    if (finished) return;
-    const current = index - 1;
-    if (current < SKIP_FROM_CARD_INDEX) return;
-    if (isLast(current) || index >= order.length) return;
-    if (timer !== undefined) clearTimeout(timer);
-    step();
-  };
-  el.addEventListener('click', onTap);
-
   /* ---------------------------------------------------------------- */
   /* PIXI-Buehne                                                       */
   /* ---------------------------------------------------------------- */
 
-  const domFallback = createDomFallback(ctx, result);
-
-  async function buildStage(): Promise<boolean> {
-    // Ein einziger Lazy-Chunk: Die drei Module haengen ohnehin aneinander.
-    const [stageApp, roomModule, cameraModule] = await Promise.all([
+  async function buildStage(): Promise<void> {
+    // Ein einziger Lazy-Chunk: Die Module haengen ohnehin aneinander.
+    const [stageApp, roomModule, cameraModule, directorModule, registry] = await Promise.all([
       import('@/game/StageApp'),
       import('@/game/VaultRoom'),
       import('@/game/Camera'),
+      import('@/game/RevealDirector'),
+      import('@/game/outcomes/registry'),
     ]);
-    if (destroyed) return false;
+    if (destroyed) return;
+
+    registry.registerAll();
 
     const assets = await stageApp.loadStageAssets();
-    if (destroyed) return false;
+    if (destroyed) return;
 
     stage = await stageApp.getStageApp();
-    if (destroyed) return false;
+    if (destroyed) return;
 
     stage.clearWorld();
     const rng = createSeededRng(result!.seed);
-    const low = ctx.session.state.settings.lowEffects || stageApp.detectLowEffects();
+    const settings = ctx.fsm.context.settings;
+    const low = settings.lowEffects || stageApp.detectLowEffects();
 
     room = new roomModule.VaultRoom({ assets, rng, lowEffects: low });
     room.populate({
       players: ctx.session.state.players,
       choices: result!.choices,
-      oaths: result!.oaths,
-      vaultFill: vaultFill(result!.vault, vaultSpec(ctx.fsm.context.settings)),
+      oaths: settings.modes.oath ? result!.oaths : [],
+      vaultFill: vaultFill(result!.vault, vaultSpec(settings)),
     });
 
     stage.world.addChild(room.view);
@@ -172,13 +151,24 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
     camera = new cameraModule.Camera(room.view);
 
     stage.attach(canvasHost);
-
     tick = (ticker) => room?.update(ticker.deltaMS);
     stage.app.ticker.add(tick);
 
-    // Der Tresor geht auf, Kassel bittet um die Karten (GDD §4.3, Intro).
-    room.vault.openDoor();
-    room.kassel.say(t('kassel.cardsPlease'));
+    const script = buildRevealScript(result!, {
+      pace: settings.revealPace,
+      oathsEnabled: settings.modes.oath,
+    });
+
+    director = new directorModule.RevealDirector({
+      script,
+      result: result!,
+      room,
+      camera,
+      rng,
+      line: (key) => t(`kassel.${key}`),
+      onCardRevealed,
+      onFinished: finish,
+    });
 
     if (ctx.dev) mountDevPanel();
 
@@ -191,35 +181,22 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
         if (slow && !destroyed) room?.setLowEffects(true);
       });
     }
-    return true;
+
+    if (!holdMode()) director.play();
   }
 
-  /** Bedienfeld fuer den Look-Check (Roadmap M2.5). Nur bei `?dev=1`. */
+  /** Bedienfeld fuer den Look-Check (Roadmap M2.5/M3). Nur bei `?dev=1`. */
   function mountDevPanel(): void {
-    let flipIndex = 0;
     let lasersOn = true;
 
     devPanel = createDevPanel({
       actions: [
+        { label: 'Show starten', onClick: () => director?.play() },
+        { label: 'Pause', onClick: () => director?.pause() },
+        { label: 'Skip', onClick: () => director?.skip() },
         { label: 'Tresor auf', onClick: () => room?.vault.openDoor() },
-        { label: 'Tresor zu', onClick: () => room?.vault.closeDoor() },
-        {
-          label: 'Karte umdrehen',
-          onClick: () => {
-            const playerId = order[flipIndex % order.length];
-            flipIndex += 1;
-            if (!playerId) return;
-            const last = flipIndex - 1 === order.length - 1;
-            revealCard(playerId, result!.choices[playerId] ?? 'share', last);
-          },
-        },
         { label: 'Alarm', onClick: () => room?.raiseAlarm() },
-        {
-          // Die Sprechblase ist der teuerste Einzelteil der Buehne (ADR-16) — sie muss
-          // sich im Perf-Test gezielt einschalten lassen.
-          label: 'Kassel',
-          onClick: () => room?.kassel.say(t('kassel.cardsPlease'), 6000),
-        },
+        { label: 'Kassel', onClick: () => room?.kassel.say(t('kassel.cardsPlease'), 6000) },
         {
           label: 'Low-Effects',
           onClick: () => {
@@ -227,7 +204,6 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
             room?.setLowEffects(!lasersOn);
           },
         },
-        { label: 'Kamera zurueck', onClick: () => camera?.reset() },
       ],
       readStats: () => {
         const times = stage?.frameTimes() ?? [];
@@ -238,79 +214,48 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
           'ms/frame': avg.toFixed(1),
           draws: stage?.drawCalls() ?? 0,
           crooks: room?.crooks.size ?? 0,
+          show: `${((director?.durationMs ?? 0) / 1000).toFixed(1)} s`,
         };
       },
     });
     el.append(devPanel.el);
   }
 
-  /** Dreht eine Karte um — auf der Buehne, oder im DOM-Notnagel. */
-  function revealCard(playerId: string, choice: Choice, last: boolean): void {
-    if (room) {
-      const card = room.cards.get(playerId);
-      const crook = room.crooks.get(playerId);
-
-      /*
-       * Bewusst **kein** Kamera-Zoom auf die Karte: Das ist Regie und gehoert in den
-       * `RevealDirector` (M3), zusammen mit Tempo-Kurve und Slow-Mo. Hier bleibt die
-       * Totale stehen — so sieht man, dass der ganze Halbkreis lebt, und genau das ist
-       * die Frage, die M2 beantwortet.
-       */
-      room.lookAtCard(playerId);
-
-      card?.lift();
-      card?.flip(last ? STALLS_LAST : STALLS_NORMAL, last ? 0.6 : 1);
-
-      // Blick-Regie: Der Besitzer zeigt erst NACH dem Flip sein Gesicht (Art Direction §7).
-      globalThis.setTimeout(() => crook?.setFace(choice === 'steal' ? 'smug' : 'innocent'), last ? 900 : 520);
-
-      if (last) {
-        room.narrowSpot(0.6, 700);
-        room.kassel.say(t(`kassel.${result!.outcome}`), 2200);
-      }
-      if (choice === 'steal') {
-        room.raiseAlarm();
-        camera?.shake();
-      }
-    }
-
-    domFallback.reveal(playerId, choice, last);
-    const log = el.dataset['revealed'] ?? '';
-    el.dataset['revealed'] = log ? `${log},${playerId}:${choice}` : `${playerId}:${choice}`;
-    vibrate(last ? 'lastCard' : choice === 'steal' ? 'alarm' : 'tap');
-  }
-
   /* ---------------------------------------------------------------- */
+
+  /** Tab gewechselt: Die Show haelt an, statt im Hintergrund weiterzulaufen. */
+  const onVisibility = (): void => {
+    if (document.hidden) director?.pause();
+    else director?.resume();
+  };
+
+  el.addEventListener('click', () => {
+    if (director?.skip()) vibrate('tap');
+  });
 
   return {
     el,
 
     activate() {
       void acquireWakeLock();
+      document.addEventListener('visibilitychange', onVisibility);
 
-      buildStage()
-        .catch((error) => {
-          // Kein WebGL, Atlas kaputt, Speicher voll: Das Spiel laeuft trotzdem weiter.
-          console.warn('[reveal] Buehne nicht verfuegbar, DOM-Fallback', error);
-          domFallback.enable(el, hint);
-        })
-        .finally(() => {
-          if (destroyed) return;
-          /*
-           * `?dev=1&hold=1` haelt den Takt an: Dann steht die Buehne still und laesst
-           * sich ansehen und messen, ohne dass die Runde weiterlaeuft. Die Karten dreht
-           * man ueber das Dev-Panel von Hand um (Roadmap M2.5).
-           */
-          if (holdMode()) return;
-          timer = globalThis.setTimeout(step, 700);
-        });
+      buildStage().catch((error) => {
+        // Kein WebGL, Atlas kaputt, Speicher voll: Das Spiel laeuft trotzdem weiter.
+        console.warn('[reveal] Buehne nicht verfuegbar, DOM-Fallback', error);
+        if (destroyed) return;
+        domFallback.enable(el, hint, result, onCardRevealed, finish);
+      });
     },
 
     destroy() {
       destroyed = true;
       finished = true;
+      document.removeEventListener('visibilitychange', onVisibility);
       devPanel?.destroy();
-      if (timer !== undefined) clearTimeout(timer);
+      domFallback.stop();
+      director?.destroy();
+      director = undefined;
       if (stage && tick) stage.app.ticker.remove(tick);
       camera?.snapHome();
       room?.destroy();
@@ -327,14 +272,25 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
 /* ------------------------------------------------------------------ */
 
 interface DomFallback {
-  /** Baut die Kartenreihe in den Screen ein — nur wenn PIXI ausfaellt. */
-  enable(host: HTMLElement, before: HTMLElement): void;
+  /** Baut die Kartenreihe ein und laesst sie im Sekundentakt umdrehen. */
+  enable(
+    host: HTMLElement,
+    before: HTMLElement,
+    result: RoundResult,
+    onCard: (playerId: string, choice: Choice, isLast: boolean) => void,
+    onDone: () => void
+  ): void;
   reveal(playerId: string, choice: Choice, last: boolean): void;
+  stop(): void;
 }
 
+/** Abstand zwischen zwei Karten im Notnagel — hier gibt es keine Tempo-Kurve. */
+const FALLBACK_STEP_MS = 1000;
+
 /**
- * Die Kartenreihe aus M1. Sie wird nur eingehaengt, wenn die Buehne nicht hochkommt —
- * dann ist die Runde zwar unspektakulaer, aber vollstaendig spielbar.
+ * Die schlichte Kartenreihe. Sie wird nur eingehaengt, wenn die Buehne nicht hochkommt —
+ * dann ist die Runde zwar unspektakulaer, aber vollstaendig spielbar. Die Reihenfolge
+ * bleibt auch hier Gesetz.
  */
 function createDomFallback(ctx: ScreenContext, result: RoundResult): DomFallback {
   const table = document.createElement('div');
@@ -342,6 +298,7 @@ function createDomFallback(ctx: ScreenContext, result: RoundResult): DomFallback
 
   const cards = new Map<string, HTMLElement>();
   let enabled = false;
+  let timer: ReturnType<typeof setTimeout> | undefined;
 
   for (const playerId of result.revealOrder) {
     const player = ctx.session.playerById(playerId);
@@ -372,11 +329,26 @@ function createDomFallback(ctx: ScreenContext, result: RoundResult): DomFallback
   }
 
   return {
-    enable(host, before) {
+    enable(host, before, round, onCard, onDone) {
       enabled = true;
       host.classList.add('is-fallback');
       host.insertBefore(table, before);
+
+      let index = 0;
+      const step = (): void => {
+        const playerId = round.revealOrder[index];
+        if (playerId === undefined) {
+          onDone();
+          return;
+        }
+        const last = index === round.revealOrder.length - 1;
+        onCard(playerId, round.choices[playerId] ?? 'share', last);
+        index += 1;
+        timer = globalThis.setTimeout(step, FALLBACK_STEP_MS);
+      };
+      timer = globalThis.setTimeout(step, 500);
     },
+
     reveal(playerId, choice, last) {
       if (!enabled) return;
       const card = cards.get(playerId);
@@ -385,6 +357,10 @@ function createDomFallback(ctx: ScreenContext, result: RoundResult): DomFallback
       if (last) card.classList.add('revealCard--last');
       if (result.moleId === playerId) card.classList.add('is-mole');
       if (result.perjurers.includes(playerId)) card.classList.add('is-perjury');
+    },
+
+    stop() {
+      if (timer !== undefined) clearTimeout(timer);
     },
   };
 }

@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel über Vertrauen und Verrat für 3–8
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M2 fertig (`v0.2.0`) — spielbar, und der Tresorraum steht. Crooks im Halbkreis hinter ihren Karten, wandernde Laser, Herr Kassel. Die choreografierte Show (Tempo-Kurve, Stalls, Slow-Mo) kommt in M3. Aktueller Stand in [`docs/PROGRESS.md`](docs/PROGRESS.md).
+**Status:** M3 fertig (`v0.3.0`) — die Show läuft. Karten drehen sich mit Tempo-Kurve und Fake-Stocken, die letzte in Slow-Mo mit Herzschlag, der Alarm blitzt beim ersten Dieb, Trinker-Zähler ploppen über den Köpfen. Die elf Ergebnis-Inszenierungen aus GDD §4.4 kommen in M4. Aktueller Stand in [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ## Entwickeln
 
@@ -48,6 +48,11 @@ Raum samt Tresor, Crooks, Karten und Herrn Kassel; `StageApp` hält das PIXI-Sin
 und lässt den Ticker GSAP treiben. Der Chunk lädt erst während der Verhandlung
 (ADR-15), und drei Atlanten entlang der Zeichenreihenfolge ergeben zwei Draw-Calls
 (ADR-14).
+
+Die Show selbst führt der `RevealDirector`: Er macht aus dem `RevealScript` **eine**
+GSAP-Timeline — Kamerafahrten, Blick-Regie, Trommelwirbel, Alarm, Slow-Mo bei der
+letzten Karte. Entschieden hat er nichts; das Ergebnis stand fest, bevor er anfing.
+Die Sounds synthetisiert der `AudioManager` zur Laufzeit (ADR-19).
 
 ## Planung
 

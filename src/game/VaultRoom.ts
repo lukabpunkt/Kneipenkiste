@@ -56,6 +56,8 @@ export class VaultRoom {
 
   readonly vault: Vault;
   readonly kassel: Kassel;
+  /** Der `front`-Atlas — Inszenierungen holen sich daraus Requisiten und Scherben. */
+  readonly frontSheet: Spritesheet;
   readonly crooks = new Map<PlayerId, Crook>();
   readonly cards = new Map<PlayerId, DecisionCard>();
 
@@ -95,21 +97,23 @@ export class VaultRoom {
     this.onSound = options.onSound ?? (() => undefined);
 
     const { back, front } = options.assets;
+    this.frontSheet = front;
     const world = STAGE.worldSize;
 
     /*
      * Wand und Boden in einem: eine Kachel, die weit ueber die Weltgrenzen hinausragt.
      *
-     * `StageApp` skaliert auf die **Breite**; auf einem 9:16-Display ist damit rund die
-     * doppelte Welthoehe sichtbar. Was hier nicht gedeckt ist, waere ein schwarzer
-     * Streifen — deshalb reicht die Kachel von -900 bis 1900.
+     * Nach **beiden** Seiten, und das aus zwei Gruenden: `StageApp` skaliert auf die
+     * Breite, sodass im Hochformat rund die doppelte Welthoehe sichtbar ist — und die
+     * Kamera schiebt den Raum beim Zoom auf eine Karte seitlich weg. Was hier nicht
+     * gedeckt ist, waere in genau dem Moment ein schwarzer Streifen am Bildrand.
      */
     this.wall = new TilingSprite({
       texture: this.texture(back, 'back/wall'),
-      width: world,
+      width: world * 2,
       height: world * 2.8,
     });
-    this.wall.position.set(0, -world * 0.9);
+    this.wall.position.set(-world * 0.5, -world * 0.9);
     this.wall.tileScale.set(1.6);
 
     /* --- Laser: duenne Linien, die durch den Raum treiben --- */
@@ -134,7 +138,7 @@ export class VaultRoom {
     /* --- Samttisch: die Buehne, auf der die Karten liegen --- */
     this.table = new Sprite(this.texture(back, 'back/table'));
     this.table.anchor.set(0.5, 0.22);
-    this.table.width = world * 1.5;
+    this.table.width = world * 1.8;
     this.table.scale.y = this.table.scale.x;
     this.table.position.set(world / 2, world * 0.52);
 
@@ -331,6 +335,24 @@ export class VaultRoom {
       }
     }
     return timeline;
+  }
+
+  /**
+   * Ein kurzer Vollbild-Blitz in einer Farbe. Weiss fuer den Meineid-Blitzschlag, Rot
+   * fuer den Alarm — derselbe Sprite, damit kein zweiter Draw-Call anfaellt (ADR-14).
+   */
+  flash(color: number, alpha: number, durationMs: number): gsap.core.Timeline {
+    if (this.lowEffects) return gsap.timeline();
+    const previous = this.alarmFlash.tint;
+    return gsap
+      .timeline({
+        onComplete: () => {
+          this.alarmFlash.tint = previous;
+        },
+      })
+      .set(this.alarmFlash, { tint: color })
+      .to(this.alarmFlash, { alpha, duration: durationMs / 2000 })
+      .to(this.alarmFlash, { alpha: 0, duration: durationMs / 2000 });
   }
 
   /** Spotlight enger ziehen — die letzte Karte bekommt den Raum fuer sich (GDD §4.3). */

@@ -55,3 +55,12 @@ Kontext: Drinkshots Arena passt komplett ins Bild (`Math.min`), weil sie ein Kre
 
 ## ADR-18 · 2026-09-04 · Der Reveal-Screen protokolliert, was er zeigt
 Kontext: Ab M2 ist die Aufdeckung ein Canvas — ein E2E-Test kann dort nicht mehr nachsehen, welche Karte aufgedeckt wurde. Entscheidung: Der Screen schreibt jede aufgedeckte Karte als `playerId:choice` in `data-revealed`. Konsequenz: Die wichtigste Zusicherung des Spiels — gezeigte Karten == getroffene Wahlen, in der Reihenfolge aus `revealOrder` — bleibt prüfbar; A3 („1 000 simulierte Runden") baut darauf auf.
+
+## ADR-19 · 2026-09-04 · Platzhalter-Sounds werden synthetisiert, nicht geladen
+Kontext: GDD §6 nennt ein howler-Sprite mit 26 Cues. Es gibt aber keine Sounddateien, und die Toolchain hat keinen OGG/MP3-Encoder. Entscheidung: Der `AudioManager` erzeugt die Cues zur Laufzeit über Web Audio (Oszillator + Rauschen + Hüllkurve), hinter genau der API, die ein howler-Sprite ebenfalls bedienen würde. Konsequenz: Kein Byte Bundle, offline ab dem ersten Start, und die Cues liegen exakt auf der Zeitachse der Show — Audit A3 fordert ±50 ms Sound-Sync, was mit dekodierten Dateien schwerer zu halten wäre. In M6 tauscht man den Klangerzeuger hinter der Fassade aus, ohne einen Aufrufer anzufassen. Übernommen aus Drinkshot (dortige ADR-20).
+
+## ADR-20 · 2026-09-04 · Die Outcome-Auswahl trifft der Director, nicht `payout.ts`
+Kontext: Architektur §5 sieht `resolveRound()` mit einem `pickOutcomeSequence`-Haken vor. Die Registry lebt aber im Bühnen-Chunk, der erst während der Verhandlung lädt (ADR-15) — der Regelkern dürfte sie nur kennen, wenn PixiJS zurück in den Einstiegs-Chunk wanderte. Entscheidung: `resolveRound()` trägt den Platzhalter `basic_outcome` ein; der `RevealDirector` ersetzt ihn durch die gewichtete Wahl aus der Registry. Konsequenz: Der Regelkern bleibt frei von der Bühne, und deterministisch bleibt es trotzdem — beide ziehen aus demselben Runden-Seed.
+
+## ADR-21 · 2026-09-04 · Canvas-Stub im Unit-Setup
+Kontext: Sobald ein Unit-Test ein Modul importiert, das irgendwo PixiJS berührt, ruft PIXI beim Laden `canvas.getContext('2d')` auf und jsdom schreibt einen mehrzeiligen „Not implemented"-Stacktrace nach stderr — bei jedem Lauf, ohne dass etwas kaputt wäre. Entscheidung: `tests/setup.ts` stubbt `getContext` für 2D und gibt für WebGL bewusst `null` zurück. Konsequenz: Die Testausgabe bleibt lesbar, und niemand hält den Stub für ein Canvas — wer wirklich rendern will, gehört in die E2E-Suite.

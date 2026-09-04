@@ -92,15 +92,26 @@ export const CARD = {
 export const LAST_CARD = {
   spotShrinkTo: 0.55,
   spotShrinkMs: 700,
-  heartbeatBpmStart: 70,
-  heartbeatBpmEnd: 130,
+} as const;
+
+/**
+ * Herzschlag bei der letzten Karte (GDD §4.3).
+ *
+ * Das Tempo steigt ueber die Verweildauer hinweg. Waehrenddessen wird die Musik
+ * abgesenkt — sonst traegt der Puls nicht, und genau der ist der Effekt.
+ */
+export const HEARTBEAT = {
+  bpm: [70, 132] as const,
+  /** Auf diesen Anteil faellt die Musik. */
+  duckTo: 0.25,
+  duckMs: 400,
 } as const;
 
 /** Trommelwirbel wird pro Karte schneller (GDD §4.5). */
-export const DRUMROLL = {
+export const DRUMROLL: { rateStart: number; rateEnd: number } = {
   rateStart: 1.0,
   rateEnd: 1.35,
-} as const;
+};
 
 /* ------------------------------------------------------------------ */
 /* Tap-to-Skip (GDD §4.3)                                              */

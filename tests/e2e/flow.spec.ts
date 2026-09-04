@@ -243,6 +243,52 @@ test.describe('Aufdeckung', () => {
     expect(new Set(revealed.split(',').map((entry) => entry.split(':')[0])).size).toBe(4);
   });
 
+  test('laesst die letzte Karte nicht wegtippen (GDD §4.3)', async ({ page }) => {
+    await startGame(page);
+    await setPlayerCount(page, 4);
+    await openVault(page);
+    await skipNegotiation(page);
+    // Zwei Diebe: Dann endet die Runde im Result und nicht in der Verteil-UI.
+    await playChoices(page, ['share', 'share', 'steal', 'steal']);
+    await runReveal(page);
+
+    const revealed = async (): Promise<string[]> => {
+      const log = (await page.locator('#app > section').getAttribute('data-revealed')) ?? '';
+      return log ? log.split(',') : [];
+    };
+
+    // Warten, bis die vorletzte Karte offen liegt, dann durchtippen.
+    await page.waitForFunction(
+      () =>
+        ((document.querySelector<HTMLElement>('#app > section')?.dataset['revealed'] ?? '').match(/,/g)
+          ?.length ?? -1) >= 2,
+      undefined,
+      { timeout: 40_000 }
+    );
+
+    /*
+     * Ab hier ist die letzte Karte dran. Zwanzig Taps duerfen sie **nicht** vorziehen —
+     * das ist die Regel, die den Moment schuetzt, fuer den es das Spiel gibt.
+     */
+    const before = (await revealed()).length;
+    for (let i = 0; i < 20; i++) await page.locator('#app > section').click({ force: true });
+    await page.waitForTimeout(400);
+    expect((await revealed()).length).toBeLessThanOrEqual(before + 1);
+
+    /*
+     * Die Show laeuft trotzdem zu Ende — und alle vier Karten liegen offen. Abgelesen
+     * wird das **auf** dem Reveal-Screen: Danach ist er samt Protokoll ausgetauscht.
+     */
+    await page.waitForFunction(
+      () =>
+        (document.querySelector<HTMLElement>('#app > section')?.dataset['revealed'] ?? '').split(',')
+          .length === 4,
+      undefined,
+      { timeout: 40_000 }
+    );
+    await atScreen(page, 'result');
+  });
+
   test('zeigt die Wahl nach dem Versiegeln nirgends mehr (Audit A1)', async ({ page }) => {
     await startGame(page);
     await setPlayerCount(page, 3);
