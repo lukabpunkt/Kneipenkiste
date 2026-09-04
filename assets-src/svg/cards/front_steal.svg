@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kartenvorderseite STEHLEN: Geldsack mit Schluck-Glas und Greifspuren. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 340" width="256" height="340">
+  <rect x="8" y="8" width="240" height="324" rx="24" fill="#FF2D55" stroke="#1A1024" stroke-width="14"/>
+  <g stroke="#FFF8E7" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M104 128c-24 16-36 40-36 64a32 32 0 0 0 32 32h48a32 32 0 0 0 32-32c0-24-12-48-36-64z"/>
+    <path d="M104 128h40l-8-24h-24z"/>
+    <path d="M112 164h24l-4 28h-16z"/>
+    <path d="M124 192v12"/>
+    <path d="M56 106l24 24M32 142l32 8M40 190l28-8"/>
+  </g>
+</svg>

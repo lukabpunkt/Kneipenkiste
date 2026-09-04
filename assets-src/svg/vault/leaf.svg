@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Türblatt ohne Rad und Zahlenkranz — die schwingen separat.
+     Der Anker sitzt im Spiel links am Rand, damit die Tür aufgeht wie eine Tür. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <circle cx="100" cy="100" r="96" fill="#1A1024"/>
+  <circle cx="100" cy="100" r="88" fill="#8C93A8"/>
+  <!-- Cel-Shading: eine harte Kante auf der abgewandten Seite -->
+  <path d="M100 12 A88 88 0 0 1 100 188 Z" fill="#4A506A" opacity="0.45"/>
+  <g fill="#4A506A" stroke="#1A1024" stroke-width="4">
+    <circle cx="100" cy="30" r="7"/>
+    <circle cx="149" cy="51" r="7"/>
+    <circle cx="170" cy="100" r="7"/>
+    <circle cx="149" cy="149" r="7"/>
+    <circle cx="100" cy="170" r="7"/>
+    <circle cx="51" cy="149" r="7"/>
+    <circle cx="30" cy="100" r="7"/>
+    <circle cx="51" cy="51" r="7"/>
+  </g>
+  <circle cx="100" cy="100" r="58" fill="#4A506A" stroke="#1A1024" stroke-width="8"/>
+</svg>

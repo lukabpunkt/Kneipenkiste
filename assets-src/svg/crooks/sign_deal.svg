@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Schild "WIR HATTEN EINEN DEAL" (GDD §4.4, steal_solo_getaway).
+     Der Text steckt als Pfad drin, nicht als <text>: Der Atlas rastert ohne Schrift-
+     Einbettung, ein <text> käme auf fremden Systemen in einer anderen Font. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 96" width="160" height="96">
+  <rect x="8" y="8" width="144" height="60" rx="6" fill="#FFF8E7" stroke="#1A1024" stroke-width="8"/>
+  <rect x="74" y="66" width="12" height="26" fill="#E8C874" stroke="#1A1024" stroke-width="7"/>
+  <!-- Handgeschriebene Zeilen, absichtlich nur angedeutet: lesbar wird das Schild
+       nie, erkennbar als Protest schon. -->
+  <g fill="#1A1024">
+    <rect x="22" y="22" width="60" height="7" rx="3"/>
+    <rect x="88" y="22" width="46" height="7" rx="3"/>
+    <rect x="22" y="36" width="38" height="7" rx="3"/>
+    <rect x="66" y="36" width="68" height="7" rx="3"/>
+    <rect x="22" y="50" width="88" height="7" rx="3"/>
+  </g>
+</svg>

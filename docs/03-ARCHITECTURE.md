@@ -22,9 +22,9 @@ Tresor/
 ├─ README.md
 ├─ docs/  (01-GDD, 02-ART-DIRECTION, 03-ARCHITECTURE, 04-ROADMAP, 05-AUDITS, DECISIONS, PROGRESS, screens/)
 ├─ index.html · vite.config.ts · tsconfig.json · package.json
-├─ public/ (manifest, icons, fonts, atlas/, audio/)
-├─ assets-src/svg/{crooks,cards,vault,room,props,kassel}/ · audio-src/
-├─ scripts/ (build-atlas.mjs, build-audio-sprite.mjs, build-icons.mjs)
+├─ public/ (manifest, icons, fonts, atlas/ [back|crooks|front, ADR-14], audio/)
+├─ assets-src/svg/{crooks,cards,vault,room/{back,front},props,kassel,dom}/ · audio-src/
+├─ scripts/ (build-atlas.mjs, build-audio-sprite.mjs, build-icons.mjs, check-colors.mjs)
 ├─ src/
 │  ├─ main.ts
 │  ├─ config/
@@ -45,6 +45,8 @@ Tresor/
 │  ├─ game/                 # PIXI-Bühne
 │  │  ├─ StageApp.ts        # PIXI-Singleton, Resize, Ticker→GSAP
 │  │  ├─ VaultRoom.ts       # Wand, Laser, Tresor, Tisch, Spotlight, Vignette, Alarm-Modus
+│  │  │                     # baut und besitzt zugleich die Buehne (Crooks, Karten, Kassel)
+│  │  ├─ layout.ts          # Halbkreis-Layout als reine Funktion (Audit A2 als Unit-Test)
 │  │  ├─ Vault.ts           # Tresor-Sprite mit Rad/Tür/Münzstapel, open()/close()/grow()/drain()/burst()
 │  │  ├─ Crook.ts           # Shotling + Maske/Shirt/Bag-Slots, Blickregie, Gesichter
 │  │  ├─ Kassel.ts          # NPC mit Sprechblasen-Queue

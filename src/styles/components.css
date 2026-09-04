@@ -2171,3 +2171,111 @@
     transition: none;
   }
 }
+
+/* ================================================================== */
+/* Bühne (PIXI) im Aufdeckungs-Screen                                 */
+/* ================================================================== */
+
+/*
+ * Der Screen selbst ist nur noch Rahmen: Das Canvas füllt ihn ganz aus, der
+ * Skip-Hinweis liegt darüber. Padding wäre hier falsch — der Tresorraum soll bis an
+ * die Kante gehen.
+ */
+.screen--reveal {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+}
+
+.reveal__stage {
+  position: absolute;
+  inset: 0;
+}
+
+.reveal__stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.screen--reveal .reveal__hint {
+  position: absolute;
+  inset: auto 0 calc(var(--space-5) + var(--safe-bottom));
+  z-index: 1;
+  margin: 0;
+  text-align: center;
+}
+
+/* Fällt PIXI aus, übernimmt die Kartenreihe aus M1 — dann braucht sie wieder Layout. */
+.screen--reveal.is-fallback {
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-4);
+}
+
+.screen--reveal.is-fallback .reveal__stage {
+  display: none;
+}
+
+.screen--reveal.is-fallback .reveal__hint {
+  position: static;
+}
+
+/* ================================================================== */
+/* Dev-Panel (?dev=1)                                                 */
+/* ================================================================== */
+
+.dev {
+  position: absolute;
+  inset: calc(var(--space-3) + var(--safe-top)) var(--space-3) auto auto;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 46vw;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: rgb(11 10 20 / 82%);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.dev__stats {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 var(--space-2);
+  margin: 0;
+  color: rgb(255 248 231 / 70%);
+}
+
+.dev__stats dt {
+  opacity: 0.65;
+}
+
+.dev__stats dd {
+  margin: 0;
+  text-align: right;
+  color: var(--c-gold);
+}
+
+.dev__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.dev__button {
+  min-height: 28px;
+  padding: 2px var(--space-2);
+  border: 1px solid rgb(255 248 231 / 22%);
+  border-radius: 6px;
+  background: var(--c-bg-panel);
+  color: var(--c-paper);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+
+.dev__button:active {
+  background: var(--c-bg-panel-raised);
+}

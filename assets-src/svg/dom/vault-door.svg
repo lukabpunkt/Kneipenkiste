@@ -2,10 +2,13 @@
   <!--
     Tresortür von vorn (Art Direction §4.2).
 
-    Eine Quelle, zwei Verbraucher (Architektur §8): Die DOM-Version im
-    Negotiation- und Result-Screen bindet diese Datei per `?raw` ein und animiert
-    die Teile mit CSS; ab M2 baut `npm run build:atlas` daraus die PIXI-Textur.
-    Deshalb tragen alle beweglichen Teile eine Klasse.
+    Die DOM-Variante des Tresor-Widgets (Architektur §8). Negotiation- und
+    Result-Screen binden diese Datei per `?raw` ein und animieren die Teile mit CSS;
+    deshalb trägt jedes bewegliche Teil eine Klasse.
+
+    Die PIXI-Variante auf der Bühne besteht aus Einzelsprites (frame, leaf, dial,
+    wheel, coins1..5) — sie muss aufschwingen, was ein einzelnes SVG nicht kann.
+    Deshalb liegt diese Datei bewusst außerhalb der Atlas-Kategorien.
   -->
   <defs>
     <clipPath id="vaultWindow">
@@ -35,7 +38,8 @@
     <circle cx="100" cy="100" r="60" fill="#0B0A14" />
     <!--
       Der Stapel steht in Ruhelage (fill = 1) randvoll im Fenster; die CSS-Variable
-      `--vault-fill` schiebt ihn nach unten aus dem Sichtfeld, wenn der Tresor leerer ist.
+      Die CSS-Variable `vault-fill` schiebt ihn nach unten aus dem Sichtfeld,
+      wenn der Tresor leerer ist.
     -->
     <g class="vault__coins">
       <rect x="34" y="104" width="132" height="80" fill="#FFC93C" />

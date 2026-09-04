@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gitter, das bei Alarm herunterfällt (GDD §4.4, steal_all_alarm). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
+  <rect x="4" y="4" width="192" height="20" rx="6" fill="#8C93A8" stroke="#1A1024" stroke-width="8"/>
+  <g fill="#8C93A8" stroke="#1A1024" stroke-width="8">
+    <rect x="24" y="20" width="16" height="216"/>
+    <rect x="68" y="20" width="16" height="216"/>
+    <rect x="112" y="20" width="16" height="216"/>
+    <rect x="156" y="20" width="16" height="216"/>
+  </g>
+</svg>

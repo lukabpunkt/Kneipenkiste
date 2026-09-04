@@ -219,21 +219,28 @@ test.describe('Aufdeckung', () => {
     await playChoices(page, ['steal', 'share', 'share', 'steal']);
     await runReveal(page);
 
-    // Warten, bis alle Karten offen liegen, dann die Reihenfolge im DOM pruefen.
+    /*
+     * Die Buehne ist ein Canvas — pruefbar ist sie ueber das Protokoll, das der Screen
+     * mitschreibt: `playerId:choice` in genau der Reihenfolge, in der aufgedeckt wurde.
+     */
     await page.waitForFunction(
-      () => document.querySelectorAll('.revealCard.is-revealed').length === 4,
+      () =>
+        (document.querySelector<HTMLElement>('#app > section')?.dataset['revealed'] ?? '').split(',')
+          .length === 4,
       undefined,
-      { timeout: 30_000 }
+      { timeout: 40_000 }
     );
 
-    const choices = await page
-      .locator('.revealCard')
-      .evaluateAll((cards) => cards.map((card) => (card.classList.contains('is-steal') ? 'steal' : 'share')));
-    expect(choices).toEqual(['share', 'share', 'steal', 'steal']);
+    const revealed = (await page.locator('#app > section').getAttribute('data-revealed')) ?? '';
+    expect(revealed.split(',').map((entry) => entry.split(':')[1])).toEqual([
+      'share',
+      'share',
+      'steal',
+      'steal',
+    ]);
 
-    // Die letzte Karte ist als solche markiert und bekommt mehr Platz.
-    await expect(page.locator('.revealCard--last')).toHaveCount(1);
-    await expect(page.locator('.revealCard').last()).toHaveClass(/revealCard--last/);
+    // Jede Karte genau einmal, und alle vier Spieler kommen vor.
+    expect(new Set(revealed.split(',').map((entry) => entry.split(':')[0])).size).toBe(4);
   });
 
   test('zeigt die Wahl nach dem Versiegeln nirgends mehr (Audit A1)', async ({ page }) => {

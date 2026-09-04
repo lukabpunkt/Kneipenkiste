@@ -4,7 +4,7 @@
 |---|---|---|---|
 | M0 Setup & Regelkern | ✅ fertig (⏳ 3 manuelle Checks offen) | `v0.0.1` | A0 bestanden |
 | M1 UI-Flow | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.1.0` | A1 bestanden |
-| M2 Bühne, Crooks, Tresor | ⬜ offen | – | – |
+| M2 Bühne, Crooks, Tresor | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.2.0` | A2 bestanden |
 | M3 Reveal-Show | ⬜ offen | – | – |
 | M4 Inszenierungen | ⬜ offen | – | – |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
@@ -82,3 +82,43 @@
 - [ ] Auf einem echten Gerät prüfen, ob das Handy während Verhandlung und Aufdeckung wach bleibt (Wake-Lock; auf iOS erst ab Safari 16.4) und ob die Vibration beim Versiegeln und bei der letzten Karte spürbar ist.
 
 **Zahlen:** 534 Unit-Tests · 30 E2E-Tests (15 × 2 Geräte) · Coverage `core/` 99,7 % Statements / 97,1 % Branches, `fsm.ts` 100 % · Bundle 24,3 KB JS gzip (PIXI kommt ab M2 dazu) · 10 Screens, 8 Komponenten.
+
+## Audit A2 — 2026-09-04
+
+**Ergebnis:** BESTANDEN (alle automatisierbaren MUSS-Checks grün; 2 Checks brauchen Lukas Gerät bzw. Auge)
+
+| Check | Status | Notiz |
+|---|---|---|
+| 8 Crooks + Raum + Laser 60 s: p50 ≤ 16.7 ms, p95 ≤ 33 ms | ✅ | Gemessen über 60 s mit acht Crooks, wandernden Lasern und sprechendem Kassel: **p50 16,7 ms · p95 16,7 ms · 60 fps**, vsync-gebunden. Automatisiert in `tests/e2e/perf.spec.ts` (20-s-Fenster, gleiche Schwellen). Gerät: Chromium/Metal auf Apple M1 — das Referenzgerät steht noch aus (⏳ unten). |
+| Draw-Batches ≤ 3 | ✅ | **2 Draw-Calls**, auch während Kassel spricht. Erreicht über ADR-14 (drei Atlanten entlang der Zeichenreihenfolge) und ADR-16 (Sprechblase als 9-Slice statt `Graphics`). Der Test zählt echte `drawElements`/`drawArrays`-Aufrufe im WebGL-Kontext, keine interne Batch-Liste, und triggert Kassels Blase gezielt mit. |
+| Heap flach über 30 s | ✅ | 9,5 MB → 9,5 MB über 60 s. Automatisiert als eigener Fall (10 % Toleranz, weil der GC seine eigene Taktung hat). |
+| Look-Check gegen Art Direction §1/§5/§6 | ✅ (⏳ Lukas Auge) | Screenshots `docs/screens/m2-3spieler-ruhe.png`, `m2-8spieler-ruhe.png`, `m2-8spieler-aufgedeckt.png`. Vorhanden und erkennbar: Domino-Masken in Spielerfarbe, Ringelshirts auf der Hälfte der Crooks, Symbol auf dem Torso, Samttisch, Stahl-Tresor mit Goldrad, Spotlight-Kegel, wandernde Laser, Vignette, Herr Kassel mit Monokel, Schnurrbart, Sakko und Kassenbuch. |
+| Alle 8 Farben + Symbole auf dem dunklen Samt unterscheidbar (Deuteranopie-Simulation) | ✅ | Neues Skript `npm run check:colors` (Brettel/Viénot über LMS, ΔE76 in CIE Lab). Bei normalem Sehen sind alle 28 Paare deutlich getrennt. **Befund:** Unter Deuteranopie rücken vier Paare zusammen (rot/grün ΔE 15, lila/cyan ΔE 13, blau/lila ΔE 22, grün/orange ΔE 22), unter Protanopie zwei (blau/lila ΔE 4, grün/orange ΔE 21). Genau dafür trägt jede Farbe ihr Symbol (GDD §3.1) — auf Torso und Kartenrückseite. Das Skript listet die betroffenen Paare namentlich auf, statt sie durchzuwinken. |
+| Halbkreis-Layout bei 3 und bei 8 Spielern ohne Überlappung | ✅ | `layoutStage()` ist eine reine Funktion, der Check damit ein Unit-Test statt eines Blicks (`tests/unit/layout.test.ts`, 11 Tests): Plätze im Bild, Crooks hinter ihren Karten, kein Paar näher als eine Kartenhöhe, Karten-Scale 0.8 ab sieben Spielern bei gleichbleibendem Bogen. |
+| Tresor open/close/grow/drain/burst laufen sauber mit Sound-Hooks | ✅ | Alle fünf geben eine GSAP-Timeline zurück, damit der `RevealDirector` (M3) sie einhängen kann statt sie nur anzustoßen. Jeder Schritt ruft `onSound(...)` mit der ID aus GDD §6 — der AudioManager hängt sich in M3 ein. Im Dev-Panel von Hand prüfbar. |
+| Preload während NEGOTIATION: kein Nachladen beim Betreten von REVEAL | ✅ | Negotiation- und Silence-Screen stoßen `preloadStageAssets()` per dynamischem `import()` an; `loadStageAssets()` teilt sich eine Promise, ein zweiter Aufruf lädt nichts nach. Der Bühnen-Chunk (92 KB gzip) liegt damit vor dem ersten Kartenflip im Speicher. |
+| Low-Effects greift bei CPU-Throttle | ✅ | Zweistufig wie in Architektur §9: Geräte-Vorabschätzung (`deviceMemory`, `hardwareConcurrency`) plus gemessener Frame-Median über die ersten 2 s. Greift die Regel, verschwinden Laser, Schatten und Vignette. Im Dev-Panel schaltbar. |
+| Dev-Panel: Spieleranzahl, Tresor auf/zu, Karte umdrehen, Alarm, FPS | ✅ | `?dev=1` blendet Bildrate, ms/Frame, Draw-Calls und Crook-Zahl ein, dazu sechs Knöpfe (Tresor auf/zu, Karte umdrehen, Alarm, Kassel, Low-Effects, Kamera zurück). `?dev=1&hold=1` hält den Karten-Takt an — so lässt sich die Bühne ansehen und messen, ohne dass die Runde weiterläuft. Die Spieleranzahl stellt man in der Lobby ein, wo sie ohnehin hingehört. |
+| Kein Nachladen, keine Console-Fehler im Flow | ✅ | Die 30 E2E-Tests aus A1 laufen unverändert grün, jetzt gegen die PIXI-Bühne. Fällt PIXI aus (kein WebGL, kaputter Atlas), übernimmt die DOM-Kartenreihe aus M1 — ein Trinkspiel darf nicht am Renderer sterben. |
+| Referenzgerät iPhone 11 / Pixel 4a: 60 fps | ⏳ manuell | Alle Messungen stammen von einem M1-Mac. Ein Gerät der Zielklasse hat niemand hier. |
+| „Sieht das nach Ocean's Eleven als Samstagmorgen-Cartoon aus?" | ⏳ manuell | Braucht ein Auge, keinen Test. |
+
+**Befunde während der Umsetzung**
+
+- **Sechs Atlanten hätten das Draw-Budget gesprengt.** Thematisch geschnitten (crooks, cards, vault, room, props, kassel) wechselt die Textur pro Frame bis zu sechsmal. Neu geschnitten entlang der Zeichenreihenfolge — und zwei Assets liegen dafür bewusst „falsch": die Farbsymbole doppelt und das Licht bei den Karten (ADR-14).
+- **PIXI lag im Einstiegs-Chunk.** Ein einziger statischer Import im Negotiation-Screen zog 170 KB gzip in den Start. Alle `game/`-Module werden jetzt dynamisch geladen; der Einstieg ist wieder bei 25 KB (ADR-15).
+- **Die Sprechblase kostete zwei Draw-Calls.** Als `Graphics` gezeichnet stieg die Zahl auf 4, sobald Kassel den Mund aufmachte. Jetzt ein 9-Slice-Sprite aus dem Atlas (ADR-16).
+- **Die Weltskalierung stimmte nicht fürs Hochformat.** Mit Drinkshots `Math.max`-Regel lag im Portrait der halbe Halbkreis außerhalb des Bildes — die äußeren Karten waren schlicht nicht da. Jetzt auf die Breite skaliert, Wand und Boden reichen über die Weltgrenzen hinaus (ADR-17).
+- **Der Überlappungstest maß die falsche Kante.** Er prüfte gegen die Karten*breite* und war grün, während sich die Karten an den Bogenenden sichtbar schnitten: Dort liegen zwei Nachbarn fast übereinander, und da entscheidet die *Höhe*. Bogen und Kartengröße wurden daraufhin gemeinsam neu gerechnet.
+- **Die Tresortür schwang um den falschen Punkt.** Das Blatt saß eine halbe Türbreite zu weit links, Zahlenrad und Griffrad blieben auf dem offenen Loch liegen. Scharnier auf die linke Kante gesetzt; das Öffnen ist jetzt eine Stauchung, keine Drehung — in 2D ist das der einzige Weg, der wie eine Tür aussieht.
+- **Kassel verschwand nach der ersten Runde.** Er hing in derselben Ebene wie die Crooks, und die räumt `populate()` zwischen zwei Runden ab. Eigene Ebene, gleiche Textur, kein zusätzlicher Draw-Call.
+- **Die Kamera fuhr pro Karte heran.** Das ist Regie und gehört in den `RevealDirector` (M3); in M2 zerstörte es die Komposition — man sah zwei von acht Crooks. Für diesen Meilenstein bleibt die Totale stehen.
+
+**Offene SOLL-Follow-ups:** keine.
+
+**Manuelle Checks für Luka vor M3:**
+
+- [ ] Die Bühne auf einem echten iPhone 11 / Pixel 4a öffnen und 60 s laufen lassen: Bleiben es 60 fps? Ruckelt etwas beim Kartenflip? (`?dev=1&hold=1` zeigt Bildrate und Draw-Calls direkt auf dem Gerät.)
+- [ ] Look-Check gegen Art Direction §1: Sieht der Raum nach „Ocean's Eleven als Samstagmorgen-Cartoon" aus? Sind Maske, Ringelshirt und Symbol auf Anhieb dem richtigen Spieler zuzuordnen?
+
+**Zahlen:** 545 Unit-Tests · 30 E2E-Tests · 3 Perf-Tests · 68 Atlas-Frames in 3 Texturen (739 KB @2x) · Einstiegs-Chunk 25 KB gzip, Bühnen-Chunk 92 KB gzip · 2 Draw-Calls · 60 fps mit 8 Crooks.

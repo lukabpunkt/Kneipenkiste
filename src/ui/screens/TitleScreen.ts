@@ -16,7 +16,7 @@ import { vibrate } from '@/ui/haptics';
 import type { ScreenContext, ScreenInstance } from '@/ui/router';
 import { createRulesSheet } from './RulesSheet';
 import { createSettingsSheet } from './SettingsSheet';
-import doorSvg from '../../../assets-src/svg/vault/door.svg?raw';
+import doorSvg from '../../../assets-src/svg/dom/vault-door.svg?raw';
 
 /** Merkt sich, dass der 18+-Hinweis schon einmal quittiert wurde. */
 function disclaimerSeen(): boolean {

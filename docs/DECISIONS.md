@@ -40,3 +40,18 @@ Kontext: Roadmap M1.5 verlangt nur „Karten als einfache Liste nacheinander umd
 
 ## ADR-13 · 2026-09-04 · Die Maulwurf-Karte bleibt bedienbar
 Kontext: Die verriegelte TEILEN-Karte war mit `aria-disabled="true"` ausgezeichnet. Entscheidung: Sie bekommt stattdessen ein sprechendes `aria-label` und bleibt fokussierbar. Konsequenz: Der Maulwurf erfährt beim Antippen, dass die Karte existiert und warum sie gesperrt ist (Rütteln + „Nicht für dich"); ein totes Element hätte ihm genau diese Information verschwiegen — und Screenreader-Nutzer noch mehr.
+
+## ADR-14 · 2026-09-04 · Atlanten nach Zeichenreihenfolge, nicht nach Thema
+Kontext: Sechs thematische Atlanten (crooks, cards, vault, room, props, kassel) hätten pro Frame bis zu sechs Texturwechsel bedeutet — Audit A2 erlaubt drei. Entscheidung: Drei Atlanten entlang der Zeichenreihenfolge — `back` (Wand, Laser, Tisch, Tresor), `crooks` (alle Figuren inkl. Herrn Kassel), `front` (Karten, Requisiten, Licht, Sprechblase). Konsequenz: Gemessen 2 Draw-Calls bei acht Crooks. Zwei Dinge liegen dafür bewusst „falsch": die Farbsymbole doppelt (`crooks/symbols` für den Torso, `cards/symbols` für die Kartenrückseite) und das Licht beim `front`-Atlas statt beim Raum — beides billiger als ein Texturwechsel.
+
+## ADR-15 · 2026-09-04 · PIXI und GSAP nur im Reveal-Chunk
+Kontext: Ein statischer Import von `StageApp` im Negotiation-Screen zog PixiJS und GSAP in den Einstiegs-Chunk — 170 KB gzip für jeden Screen, obwohl nur die Aufdeckung sie braucht. Entscheidung: Alle `game/`-Module werden dynamisch importiert; der Negotiation- und der Silence-Screen stoßen den Preload per `import()` an. Konsequenz: Einstiegs-Chunk 25 KB gzip, Bühnen-Chunk 92 KB gzip und lädt während der Verhandlung. Architektur §1 („Reveal-Chunk lazy") ist damit umgesetzt, nicht nur geplant.
+
+## ADR-16 · 2026-09-04 · Die Sprechblase ist ein 9-Slice-Sprite
+Kontext: Als `Graphics` gezeichnet kostete Kassels Sprechblase zwei zusätzliche Draw-Calls (Rahmen + Text) — gemessen 4 statt 3, sobald er sprach. Entscheidung: Der Rahmen ist ein `NineSliceSprite` aus dem `front`-Atlas, der Zipfel ein eigener Sprite; nur der Text bleibt ein `Text`. Konsequenz: 2 Draw-Calls auch während er spricht. Der Text bleibt bewusst kein BitmapText — Kassels Sätze kommen aus der i18n, sind zweisprachig und voller Umlaute.
+
+## ADR-17 · 2026-09-04 · Die Bühne skaliert auf die Breite
+Kontext: Drinkshots Arena passt komplett ins Bild (`Math.min`), weil sie ein Kreis ist. Im Hochformat wäre der Tresorraum damit ein Streifen in der Mitte; mit `Math.max` läge dagegen der halbe Halbkreis außerhalb des Bildes. Entscheidung: `scale = width / 1000`, vertikal zentriert; Wand und Boden reichen bewusst weit über die Weltgrenzen hinaus. Konsequenz: Der Halbkreis nutzt die volle Breite, die Komposition steht im unteren Bilddrittel — dort, wo auf einem Handy der Daumen und der Blick sind.
+
+## ADR-18 · 2026-09-04 · Der Reveal-Screen protokolliert, was er zeigt
+Kontext: Ab M2 ist die Aufdeckung ein Canvas — ein E2E-Test kann dort nicht mehr nachsehen, welche Karte aufgedeckt wurde. Entscheidung: Der Screen schreibt jede aufgedeckte Karte als `playerId:choice` in `data-revealed`. Konsequenz: Die wichtigste Zusicherung des Spiels — gezeigte Karten == getroffene Wahlen, in der Reihenfolge aus `revealOrder` — bleibt prüfbar; A3 („1 000 simulierte Runden") baut darauf auf.

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kartenrückseite (Art Direction §5.1). Die Fläche ist weiss und wird in Spielerfarbe
+     getintet; das Symbol liegt als eigener Sprite darüber. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 340" width="256" height="340">
+  <rect x="8" y="8" width="240" height="324" rx="24" fill="#FFFFFF" stroke="#1A1024" stroke-width="14"/>
+  <!-- Rautenmuster, damit die Rückseite nicht wie eine leere Fläche wirkt -->
+  <g fill="#000000" opacity="0.12">
+    <path d="M128 46 L158 96 128 146 98 96 Z"/>
+    <path d="M128 194 L158 244 128 294 98 244 Z"/>
+    <path d="M58 120 L88 170 58 220 28 170 Z"/>
+    <path d="M198 120 L228 170 198 220 168 170 Z"/>
+  </g>
+</svg>

@@ -21,7 +21,8 @@
     "build:atlas": "node scripts/build-atlas.mjs",
     "build:audio": "node scripts/build-audio-sprite.mjs",
     "build:icons": "node scripts/build-icons.mjs",
-    "preview:outcomes": "vite --host --open \"/?dev=1&panel=outcomes\""
+    "preview:outcomes": "vite --host --open \"/?dev=1&panel=outcomes\"",
+    "check:colors": "node scripts/check-colors.mjs"
   },
   "dependencies": {
     "gsap": "^3.13.0",

@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel über Vertrauen und Verrat für 3–8
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M1 fertig (`v0.1.0`) — **ab hier ist es spielbar.** Der komplette Flow von der Lobby bis zum Result läuft; die Aufdeckung ist noch ein DOM-Platzhalter, die PixiJS-Bühne kommt in M2/M3. Aktueller Stand in [`docs/PROGRESS.md`](docs/PROGRESS.md).
+**Status:** M2 fertig (`v0.2.0`) — spielbar, und der Tresorraum steht. Crooks im Halbkreis hinter ihren Karten, wandernde Laser, Herr Kassel. Die choreografierte Show (Tempo-Kurve, Stalls, Slow-Mo) kommt in M3. Aktueller Stand in [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ## Entwickeln
 
@@ -21,6 +21,7 @@ npm run dev            # Vite mit --host, auch vom Handy im WLAN erreichbar
 | `npm run test:unit` · `test:coverage`                 | Vitest (Schwellen: `core/` ≥ 95 %, `fsm.ts` = 100 %)     |
 | `npm run test:e2e` · `test:perf`                      | Playwright auf iPhone 12 (WebKit) und Pixel 5 (Chromium) |
 | `npm run build:atlas` · `build:audio` · `build:icons` | Assets aus `assets-src/` bzw. `audio-src/`               |
+| `npm run check:colors`                                | Farb-Audit: Deuteranopie/Protanopie über CIE Lab (A2)    |
 | `npm run preview:outcomes`                            | Dev-Panel mit den Ergebnis-Inszenierungen (ab M4)        |
 
 ## Aufbau
@@ -40,8 +41,13 @@ Die Show (`src/game/`) liest dieses Ergebnis und inszeniert es — sie würfelt 
 
 Darüber liegt die UI: ein Router mit zehn Screens (`src/ui/screens/`) und die Komponenten
 (`src/ui/components/`) — Tresor-Widget mit Split-Flap-Zähler, Countdown-Ring,
-Entscheidungskarten, Badges mit Eid-Siegel. Menüs sind DOM, nur die Aufdeckung wird
-ab M3 eine PixiJS-Bühne.
+Entscheidungskarten, Badges mit Eid-Siegel. Menüs sind DOM.
+
+Die Aufdeckung ist eine PixiJS-Bühne (`src/game/`): `VaultRoom` baut und besitzt den
+Raum samt Tresor, Crooks, Karten und Herrn Kassel; `StageApp` hält das PIXI-Singleton
+und lässt den Ticker GSAP treiben. Der Chunk lädt erst während der Verhandlung
+(ADR-15), und drei Atlanten entlang der Zeichenreihenfolge ergeben zwei Draw-Calls
+(ADR-14).
 
 ## Planung
 

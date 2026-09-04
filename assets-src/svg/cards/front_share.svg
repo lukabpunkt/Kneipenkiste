@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kartenvorderseite TEILEN: zwei anstoßende Gläser (ADR-11). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 340" width="256" height="340">
+  <rect x="8" y="8" width="240" height="324" rx="24" fill="#2ED573" stroke="#1A1024" stroke-width="14"/>
+  <g stroke="#1A1024" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <g transform="translate(90 120) rotate(15)">
+      <path d="M-34 0h68l-13 51h-42z"/>
+      <path d="M0 51v38"/>
+      <path d="M-26 89h52"/>
+    </g>
+    <g transform="translate(166 120) rotate(-15)">
+      <path d="M-34 0h68l-13 51h-42z"/>
+      <path d="M0 51v38"/>
+      <path d="M-26 89h52"/>
+    </g>
+    <path d="M128 104v-18M108 111l-13-13M148 111l13-13"/>
+  </g>
+</svg>

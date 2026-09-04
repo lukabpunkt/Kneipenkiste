@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Samttisch, auf dem die Karten liegen (Art Direction §6). Ellipse mit Kante und
+     Cel-Highlight, kein Verlauf — der Samt lebt von der harten Lichtkante. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="400" height="160">
+  <ellipse cx="400" cy="180" rx="384" ry="128" fill="#3E1428"/>
+  <ellipse cx="400" cy="160" rx="384" ry="128" fill="#5B1E3A" stroke="#1A1024" stroke-width="10"/>
+  <!-- Lichtkante oben: das Spotlight fällt von vorn -->
+  <ellipse cx="400" cy="128" rx="300" ry="86" fill="#7A2A50"/>
+  <ellipse cx="400" cy="112" rx="190" ry="52" fill="#8C3660" opacity="0.55"/>
+</svg>

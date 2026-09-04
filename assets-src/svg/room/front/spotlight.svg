@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Spotlight-Kegel von oben (Art Direction §6). Wird mit Alpha 0.18 über alles gelegt;
+     der Verlauf gehört zum Licht, nicht zu einer Figur — dort sind Verläufe verboten. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="300" height="350">
+  <defs>
+    <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF1C4" stop-opacity="0.95"/>
+      <stop offset="70%" stop-color="#FFF1C4" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#FFF1C4" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="pool">
+      <stop offset="40%" stop-color="#FFF1C4" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#FFF1C4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <path d="M258 0 H342 L560 620 H40 Z" fill="url(#cone)"/>
+  <ellipse cx="300" cy="620" rx="270" ry="72" fill="url(#pool)"/>
+</svg>

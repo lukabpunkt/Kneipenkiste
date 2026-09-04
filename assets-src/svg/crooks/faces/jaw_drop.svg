@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gesicht "jaw_drop" — Augen aufgerissen, Mund offen. Die Kinnlade selbst ist ein
+     eigener Sprite (`jaw`), der zu Boden fallen kann (Art Direction §5). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <ellipse cx="27" cy="22" rx="15" ry="17" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <ellipse cx="69" cy="22" rx="15" ry="17" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <circle cx="27" cy="24" r="6" fill="#1A1024"/>
+  <circle cx="69" cy="24" r="6" fill="#1A1024"/>
+  <!-- Offener Mund: dunkles Loch, in das die Kinnlade gehört -->
+  <ellipse cx="48" cy="52" rx="13" ry="10" fill="#1A1024"/>
+</svg>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Staubsauger, der den Tresor leersaugt (Art Direction §4.2, Reset-Animation). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" width="160" height="120">
+  <rect x="14" y="52" width="90" height="54" rx="16" fill="#FF4757" stroke="#1A1024" stroke-width="9"/>
+  <circle cx="40" cy="106" r="12" fill="#1A1024"/>
+  <circle cx="80" cy="106" r="12" fill="#1A1024"/>
+  <path d="M104 70 C130 70 138 52 138 30" stroke="#8C93A8" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <path d="M138 30 L120 6 H156 Z" fill="#8C93A8" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="59" cy="76" r="14" fill="#FFF8E7" stroke="#1A1024" stroke-width="7"/>
+</svg>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ringelshirt-Overlay für den Torso (Art Direction §5). Liegt über dem getinteten
+     Torso und wird selbst NICHT getintet — sonst verschwänden die Streifen. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 112" width="96" height="112">
+  <defs>
+    <clipPath id="stripeClip">
+      <path d="M48 13 C64 13 71 24 73 39 C75 55 79 70 79 82 C79 96 66 100 48 100 C30 100 17 96 17 82 C17 70 21 55 23 39 C25 24 32 13 48 13 Z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#stripeClip)" fill="#FFF8E7">
+    <rect x="10" y="26" width="76" height="11"/>
+    <rect x="10" y="48" width="76" height="11"/>
+    <rect x="10" y="70" width="76" height="11"/>
+    <rect x="10" y="92" width="76" height="11"/>
+  </g>
+</svg>

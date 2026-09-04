@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kassenbuch in Kassels Hand (Art Direction §5). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 64" width="56" height="64">
+  <rect x="6" y="6" width="44" height="52" rx="4" fill="#5B1E3A" stroke="#1A1024" stroke-width="6"/>
+  <rect x="14" y="6" width="36" height="52" rx="3" fill="#FFF8E7" stroke="#1A1024" stroke-width="5"/>
+  <g fill="#8C93A8">
+    <rect x="20" y="18" width="24" height="4" rx="2"/>
+    <rect x="20" y="28" width="24" height="4" rx="2"/>
+    <rect x="20" y="38" width="16" height="4" rx="2"/>
+  </g>
+</svg>

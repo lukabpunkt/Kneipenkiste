@@ -202,12 +202,12 @@ export const STAGE = {
   /** Logische Weltgroesse, aufloesungsunabhaengig. */
   worldSize: 1000,
   /** Radius des Karten-Halbkreises auf dem Samttisch (fix, Art Direction §6). */
-  arcRadius: 380,
+  arcRadius: 400,
   /** Karten werden bei 7-8 Spielern kleiner, der Halbkreis bleibt gleich gross. */
   cardScale: { default: 1, crowded: 0.8 },
   crowdedFrom: 7,
   /** Kamera faehrt auf die aktive Karte. */
-  cardZoom: 1.15,
+  cardZoom: 1.15 as number,
   panMs: 400,
   /** Crook-Hoehe in Welteinheiten, abhaengig von der Spielerzahl. */
   crookHeight: { min: 170, max: 220 } as const,

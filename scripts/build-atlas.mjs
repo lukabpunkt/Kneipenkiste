@@ -21,14 +21,30 @@ const SRC_ROOT = 'assets-src/svg';
 const OUT_DIR = 'public/atlas';
 const MAX_SIZE = 2048;
 
-/** Welche Ordner werden zu welchem Atlas? */
+/**
+ * Welche Ordner werden zu welchem Atlas?
+ *
+ * Gruppiert wird nach **Zeichenreihenfolge**, nicht nach Thema (ADR-14). PixiJS bricht
+ * einen Batch auf, sobald die Textur wechselt; drei Atlanten in der Reihenfolge, in der
+ * die Bühne sie zeichnet, ergeben genau drei Draw-Calls (Audit A2: ≤ 3).
+ *
+ * - `back`   — die Kulisse: Wand, Laser, Tisch, Tresor
+ * - `crooks` — alle Figuren, also auch Herr Kassel
+ * - `front`  — alles davor: Karten, Requisiten und das Licht (Spotlight, Vignette)
+ *
+ * Zwei Konsequenzen, die man beim Zeichnen der Assets im Kopf haben muss:
+ *
+ * 1. Das Licht liegt bei den Karten, nicht beim Raum — es wird zuletzt gezeichnet. Läge
+ *    es im `back`-Atlas, käme dessen Textur ein zweites Mal an die Reihe: ein vierter
+ *    Draw-Call für zwei Sprites.
+ * 2. Die Farbsymbole liegen **doppelt** im Atlas, in `crooks/symbols` und in
+ *    `cards/symbols`. Der Torso holt sie aus dem einen, die Kartenrückseite aus dem
+ *    anderen. Zwei Kilobyte doppelt sind billiger als ein Texturwechsel je Karte.
+ */
 const CATEGORIES = [
-  { name: 'crooks', dir: 'crooks' },
-  { name: 'cards', dir: 'cards' },
-  { name: 'vault', dir: 'vault' },
-  { name: 'room', dir: 'room' },
-  { name: 'props', dir: 'props' },
-  { name: 'kassel', dir: 'kassel' },
+  { name: 'back', dirs: ['room/back', 'vault'] },
+  { name: 'crooks', dirs: ['crooks', 'kassel'] },
+  { name: 'front', dirs: ['cards', 'props', 'room/front'] },
 ];
 
 const SCALES = [
@@ -69,11 +85,22 @@ async function rasterize(file, factor) {
 }
 
 async function buildCategory(category, scale) {
-  const srcDir = path.join(SRC_ROOT, category.dir);
-  if (!existsSync(srcDir)) return null;
-
-  const svgs = await collectSvgs(srcDir);
+  /*
+   * Ein Atlas kann aus mehreren Quellordnern kommen. Der Ordnername bleibt Teil des
+   * Frame-Namens (`vault/wheel`, `cards/back`) — die Bühne fragt also weiterhin nach
+   * dem, was sie meint, und nicht nach der Atlas-Einteilung.
+   */
+  const svgs = [];
+  for (const dir of category.dirs) {
+    const srcDir = path.join(SRC_ROOT, dir);
+    if (!existsSync(srcDir)) continue;
+    const prefix = path.basename(dir);
+    for (const entry of await collectSvgs(srcDir)) {
+      svgs.push({ file: entry.file, name: `${prefix}/${entry.name}` });
+    }
+  }
   if (svgs.length === 0) return null;
+  svgs.sort((a, b) => a.name.localeCompare(b.name));
 
   const images = await Promise.all(
     svgs.map(async ({ file, name }) => ({

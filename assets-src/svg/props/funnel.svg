@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Trichter, mit dem Kassel die Schlücke verteilt (GDD §4.4, steal_multi_anvil). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100" height="120">
+  <path d="M8 12 H92 L60 62 V96 H40 V62 Z" fill="#8C93A8" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M50 12 H92 L60 62 V96 H50 Z" fill="#4A506A"/>
+  <rect x="36" y="94" width="28" height="16" rx="4" fill="#8C93A8" stroke="#1A1024" stroke-width="8"/>
+</svg>

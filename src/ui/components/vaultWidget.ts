@@ -2,15 +2,18 @@
  * Tresor-Widget (Art Direction §4.2) — die DOM-Variante fuer Negotiation und Result.
  *
  * Architektur §8: Das Widget existiert zweimal. Hier als Inline-SVG mit CSS-Animationen,
- * ab M2 zusaetzlich als PIXI-Sprite auf der Buehne. Beide lesen dieselbe Quelle
- * (`assets-src/svg/vault/door.svg`) — ein PIXI-Canvas im Verhandlungs-Screen waere
- * Overkill.
+ * auf der Buehne als PIXI-Sprites. Ein PIXI-Canvas im Verhandlungs-Screen waere Overkill.
+ *
+ * Die beiden Varianten teilen sich bewusst **keine** Datei: Die Buehne muss die Tuer
+ * aufschwingen lassen, dafuer braucht sie Einzelteile (`assets-src/svg/vault/*`). Diese
+ * hier ist ein Stueck (`assets-src/svg/dom/vault-door.svg`) und liegt deshalb ausserhalb
+ * der Atlas-Kategorien.
  *
  * Der Muenzpegel im Fenster steigt mit dem Tresorinhalt: Man soll sehen, worum es geht,
  * bevor man die Zahl liest.
  */
 
-import doorSvg from '../../../assets-src/svg/vault/door.svg?raw';
+import doorSvg from '../../../assets-src/svg/dom/vault-door.svg?raw';
 import type { VaultSpec } from '@/core/vault';
 import { plural, t } from '@/core/i18n';
 import { createFlipCounter, type FlipCounter } from './flipCounter';

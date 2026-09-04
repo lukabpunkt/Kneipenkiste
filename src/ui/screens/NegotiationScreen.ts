@@ -140,6 +140,12 @@ export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
       startKassel();
       // Das Handy liegt auf dem Tisch und wird 30 s nicht angefasst (GDD §5).
       void acquireWakeLock();
+      /*
+       * Die Atlanten laden waehrend geredet wird (Architektur §8). Beim Betreten der
+       * Aufdeckung darf nichts mehr nachgeladen werden — sonst haengt die Show genau in
+       * dem Moment, in dem alle hinschauen.
+       */
+      void import('@/game/StageApp').then((m) => m.preloadStageAssets());
     },
     destroy() {
       done = true;

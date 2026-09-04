@@ -54,6 +54,8 @@ export function createSilenceScreen(ctx: ScreenContext): ScreenInstance {
     activate() {
       ring.start();
       void acquireWakeLock();
+      // Zehn Sekunden reichen fuer die Atlanten (Architektur §8).
+      void import('@/game/StageApp').then((m) => m.preloadStageAssets());
     },
     destroy() {
       done = true;

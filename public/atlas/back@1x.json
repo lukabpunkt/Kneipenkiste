@@ -1,0 +1,303 @@
+{
+  "frames": {
+    "back/table": {
+      "frame": {
+        "x": 3,
+        "y": 3,
+        "w": 390,
+        "h": 141
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 5,
+        "y": 13,
+        "w": 390,
+        "h": 141
+      },
+      "sourceSize": {
+        "w": 400,
+        "h": 160
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vault/frame": {
+      "frame": {
+        "x": 399,
+        "y": 3,
+        "w": 232,
+        "h": 232
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 4,
+        "w": 232,
+        "h": 232
+      },
+      "sourceSize": {
+        "w": 240,
+        "h": 240
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vault/leaf": {
+      "frame": {
+        "x": 3,
+        "y": 150,
+        "w": 192,
+        "h": 192
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 4,
+        "w": 192,
+        "h": 192
+      },
+      "sourceSize": {
+        "w": 200,
+        "h": 200
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vault/dial": {
+      "frame": {
+        "x": 201,
+        "y": 150,
+        "w": 146,
+        "h": 146
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 7,
+        "y": 7,
+        "w": 146,
+        "h": 146
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 160
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "back/wall": {
+      "frame": {
+        "x": 637,
+        "y": 3,
+        "w": 128,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vault/coins5": {
+      "frame": {
+        "x": 771,
+        "y": 3,
+        "w": 128,
+        "h": 100
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 20,
+        "w": 128,
+        "h": 100
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 120
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vault/coins4": {
+      "frame": {
+        "x": 905,
+        "y": 3,
+        "w": 128,
+        "h": 72
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 48,
+        "w": 128,
+        "h": 72
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 120
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vault/coins3": {
+      "frame": {
+        "x": 1039,
+        "y": 3,
+        "w": 128,
+        "h": 59
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 61,
+        "w": 128,
+        "h": 59
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 120
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vault/coins2": {
+      "frame": {
+        "x": 1173,
+        "y": 3,
+        "w": 128,
+        "h": 42
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 78,
+        "w": 128,
+        "h": 42
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 120
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vault/coins1": {
+      "frame": {
+        "x": 1307,
+        "y": 3,
+        "w": 128,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 16,
+        "y": 92,
+        "w": 128,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 120
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vault/wheel": {
+      "frame": {
+        "x": 1441,
+        "y": 3,
+        "w": 110,
+        "h": 110
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 5,
+        "y": 5,
+        "w": 110,
+        "h": 110
+      },
+      "sourceSize": {
+        "w": 120,
+        "h": 120
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "back/laser": {
+      "frame": {
+        "x": 1307,
+        "y": 37,
+        "w": 64,
+        "h": 4
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 4,
+        "w": 64,
+        "h": 4
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 12
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "app": "http://github.com/odrick/free-tex-packer-core",
+    "version": "0.3.9",
+    "image": "back@1x.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 2048,
+      "h": 512
+    },
+    "scale": 1
+  }
+}

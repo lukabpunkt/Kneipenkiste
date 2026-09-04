@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Tresorrahmen mit dunklem Inneren. Der Rahmen bleibt stehen, wenn die Tür aufschwingt. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <circle cx="120" cy="120" r="116" fill="#1A1024"/>
+  <circle cx="120" cy="120" r="108" fill="#4A506A"/>
+  <circle cx="120" cy="120" r="96" fill="#1A1024"/>
+  <circle cx="120" cy="120" r="88" fill="#0B0A14"/>
+  <!-- Nietenkranz auf dem Rahmen -->
+  <g fill="#8C93A8" stroke="#1A1024" stroke-width="4">
+    <circle cx="120" cy="18" r="7"/>
+    <circle cx="192" cy="48" r="7"/>
+    <circle cx="222" cy="120" r="7"/>
+    <circle cx="192" cy="192" r="7"/>
+    <circle cx="120" cy="222" r="7"/>
+    <circle cx="48" cy="192" r="7"/>
+    <circle cx="18" cy="120" r="7"/>
+    <circle cx="48" cy="48" r="7"/>
+  </g>
+</svg>
