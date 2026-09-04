@@ -3,7 +3,7 @@
 | Meilenstein | Status | Tag | Audit |
 |---|---|---|---|
 | M0 Setup & Regelkern | ✅ fertig (⏳ 3 manuelle Checks offen) | `v0.0.1` | A0 bestanden |
-| M1 UI-Flow (DOM-Halle) | ⬜ offen | – | – |
+| M1 UI-Flow (DOM-Halle) | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.1.0` | A1 bestanden |
 | M2 PIXI-Halle, Koffer, Charaktere | ⬜ offen | – | – |
 | M3 Hinweise, Schranke, Audio | ⬜ offen | – | – |
 | M4 Röntgen-Sequenzen | ⬜ offen | – | – |
@@ -53,3 +53,42 @@ Drei ADRs (`docs/DECISIONS.md`): ADR-7 (ungeöffneter Diplomat passiert die Schr
 
 ### Aus Drinkshot übernommen
 `core/store.ts`, `core/rng.ts` (um `RandomSource`/`SECURE_RNG` erweitert), `core/i18n.ts` (um `tList()` für die Fragevorschläge erweitert), `styles/base.css`, Fonts, Icons, ESLint-/Prettier-/TS-Konfiguration, CI-Grundgerüst.
+
+## Audit A1 — 2026-09-04
+
+**Ergebnis:** BESTANDEN (alle automatisierbaren MUSS-Checks grün; 2 Checks brauchen echte Menschen bzw. Lukas Gerät)
+
+| Check | Status | Notiz |
+|---|---|---|
+| E2E-Szenarien aus M1.7 grün (iPhone 12 + Pixel 5) | ✅ | 20 E2E auf beiden Geräten. Runde 1: Fang (8 Schlücke) + Belästigung + Gate-Schmuggler → Banner `gotThrough`. Runde 2: ehrliche Runde durchgewunken → `honestRound`, niemand trinkt, alle Hinweise gelogen. Runde 3: Bestechung angenommen (Koffer nicht mehr tippbar) + Diplomat geöffnet (Beamter trinkt 3). |
+| Pack: Stepper 0–6, Risiko-Zeile korrekt, kein fremdes Ergebnis sichtbar, Bedenkzeit → 0 | ✅ | Risiko-Zeile im E2E geprüft (`Erwischt = 8 Schlücke · Durch = 4 verteilen`); der Screen bekommt nur `ownPack()`. Bedenkzeit-Fallback packt 0 und zeigt einen Toast. |
+| Hall: Hinweis-Icons an den richtigen Koffern, ohne Menge/Truthful; Countdown; „Nochmal ansehen" max 1×; Bestechung sperrt | ✅ | Hinweise werden einzeln freigeschaltet; `publicView` enthält weder Menge noch `truthful`. Replay-Zähler aus `HINT_REPLAY_LIMIT`. |
+| Inspect: max k Öffnungen; gesperrte/offene Koffer nicht tippbar; „Durchwinken" jederzeit; Banner korrekt | ✅ | k=2 bei 5 Spielern im E2E geprüft; bezahlter Koffer ist im DOM kein Button mehr. |
+| Gate: Reihenfolge sauber → Schmuggler; Mengen erst hier sichtbar | ✅ | Reihenfolge in `round.test.ts` über 100 Seeds; im E2E erscheint das `DURCHGEKOMMEN`-Banner erst an der Schranke. |
+| Distribute: Beamter zuerst; nicht an sich selbst; Summe stimmt | ✅ | `ownersInOrder()` setzt den Beamten an Position 1 (Test in `fsm.test.ts`); der eigene Eintrag fehlt in der Liste; „Fertig" bleibt gesperrt, bis alle Tokens vergeben sind. |
+| Result: Banner, Koffer-Übersicht, Hinweis-Auflösung, Statistik nach 5 Runden | ✅ | Screenshot `docs/screens/m1-result.png`. Statistik-Test über fünf Runden mit von Hand nachgerechneten Erwartungen (`session.test.ts`). |
+| Koffer-Touch-Ziele ≥ 56 px | ✅ | Eigener E2E-Test misst jede Karte auf beiden Geräten. |
+| Safe-Areas, Reload-Persistenz, Back-Dialog | ✅ | Safe-Areas über Tokens; Session (Spieler, Namen, Farben, Modi) überlebt den Neustart (`session.test.ts`); Zurück-Taste öffnet „Runde abbrechen?". |
+| Kein hardcodierter UI-Text | ✅ | Alle Strings über `t()`/`tList()`; DE und EN haben identische Keys (150), kein Wert leer. |
+| Unbeteiligte Person versteht jeden Screen; erkennt, dass nur der Beamte tippen darf | ⏳ manuell | Alle Knöpfe des Beamten tragen seine Farbe **und** sein Symbol (`createOfficerButton`); braucht trotzdem echte Menschen. |
+| Party-Tauglichkeit auf echtem Gerät | ⏳ manuell | Läuft in der Emulation beider Referenzgeräte. |
+
+### Was in M1 gefunden und behoben wurde
+Sechs Fehler, die nur beim echten Durchspielen auffielen:
+1. **Nach der ersten Öffnung war kein Koffer mehr tippbar.** Bei `INSPECT → INSPECT` wechselt der Router den Screen nicht, und `render()` lief nach dem Freigeben des Boards nicht erneut — der Beamte hätte seine zweite Öffnung nie nutzen können.
+2. **Die Countdown-Zahl war unsichtbar**, weil der `::after`-Kreis des Rings sie überdeckte.
+3. **Die Status-Zeile der Halle** war gebaut, aber nie ins DOM gehängt.
+4. **Das Dev-Panel wurde bei jedem Screenwechsel weggeräumt** (`mount()` leert den Host) und fing außerdem Klicks auf den darunterliegenden Knöpfen ab.
+5. **Eine frische Session erzwang Deutsch**, statt der Browsersprache zu folgen.
+6. **„Der tickt Koffer war sauber"** — die Hinweis-Auflösung setzte das Icon-Label (ein Verb) in eine Nominalphrase. Jetzt gibt es `hintSubject.*` und der Satz liest sich wie im GDD.
+
+Dazu eine Regression aus dem Umräumen der Stylesheets: Die `.screen`-Basisregel ging verloren, wodurch Screens den Rahmen überliefen.
+
+### Bundle
+JS 77,2 KB → **24,8 KB gzip**, CSS 24,6 KB → 5,6 KB gzip (Budget 450 KB JS). Die PIXI-Halle kommt erst in M2 und wird als eigener Chunk nachgeladen.
+
+**Offene SOLL-Follow-ups:** keine.
+
+**Manuelle Checks für Luka vor M2:**
+- [ ] Eine Runde zu fünft auf einem echten Handy spielen: Versteht der Tisch die Screens ohne Erklärung? Ist klar, dass nur der Beamte tippt?
+- [ ] Ist das Verhör mit 45 s zu lang oder zu kurz? (Wert steht in `rules.ts`, Änderung braucht nur einen ADR.)

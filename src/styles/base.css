@@ -201,39 +201,3 @@ button {
   border: 0;
 }
 
-/* ------------------------------------------------------------------ */
-/* Title (M0 — der volle Flow kommt in M1)                             */
-/* ------------------------------------------------------------------ */
-
-.screen {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.screen--title {
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  padding: var(--space-6);
-  text-align: center;
-}
-
-.title__logo {
-  font-size: var(--fs-2xl);
-  color: var(--c-customs);
-  text-shadow: var(--sticker-shadow);
-}
-
-.title__tagline {
-  margin: 0;
-  max-width: 22ch;
-  color: rgb(255 248 231 / 78%);
-}
-
-.title__version {
-  margin: 0;
-  font-size: var(--fs-xs);
-  color: rgb(255 248 231 / 35%);
-}

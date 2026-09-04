@@ -35,15 +35,13 @@ jobs:
         run: npm run test:coverage
 
       - name: Informationssicherheit (Standing Audit)
-        # Kein Screen und kein Director darf `round.packs`, `diplomatId` oder `truthful`
-        # anfassen. Der Vitest-Lauf prueft das ebenfalls; hier steht es als eigener,
-        # sofort lesbarer Schritt, weil daran das Gameplay haengt.
+        # Kein Screen und kein Director greift an `publicView` vorbei auf die Runde zu.
+        # `publicView.test.ts` prueft dasselbe genauer (inkl. erlaubtem Reveal); hier
+        # steht die grobe Variante als eigener, sofort lesbarer Schritt.
         run: |
-          if [ -d src/ui ] || [ -d src/game ]; then
-            if grep -rnE '\.packs\b|\bdiplomatId\b|truthful' src/ui src/game 2>/dev/null; then
-              echo "::error::Ein Screen oder Director liest geheime Rundendaten."
-              exit 1
-            fi
+          if grep -rnE '\.packs\b|context\.round\b' src/ui src/game 2>/dev/null; then
+            echo "::error::Ein Screen oder Director greift direkt auf die Runde zu."
+            exit 1
           fi
           echo "OK — Screens sehen nur publicView."
 

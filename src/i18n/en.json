@@ -32,13 +32,30 @@
     "tooFewPlayers": "Two travellers and one officer — that's not customs, that's a coin toss. Get someone else.",
     "addPlayer": "Add player",
     "interrogationDuration": "Interrogation",
-    "packTimer": "Thinking time"
+    "packTimer": "Thinking time",
+    "officerNextLabel": "Officer round {round}:",
+    "changeColor": "Change {name}'s colour",
+    "playerName": "Name",
+    "removePlayer": "Remove {name}",
+    "timerOff": "off"
   },
   "modes": {
-    "bribery": { "name": "Bribery", "hint": "Travellers may openly offer the officer tokens." },
-    "sniffer": { "name": "Sniffer dog", "hint": "Waldi gives one reliable hint — at the cost of one opening." },
-    "diplomat": { "name": "Diplomat", "hint": "One traveller secretly has immunity." },
-    "highSeason": { "name": "High season", "hint": "Smuggle up to 10 items, one extra opening." }
+    "bribery": {
+      "name": "Bribery",
+      "hint": "Travellers may openly offer the officer tokens."
+    },
+    "sniffer": {
+      "name": "Sniffer dog",
+      "hint": "Waldi gives one reliable hint — at the cost of one opening."
+    },
+    "diplomat": {
+      "name": "Diplomat",
+      "hint": "One traveller secretly has immunity."
+    },
+    "highSeason": {
+      "name": "High season",
+      "hint": "Smuggle up to 10 items, one extra opening."
+    }
   },
   "officerIntro": {
     "headline": "{name} is the customs officer.",
@@ -59,7 +76,10 @@
     "risk": "Caught = {caught} sips · Through = hand out {tokens}",
     "riskClean": "Clean. No risk, no loot.",
     "immunity": "You have diplomatic immunity. They don't know.",
-    "timeout": "Time's up — your case stays clean."
+    "timeout": "Time's up — your case stays clean.",
+    "decrease": "One item less",
+    "increase": "One item more",
+    "amountLabel": "{amount} items of contraband"
   },
   "packed": {
     "headline": "All cases closed.",
@@ -76,7 +96,9 @@
     "bribeAccepted": "Paid",
     "bribeSpeech": "I'll give you {amount} to hand out if you don't open mine.",
     "dogBark": "Waldi barks.",
-    "dogQuiet": "Waldi moves on."
+    "dogQuiet": "Waldi moves on.",
+    "officerNote": "Officer",
+    "hintsRunning": "The luggage rolls in …"
   },
   "hints": {
     "wobble": "wobbled",
@@ -102,7 +124,10 @@
     "scanning": "Scanning …",
     "bannerCaught": "{name} BUSTED · drinks {sips}",
     "bannerClean": "HARASSMENT · {officer} drinks {sips}",
-    "bannerDiplomat": "DIPLOMAT · {officer} drinks {sips}"
+    "bannerDiplomat": "DIPLOMAT · {officer} drinks {sips}",
+    "pickSuitcase": "Which case?",
+    "revealClean": "Socks, a toothbrush, a teddy.",
+    "revealDiplomat": "A diplomatic passport."
   },
   "gate": {
     "headline": "Gate",
@@ -111,12 +136,14 @@
     "stampBusted": "BUSTED",
     "stampHarassment": "HARASSMENT",
     "bannerThrough": "{name} GOT THROUGH · hands out {tokens}",
-    "bannerOk": "{name} passes."
+    "bannerOk": "{name} passes.",
+    "stampThrough": "Got through"
   },
   "distribute": {
     "headline": "{name} hands out {tokens}",
     "hint": "Tap = +1, long press = −1. Not to yourself.",
-    "done": "Done"
+    "done": "Done",
+    "giveTo": "{name}: {sips}"
   },
   "result": {
     "banner": {
@@ -136,8 +163,8 @@
     "hintResolution": "Hints",
     "hintTrue": "was true",
     "hintFalse": "lied",
-    "hintTrueLine": "The case that {hint}: {amount} — good nose.",
-    "hintFalseLine": "The case that {hint} was clean. Fell for it.",
+    "hintTrueLine": "{hint}: {amount} — good nose.",
+    "hintFalseLine": "{hint} was clean. Fell for it.",
     "stats": "Statistics",
     "statSmuggled": "Smuggled across",
     "statCaught": "Caught",
@@ -147,14 +174,31 @@
     "bestNose": "Best nose",
     "nextRound": "Next round",
     "changePlayers": "Change players",
-    "changeMode": "Change mode"
+    "changeMode": "Change mode",
+    "reason": {
+      "caught": "busted · drinks {sips}",
+      "harassment": "harassment · drinks {sips}",
+      "diplomat": "diplomat · drinks {sips}"
+    }
   },
   "rules": {
     "headline": "Rules",
-    "pack": { "title": "Packing", "body": "Every traveller secretly packs 0 to 6 items of contraband. 0 is clean and safe. More is more risk and more loot." },
-    "hints": { "title": "Hints lie sometimes", "body": "The officer sees small hints on the cases. They are only mostly right — and they never reveal how much is inside." },
-    "inspect": { "title": "Interrogation & inspection", "body": "The officer asks, everyone answers. Then they open up to k cases in the scanner. Busted means drinking double; opening an innocent case means the officer drinks." },
-    "payout": { "title": "Payout", "body": "Whoever gets through hands out one sip per item. The officer keeps what they catch." }
+    "pack": {
+      "title": "Packing",
+      "body": "Every traveller secretly packs 0 to 6 items of contraband. 0 is clean and safe. More is more risk and more loot."
+    },
+    "hints": {
+      "title": "Hints lie sometimes",
+      "body": "The officer sees small hints on the cases. They are only mostly right — and they never reveal how much is inside."
+    },
+    "inspect": {
+      "title": "Interrogation & inspection",
+      "body": "The officer asks, everyone answers. Then they open up to k cases in the scanner. Busted means drinking double; opening an innocent case means the officer drinks."
+    },
+    "payout": {
+      "title": "Payout",
+      "body": "Whoever gets through hands out one sip per item. The officer keeps what they catch."
+    }
   },
   "settings": {
     "headline": "Settings",
@@ -173,5 +217,23 @@
     "body": "The cases will not be inspected.",
     "confirm": "Abandon",
     "dismiss": "Keep playing"
+  },
+  "items": {
+    "ducks": "{count} rubber ducks",
+    "cheese": "{count} wheels of cheese",
+    "gnomes": "{count} garden gnomes",
+    "flamingos": "{count} flamingos",
+    "pineapples": "{count} pineapples",
+    "sombreros": "{count} sombreros",
+    "cuckoo": "{count} cuckoo clocks",
+    "cacti": "{count} cacti"
+  },
+  "hintSubject": {
+    "wobble": "The wobbling case",
+    "drip": "The dripping case",
+    "heavy": "The heavy case",
+    "click": "The ticking case",
+    "feather": "The case with the feather",
+    "dog": "The sniffed case"
   }
 }

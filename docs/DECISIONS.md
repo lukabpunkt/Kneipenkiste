@@ -28,3 +28,12 @@ Kontext: CLAUDE.md verlangt `crypto.getRandomValues` für Hinweise, Diplomat und
 
 ## ADR-9 · 2026-09-04 · Ein Tap auf einen gesperrten Koffer wird still verworfen
 Kontext: `inspect()` wirft bei geöffneten, bezahlten oder überzähligen Koffern — die FSM reichte das als Exception durch und hätte eine Runde beenden können. Entscheidung: `send({type:'inspectSuitcase'})` prüft vorher `canInspect()` und gibt sonst `false` zurück; die reine Funktion wirft weiterhin. Konsequenz: Ein verirrter Tap kostet nichts, echte Regelverstöße im Kern fallen weiterhin sofort auf.
+
+## ADR-10 · 2026-09-04 · Screens kommen nur über eine Schleuse an die Runde
+Kontext: „Screens bekommen ausschließlich `publicView`" war eine Regel, die jeder Screen einzeln einhalten musste — und die erste unachtsame Zeile hätte sie gebrochen. Entscheidung: `ScreenContext` bietet `view(phase)`, `ownPack(id)` und `reveal()`; die Projektion passiert an genau einer Stelle in `app.ts`, kein Screen fasst `fsm.context.round` an. Konsequenz: `publicView.test.ts` prüft das strukturell (kein `context.round`, kein Selbst-Import von `core/publicView`), nicht mehr nur per Wortlaut-grep. Der Result-Screen darf `truthful` zeigen — das ist der Reveal, und der Test erlaubt ihn nur über `ctx.reveal()`.
+
+## ADR-11 · 2026-09-04 · Das Dev-Panel liegt in `src/dev/`, nicht in `src/ui/`
+Kontext: Das Debug-Panel muss Mengen, Diplomat und `truthful` aufdecken können — genau das, was der Lint-Test in `src/ui/` verbietet. Entscheidung: Eigener Ordner `src/dev/`, außerhalb der geprüften Bereiche; das Panel hängt neben dem Router-Host, weil `mount()` den Host bei jedem Screenwechsel leert. Konsequenz: Der Audit-Test bleibt streng, ohne Ausnahmeliste.
+
+## ADR-12 · 2026-09-04 · Seed-Steuerung nur im Dev-Build
+Kontext: E2E-Tests brauchen reproduzierbare Runden, produktiv müssen Hinweise, Diplomat und Item-Set über `crypto` fallen (CLAUDE.md). Entscheidung: `?dev=1&seed=123` injiziert einen `createSeededRng` in die FSM; ohne `dev=1` wird der Parameter ignoriert. Konsequenz: Die drei M1.7-Szenarien sind deterministisch, eine URL kann das Spiel aber nicht manipulieren.

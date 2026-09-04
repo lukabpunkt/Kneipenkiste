@@ -158,14 +158,22 @@ describe('resultView', () => {
   });
 });
 
-describe('Lint: kein Screen fasst geheime Felder an', () => {
+describe('Lint: Screens sehen nur publicView', () => {
   /*
-   * Der Test aus dem Standing Audit. Er laeuft ueber `src/ui/` und `src/game/`, weil dort
-   * ab M1 die Screens und ab M2 die Directors liegen — beide duerfen ausschliesslich mit
-   * `publicView` arbeiten.
+   * Der Test aus dem Standing Audit — praeziser als ein blosses grep nach Wortlauten.
+   *
+   * Erlaubt ist genau ein Weg an die Runde: die drei Projektionen aus `core/publicView`.
+   * Verboten ist alles, was daran vorbeigeht. `truthful` und `diplomatId` duerfen
+   * vorkommen — aber nur in der Datei, die den Reveal baut, und nur aus `resultView`:
+   * Das Aufloesen der Hinweise **ist** der Result-Screen (GDD §3.8).
+   *
+   * Kommentare werden vorher entfernt: Eine Datei, die die Regel erklaert, verletzt sie nicht.
    */
   const roots = ['src/ui', 'src/game'];
-  const forbidden = [/\.packs\b/, /\bdiplomatId\b/, /truthful/];
+
+  function stripComments(source: string): string {
+    return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+  }
 
   function walk(dir: string, out: string[] = []): string[] {
     let entries: string[];
@@ -182,16 +190,44 @@ describe('Lint: kein Screen fasst geheime Felder an', () => {
     return out;
   }
 
-  it('findet weder `round.packs` noch `diplomatId` noch `truthful`', () => {
-    const offenders: string[] = [];
-    for (const root of roots) {
-      for (const file of walk(root)) {
-        const source = readFileSync(file, 'utf8');
-        for (const pattern of forbidden) {
-          if (pattern.test(source)) offenders.push(`${file}: ${pattern}`);
-        }
-      }
-    }
+  const files = roots.flatMap((root) => walk(root)).map((file) => ({
+    file,
+    code: stripComments(readFileSync(file, 'utf8')),
+  }));
+
+  it('findet Dateien zum Pruefen', () => {
+    expect(files.length).toBeGreaterThan(10);
+  });
+
+  it('fasst nirgends `packs` an', () => {
+    expect(files.filter(({ code }) => /\.packs\b/.test(code)).map((f) => f.file)).toEqual([]);
+  });
+
+  it('greift nirgends direkt auf die Runde zu', () => {
+    /* `context.round` waere das Schlupfloch, durch das alles andere nachkommt. */
+    const offenders = files
+      .filter(({ code }) => /context\.round\b/.test(code))
+      .map((f) => f.file);
+    expect(offenders).toEqual([]);
+  });
+
+  it('liest `truthful` und `diplomatId` nur aus dem Reveal', () => {
+    const offenders = files
+      .filter(({ code }) => /\btruthful\b|\bdiplomatId\b/.test(code))
+      .filter(({ code }) => !/ctx\.reveal\(\)/.test(code))
+      .map((f) => f.file);
+    expect(offenders).toEqual([]);
+  });
+
+  it('holt die Runde ausschliesslich ueber die Projektionen', () => {
+    /*
+     * Ein Screen, der `publicView`, `packView` oder `resultView` selbst importiert,
+     * haette auch das `Round`-Objekt in der Hand. Die Schleuse sitzt in `app.ts`.
+     */
+    const offenders = files
+      .filter(({ code }) => /from '@\/core\/publicView'/.test(code))
+      .filter(({ code }) => !/^import type/m.test(code))
+      .map((f) => f.file);
     expect(offenders).toEqual([]);
   });
 });

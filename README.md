@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Bluffspiel für 4–8 Personen. Alle sind Reisen
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot), [Der Tresor](https://github.com/lukabpunkt/Tresor) und [Sprengmeister](https://github.com/lukabpunkt/Sprengmeister) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M0 fertig (`v0.0.1`) — Regelkern komplett und getestet, Projekt läuft. Als Nächstes M1 (kompletter UI-Flow mit DOM-Platzhalter-Halle).
+**Status:** M1 fertig (`v0.1.0`) — von der Lobby bis zum Result durchspielbar, Halle/Kontrolle/Schranke noch als DOM-Platzhalter. **Ab hier auf einer Party spielbar.** Als Nächstes M2 (PIXI-Halle).
 
 ## Planung
 
@@ -27,16 +27,18 @@ Vite 6 · TypeScript · PixiJS v8 · GSAP 3 · howler.js · vite-plugin-pwa · V
 ```
 npm install
 npm run dev          # Vite --host
-npm test             # typecheck + lint + 181 Unit-Tests
+npm test             # typecheck + lint + 203 Unit-Tests
 npm run test:e2e     # Playwright, iPhone 12 + Pixel 5
 ```
 
 Läuft auf Port 4173 schon etwas anderes: `PREVIEW_PORT=4183 npm run test:e2e`.
+
+**Dev-Modus:** `?dev=1` blendet ein Panel mit Zustand, Seed und „reveal" ein (deckt Mengen, Diplomat und die Wahrheit hinter den Hinweisen auf). `?dev=1&seed=123` macht eine Runde reproduzierbar — produktiv würfeln Hinweise, Diplomat und Item-Set immer über `crypto`.
 
 ### Nächster Meilenstein
 
 ```
 cd /Users/lukabloemendal/Documents/Zoll
 claude
-> Lies CLAUDE.md und docs/. Setze Milestone M1 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A1 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
+> Lies CLAUDE.md und docs/. Setze Milestone M2 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A2 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
 ```

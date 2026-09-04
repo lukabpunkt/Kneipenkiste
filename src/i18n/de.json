@@ -32,13 +32,30 @@
     "tooFewPlayers": "Zwei Reisende und ein Beamter — das ist kein Zoll, das ist ein Münzwurf. Holt noch jemanden.",
     "addPlayer": "Spieler hinzufügen",
     "interrogationDuration": "Verhör",
-    "packTimer": "Bedenkzeit"
+    "packTimer": "Bedenkzeit",
+    "officerNextLabel": "Beamter Runde {round}:",
+    "changeColor": "Farbe von {name} ändern",
+    "playerName": "Name",
+    "removePlayer": "{name} entfernen",
+    "timerOff": "aus"
   },
   "modes": {
-    "bribery": { "name": "Bestechung", "hint": "Reisende dürfen dem Beamten öffentlich Tokens anbieten." },
-    "sniffer": { "name": "Spürhund", "hint": "Waldi gibt einen verlässlichen Hinweis — dafür eine Öffnung weniger." },
-    "diplomat": { "name": "Diplomat", "hint": "Ein Reisender hat geheim Immunität." },
-    "highSeason": { "name": "Hochsaison", "hint": "Bis zu 10 Stück schmuggeln, eine Öffnung mehr." }
+    "bribery": {
+      "name": "Bestechung",
+      "hint": "Reisende dürfen dem Beamten öffentlich Tokens anbieten."
+    },
+    "sniffer": {
+      "name": "Spürhund",
+      "hint": "Waldi gibt einen verlässlichen Hinweis — dafür eine Öffnung weniger."
+    },
+    "diplomat": {
+      "name": "Diplomat",
+      "hint": "Ein Reisender hat geheim Immunität."
+    },
+    "highSeason": {
+      "name": "Hochsaison",
+      "hint": "Bis zu 10 Stück schmuggeln, eine Öffnung mehr."
+    }
   },
   "officerIntro": {
     "headline": "{name} ist Zollbeamter.",
@@ -59,7 +76,10 @@
     "risk": "Erwischt = {caught} Schlücke · Durch = {tokens} verteilen",
     "riskClean": "Sauber. Kein Risiko, keine Beute.",
     "immunity": "Du hast diplomatische Immunität. Sie wissen es nicht.",
-    "timeout": "Zeit abgelaufen — dein Koffer bleibt sauber."
+    "timeout": "Zeit abgelaufen — dein Koffer bleibt sauber.",
+    "decrease": "Ein Stück weniger",
+    "increase": "Ein Stück mehr",
+    "amountLabel": "{amount} Stück Schmuggelware"
   },
   "packed": {
     "headline": "Alle Koffer geschlossen.",
@@ -76,7 +96,9 @@
     "bribeAccepted": "Bezahlt",
     "bribeSpeech": "Ich gebe dir {amount} zu verteilen, wenn du mich nicht öffnest.",
     "dogBark": "Waldi bellt.",
-    "dogQuiet": "Waldi geht weiter."
+    "dogQuiet": "Waldi geht weiter.",
+    "officerNote": "Beamter",
+    "hintsRunning": "Das Gepäck rollt ein …"
   },
   "hints": {
     "wobble": "wackelte",
@@ -102,7 +124,10 @@
     "scanning": "Röntgen läuft …",
     "bannerCaught": "{name} ERWISCHT · trinkt {sips}",
     "bannerClean": "BELÄSTIGUNG · {officer} trinkt {sips}",
-    "bannerDiplomat": "DIPLOMAT · {officer} trinkt {sips}"
+    "bannerDiplomat": "DIPLOMAT · {officer} trinkt {sips}",
+    "pickSuitcase": "Welcher Koffer?",
+    "revealClean": "Socken, Zahnbürste, ein Teddy.",
+    "revealDiplomat": "Ein Diplomatenpass."
   },
   "gate": {
     "headline": "Schranke",
@@ -111,12 +136,14 @@
     "stampBusted": "ERWISCHT",
     "stampHarassment": "BELÄSTIGUNG",
     "bannerThrough": "{name} DURCHGEKOMMEN · verteilt {tokens}",
-    "bannerOk": "{name} passiert."
+    "bannerOk": "{name} passiert.",
+    "stampThrough": "Durchgekommen"
   },
   "distribute": {
     "headline": "{name} verteilt {tokens}",
     "hint": "Tippen = +1, lange drücken = −1. Nicht an dich selbst.",
-    "done": "Fertig"
+    "done": "Fertig",
+    "giveTo": "{name}: {sips}"
   },
   "result": {
     "banner": {
@@ -136,8 +163,8 @@
     "hintResolution": "Hinweise",
     "hintTrue": "stimmte",
     "hintFalse": "log",
-    "hintTrueLine": "Der {hint} Koffer: {amount} — guter Riecher.",
-    "hintFalseLine": "Der {hint} Koffer war sauber. Reingefallen.",
+    "hintTrueLine": "{hint}: {amount} — guter Riecher.",
+    "hintFalseLine": "{hint} war sauber. Reingefallen.",
     "stats": "Statistik",
     "statSmuggled": "Über die Grenze gebracht",
     "statCaught": "Erwischt",
@@ -147,14 +174,31 @@
     "bestNose": "Bester Riecher",
     "nextRound": "Nächste Runde",
     "changePlayers": "Spieler ändern",
-    "changeMode": "Modus ändern"
+    "changeMode": "Modus ändern",
+    "reason": {
+      "caught": "erwischt · trinkt {sips}",
+      "harassment": "Belästigung · trinkt {sips}",
+      "diplomat": "Diplomat · trinkt {sips}"
+    }
   },
   "rules": {
     "headline": "Regeln",
-    "pack": { "title": "Packen", "body": "Jeder Reisende packt heimlich 0 bis 6 Stück Schmuggelware. 0 ist sauber und sicher. Mehr ist mehr Risiko und mehr Beute." },
-    "hints": { "title": "Hinweise lügen manchmal", "body": "Der Beamte sieht kleine Hinweise an den Koffern. Sie stimmen nur meistens — und sie verraten nie, wie viel drin ist." },
-    "inspect": { "title": "Verhör & Kontrolle", "body": "Der Beamte fragt, alle antworten. Dann öffnet er bis zu k Koffer im Röntgengerät. Erwischt heißt doppelt trinken, unschuldig geöffnet heißt: der Beamte trinkt." },
-    "payout": { "title": "Auszahlung", "body": "Wer durchkommt, verteilt einen Schluck je Stück. Der Beamte bekommt, was er fängt." }
+    "pack": {
+      "title": "Packen",
+      "body": "Jeder Reisende packt heimlich 0 bis 6 Stück Schmuggelware. 0 ist sauber und sicher. Mehr ist mehr Risiko und mehr Beute."
+    },
+    "hints": {
+      "title": "Hinweise lügen manchmal",
+      "body": "Der Beamte sieht kleine Hinweise an den Koffern. Sie stimmen nur meistens — und sie verraten nie, wie viel drin ist."
+    },
+    "inspect": {
+      "title": "Verhör & Kontrolle",
+      "body": "Der Beamte fragt, alle antworten. Dann öffnet er bis zu k Koffer im Röntgengerät. Erwischt heißt doppelt trinken, unschuldig geöffnet heißt: der Beamte trinkt."
+    },
+    "payout": {
+      "title": "Auszahlung",
+      "body": "Wer durchkommt, verteilt einen Schluck je Stück. Der Beamte bekommt, was er fängt."
+    }
   },
   "settings": {
     "headline": "Einstellungen",
@@ -173,5 +217,23 @@
     "body": "Die Koffer werden nicht kontrolliert.",
     "confirm": "Abbrechen",
     "dismiss": "Weiterspielen"
+  },
+  "items": {
+    "ducks": "{count} Gummienten",
+    "cheese": "{count} Käselaibe",
+    "gnomes": "{count} Gartenzwerge",
+    "flamingos": "{count} Flamingos",
+    "pineapples": "{count} Ananas",
+    "sombreros": "{count} Sombreros",
+    "cuckoo": "{count} Kuckucksuhren",
+    "cacti": "{count} Kaktusse"
+  },
+  "hintSubject": {
+    "wobble": "Der wackelnde Koffer",
+    "drip": "Der tropfende Koffer",
+    "heavy": "Der schwere Koffer",
+    "click": "Der tickende Koffer",
+    "feather": "Der Koffer mit der Feder",
+    "dog": "Der beschnüffelte Koffer"
   }
 }

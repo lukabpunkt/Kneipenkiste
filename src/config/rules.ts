@@ -133,6 +133,20 @@ export const PASS_TAP_LOCK_MS = 800;
 /** "Nochmal ansehen" der Hinweise: genau einmal pro Runde (GDD §3.3). */
 export const HINT_REPLAY_LIMIT = 1;
 
+/** Long-Press-Auto-Repeat im Pack-Stepper (Art Direction §4.2). */
+export const STEPPER_REPEAT_MS = { initial: 300, interval: 90 } as const;
+
+/**
+ * Wie lange der Knopf auf dem Packed-Screen taub bleibt.
+ *
+ * Er sitzt an derselben Stelle wie "Koffer schliessen" davor — ohne Sperre reicht ein
+ * Doppeltap durch, und die Hinweise laufen, bevor das Handy in der Mitte liegt.
+ */
+export const PACKED_ARM_MS = 400;
+
+/** Wie lange ein Banner nach Kontrolle oder Schranke stehen bleibt (ms). */
+export const BANNER_MS = 2200;
+
 /* ------------------------------------------------------------------ */
 /* Settings (Architektur §4)                                           */
 /* ------------------------------------------------------------------ */

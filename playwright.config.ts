@@ -13,6 +13,12 @@ export default defineConfig({
   workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
+  /*
+   * Eine gespielte Runde dauert echte Zeit: Hinweise laufen ab, der Scan stockt bei 50 %,
+   * Banner stehen. Playwrights 30-s-Standard geht von statischen Seiten aus — hier waere
+   * er eine Zeitmessung des Spiels, nicht ein Test seiner Funktion.
+   */
+  timeout: 120_000,
   expect: { timeout: 10_000 },
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
   use: { baseURL: BASE_URL, trace: 'on-first-retry' },

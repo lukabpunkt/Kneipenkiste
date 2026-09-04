@@ -169,13 +169,34 @@ export const PARTICLE_BUDGET = {
 /* Motion (Art Direction §7, wie Drinkshot)                            */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Timings der **DOM-Schicht** in Millisekunden (`Element.animate`, CSS).
+ * Die Buehnen-Timings der PIXI-Sequenzen stehen in Sekunden in `config/choreo.ts` —
+ * das ist die Einheit, die GSAP erwartet.
+ */
 export const MOTION = {
-  fast: 0.12,
-  base: 0.26,
-  slow: 0.42,
-  wipe: 0.32,
-  sheet: 0.26,
+  fast: 120, // Tap-Feedback
+  base: 260, // Screen-Elemente
+  slow: 420, // grosse Panels
+  /** Screen-Wipe zwischen den Screens. */
+  wipeMs: 320,
+  /** Bottom-Sheet Slide-up. */
+  sheetMs: 260,
+  sheetEase: 'cubic-bezier(.2,.9,.3,1.2)',
+  /** Result: Zahlen zaehlen hoch, Balken wachsen. */
+  countUpMs: 620,
+  /** Versatz zwischen zwei Zeilen — Listen bauen sich von oben auf. */
+  staggerMs: 70,
+  /* GSAP-Easings fuer die Buehne (M2+). */
   easeOvershoot: 'back.out(1.7)',
   easeSnappy: 'power2.inOut',
   easeDrop: 'power2.in',
 } as const;
+
+/** Alias fuer die DOM-Helfer in `ui/animate.ts` — dieselben Werte, sprechender Name. */
+export const UI_TIMING = MOTION;
+
+/** Hex-Zahl → CSS-Farbstring. */
+export function hex(value: number): string {
+  return `#${value.toString(16).padStart(6, '0')}`;
+}
