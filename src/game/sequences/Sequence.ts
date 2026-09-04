@@ -100,11 +100,12 @@ export class SequenceRegistry {
   }
 
   /**
-   * Wählt gewichtet aus einer Kategorie und sperrt die Wahl für die nächsten Runden.
+   * Wählt gewichtet aus einer Kategorie und sperrt die Wahl für die nächsten Züge.
    *
-   * Sind alle Kandidaten gesperrt — bei einer Kategorie mit drei Einträgen passiert das
-   * ab der vierten Runde —, wird die Sperre für diesen Zug ignoriert. Lieber eine
-   * Wiederholung als gar keine Sequenz.
+   * Bei drei Kandidaten und einem Fenster von drei ist ab dem vierten Zug alles gesperrt.
+   * Dann gibt die Sperre nach — aber **nicht ganz**: Die zuletzt gespielte Sequenz bleibt
+   * ausgeschlossen. Eine Wiederholung nach zwei Runden fällt kaum auf, zweimal dasselbe
+   * direkt hintereinander nimmt dem Gag die Pointe. Genau das prüft der A4-Audit.
    */
   pick(kind: SequenceKind, rng: RandomSource): Sequence {
     const candidates = this.byKind.get(kind);
@@ -114,7 +115,15 @@ export class SequenceRegistry {
 
     const blocked = this.recent.get(kind) ?? [];
     const free = candidates.filter((s) => !blocked.includes(s.id));
-    const pool = free.length > 0 ? free : candidates;
+
+    let pool = free;
+    if (pool.length === 0) {
+      /* Alles gesperrt: nur die letzte bleibt tabu. */
+      const last = blocked[0];
+      pool = candidates.filter((s) => s.id !== last);
+    }
+    /* Und wenn es wirklich nur eine gibt, dann eben die. */
+    if (pool.length === 0) pool = candidates;
 
     const chosen = rng.weighted(pool, (s) => s.weight);
     this.remember(kind, chosen.id);

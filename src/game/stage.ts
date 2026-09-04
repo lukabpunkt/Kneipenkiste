@@ -10,7 +10,7 @@
  */
 
 import type { ColorId } from '@/config/theme';
-import { createSeededRng } from '@/core/rng';
+import { createSeededRng, type RandomSource } from '@/core/rng';
 import type { PlayerId } from '@/core/types';
 import { noteStageBuild } from '@/dev/stageProbe';
 import { BribeDirector } from './BribeDirector';
@@ -19,6 +19,8 @@ import { getHallApp, loadHallAssets, type HallAppHandle } from './HallApp';
 import { HallView } from './HallView';
 import { HintDirector } from './HintDirector';
 import { InspectDirector } from './InspectDirector';
+import { sequenceRegistry } from './sequences/registry';
+import type { SequenceRegistry } from './sequences/Sequence';
 
 export interface StagePlayer {
   id: PlayerId;
@@ -39,6 +41,10 @@ export interface StageRequest {
 export interface Stage {
   readonly app: HallAppHandle;
   readonly view: HallView;
+  /** Die Registry der Session — die Dev-Sonde vermisst darüber jede Sequenz. */
+  readonly registry: SequenceRegistry;
+  /** Der seedbare PRNG der Inszenierung. */
+  readonly rng: RandomSource;
   readonly hints: HintDirector;
   readonly inspect: InspectDirector;
   readonly gate: GateDirector;
@@ -103,6 +109,8 @@ export async function ensureStage(request: StageRequest): Promise<Stage> {
   current = {
     app,
     view,
+    registry: sequenceRegistry(),
+    rng,
     hints: new HintDirector(view, rng),
     inspect: new InspectDirector(view, rng),
     gate: new GateDirector(view, rng),

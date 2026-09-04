@@ -21,6 +21,16 @@ import type { InspectResult, ItemSet } from '@/core/types';
 import type { HallView } from './HallView';
 import { sequenceRegistry } from './sequences/registry';
 
+/**
+ * Welches peinliche Item die saubere Sequenz auspackt — und damit auch, welche Silhouette
+ * im Röntgenbild liegt.
+ */
+function embarrassingFor(sequenceId: string): 'teddy' | 'mug' | 'duck_bow' {
+  if (sequenceId === 'clean_mug') return 'mug';
+  if (sequenceId === 'clean_duck_bow') return 'duck_bow';
+  return 'teddy';
+}
+
 export class InspectDirector {
   private readonly view: HallView;
   private readonly rng: RandomSource;
@@ -65,11 +75,24 @@ export class InspectDirector {
       play('xray_powerup');
     });
 
+    /*
+     * --- Die Sequenz wird **vor** dem Scan gewählt ---
+     *
+     * Nicht aus Ordnungsliebe: Bei einem sauberen Koffer zeigt der Monitor ein peinliches
+     * Item, und danach packt die Sequenz genau dieses aus. Wählte man die Sequenz erst
+     * nach dem Scan, zeigte das Röntgenbild einen Teddy und der Reisende drückte sich
+     * eine Tasse an die Brust — das Bild hätte gelogen, und dieses Bild darf nie lügen.
+     */
+    const kind =
+      result.kind === 'caught' ? 'xrayCaught' : result.kind === 'clean' ? 'xrayClean' : 'xrayOverlay';
+    const sequence = sequenceRegistry().pick(kind, this.rng);
+
     /* --- Der Scan. Bis er durch ist, ist nichts zu erkennen. --- */
     const scan = this.view.xray.scan({
       amount: result.kind === 'clean' ? 0 : result.amount,
       itemSet,
       ...(result.kind === 'diplomat' ? { diplomat: true } : {}),
+      ...(result.kind === 'clean' ? { embarrassing: embarrassingFor(sequence.id) } : {}),
     });
     timeline.add(scan, `>${XRAY.powerUp}`);
     timeline.call(() => play('scanline_loop'), undefined, `${XRAY_LABELS.scanStart}`);
@@ -97,10 +120,8 @@ export class InspectDirector {
 
     const ctx = this.view.sequenceContext(result.suitcaseOf, itemSet, result.amount, this.rng);
     if (ctx) {
-      const kind =
-        result.kind === 'caught' ? 'xrayCaught' : result.kind === 'clean' ? 'xrayClean' : 'xrayOverlay';
       timeline.addLabel(XRAY_LABELS.verdict, `>${XRAY.faceReaction}`);
-      timeline.add(sequenceRegistry().pick(kind, this.rng).build(ctx), XRAY_LABELS.face);
+      timeline.add(sequence.build(ctx), XRAY_LABELS.face);
     }
 
     if (result.kind === 'caught') {

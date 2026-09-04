@@ -8,7 +8,7 @@
 
 import gsap from 'gsap';
 import { Container, Graphics, Text, type Spritesheet, type Texture } from 'pixi.js';
-import { FONTS, PARTICLE_BUDGET, STAMP, UI_COLORS } from '@/config/theme';
+import { FONTS, PARTICLE_BUDGET, STAGE, STAMP, UI_COLORS } from '@/config/theme';
 import type { ItemSet } from '@/core/types';
 import { ParticlePool } from './ParticlePool';
 
@@ -34,6 +34,11 @@ export class FxKit {
   private readonly dropTexture: Texture;
   private readonly featherTexture: Texture;
 
+  /** Das rote Alarmlicht — ein einziges Overlay, kein Partikel (Art Direction §8). */
+  private readonly alarm: Graphics;
+  /** Der rote Teppich für den Diplomaten. */
+  private readonly carpet: Graphics;
+
   private lowEffects = false;
 
   constructor(itemsSheet: Spritesheet, dropTexture: Texture, featherTexture: Texture) {
@@ -46,8 +51,30 @@ export class FxKit {
     this.feathers = new ParticlePool(PARTICLE_BUDGET.feathers);
     this.confetti = new ParticlePool(PARTICLE_BUDGET.confetti);
 
+    /*
+     * Das Alarmlicht liegt über der ganzen Bühne und ist im Ruhezustand unsichtbar. Ein
+     * Overlay statt vieler Lichter: Es kostet einen Draw-Call, und der A2-Grenzwert von
+     * drei ist knapp.
+     */
+    this.alarm = new Graphics()
+      .rect(-STAGE.worldWidth, -STAGE.worldHeight, STAGE.worldWidth * 3, STAGE.worldHeight * 3)
+      .fill(UI_COLORS.alarm);
+    this.alarm.alpha = 0;
+    this.alarm.eventMode = 'none';
+
+    this.carpet = new Graphics();
+    this.carpet.alpha = 0;
+    this.carpet.eventMode = 'none';
+
     this.view.eventMode = 'none';
-    this.view.addChild(this.items.view, this.drops.view, this.feathers.view, this.confetti.view);
+    this.view.addChild(
+      this.carpet,
+      this.items.view,
+      this.drops.view,
+      this.feathers.view,
+      this.confetti.view,
+      this.alarm
+    );
   }
 
   setLowEffects(value: boolean): void {
@@ -72,6 +99,92 @@ export class FxKit {
     this.drops.clear();
     this.feathers.clear();
     this.confetti.clear();
+    this.alarm.alpha = 0;
+    this.carpet.alpha = 0;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Alarm (erwischt)                                                    */
+  /* ------------------------------------------------------------------ */
+
+  /**
+   * Das rote Blinklicht.
+   *
+   * Bewusst als Alpha-Puls und nicht als harter Wechsel: Ein hart blinkendes Rotlicht
+   * auf einem Handy in der Tischmitte ist unangenehm, ein pulsierendes liest sich als
+   * Alarm. Bei „weniger Effekte" bleibt es aus — die Information steht im Banner.
+   */
+  alarmLight(pulses = 3, durationSec = 0.9): gsap.core.Timeline {
+    if (this.lowEffects) return gsap.timeline();
+
+    this.alarm.alpha = 0;
+    return gsap
+      .timeline()
+      .to(this.alarm, {
+        /*
+         * 0.22, nicht 0.34: Bei einem Drittel Deckkraft ertrinkt die ganze Halle in Rosa,
+         * und man sieht weder die fliegende Ware noch das Gesicht des Reisenden. Der
+         * Alarm soll die Szene färben, nicht ersetzen.
+         */
+        alpha: 0.22,
+        duration: durationSec / (pulses * 2),
+        yoyo: true,
+        repeat: pulses * 2 - 1,
+        ease: 'sine.inOut',
+      })
+      .set(this.alarm, { alpha: 0 });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Pfütze (caught_sweat_flood)                                         */
+  /* ------------------------------------------------------------------ */
+
+  /**
+   * Eine Pfütze wächst unter dem Reisenden — bis er darauf ausrutscht.
+   *
+   * Sie liegt hinter den Partikeln, damit die Schweißtropfen sichtbar hineinfallen.
+   */
+  puddle(x: number, y: number, growSec: number): { view: Graphics; timeline: gsap.core.Timeline } {
+    const view = new Graphics().ellipse(0, 0, 90, 20).fill({ color: 0x8fd3ff, alpha: 0.65 });
+    view.position.set(x, y);
+    view.scale.set(0);
+    view.eventMode = 'none';
+    this.view.addChildAt(view, 1);
+
+    const timeline = gsap.timeline().to(view.scale, {
+      x: 1,
+      y: 1,
+      duration: growSec,
+      ease: 'power2.out',
+    });
+
+    return { view, timeline };
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Roter Teppich (diplomat_pass)                                       */
+  /* ------------------------------------------------------------------ */
+
+  /** Der Teppich rollt aus. Er ist der ganze Witz: Aus dem Alarm wird ein Empfang. */
+  rollOutCarpet(fromX: number, toX: number, y: number, durationSec: number): gsap.core.Timeline {
+    const width = Math.abs(toX - fromX);
+    this.carpet
+      .clear()
+      .rect(Math.min(fromX, toX), y - 14, width, 28)
+      .fill(UI_COLORS.carpet);
+    this.carpet.alpha = 1;
+    this.carpet.scale.set(0, 1);
+    this.carpet.pivot.set(fromX, 0);
+    this.carpet.position.set(fromX, 0);
+
+    return gsap
+      .timeline()
+      .to(this.carpet.scale, { x: 1, duration: durationSec, ease: 'power2.out' });
+  }
+
+  /** Räumt den Teppich weg. */
+  rollUpCarpet(durationSec = 0.3): gsap.core.Timeline {
+    return gsap.timeline().to(this.carpet, { alpha: 0, duration: durationSec });
   }
 
   /* ------------------------------------------------------------------ */
@@ -266,6 +379,8 @@ export class FxKit {
   }
 
   destroy(): void {
+    this.alarm.destroy();
+    this.carpet.destroy();
     this.items.destroy();
     this.drops.destroy();
     this.feathers.destroy();

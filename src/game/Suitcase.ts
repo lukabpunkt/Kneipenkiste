@@ -63,6 +63,8 @@ export class Suitcase {
   private readonly lock: Sprite;
   private readonly glow: Graphics;
   private readonly tagSprite: Sprite;
+  /** Der aufgeklappte Deckel. Unsichtbar, bis der Koffer aufgeht. */
+  private readonly lid: Sprite;
 
   private state: SuitcaseState = 'closed';
   private readonly baseScale: number;
@@ -138,7 +140,16 @@ export class Suitcase {
     this.lock.position.set(0, -CASE.height / 2);
     this.lock.visible = false;
 
-    this.bodyGroup.addChild(this.shell, this.handle, this.buckleL, this.buckleR, this.lock);
+    /*
+     * Der Deckel klappt um seine **untere** Kante nach hinten weg. Deshalb sitzt sein
+     * Ankerpunkt unten und er liegt hinter der Schale: Beim Aufklappen soll er hinter dem
+     * Koffer verschwinden, nicht davor liegen.
+     */
+    this.lid = sprite('lid_open', color.hex);
+    this.lid.position.set(0, -CASE.height + 8);
+    this.lid.visible = false;
+
+    this.bodyGroup.addChild(this.lid, this.shell, this.handle, this.buckleL, this.buckleR, this.lock);
     this.view.addChild(this.glow, this.bodyGroup, this.tagGroup);
 
     this.baseScale = options.width / CASE.width;
@@ -293,6 +304,15 @@ export class Suitcase {
    * mehrere Hinweise hinweg Abweichungen an und sieht am Ende anders aus als die anderen.
    */
   resetAfterHint(): void {
+    this.lid.visible = false;
+    this.lid.position.set(0, -CASE.height + 8);
+    this.lid.scale.set(1, 1);
+    this.buckleL.alpha = 1;
+    this.buckleL.position.set(-CASE.buckleX, CASE.buckleY);
+    this.buckleL.rotation = 0;
+    this.buckleR.alpha = 1;
+    this.buckleR.position.set(CASE.buckleX, CASE.buckleY);
+    this.buckleR.rotation = 0;
     this.view.rotation = 0;
     this.view.alpha = 1;
     this.view.scale.set(this.baseScale);
@@ -303,25 +323,49 @@ export class Suitcase {
     this.tagGroup.position.set(0, CASE.tagY);
   }
 
-  /** Springt auf: erwischt. Der Deckel klappt weg, die Ware kommt raus (Fontäne in M4). */
+  /**
+   * Springt auf: erwischt.
+   *
+   * Squash & Stretch am Anfang, dann klappt der Deckel mit Overshoot nach hinten weg.
+   * Die Schnallen fliegen mit — sie sind das, was man wirklich springen sieht.
+   */
   openCaught(): gsap.core.Timeline {
     this.state = 'openCaught';
+    this.lid.visible = true;
+    this.lid.rotation = 0;
+    this.lid.scale.set(1, 1);
+
     return gsap
       .timeline()
-      .to(this.view.scale, { y: this.baseScale * 1.12, duration: 0.07, ease: 'power2.out' })
-      .to(this.view.scale, { y: this.baseScale, duration: 0.24, ease: 'elastic.out(1,0.4)' })
-      .to(this.buckleL, { y: CASE.buckleY - 30, alpha: 0, duration: 0.2 }, 0)
-      .to(this.buckleR, { y: CASE.buckleY - 30, alpha: 0, duration: 0.2 }, 0.04);
+      .to(this.view.scale, { y: this.baseScale * 1.14, duration: 0.07, ease: 'power2.out' })
+      .to(this.view.scale, { y: this.baseScale, duration: 0.26, ease: 'elastic.out(1,0.4)' })
+      /* Der Deckel klappt nach hinten weg und wird dabei flacher — billige Perspektive. */
+      .to(this.lid.scale, { y: 0.24, duration: 0.16, ease: 'back.in(2)' }, 0.02)
+      .to(this.lid, { y: -CASE.height - 14, duration: 0.16, ease: 'back.in(2)' }, 0.02)
+      .to(this.buckleL, { y: CASE.buckleY - 34, alpha: 0, rotation: -1.2, duration: 0.22 }, 0)
+      .to(this.buckleR, { y: CASE.buckleY - 34, alpha: 0, rotation: 1.2, duration: 0.22 }, 0.04);
   }
 
-  /** Klappt auf: sauber. Ruhiger, fast entschuldigend. */
+  /**
+   * Klappt auf: sauber.
+   *
+   * Ruhiger, fast entschuldigend — kein Springen, kein Overshoot. Der Unterschied zum
+   * Fang muss in einer Sekunde lesbar sein, und er liegt genau hier: Der eine Koffer
+   * springt auf, der andere geht auf.
+   */
   openClean(): gsap.core.Timeline {
     this.state = 'openClean';
+    this.lid.visible = true;
+    this.lid.rotation = 0;
+    this.lid.scale.set(1, 1);
+
     return gsap
       .timeline()
-      .to(this.buckleL, { y: CASE.buckleY - 18, alpha: 0, duration: 0.26, ease: 'power2.out' })
-      .to(this.buckleR, { y: CASE.buckleY - 18, alpha: 0, duration: 0.26, ease: 'power2.out' }, 0.08)
-      .to(this.view, { rotation: -0.05, duration: 0.3, ease: 'sine.inOut' }, 0);
+      .to(this.lid.scale, { y: 0.3, duration: 0.34, ease: 'power2.inOut' })
+      .to(this.lid, { y: -CASE.height - 10, duration: 0.34, ease: 'power2.inOut' }, '<')
+      .to(this.buckleL, { y: CASE.buckleY - 18, alpha: 0, duration: 0.28, ease: 'power2.out' }, 0)
+      .to(this.buckleR, { y: CASE.buckleY - 18, alpha: 0, duration: 0.28, ease: 'power2.out' }, 0.08)
+      .to(this.view, { rotation: -0.04, duration: 0.32, ease: 'sine.inOut' }, 0);
   }
 
   setState(state: SuitcaseState): void {

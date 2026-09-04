@@ -13,6 +13,13 @@ export interface SuitcaseRect {
   height: number;
 }
 
+export interface SequenceReport {
+  id: string;
+  kind: string;
+  durationSec: number;
+  labels: Record<string, number>;
+}
+
 export interface StageProbe {
   suitcases(): SuitcaseRect[];
   drawCalls(): number;
@@ -23,6 +30,9 @@ export interface StageProbe {
   isolateTaps(): void;
   mode(): string;
   builds(): number;
+  xraySequences(itemSet: string, amount: number): SequenceReport[];
+  drawSequences(kind: string, count: number): string[];
+  particles(): number;
 }
 
 declare global {

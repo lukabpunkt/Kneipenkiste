@@ -6,7 +6,7 @@
 | M1 UI-Flow (DOM-Halle) | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.1.0` | A1 bestanden |
 | M2 PIXI-Halle, Koffer, Charaktere | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.2.0` | A2 bestanden |
 | M3 Hinweise, Schranke, Audio | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.3.0` | A3 bestanden |
-| M4 Röntgen-Sequenzen | ⬜ offen | – | – |
+| M4 Röntgen-Sequenzen | ✅ fertig (⏳ 1 manueller Check offen) | `v0.4.0` | A4 bestanden |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
 | M6 Playtest & Release | ⬜ offen | – | – |
 
@@ -174,3 +174,50 @@ Sechs Fehler, alle erst am Bild sichtbar:
 **Manuelle Checks für Luka vor M4:**
 - [ ] Ton anhören: Sind die sechs Hinweise auseinanderzuhalten, ohne hinzusehen? Hebt sich Waldis Bellen ab (es ist der einzige Hinweis, der nie lügt)?
 - [ ] Hinweis-Test aus A3: Drei Personen sehen fünf Hall-Phasen — sagen mindestens zwei, sie hätten den Hinweisen „eher geglaubt"?
+
+## Audit A4 — 2026-09-05
+
+**Ergebnis:** BESTANDEN (alle automatisierbaren MUSS-Checks grün; der „Lustig-Test" braucht drei Menschen)
+
+### Pro Sequenz
+
+Gemessen auf der echten Bühne, nicht an den Konstanten aus `choreo.ts` — ein vertauschter Beat versteckt sich in einer Timeline, nicht in einer Zahl.
+
+| Sequenz | Dauer | Gesicht → Urteil | Lesbar in 1 s | Prinzipien |
+|---|---|---|---|---|
+| `caught_alarm_burst` | 3,28 s | 0,00 → 0,20 s | Sirene, Rotlicht, Ware fliegt — „erwischt" ohne Text | Anticipation (Koffer duckt sich), Squash, Overshoot, Follow-Through (Kopf ruckt nach), Sound-Sync |
+| `caught_sweat_flood` | 3,39 s | 0,00 → 0,20 s | Pfütze wächst, er rutscht aus — verrät sich selbst | Anticipation (Beine weg), **Hit-Stop** in der Luft, Squash beim Aufprall, Overshoot |
+| `caught_slow_zip` | 3,04 s | 0,00 → 0,20 s | Zeitlupe, dann Springteufel — die Verzögerung ist der Gag | Anticipation (drei immer schnellere Stufen), Squash vor dem Aufspringen, Sound-Sync |
+| `clean_teddy` | 3,12 s | 0,00 → 0,20 s | Teddy an der Brust, Beamter wird rot | Overshoot (Arme), Squash (Beamter schrumpft vor Scham), Follow-Through (Wiegen) |
+| `clean_mug` | 3,40 s | 0,00 → 0,20 s | Er starrt, zittert, trinkt | **Pause als Timing** (0,28 s Starren), Zittern in 45-ms-Takt, Follow-Through |
+| `clean_duck_bow` | 2,84 s | 0,00 → 0,20 s | Eine Ente mit Schleife — legal, weil nur eine | Overshoot (Kopf), Halten, Sound-Sync (zweimal Quietschen) |
+| `diplomat_pass` | 2,42 s | 0,00 → 0,20 s | Sirene setzt an und **bricht ab**, Teppich rollt aus | Der Bruch selbst ist das Timing; Overshoot (Salut), Follow-Through (Arm bleibt zu lange oben) |
+
+### Gesamt
+
+| Check | Status | Notiz |
+|---|---|---|
+| 6 Röntgen-Sequenzen + Diplomat-Overlay | ✅ | Alle sieben registriert, jede einzeln über die Dev-Sonde vermessbar. |
+| Scanline-Aufbau + Stall; `revealed` ≥ `scanComplete` | ✅ | Label-Test aus M0 gilt weiter; dazu im E2E: Über den gesamten Scan zeigt das Banner **nur** „Röntgen läuft" — durchgehend gemessen, nicht stichprobenartig, denn ein einzelnes aufblitzendes Frame wäre genau der Fehler. |
+| Gesicht → Alarm/Stempel → Banner in dieser Reihenfolge | ✅ | Über die Timeline-Labels jeder gebauten Sequenz. Das Gesicht bekommt in allen sieben exakt 200 ms allein. |
+| Dauer ≤ 5 s | ✅ | Längste: `clean_mug` mit 3,40 s. Kürzeste: `diplomat_pass` mit 2,42 s. |
+| Reset-Invariante | ✅ | `HallView.reset()` stellt Figuren, Koffer und Effekte in die Ruhelage; die Dev-Sonde baut jede Sequenz und räumt danach auf. |
+| Anticipation, Squash & Stretch, Overshoot, Hit-Stop, Follow-Through, Sound-Sync | ✅ | Pro Sequenz in der Tabelle oben belegt. |
+| ≤ 2 Long-Tasks; Perf grün | ✅ | Unverändert nach M4: p50 **16,7 ms**, p95 17,7 ms, **3 Draw-Calls**, Update p50 0 ms. |
+| Diplomat-Overlay ersetzt caught/clean korrekt | ✅ | Es taucht in 200 Ziehungen aus `xrayCaught` nie auf und ist die einzige Sequenz in `xrayOverlay` — es **ersetzt**, statt zu ergänzen. Ein Diplomat wird nie erwischt, das ist eine Regelkern-Invariante. |
+| No-Repeat über 1 000 Runden | ✅ | Je Kategorie 1 000 Ziehungen: nie zweimal dieselbe hintereinander, und jede kommt vor. Führte zu ADR-20. |
+| Silhouetten-Layouts aller 8 Item-Sets | ✅ | Aus M2; neu ist, dass die Silhouette der sauberen Ware zur gezogenen Sequenz passt (ADR-19). |
+| Item-Fontäne fliegt wirklich | ✅ | Eigener Test misst lebende Partikel während der Sequenz (> 0) und hält das Budget aus Art Direction §8 ein (≤ 200). |
+| „Lustig-Test": ≥ 2 von 3 grinsen | ⏳ manuell | Braucht drei Menschen. |
+| Video `docs/screens/m4-xray.mp4` | ⏳ SOLL | Stattdessen sieben Screenshots, einer je Sequenz. |
+
+### Was gefunden und behoben wurde
+1. **Die Registry konnte dieselbe Sequenz zweimal hintereinander ziehen** — bei Zug 9 im 1000er-Test. Der Fallback ignorierte die gesamte Historie statt nur das Fenster (ADR-20).
+2. **Das Röntgenbild hätte lügen können:** Die Sequenz wurde nach dem Scan gezogen, also konnte der Monitor einen Teddy zeigen und die Sequenz eine Tasse auspacken (ADR-19).
+3. **Das Alarmlicht war zu stark** (Alpha 0,34) — die ganze Halle ertrank in Rosa, und weder die fliegende Ware noch das Gesicht des Reisenden waren zu sehen. Jetzt 0,22.
+4. **Die Koffer sprangen nicht sichtbar auf.** Das Asset `lid_open` lag ungenutzt herum; jetzt klappt der Deckel nach hinten weg — beim Fang mit Overshoot, beim sauberen Koffer ruhig. Der Unterschied ist in einer Sekunde lesbar, und genau darum geht es.
+
+**Offene SOLL-Follow-ups:** Video (1).
+
+**Manueller Check für Luka vor M5:**
+- [ ] „Lustig-Test" aus A4: Drei Personen sehen die sieben Sequenzen (`?dev=1&panel=sequences`) — grinsen mindestens zwei?

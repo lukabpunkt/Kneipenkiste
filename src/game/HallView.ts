@@ -333,6 +333,19 @@ export class HallView {
     this.suitcases.get(playerId)?.select(on, colorById(this.officerColor).hex);
   }
 
+  /**
+   * Stellt die Ruhepose aller Figuren und Koffer wieder her.
+   *
+   * Gebraucht von der Dev-Sonde, die Sequenzen baut, um sie zu vermessen: Ein `build()`
+   * setzt Startwerte, und ohne Reset stünde die Bühne danach schief.
+   */
+  reset(): void {
+    for (const traveler of this.travelers.values()) traveler.reset();
+    this.officer.reset();
+    for (const suitcase of this.suitcases.values()) suitcase.resetAfterHint();
+    this.fx.clear();
+  }
+
   setLowEffects(value: boolean): void {
     this.lowEffects = value;
     this.xray.setLowEffects(value);

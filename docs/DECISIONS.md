@@ -55,3 +55,9 @@ Kontext: Das Angebot ist laut GDD §3.7 **öffentlich** — wer besticht, wirkt 
 
 ## ADR-18 · 2026-09-05 · Wer die Schranke passiert hat, verlässt die Bühne
 Kontext: Alle Reisenden liefen an dieselbe Stelle vor der Schranke und blieben dort. Bei sieben Koffern stand am Ende eine Menschentraube statt eines Durchgangs. Entscheidung: Nach jedem Reveal laufen Reisender und Koffer nach rechts aus dem Bild und blenden aus. Konsequenz: Die Schranke liest sich als Durchgang, und der jeweils nächste steht frei — wichtig, weil der letzte Koffer der Höhepunkt der Runde ist (ADR-4).
+
+## ADR-19 · 2026-09-05 · Die Sequenz wird vor dem Scan gewählt
+Kontext: Bei einem sauberen Koffer zeigt das Röntgenbild ein peinliches Item (Teddy, Tasse, Ente mit Schleife), und die Sequenz danach packt genau dieses aus. Wählte man die Sequenz erst nach dem Scan, zeigte der Monitor einen Teddy und der Reisende drückte sich eine Tasse an die Brust. Entscheidung: `InspectDirector` zieht die Sequenz aus der Registry, **bevor** er den Scan baut, und leitet die Silhouette aus ihrer ID ab. Konsequenz: Das Röntgenbild sagt immer die Wahrheit — und dieses Bild ist das einzige im Spiel, das nie lügen darf.
+
+## ADR-20 · 2026-09-05 · Die Sperre gibt nach, aber nie für die zuletzt gespielte Sequenz
+Kontext: Bei drei Kandidaten und einem Sperrfenster von drei ist ab dem vierten Zug alles gesperrt. Die Registry fiel dann auf **alle** zurück — und zog im Test bei Zug 9 zweimal hintereinander `caught_alarm_burst`. Entscheidung: Ist alles gesperrt, bleibt wenigstens die zuletzt gespielte ausgeschlossen; nur bei einer einzigen registrierten Sequenz gibt auch das nach. Konsequenz: Eine Wiederholung nach zwei Runden fällt kaum auf, zweimal dasselbe direkt hintereinander nimmt dem Gag die Pointe — und genau das ist jetzt ausgeschlossen (geprüft über 1 000 Ziehungen je Kategorie).

@@ -72,6 +72,26 @@ export function createSequencePreview(stage: Stage, itemSet: Parameters<Stage['g
     );
   }
 
+  /*
+   * Die Röntgen-Sequenzen. Sie spielen ohne Scan davor — hier geht es um die Sequenz
+   * selbst, nicht um den Bildaufbau. Der ist im Spiel und im A4-Test gedeckt.
+   */
+  const xray = document.createElement('div');
+  xray.className = 'seq-preview__row';
+  for (const kind of ['xrayCaught', 'xrayClean', 'xrayOverlay'] as const) {
+    for (const sequence of stage.registry.all(kind)) {
+      xray.append(
+        button(sequence.id.replace(/^(caught|clean|diplomat)_?/, ''), () => {
+          const id = target();
+          if (!id) return;
+          stage.view.reset();
+          const ctx = stage.view.sequenceContext(id, itemSet, 4, stage.rng);
+          if (ctx) sequence.build(ctx);
+        })
+      );
+    }
+  }
+
   const others = document.createElement('div');
   others.className = 'seq-preview__row';
   others.append(
@@ -93,7 +113,7 @@ export function createSequencePreview(stage: Stage, itemSet: Parameters<Stage['g
     })
   );
 
-  el.append(hints, gates, others);
+  el.append(hints, xray, gates, others);
 
   return {
     el,

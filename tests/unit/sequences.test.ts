@@ -79,19 +79,33 @@ describe('SequenceRegistry', () => {
     expect(new Set(picks).size).toBe(4);
   });
 
-  it('nimmt lieber eine Wiederholung als gar nichts', () => {
-    /* Zwei Kandidaten, Sperrfenster 3: Ab dem dritten Zug ist alles gesperrt. */
-    const registry = new SequenceRegistry().register(
-      stub('a', 'gateSmuggler'),
-      stub('b', 'gateSmuggler')
-    );
-    const rng = createSeededRng(7);
+  it('wiederholt sich nie unmittelbar, auch wenn alles gesperrt ist', () => {
+    /*
+     * Der wichtigste Fall: Bei zwei oder drei Kandidaten und Sperrfenster 3 ist ab dem
+     * dritten Zug alles gesperrt. Dann muss die Sperre nachgeben — aber die zuletzt
+     * gespielte bleibt tabu. Zweimal derselbe Gag direkt hintereinander ist der eine
+     * Fehler, den das Sperrfenster verhindern soll (Audit A4).
+     */
+    for (const size of [2, 3, 4]) {
+      const registry = new SequenceRegistry().register(
+        ...['a', 'b', 'c', 'd'].slice(0, size).map((id) => stub(id, 'gateSmuggler'))
+      );
+      const rng = createSeededRng(7);
 
-    const picks = Array.from({ length: 10 }, () => registry.pick('gateSmuggler', rng).id);
-    expect(picks).toHaveLength(10);
-    expect(picks.every((id) => id === 'a' || id === 'b')).toBe(true);
-    /* Die ersten beiden sind trotzdem verschieden. */
-    expect(picks[0]).not.toBe(picks[1]);
+      const picks = Array.from({ length: 500 }, () => registry.pick('gateSmuggler', rng).id);
+      for (let i = 1; i < picks.length; i++) {
+        expect(picks[i], `${size} Kandidaten, Zug ${i}`).not.toBe(picks[i - 1]);
+      }
+      /* Über 500 Züge kommt jede vor. */
+      expect(new Set(picks).size).toBe(size);
+    }
+  });
+
+  it('kommt auch mit einer einzigen Sequenz zurecht', () => {
+    const registry = new SequenceRegistry().register(stub('einzig', 'xrayOverlay'));
+    const rng = createSeededRng(2);
+    const picks = Array.from({ length: 5 }, () => registry.pick('xrayOverlay', rng).id);
+    expect(picks).toEqual(['einzig', 'einzig', 'einzig', 'einzig', 'einzig']);
   });
 
   it('merkt sich höchstens `NO_REPEAT_WINDOW` Einträge', () => {

@@ -11,7 +11,7 @@
  */
 
 import type { Stage } from '@/game/stage';
-import type { PlayerId } from '@/core/types';
+import type { ItemSet, PlayerId } from '@/core/types';
 
 export interface SuitcaseRect {
   playerId: PlayerId;
@@ -20,6 +20,14 @@ export interface SuitcaseRect {
   y: number;
   width: number;
   height: number;
+}
+
+/** Was eine gebaute Sequenz über sich verrät — der A4-Audit misst genau das. */
+export interface SequenceReport {
+  id: string;
+  kind: string;
+  durationSec: number;
+  labels: Record<string, number>;
 }
 
 export interface StageProbe {
@@ -42,6 +50,24 @@ export interface StageProbe {
   mode(): string;
   /** Wie oft die Bühne insgesamt aufgebaut wurde — muss über Hall/Inspect/Gate 1 bleiben. */
   builds(): number;
+  /**
+   * Baut jede Röntgen-Sequenz einmal auf der echten Bühne und meldet Dauer und Labels.
+   *
+   * Der A4-Audit fordert für jede Sequenz: `revealed ≥ scanComplete`, Reihenfolge
+   * Gesicht → Urteil → Banner, und Dauer ≤ 5 s. Ohne diese Sonde ließe sich das nur an
+   * der Choreografie prüfen, nicht an dem, was wirklich gebaut wird — und genau dort
+   * schleicht sich ein vertauschter Beat ein.
+   */
+  xraySequences(itemSet: string, amount: number): SequenceReport[];
+  /**
+   * Zieht `count`-mal aus einer Kategorie und meldet die IDs.
+   *
+   * Der A4-Audit fordert „No-Repeat 3 über 1 000 Runden" — das lässt sich nur an der
+   * echten Registry messen, mit ihrer echten Historie.
+   */
+  drawSequences(kind: string, count: number): string[];
+  /** Wie viele Partikel gerade leben — das Budget aus Art Direction §8 liest das. */
+  particles(): number;
 }
 
 let taps: PlayerId[] = [];
@@ -116,6 +142,52 @@ export function attachStageProbe(stage: Stage, canvasHost: HTMLElement): void {
     },
     mode: () => stage.view.getMode(),
     builds: () => builds,
+
+    particles: () => stage.view.fx.activeParticles,
+
+    drawSequences(kind, count) {
+      const registry = stage.registry;
+      registry.clearHistory();
+      const out: string[] = [];
+      for (let i = 0; i < count; i++) {
+        out.push(registry.pick(kind as Parameters<typeof registry.pick>[0], stage.rng).id);
+      }
+      registry.clearHistory();
+      return out;
+    },
+
+    xraySequences(itemSet, amount) {
+      const target = stage.view.suitcaseIds()[0];
+      if (!target) return [];
+
+      const reports: SequenceReport[] = [];
+
+      for (const kind of ['xrayCaught', 'xrayClean', 'xrayOverlay'] as const) {
+        for (const sequence of stage.registry.all(kind)) {
+          const ctx = stage.view.sequenceContext(target, itemSet as ItemSet, amount, stage.rng);
+          if (!ctx) continue;
+
+          /*
+           * `paused` bauen und sofort wieder abräumen: Die Sequenz soll vermessen, nicht
+           * abgespielt werden — sonst stünde die Bühne danach woanders.
+           */
+          const timeline = sequence.build(ctx);
+          timeline.pause(0);
+
+          reports.push({
+            id: sequence.id,
+            kind: sequence.kind,
+            durationSec: timeline.duration(),
+            labels: { ...timeline.labels },
+          });
+
+          timeline.kill();
+        }
+      }
+
+      stage.view.reset();
+      return reports;
+    },
   };
 
   Reflect.set(globalThis, '__zollStage', probe);
