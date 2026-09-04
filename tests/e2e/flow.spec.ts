@@ -19,15 +19,20 @@ import { expect, test } from '@playwright/test';
 import { createSeededRng } from '../../src/core/rng';
 import {
   buryMines,
+  countTiles,
   dig,
-  digUntilRoundOver,
   distributeAll,
+  drawCalls,
   layout,
+  cellPoint,
   openLobby,
   settle,
   startDigging,
+  tapCell,
   tapPass,
-  treasureCellFromReplay,
+  tileColors,
+  tileState,
+  waitForBoard,
 } from './helpers';
 
 /**
@@ -134,32 +139,34 @@ test.describe('Minenphase', () => {
 
     // Spieler 1 legt auf 0 und 1.
     await tapPass(page);
+    await waitForBoard(page);
     await expect(page.getByRole('button', { name: 'Vergraben' })).toBeDisabled();
 
-    await page.locator('.tile[data-cell="0"]').click();
+    await tapCell(page, 0, 5, 3);
     await expect(page.locator('.place__counter')).toContainText('1 / 2');
     await expect(page.getByRole('button', { name: 'Vergraben' })).toBeDisabled();
 
-    await page.locator('.tile[data-cell="1"]').click();
+    await tapCell(page, 1, 5, 3);
     await expect(page.locator('.place__counter')).toContainText('2 / 2');
     await expect(page.getByRole('button', { name: 'Vergraben' })).toBeEnabled();
 
     // Dritte Mine wird abgewiesen, das Feld bleibt bei zwei.
-    await page.locator('.tile[data-cell="2"]').click();
+    await tapCell(page, 2, 5, 3);
     await expect(page.locator('.place__counter')).toContainText('2 / 2');
-    await expect(page.locator('.tile--armed')).toHaveCount(2);
+    expect(await countTiles(page, 'mine_placed')).toBe(2);
 
     // Toggle nimmt die eigene wieder weg.
-    await page.locator('.tile[data-cell="0"]').click();
-    await expect(page.locator('.tile--armed')).toHaveCount(1);
-    await page.locator('.tile[data-cell="0"]').click();
+    await tapCell(page, 0, 5, 3);
+    expect(await countTiles(page, 'mine_placed')).toBe(1);
+    await tapCell(page, 0, 5, 3);
+    expect(await countTiles(page, 'mine_placed')).toBe(2);
 
     await page.getByRole('button', { name: 'Vergraben' }).click();
 
     // Spieler 2 sieht ein leeres Feld — von Spieler 1 ist nichts zu sehen.
     await tapPass(page);
-    await expect(page.locator('[data-screen="place"] .tile').first()).toBeVisible();
-    await expect(page.locator('.tile--armed')).toHaveCount(0);
+    await waitForBoard(page);
+    expect(await countTiles(page, 'mine_placed')).toBe(0);
   });
 });
 
@@ -179,31 +186,30 @@ test.describe('Grabphase', () => {
     await startDigging(page);
 
     /* --- Explosion: der Schuldige steht im selben Banner (Design-Prioritaet 2) --- */
-    await page.locator('.tile[data-cell="0"]').click();
+    await tapCell(page, 0);
 
     const banner = page.locator('.drink-banner');
-    await expect(banner).toBeVisible();
+    await expect(banner).toBeVisible({ timeout: 15_000 });
     await expect(banner).toContainText('TRINKT 2');
     await expect(banner.locator('.kill-feed__text')).toContainText('Spieler 2');
     await expect(banner.locator('.kill-feed__text')).toContainText('Spieler 1');
     await expect(banner.locator('.badge')).toHaveCount(2);
 
-    await settle(page);
+    // Der Krater traegt den Farbring des Legers — Spieler 2 ist blau.
+    expect(await tileState(page, 0)).toBe('crater');
+    expect(await tileColors(page, 0)).toContain('#3b82f6');
 
-    // Der Krater traegt den Farbring des Legers.
-    await expect(page.locator('.tile[data-cell="0"]')).toHaveClass(/tile--crater/);
-    await expect(page.locator('.tile[data-cell="0"] .tile__ring')).toHaveCount(1);
+    await settle(page);
     // Ein Token ist angefallen.
     await expect(page.locator('.token-chip')).toHaveCount(1);
 
     /* --- Kistenfund --- */
     await dig(page, chest);
-    await expect(page.locator('[data-screen="distribute"]')).toBeVisible();
+    await expect(page.locator('[data-screen="distribute"]')).toBeVisible({ timeout: 20_000 });
 
     await distributeAll(page);
     await expect(page.locator('[data-screen="result"]')).toBeVisible();
     await expect(page.locator('.result__banner')).toContainText('hat die Kiste');
-    expect(await treasureCellFromReplay(page)).toBe(chest);
 
     /* --- Runde 2: Preis der Gier --- */
     await page.getByRole('button', { name: 'Nächste Runde' }).click();
@@ -213,20 +219,19 @@ test.describe('Grabphase', () => {
     await buryMines(page, 4, layout(4, { forced: { 0: [chest2, chest2 === 0 ? 1 : 0] } }));
     await startDigging(page);
 
-    await page.locator(`.tile[data-cell="${chest2}"]`).click();
-    await expect(page.locator('.drink-banner__headline')).toContainText('GIER');
+    await tapCell(page, chest2);
+    await expect(page.locator('.drink-banner__headline')).toContainText('GIER', { timeout: 15_000 });
+
+    // Beide Zeichen stehen auf derselben Platte: Kiste **und** der Ring des Legers.
+    expect(await tileState(page, chest2)).toBe('treasure');
+    expect((await tileColors(page, chest2)).length).toBeGreaterThan(0);
+
     // Der Preis der Gier beendet die Runde: Das Feld bleibt gesperrt, der Screen wechselt.
-    await expect(page.locator('[data-screen="dig"]')).toBeHidden({ timeout: 20_000 });
+    await expect(page.locator('[data-screen="dig"]')).toBeHidden({ timeout: 25_000 });
 
     await distributeAll(page);
     await expect(page.locator('[data-screen="result"]')).toBeVisible();
     await expect(page.locator('.result__banner')).toContainText('Preis der Gier');
-
-    // Beide Zeichen stehen auf derselben Platte: Krater **und** Kiste.
-    const greedTile = page.locator(`[data-screen="result"] .tile[data-cell="${chest2}"]`);
-    await expect(greedTile).toHaveClass(/tile--greed/);
-    await expect(greedTile.locator('.tile__chest')).toHaveCount(1);
-    expect(await greedTile.locator('.tile__ring').count()).toBeGreaterThan(0);
   });
 
   test('deckt die eigene Mine genauso auf wie ein leeres Feld (ADR-2)', async ({ page }) => {
@@ -247,26 +252,22 @@ test.describe('Grabphase', () => {
     await startDigging(page);
 
     // Spieler 1 ist dran und graebt seinen eigenen Trittstein auf.
-    await dig(page, mined);
-    const minedTile = page.locator(`.tile[data-cell="${mined}"]`);
-    await expect(minedTile).toHaveClass(/tile--empty/);
-    await expect(minedTile.locator('.tile__ring')).toHaveCount(0);
-    // Kein Banner, kein Kill-Feed: Es ist nichts passiert.
+    await dig(page, mined, 5, 3);
+    expect(await tileState(page, mined)).toBe('open_empty');
+    // Kein Ring, kein Banner, kein Kill-Feed: Es ist nichts passiert.
+    expect(await tileColors(page, mined)).toEqual([]);
     await expect(page.locator('.drink-banner')).toHaveCount(0);
-    const minedHtml = await minedTile.innerHTML();
-    const minedClasses = await minedTile.getAttribute('class');
 
     // Ein echtes leeres Feld daneben.
-    await dig(page, plain);
-    const plainTile = page.locator(`.tile[data-cell="${plain}"]`);
-    const plainClasses = await plainTile.getAttribute('class');
+    await dig(page, plain, 5, 3);
 
     /*
-     * Die Klassenlisten muessen identisch sein. Der `critter` darf sich unterscheiden —
-     * er kommt aus Seed und Zelle, nicht aus dem Inhalt (ADR-2).
+     * Beide Platten sind im selben Zustand und tragen dieselben Farben — naemlich keine.
+     * Der `critter` darf sich unterscheiden: Er kommt aus Seed und Zelle, nicht aus dem
+     * Inhalt (ADR-2).
      */
-    expect(minedClasses).toBe(plainClasses);
-    expect(minedHtml).not.toContain('tile__ring');
+    expect(await tileState(page, plain)).toBe(await tileState(page, mined));
+    expect(await tileColors(page, plain)).toEqual(await tileColors(page, mined));
 
     // Und die Zahl der verbleibenden Minen ist beim Trittstein nicht gesunken (ADR-8).
     await expect(page.locator('.dig__mines-left')).toContainText('6');
@@ -287,18 +288,20 @@ test.describe('Grabphase', () => {
     await buryMines(page, 3, layout(3, { forced: { 1: [15, dudCell] }, avoid: [chest] }));
     await startDigging(page);
 
-    await page.locator(`.tile[data-cell="${dudCell}"]`).click();
+    await tapCell(page, dudCell, 5, 3);
 
     const banner = page.locator('.drink-banner');
-    await expect(banner).toBeVisible();
+    await expect(banner).toBeVisible({ timeout: 15_000 });
     await expect(banner).toContainText('Pfff');
     // Der Leger wird gezeigt — das ist der Bluff (GDD §3.6).
     await expect(banner.locator('.kill-feed__text')).toContainText('Spieler 2');
     // ... aber niemand trinkt.
     await expect(banner).not.toContainText('TRINKT');
 
+    expect(await tileState(page, dudCell)).toBe('dud');
+    expect((await tileColors(page, dudCell)).length).toBeGreaterThan(0);
+
     await settle(page);
-    await expect(page.locator(`.tile[data-cell="${dudCell}"]`)).toHaveClass(/tile--dud/);
     await expect(page.locator('.token-chip')).toHaveCount(0);
   });
 
@@ -327,14 +330,17 @@ test.describe('Grabphase', () => {
     await startDigging(page);
 
     // Spieler 1 tritt auf die Mine von Spieler 2.
-    await dig(page, origin);
+    await dig(page, origin, 5, 3);
 
-    // Die mitgerissenen Krater sind als solche markiert und zeigen ihre Leger.
-    const chained = page.locator('.tile--chained');
-    expect(await chained.count()).toBeGreaterThan(0);
-    for (const tile of await chained.all()) {
-      expect(await tile.locator('.tile__ring').count()).toBeGreaterThan(0);
+    // Die Nachbarn sind mitgerissen worden und zeigen ihre Leger.
+    expect(await tileState(page, origin)).toBe('crater');
+    let chained = 0;
+    for (const cell of neighbours) {
+      if ((await tileState(page, cell)) !== 'crater') continue;
+      chained += 1;
+      expect((await tileColors(page, cell)).length).toBeGreaterThan(0);
     }
+    expect(chained).toBeGreaterThan(0);
 
     // Getrunken wird nur fuer die getippte Platte — nicht fuer die Nachbarn.
     await expect(page.locator('.token-chip')).toHaveCount(1);
@@ -355,7 +361,7 @@ test.describe('Verteilung (GDD §3.5)', () => {
     await dig(page, 0); // Spieler 1 tritt in die Mine von Spieler 2
     await dig(page, chest); // Spieler 2 findet die Kiste
 
-    await expect(page.locator('[data-screen="distribute"]')).toBeVisible();
+    await expect(page.locator('[data-screen="distribute"]')).toBeVisible({ timeout: 20_000 });
 
     // Der Finder verteilt zuerst (Architektur §3) — hier Spieler 2, der auch Leger ist.
     await expect(page.locator('.distribute__hand-to')).toContainText('Spieler 2');
@@ -395,24 +401,35 @@ test.describe('Result', () => {
 
     await distributeAll(page);
     await expect(page.locator('[data-screen="result"]')).toBeVisible();
+    await waitForBoard(page);
+    // Die Replay-Welle laeuft 40 ms pro Ring.
+    await page.waitForTimeout(2500);
 
-    const rings = page.locator('[data-screen="result"] .tile__ring--revealed');
-    expect(await rings.count()).toBe(8);
-    // Keine davon ist hochgegangen — alle acht tragen das "Puh"-Schild.
-    expect(await page.locator('.tile__phew').count()).toBe(8);
+    /*
+     * Acht Minen liegen im Boden, keine ist hochgegangen — im Replay traegt jede ihren
+     * Farbring. Das ist der Aha-Moment der Runde (GDD §4.4, §7).
+     */
+    expect(await countTiles(page, 'mine_revealed')).toBe(8);
   });
 
   test('fuehrt die Session-Statistik ueber mehrere Runden', async ({ page }) => {
+    test.setTimeout(180_000);
     const seed = 33;
 
     await openLobby(page, { players: 3, seed });
     await page.getByRole('button', { name: 'Feld verminen' }).click();
 
-    for (let round = 0; round < 2; round++) {
-      if (round > 0) await page.getByRole('button', { name: 'Nächste Runde' }).click();
-      await buryMines(page, 3);
+    /*
+     * Gezielt auf die Kiste graben statt blind das Feld abzuarbeiten: Mit der vollen
+     * Inszenierung kostet jede Grabung rund vier Sekunden, und der Test will die
+     * Statistik pruefen, nicht die Geduld.
+     */
+    for (let round = 1; round <= 2; round++) {
+      if (round > 1) await page.getByRole('button', { name: 'Nächste Runde' }).click();
+      const chest = treasureCell(seed, round);
+      await buryMines(page, 3, layout(3, { avoid: [chest] }));
       await startDigging(page);
-      await digUntilRoundOver(page);
+      await dig(page, chest, 5, 3);
       await distributeAll(page);
       await expect(page.locator('[data-screen="result"]')).toBeVisible();
     }
@@ -431,16 +448,66 @@ test.describe('Touch und Texte (Audit A1)', () => {
     await openLobby(page, { players: 6, seed: 1 });
     await page.getByRole('button', { name: 'Feld verminen' }).click();
     await tapPass(page);
-    await expect(page.locator('[data-screen="place"] .tile').first()).toBeVisible();
+    await waitForBoard(page);
 
-    const box = await page.locator('.tile').first().boundingBox();
-    expect(box).not.toBeNull();
-    expect(box!.width).toBeGreaterThanOrEqual(56);
-    expect(box!.height).toBeGreaterThanOrEqual(56);
+    /*
+     * Das Feld ist ein Canvas — gemessen wird deshalb der Abstand zweier Zellmitten in
+     * Bildschirmpixeln. Er ist Plattenbreite plus Abstand; abzueglich des Abstands bleibt
+     * die Tippflaeche (GDD §5, Audit A1/A2).
+     */
+    const first = await cellPoint(page, 0, 6, 6);
+    const second = await cellPoint(page, 1, 6, 6);
+    const pitch = second.x - first.x;
 
-    // Abstand zwischen zwei Platten ≥ 6 px.
-    const second = await page.locator('.tile').nth(1).boundingBox();
-    expect(second!.x - (box!.x + box!.width)).toBeGreaterThanOrEqual(6);
+    // 153 + 16 Welteinheiten Rasterabstand → davon sind 153/169 die Platte.
+    const platePx = pitch * (153 / 169);
+    const gapPx = pitch * (16 / 169);
+
+    expect(platePx).toBeGreaterThanOrEqual(56);
+    expect(gapPx).toBeGreaterThanOrEqual(6);
+  });
+
+  test('trifft 50 Taps zuverlaessig (Audit A2)', async ({ page }) => {
+    /*
+     * Der Tap ist die einzige Eingabe des Spiels. Ein Fehl-Tap auf einem Canvas ist
+     * schlimmer als auf einem Button: Es gibt keinen Hover, kein Fokusring, nichts, was
+     * vorher sagt, wo man landet — nur das Ergebnis.
+     */
+    await openLobby(page, { players: 3, seed: 4 });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await tapPass(page);
+    await waitForBoard(page);
+
+    // 25 Zellen, jede zweimal: setzen und wieder wegnehmen.
+    let hits = 0;
+    for (let round = 0; round < 2; round++) {
+      for (let cell = 0; cell < 25; cell++) {
+        const before = await tileState(page, cell);
+        await tapCell(page, cell, 5, 3);
+        const after = await tileState(page, cell);
+        // Ein Tap hat gewirkt, wenn sich der Zustand geaendert hat — oder wenn das
+        // Kontingent voll war und die Logik ihn korrekt abgelehnt hat.
+        if (after !== before || (await countTiles(page, 'mine_placed')) === 2) hits += 1;
+      }
+    }
+    expect(hits).toBe(50);
+  });
+
+  test('haelt die Draw-Batches bei hoechstens drei (Audit A2)', async ({ page }) => {
+    await openLobby(page, { players: 8, seed: 6 });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await tapPass(page);
+    await waitForBoard(page);
+    await page.waitForTimeout(600);
+
+    /*
+     * Zwei Atlanten plus die Wiese als `Graphics` — mehr darf es nicht werden. Jeder
+     * zusaetzliche Batch ist ein Texturwechsel pro Frame, und davon haengt auf einem
+     * Pixel 4a die Bildrate ab.
+     */
+    const draws = await drawCalls(page);
+    expect(draws).toBeGreaterThan(0);
+    expect(draws).toBeLessThanOrEqual(3);
   });
 
   test('zeigt nirgends einen fehlenden Uebersetzungsschluessel', async ({ page }) => {

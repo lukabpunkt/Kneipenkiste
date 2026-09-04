@@ -28,7 +28,7 @@ export default defineConfig({
   timeout: 120_000,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
   use: {
-    baseURL: 'http://localhost:4173/Sprengmeister/',
+    baseURL: 'http://localhost:4183/Sprengmeister/',
     trace: 'on-first-retry',
   },
   projects: [
@@ -56,7 +56,7 @@ export default defineConfig({
      * haelt fest, dass das so bleibt.
      */
     command: 'npm run build:e2e && npm run preview',
-    url: 'http://localhost:4173/Sprengmeister/',
+    url: 'http://localhost:4183/Sprengmeister/',
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },

@@ -252,16 +252,17 @@ describe('Informationssicherheit im Code', () => {
   /**
    * Drei Muster, die zusammen jeden realistischen Weg zum privaten Board abdecken:
    *
-   * 1. `.board` — der Zugriff auf das Board selbst. Das ist die schaerfste der drei:
-   *    Wer `fsm.context.board` nicht anfassen kann, kommt an `mines` gar nicht heran.
+   * 1. `context.board` — der **einzige** Weg zum privaten Board. Wer ihn nicht gehen
+   *    kann, kommt an `mines` gar nicht heran; das ist die schaerfste der drei.
    * 2. `board.mines` / `board.treasure` — falls doch einmal ein Board hereingereicht wird.
    * 3. `{ mines` / `{ treasure` — dieselben Felder ueber eine Destrukturierung.
    *
-   * Bewusst **nicht** verboten ist ein blosses `.treasure`: `ReplayCell.treasure` kommt
-   * aus `replayView()` und darf am Rundenende gelesen werden (GDD §4.4).
+   * Bewusst **nicht** verboten sind ein blosses `.treasure` und ein blosses `.board`:
+   * `ReplayCell.treasure` kommt aus `replayView()` und darf am Rundenende gelesen
+   * werden (GDD §4.4), und `stage.board` ist die PIXI-Buehne, nicht das Spielfeld.
    */
   const FORBIDDEN: readonly [RegExp, string][] = [
-    [/\.board\b/, 'Zugriff auf das private Board'],
+    [/\bcontext\.board\b/, 'Zugriff auf das private Board ueber context.board'],
     [/\b[Bb]oard\.(mines|treasure)\b/, 'board.mines / board.treasure'],
     [/\{\s*(mines|treasure)\s*[,}]/, 'Destrukturierung von mines / treasure'],
   ];
@@ -292,6 +293,7 @@ describe('Informationssicherheit im Code', () => {
     expect(hits('// ADR-2: niemand liest hier board.mines')).toBe(0);
     expect(hits('if (replayCell.treasure) show();')).toBe(0);
     expect(hits('const view = fsm.replay();')).toBe(0);
+    expect(hits('stage.board?.renderPublic(view);')).toBe(0);
   });
 
   it('haelt die einzigen Board-Ausgaenge in core/board.ts', () => {

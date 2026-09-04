@@ -32,15 +32,16 @@ export default defineConfig({
          * er wird wie Kernlogik behandelt, obwohl er in `ui/` liegt: jede Zeile, jede
          * Funktion.
          *
-         * Bei den Zweigen sind 65 % das Maximum des Erreichbaren, und das ist kein
-         * Nachlassen: Die fehlenden drei sind `import.meta.env.VITE_E2E` (wird nie
-         * ausgewertet, weil Vitest mit `DEV === true` laeuft und `||` kurzschliesst)
-         * und die `?? ''`-Fallbacks fuer `location.search` (in jsdom immer gesetzt).
-         * Ob der Hook im Deploy-Build wirklich verschwindet, kann ohnehin kein
-         * Unit-Test zeigen — das prueft der CI-Schritt am gebauten Bundle.
+         * Bei den Zweigen sind rund 54 % das Maximum des Erreichbaren, und das ist kein
+         * Nachlassen: Die fehlenden sind `import.meta.env.VITE_E2E` (wird nie
+         * ausgewertet, weil Vitest mit `DEV === true` laeuft und `||` kurzschliesst),
+         * der gesperrte Zustand selbst (eine Bau-Eigenschaft, keine Laufzeit-Frage) und
+         * die `?? ''`-Fallbacks fuer `location.search` (in jsdom immer gesetzt).
+         * Ob der Hook im Deploy-Build verschwindet, kann ohnehin kein Unit-Test zeigen —
+         * das prueft der CI-Schritt am gebauten Bundle (ADR-11).
          */
         'src/ui/devSeed.ts': {
-          branches: 65,
+          branches: 50,
           functions: 100,
           lines: 100,
           statements: 100,

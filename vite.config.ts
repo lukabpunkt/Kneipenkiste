@@ -27,7 +27,13 @@ export default defineConfig({
   },
   preview: {
     host: true,
-    port: 4173,
+    /*
+     * Eigener Port, nicht der Vite-Standard 4173: Drinkshot und Der Tresor liegen auf
+     * demselben Rechner und belegen ihn. Ein fremder Preview-Server auf dem Port faellt
+     * nicht als Fehler auf — er liefert einfach das andere Spiel aus, und die E2E-Tests
+     * scheitern an Meldungen, die mit diesem Projekt nichts zu tun haben.
+     */
+    port: 4183,
   },
   build: {
     target: 'es2022',

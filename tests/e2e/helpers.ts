@@ -9,7 +9,88 @@
  * Ohne diesen Hook liesse sich nie pruefen, was passiert, wenn jemand die Kiste findet.
  */
 
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
+
+/* ------------------------------------------------------------------ */
+/* Das PIXI-Feld antippen (ab M2)                                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Die Welt ist 1000 × 1500 Einheiten im Hochformat (ADR-12); das Feld sitzt oben, die
+ * Digger-Baenke darunter. Diese Zahlen spiegeln `config/theme.ts` — sie stehen hier noch
+ * einmal, damit der Test die Umrechnung **unabhaengig** vom Produktionscode macht. Ein
+ * Test, der dieselbe Funktion benutzt wie der Code, prueft nur sich selbst.
+ */
+const WORLD = { width: 1000, height: 1500 } as const;
+const LAYOUT = { 5: { plate: 185, gap: 18 }, 6: { plate: 153, gap: 16 } } as const;
+const FIELD_TOP = { single: 155, double: 255 } as const;
+
+/** Bildschirmposition einer Zelle im Canvas. */
+export async function cellPoint(
+  page: Page,
+  cell: number,
+  size: 5 | 6 = 5,
+  playerCount = 4
+): Promise<{ x: number; y: number }> {
+  const canvas: Locator = page.locator('.stage-host canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('Das Canvas ist nicht sichtbar.');
+
+  const layout = LAYOUT[size];
+  const extent = size * layout.plate + (size - 1) * layout.gap;
+  const top = playerCount >= 6 ? FIELD_TOP.double : FIELD_TOP.single;
+
+  const worldX =
+    (WORLD.width - extent) / 2 + layout.plate / 2 + (cell % size) * (layout.plate + layout.gap);
+  const worldY = top + layout.plate / 2 + Math.floor(cell / size) * (layout.plate + layout.gap);
+
+  return {
+    x: box.x + (worldX / WORLD.width) * box.width,
+    y: box.y + (worldY / WORLD.height) * box.height,
+  };
+}
+
+/** Tippt eine Platte im PIXI-Feld an. */
+export async function tapCell(page: Page, cell: number, size: 5 | 6 = 5, playerCount = 4): Promise<void> {
+  const point = await cellPoint(page, cell, size, playerCount);
+  await page.mouse.click(point.x, point.y);
+}
+
+/** Wartet, bis das Feld gerendert ist — `activate()` laeuft erst nach dem Wipe. */
+export async function waitForBoard(page: Page): Promise<void> {
+  await expect(page.locator('.stage-host canvas')).toBeVisible({ timeout: 20_000 });
+  // Die Bruecke steht erst, wenn die Buehne fertig gemountet ist.
+  await page.waitForFunction(() => globalThis.__sprengmeister !== undefined, { timeout: 20_000 });
+  await page.waitForTimeout(200);
+}
+
+/* ------------------------------------------------------------------ */
+/* Die Test-Bruecke (src/game/testBridge.ts)                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Das Feld ist ein Canvas — ein Test kann daran nichts ablesen. Diese Helfer fragen die
+ * Bruecke, die der E2E-Build bereitstellt (ADR-11).
+ */
+export function tileState(page: Page, cell: number): Promise<string | undefined> {
+  return page.evaluate((c) => globalThis.__sprengmeister?.tileState(c), cell);
+}
+
+export function tileColors(page: Page, cell: number): Promise<string[]> {
+  return page.evaluate((c) => globalThis.__sprengmeister?.tileColors(c) ?? [], cell);
+}
+
+export function countTiles(page: Page, state: string): Promise<number> {
+  return page.evaluate((s) => globalThis.__sprengmeister?.countTiles(s as never) ?? 0, state);
+}
+
+export function drawCalls(page: Page): Promise<number> {
+  return page.evaluate(() => globalThis.__sprengmeister?.drawCalls() ?? 0);
+}
+
+export function frameTimes(page: Page): Promise<number[]> {
+  return page.evaluate(() => globalThis.__sprengmeister?.frameTimes() ?? []);
+}
 
 /**
  * Den Pass-Screen antippen, bis er den Tap annimmt.
@@ -136,14 +217,16 @@ export async function buryMines(
   playerCount: number,
   cellsFor?: (playerIndex: number) => readonly number[]
 ): Promise<void> {
+  const size = playerCount >= 6 ? 6 : 5;
+
   for (let index = 0; index < playerCount; index++) {
     await tapPass(page);
-    // Wie bei `startDigging`: erst wenn eine Platte da ist, laeuft `activate()` durch.
-    await expect(page.locator('[data-screen="place"] .tile--covered').first()).toBeVisible();
+    await waitForBoard(page);
 
     const cells = cellsFor?.(index) ?? [index * 2, index * 2 + 1];
     for (const cell of cells) {
-      await page.locator(`.tile[data-cell="${cell}"]`).click();
+      await tapCell(page, cell, size, playerCount);
+      await page.waitForTimeout(120);
     }
 
     const bury = page.getByRole('button', { name: 'Vergraben' });
@@ -165,7 +248,7 @@ export async function buryMines(
 export async function startDigging(page: Page): Promise<void> {
   await page.getByRole('button', { name: "Los geht's" }).click();
   await expect(page.locator('[data-screen="dig"]')).toBeVisible();
-  await expect(page.locator('.tile--covered').first()).toBeVisible({ timeout: 15_000 });
+  await waitForBoard(page);
 }
 
 /**
@@ -177,31 +260,30 @@ export async function startDigging(page: Page): Promise<void> {
  * waere ein sicherer Timeout.
  */
 export async function settle(page: Page): Promise<void> {
-  await expect(async () => {
-    if (!(await page.locator('[data-screen="dig"]').isVisible())) return;
-    await expect(page.locator('.board')).not.toHaveAttribute('aria-busy', 'true', { timeout: 500 });
-  }).toPass({ timeout: 20_000 });
+  /*
+   * Das Feld sagt selbst, wann es fertig ist: Der `DigDirector` sperrt es fuer die Dauer
+   * der Inszenierung und gibt es danach wieder frei (Architektur §3).
+   *
+   * Auf das Banner zu warten reicht nicht — bei einem leeren Feld gibt es keins, und der
+   * Test wuerde pruefen, bevor die Anticipation ueberhaupt durch ist.
+   */
+  await page
+    .waitForFunction(() => globalThis.__sprengmeister?.locked() === true, { timeout: 5000 })
+    .catch(() => undefined);
+
+  await page.waitForFunction(
+    () =>
+      document.querySelector('[data-screen="dig"]') === null ||
+      globalThis.__sprengmeister?.locked() === false,
+    { timeout: 25_000 }
+  );
+  await page.waitForTimeout(250);
 }
 
 /** Eine Platte aufgraben und warten, bis die Inszenierung durch ist. */
-export async function dig(page: Page, cell: number): Promise<void> {
-  await page.locator(`.tile[data-cell="${cell}"]`).click();
+export async function dig(page: Page, cell: number, size: 5 | 6 = 5, playerCount = 4): Promise<void> {
+  await tapCell(page, cell, size, playerCount);
   await settle(page);
-}
-
-/**
- * Findet die Kiste, indem der Reihe nach gegraben wird — fuer Tests, die nur ein
- * Rundenende brauchen und denen egal ist, wie es zustande kommt.
- */
-export async function digUntilRoundOver(page: Page, maxDigs = 40): Promise<void> {
-  for (let i = 0; i < maxDigs; i++) {
-    if (!(await page.locator('[data-screen="dig"]').isVisible())) return;
-    const closed = page.locator('.tile--covered:not([disabled])').first();
-    if ((await closed.count()) === 0) return;
-    await closed.click();
-    await settle(page);
-  }
-  throw new Error(`Die Runde war nach ${maxDigs} Grabungen nicht vorbei — das kann nicht sein.`);
 }
 
 /**
@@ -245,11 +327,4 @@ export async function distributeAll(page: Page): Promise<void> {
   }
 
   await expect(page.locator('[data-screen="result"]')).toBeVisible({ timeout: 20_000 });
-}
-
-/** Die Zelle, unter der die Kiste liegt — aus dem Replay des Result-Screens. */
-export async function treasureCellFromReplay(page: Page): Promise<number> {
-  const tile = page.locator('[data-screen="result"] .tile', { has: page.locator('.tile__chest') }).first();
-  const cell = await tile.getAttribute('data-cell');
-  return Number(cell);
 }

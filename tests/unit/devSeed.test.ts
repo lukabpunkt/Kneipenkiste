@@ -5,10 +5,14 @@
  * des Spiels, weil jeder die einzige Information ausrechnen koennte, die niemand am
  * Tisch kennt. Zwei Dinge halten das auseinander:
  *
- * 1. Dieser Test: Der Hook liefert nur dann etwas anderes als `crypto`, wenn er erlaubt
- *    ist und ein Seed anliegt.
- * 2. Ein CI-Schritt, der das gebaute Bundle nach `?seed=` durchsucht — denn ob der Zweig
- *    wirklich verschwindet, entscheidet der Bundler, nicht der Quelltext.
+ * 1. Dieser Test: Der Hook liefert nur dann etwas anderes als `crypto`, wenn ein Seed
+ *    anliegt und er gueltig ist.
+ * 2. Ein CI-Schritt, der das gebaute Bundle nach `?seed=` durchsucht.
+ *
+ * Der **gesperrte** Zustand wird hier bewusst nicht simuliert: Er ist keine
+ * Laufzeit-Eigenschaft, sondern eine Bau-Eigenschaft. Ihn ueber einen injizierbaren
+ * Schalter testbar zu machen, hat genau das kaputtgemacht, was er sichern soll — der
+ * Bundler konnte den toten Zweig nicht mehr entfernen (ADR-11).
  */
 
 import { describe, expect, it } from 'vitest';
@@ -50,16 +54,6 @@ describe('Test-Seed', () => {
   it('faellt bei unsinnigen Seeds auf die sichere Quelle zurueck', () => {
     expect(secureSource('?seed=abc')).toBe(secureRandom);
     expect(secureSource('?seed=')).toBe(secureRandom);
-  });
-
-  it('ignoriert ?seed= vollstaendig, wenn der Hook gesperrt ist (ADR-11)', () => {
-    /*
-     * Der Produktionsfall. Ob der Zweig im Deploy-Build wirklich **verschwindet**,
-     * entscheidet der Bundler und prueft ein CI-Schritt — hier steht nur, dass er auch
-     * dann nichts taete, wenn er noch da waere.
-     */
-    expect(secureSource('?seed=42', false)).toBe(secureRandom);
-    expect(seedActive('?seed=42', false)).toBe(false);
   });
 
   it('bleibt im erlaubten Bereich', () => {
