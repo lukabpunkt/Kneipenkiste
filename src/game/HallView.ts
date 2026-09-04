@@ -17,7 +17,10 @@ import { layoutSuitcases } from './layout';
 import { createEventBus, type EventBus } from '@/core/store';
 import type { PlayerId } from '@/core/types';
 import type { PublicRound } from '@/core/publicView';
+import type { ItemSet } from '@/core/types';
+import type { SequenceContext } from './sequences/Sequence';
 import { Camera } from './Camera';
+import { FxKit } from './fx/FxKit';
 import { Hall } from './Hall';
 import type { HallAppHandle, HallAssets } from './HallApp';
 import { Officer } from './Officer';
@@ -51,6 +54,7 @@ export class HallView {
   readonly officer: Officer;
   readonly waldi: Waldi;
   readonly camera: Camera;
+  readonly fx: FxKit;
 
   private readonly app: HallAppHandle;
   private readonly root = new Container();
@@ -82,6 +86,18 @@ export class HallView {
     this.hall = new Hall(options.assets.hall);
     this.xray = new XrayMonitor(options.assets.hall, options.assets.xray);
     this.xray.setLowEffects(this.lowEffects);
+
+    /*
+     * Tropfen und Federn borgen sich Texturen aus den vorhandenen Atlanten statt eigene
+     * zu bekommen: Ein Tropfen ist eine getintete Ellipse, eine Feder ein kleines
+     * Dreieck — dafuer lohnt kein Frame, und jeder gesparte Atlas ist ein Draw-Call
+     * weniger (Audit A2: <= 3).
+     */
+    const dropTexture = options.assets.xray.textures['toothbrush'];
+    const featherTexture = options.assets.items.textures['towel'];
+    if (!dropTexture || !featherTexture) throw new Error('Fx-Texturen fehlen im Atlas.');
+    this.fx = new FxKit(options.assets.items, dropTexture, featherTexture);
+    this.fx.setLowEffects(this.lowEffects);
 
     /* --- Koffer auf dem Band, ein- oder zweireihig (ADR-13) --- */
     const count = options.travelerIds.length;
@@ -151,7 +167,7 @@ export class HallView {
     this.hall.floorLayer.addChild(this.waldi.view);
 
     /* --- Zusammenbauen --- */
-    this.root.addChild(this.hall.view, this.xray.view, this.hitLayer);
+    this.root.addChild(this.hall.view, this.xray.view, this.fx.view, this.hitLayer);
     this.camera = new Camera(this.app.world, this.app.layout);
 
     this.buildHitAreas();
@@ -303,6 +319,11 @@ export class HallView {
     return [...this.suitcases.keys()];
   }
 
+  /** Die Farbe des Beamten — alles, was ihm gehoert, traegt sie (CLAUDE.md). */
+  get officerColorId(): ColorId {
+    return this.officerColor;
+  }
+
   travelerOf(playerId: PlayerId): Traveler | undefined {
     return this.travelers.get(playerId);
   }
@@ -315,20 +336,52 @@ export class HallView {
   setLowEffects(value: boolean): void {
     this.lowEffects = value;
     this.xray.setLowEffects(value);
+    this.fx.setLowEffects(value);
     for (const traveler of this.travelers.values()) traveler.setLowEffects(value);
     this.officer.setLowEffects(value);
   }
 
   update(deltaMs: number): void {
     this.hall.update(deltaMs);
+    this.fx.update(deltaMs);
     for (const suitcase of this.suitcases.values()) suitcase.update(deltaMs);
     for (const traveler of this.travelers.values()) traveler.update(deltaMs);
     this.officer.update(deltaMs);
   }
 
+  /**
+   * Baut den Kontext, den eine Sequenz bekommt.
+   *
+   * Er enthaelt Bewegliches (Koffer, Reisender, Beamter, Effekte) — aber **keine**
+   * Rundendaten ausser Menge und Item-Set, und die sind zu diesem Zeitpunkt bereits
+   * oeffentlich (das Roentgenbild hat sie gezeigt).
+   */
+  sequenceContext(
+    suitcaseOf: PlayerId,
+    itemSet: ItemSet,
+    amount: number,
+    rng: RandomSource
+  ): SequenceContext | null {
+    const suitcase = this.suitcases.get(suitcaseOf);
+    if (!suitcase) return null;
+
+    return {
+      view: this,
+      suitcase,
+      traveler: this.travelers.get(suitcaseOf),
+      officer: this.officer,
+      fx: this.fx,
+      rng,
+      itemSet,
+      amount,
+      suitcaseOf,
+    };
+  }
+
   destroy(): void {
     this.events.clear();
     this.unmount();
+    this.fx.destroy();
     this.root.destroy({ children: true });
   }
 }

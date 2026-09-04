@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Bluffspiel für 4–8 Personen. Alle sind Reisen
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot), [Der Tresor](https://github.com/lukabpunkt/Tresor) und [Sprengmeister](https://github.com/lukabpunkt/Sprengmeister) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M2 fertig (`v0.2.0`) — die Zollhalle rendert in PixiJS: Koffer rollen ein, Reisende stehen hinter der gelben Linie, der Röntgenmonitor baut sein Bild zeilenweise auf. Sequenzen und Sound folgen in M3.
+**Status:** M3 fertig (`v0.3.0`) — die sechs Hinweise, die vier Schranken-Sequenzen und der komplette Ton laufen. Die Röntgen-Sequenzen sind noch Platzhalter; sie kommen in M4.
 
 ## Planung
 
@@ -27,7 +27,7 @@ Vite 6 · TypeScript · PixiJS v8 · GSAP 3 · howler.js · vite-plugin-pwa · V
 ```
 npm install
 npm run dev          # Vite --host
-npm test             # typecheck + lint + 214 Unit-Tests
+npm test             # typecheck + lint + 240 Unit-Tests
 npm run test:e2e     # Playwright, iPhone 12 + Pixel 5
 npm run test:perf    # Render- und Interaktions-Audit (A2)
 npm run build:atlas  # SVG → Atlas (@1x/@2x)
@@ -35,12 +35,12 @@ npm run build:atlas  # SVG → Atlas (@1x/@2x)
 
 Läuft auf Port 4173 schon etwas anderes: `PREVIEW_PORT=4183 npm run test:e2e`.
 
-**Dev-Modus:** `?dev=1` blendet ein Panel mit Zustand, Seed und „reveal" ein (deckt Mengen, Diplomat und die Wahrheit hinter den Hinweisen auf). `?dev=1&seed=123` macht eine Runde reproduzierbar — produktiv würfeln Hinweise, Diplomat und Item-Set immer über `crypto`.
+**Dev-Modus:** `?dev=1` blendet ein Panel mit Zustand, Seed und „reveal" ein (deckt Mengen, Diplomat und die Wahrheit hinter den Hinweisen auf). `?dev=1&seed=123` macht eine Runde reproduzierbar — produktiv würfeln Hinweise, Diplomat und Item-Set immer über `crypto`. `?dev=1&panel=sequences` blendet die Sequenz-Preview ein: jede Animation auf Knopfdruck, auf der echten Bühne.
 
 ### Nächster Meilenstein
 
 ```
 cd /Users/lukabloemendal/Documents/Zoll
 claude
-> Lies CLAUDE.md und docs/. Setze Milestone M3 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A3 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
+> Lies CLAUDE.md und docs/. Setze Milestone M4 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A4 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
 ```

@@ -14,6 +14,7 @@
  *   Director den Hinweis abgespielt hat — und die Icon-Leiste behält ihre Höhe.
  */
 
+import { play, startTicking, stopTicking } from '@/audio/AudioManager';
 import { HUD } from '@/config/choreo';
 import { HINT_REPLAY_LIMIT } from '@/config/rules';
 import { t, tList } from '@/core/i18n';
@@ -47,6 +48,11 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
     seconds: ctx.session.settings().interrogationSec,
     colorId: officerColor,
     onTick: (remaining) => {
+      /*
+       * Die Hallenuhr tickt erst in den letzten Sekunden mit. Über 45 Sekunden wäre sie
+       * Hintergrundrauschen; erst wenn es knapp wird, ist sie Druckmittel (GDD §3.3).
+       */
+      if (remaining === HUD.tickFromSec) startTicking();
       if (remaining <= HUD.tickFromSec && remaining > 0) vibrate('tap');
     },
     onFinish: () => endInterrogation(),
@@ -166,6 +172,12 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
                 disabled: offer !== undefined,
                 onOffer: (amount) => {
                   ctx.fsm.bribe(suitcase.playerId, amount);
+                  /* Das Angebot gehört auf die Bühne, wo alle es sehen (GDD §3.7). */
+                  stageHostStage?.bribe.offer(
+                    suitcase.playerId,
+                    amount,
+                    t('hall.bribeSpeech', { amount })
+                  );
                   refresh();
                 },
               })
@@ -185,13 +197,14 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
 
   /** Ein offenes Angebot: Der Beamte — und nur er — nimmt an oder lehnt ab. */
   function bribeOffer(from: PlayerId, amount: BribeAmount): HTMLElement {
+    void amount;
     const box = document.createElement('div');
     box.className = 'hall__offer';
 
-    const text = document.createElement('p');
-    text.className = 'hall__offer-text';
-    text.textContent = t('hall.bribeSpeech', { amount });
-
+    /*
+     * Nur die Knöpfe des Beamten. Der Text des Angebots steht als Sprechblase auf der
+     * Bühne — er gehört dem Reisenden, nicht dem HUD des Beamten.
+     */
     const buttons = document.createElement('div');
     buttons.className = 'hall__offer-actions';
     buttons.append(
@@ -201,6 +214,7 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
         className: 'btn--compact',
         onClick: () => {
           ctx.fsm.answerBribe(from, true);
+          stageHostStage?.bribe.accept(from, amount);
           refresh();
         },
       }),
@@ -211,12 +225,13 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
         className: 'btn--compact',
         onClick: () => {
           ctx.fsm.answerBribe(from, false);
+          stageHostStage?.bribe.decline(from);
           refresh();
         },
       })
     );
 
-    box.append(text, buttons);
+    box.append(buttons);
     return box;
   }
 
@@ -251,7 +266,7 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
     await stage.hints.rollIn(view);
     if (ended) return;
 
-    await stage.hints.play(view.hints, (hint) => {
+    await stage.hints.play(view.hints, view.itemSet, (hint) => {
       shownHints.push(hint);
       renderMarkers();
       vibrate('tap');
@@ -291,6 +306,8 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
     if (ended) return;
     ended = true;
     countdown.stop();
+    stopTicking();
+    play('ui_confirm');
     ctx.fsm.send({ type: 'endInterrogation' });
   }
 
@@ -318,6 +335,7 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
     destroy() {
       ended = true;
       countdown.stop();
+      stopTicking();
       resizeObserver?.disconnect();
       if (questionTimer !== undefined) clearInterval(questionTimer);
       stageHostStage?.hints.stop();

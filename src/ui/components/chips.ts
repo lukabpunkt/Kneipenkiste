@@ -47,11 +47,13 @@ export function createBribeChip(options: {
   const el = document.createElement('div');
   el.className = 'bribe';
   el.style.setProperty('--bribe-color', hex(colorById(options.colorId).hex));
-
-  const label = document.createElement('span');
-  label.className = 'bribe__label';
-  label.textContent = t('hall.bribeOffer');
-  el.append(label);
+  /*
+   * Nur die drei Zahlen, kein Wortlabel: Bei fünf Koffern nebeneinander überlappten sich
+   * sonst die Chips. Was sie bedeuten, steht in der `aria-label` jedes Knopfes und in der
+   * Sprechblase, sobald jemand bietet.
+   */
+  el.setAttribute('aria-label', t('hall.bribeOffer'));
+  el.title = t('hall.bribeOffer');
 
   for (const amount of [1, 2, 3] as BribeAmount[]) {
     const button = document.createElement('button');

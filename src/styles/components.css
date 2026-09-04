@@ -449,17 +449,13 @@ button.suitcase:active {
 .bribe {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   font-size: var(--fs-xs);
 }
 
-.bribe__label {
-  color: rgb(255 248 231 / 60%);
-}
-
 .bribe__btn {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border: 2px solid var(--bribe-color);
   border-radius: 50%;
   background: transparent;
@@ -694,4 +690,39 @@ button.suitcase:active {
   .stepper__value.is-punched {
     animation: none;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Sequenz-Preview (?dev=1&panel=sequences)                            */
+/* ------------------------------------------------------------------ */
+
+/* Oben links: Unten liegen die Bestechungs-Knöpfe und die Marker der Koffer. */
+.seq-preview {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  z-index: var(--z-hud);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 72%);
+}
+
+.seq-preview__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.seq-preview__btn {
+  padding: 2px 6px;
+  border: 1px solid #7fffd4;
+  border-radius: 4px;
+  background: transparent;
+  color: #7fffd4;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  cursor: pointer;
 }

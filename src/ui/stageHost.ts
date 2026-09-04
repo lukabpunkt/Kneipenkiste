@@ -67,6 +67,7 @@ export function createStageHost(ctx: ScreenContext, view: PublicRound): StageHos
   el.append(canvasHost, hud, description);
 
   let stage: Stage | undefined;
+  let preview: { el: HTMLElement; destroy(): void } | undefined;
 
   return {
     el,
@@ -84,16 +85,24 @@ export function createStageHost(ctx: ScreenContext, view: PublicRound): StageHos
       });
       stage.attach(canvasHost);
 
-      /* Nur im Dev-Build: die Messsonde für Tap-Zuverlässigkeit und Performance. */
+      /* Nur im Dev-Build: Messsonde und, auf Wunsch, die Sequenz-Preview. */
       if (ctx.dev) {
         const { attachStageProbe } = await import('@/dev/stageProbe');
         attachStageProbe(stage, canvasHost);
+
+        const { isSequencePanel, createSequencePreview } = await import('@/dev/sequencePreview');
+        if (isSequencePanel() && !preview) {
+          preview = createSequencePreview(stage, view.itemSet);
+          el.append(preview.el);
+        }
       }
 
       return stage;
     },
 
     release() {
+      preview?.destroy();
+      preview = undefined;
       stage?.detach();
     },
   };

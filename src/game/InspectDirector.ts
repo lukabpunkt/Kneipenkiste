@@ -13,17 +13,22 @@
  */
 
 import gsap from 'gsap';
+import { duckMusic, play, startBelt, stopBelt, unduckMusic } from '@/audio/AudioManager';
 import { XRAY, XRAY_LABELS } from '@/config/choreo';
 import { LAYOUT } from '@/config/theme';
+import type { RandomSource } from '@/core/rng';
 import type { InspectResult, ItemSet } from '@/core/types';
 import type { HallView } from './HallView';
+import { sequenceRegistry } from './sequences/registry';
 
 export class InspectDirector {
   private readonly view: HallView;
+  private readonly rng: RandomSource;
   private timeline: gsap.core.Timeline | undefined;
 
-  constructor(view: HallView) {
+  constructor(view: HallView, rng: RandomSource) {
     this.view = view;
+    this.rng = rng;
   }
 
   /**
@@ -48,10 +53,17 @@ export class InspectDirector {
 
     /* --- Der Koffer fährt ins Gerät --- */
     this.view.hall.runBelt(true);
+    startBelt();
+    duckMusic();
     this.view.highlight(result.suitcaseOf, true);
+
     timeline.add(this.view.camera.toXray(), 0);
     timeline.add(suitcase.travelIntoMachine(LAYOUT.machine.x - 40, XRAY.travelIn), 0.1);
-    timeline.call(() => this.view.hall.runBelt(false));
+    timeline.call(() => {
+      this.view.hall.runBelt(false);
+      stopBelt();
+      play('xray_powerup');
+    });
 
     /* --- Der Scan. Bis er durch ist, ist nichts zu erkennen. --- */
     const scan = this.view.xray.scan({
@@ -60,6 +72,8 @@ export class InspectDirector {
       ...(result.kind === 'diplomat' ? { diplomat: true } : {}),
     });
     timeline.add(scan, `>${XRAY.powerUp}`);
+    timeline.call(() => play('scanline_loop'), undefined, `${XRAY_LABELS.scanStart}`);
+    timeline.call(() => play('scan_stall'), undefined, `${XRAY_LABELS.stall}`);
 
     /*
      * Während des Scans steigt der Schweiß. Das ist die einzige Information, die die
@@ -71,59 +85,43 @@ export class InspectDirector {
       timeline.call(() => traveler.sweat(2), undefined, `${XRAY_LABELS.stall}`);
     }
 
-    /* --- Reaktion vor Konsequenz --- */
+    /*
+     * --- Die Sequenz ---
+     *
+     * Sie beginnt bei `face` und hält damit die Regel "Reaktion vor Konsequenz" ein:
+     * erst das Gesicht des Reisenden, dann Alarm oder Stempel, dann das Banner. Welche
+     * Sequenz läuft, wählt die Registry — in M3 sind das noch Platzhalter, ab M4 die
+     * sechs ausgearbeiteten.
+     */
     timeline.addLabel(XRAY_LABELS.face);
-    if (traveler) {
-      timeline.call(() => {
-        if (result.kind === 'caught') traveler.sweat(3);
-        else if (result.kind === 'clean') traveler.beOutraged();
-        else traveler.beSmug();
-      });
-    }
-    timeline.to({}, { duration: XRAY.faceReaction });
 
-    /* --- Konsequenz --- */
-    timeline.addLabel(XRAY_LABELS.verdict);
-    timeline.call(() => {
-      switch (result.kind) {
-        case 'caught':
-          officer.setFace('triumph');
-          break;
-        case 'clean':
-          officer.setFace('blush');
-          break;
-        case 'diplomat':
-          officer.setFace('facepalm');
-          break;
-      }
-    });
+    const ctx = this.view.sequenceContext(result.suitcaseOf, itemSet, result.amount, this.rng);
+    if (ctx) {
+      const kind =
+        result.kind === 'caught' ? 'xrayCaught' : result.kind === 'clean' ? 'xrayClean' : 'xrayOverlay';
+      timeline.addLabel(XRAY_LABELS.verdict, `>${XRAY.faceReaction}`);
+      timeline.add(sequenceRegistry().pick(kind, this.rng).build(ctx), XRAY_LABELS.face);
+    }
 
     if (result.kind === 'caught') {
-      timeline.add(this.view.camera.shake(), '<');
-      timeline.add(officer.blowWhistle(), '<');
-      timeline.add(suitcase.openCaught(), '<');
-    } else if (result.kind === 'clean') {
-      timeline.add(officer.clipboardMark('cross'), '<');
-      timeline.add(suitcase.openClean(), '<');
-    } else {
-      timeline.add(officer.clipboardMark('crumple'), '<');
+      timeline.add(this.view.camera.shake(), XRAY_LABELS.verdict);
     }
 
-    timeline.to({}, { duration: XRAY.verdict });
-
     /* --- Banner --- */
-    timeline.addLabel(XRAY_LABELS.banner);
+    timeline.addLabel(XRAY_LABELS.banner, `>${XRAY.verdict}`);
 
     /*
      * Die Kamera bleibt auf dem Monitor, solange das Banner steht. Fährt sie schon
      * währenddessen zurück, rutscht das Röntgenbild aus dem Bild, bevor jemand es gelesen
      * hat — und genau dieses Bild ist der Moment, für den das Spiel gebaut ist.
      */
-    timeline.to({}, { duration: XRAY.bannerHold });
+    timeline.to({}, { duration: XRAY.bannerHold }, XRAY_LABELS.banner);
 
     timeline.call(() => {
       this.view.highlight(result.suitcaseOf, false);
       this.view.camera.reset();
+      unduckMusic();
+      officer.setFace('stern');
     });
     timeline.add(suitcase.returnFromMachine(homeX, XRAY.travelIn * 0.8));
 

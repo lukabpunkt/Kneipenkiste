@@ -11,7 +11,7 @@
  */
 
 import gsap from 'gsap';
-import { Container, Graphics, Sprite, Text, type Spritesheet } from 'pixi.js';
+import { Container, Graphics, Sprite, Text, type Spritesheet, type Texture } from 'pixi.js';
 import { FONTS, UI_COLORS, colorById, textColorOn, type ColorId } from '@/config/theme';
 import type { HintType, PlayerId } from '@/core/types';
 
@@ -62,6 +62,7 @@ export class Suitcase {
   private readonly tagGroup = new Container();
   private readonly lock: Sprite;
   private readonly glow: Graphics;
+  private readonly tagSprite: Sprite;
 
   private state: SuitcaseState = 'closed';
   private readonly baseScale: number;
@@ -103,6 +104,7 @@ export class Suitcase {
 
     const tag = sprite('tag', color.hex);
     tag.anchor.set(0.5, 0.5);
+    this.tagSprite = tag;
 
     /*
      * Der Name auf dem Anhänger. Passt er nicht, wird er auf ein Kürzel gekürzt
@@ -148,6 +150,11 @@ export class Suitcase {
 
   position(x: number, y: number): void {
     this.view.position.set(x, y);
+  }
+
+  /** Die Anhaenger-Textur — die fliegenden Bestechungs-Tokens borgen sie sich. */
+  get tagTexture(): Texture {
+    return this.tagSprite.texture;
   }
 
   /** Weltbreite und -höhe für die Trefferfläche (Audit A2: ≥ 56 px auf dem Gerät). */

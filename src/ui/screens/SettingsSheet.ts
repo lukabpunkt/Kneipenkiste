@@ -5,6 +5,7 @@
  * **nicht** hier, sondern in der Lobby: Sie gehoeren zur Runde, nicht zum Geraet.
  */
 
+import { play, setAudioEnabled, setMusicVolume } from '@/audio/AudioManager';
 import { LOCALES, setLocale, t } from '@/core/i18n';
 import type { Locale } from '@/config/rules';
 import { setHapticsEnabled } from '../haptics';
@@ -19,9 +20,12 @@ export function openSettingsSheet(host: HTMLElement, ctx: ScreenContext): Sheet 
       list.className = 'settings';
 
       list.append(
-        toggleRow(t('settings.sound'), ctx.session.settings().sound, (value) =>
-          ctx.session.setSettings({ sound: value })
-        ),
+        toggleRow(t('settings.sound'), ctx.session.settings().sound, (value) => {
+          ctx.session.setSettings({ sound: value });
+          setAudioEnabled(value);
+          /* Sofort hörbar: Wer den Schalter umlegt, will wissen, ob es wirkt. */
+          if (value) play('ui_confirm');
+        }),
         toggleRow(t('settings.haptics'), ctx.session.settings().haptics, (value) => {
           ctx.session.setSettings({ haptics: value });
           setHapticsEnabled(value);
@@ -29,9 +33,10 @@ export function openSettingsSheet(host: HTMLElement, ctx: ScreenContext): Sheet 
         toggleRow(t('settings.lowEffects'), ctx.session.settings().lowEffects, (value) =>
           ctx.session.setSettings({ lowEffects: value })
         ),
-        sliderRow(t('settings.music'), ctx.session.settings().music, (value) =>
-          ctx.session.setSettings({ music: value })
-        ),
+        sliderRow(t('settings.music'), ctx.session.settings().music, (value) => {
+          ctx.session.setSettings({ music: value });
+          setMusicVolume(value);
+        }),
         localeRow(ctx)
       );
 

@@ -82,9 +82,15 @@ export class Camera {
     return this.focus(LAYOUT.monitor.x, LAYOUT.monitor.y + 120, STAGE.inspectZoom, CAMERA.toXray);
   }
 
-  /** Schwenkt zur Schranke. */
+  /**
+   * Schwenkt zur Schranke.
+   *
+   * Ohne Zoom: An der Schranke zählt, dass **Koffer und Reisender zusammen** im Bild
+   * sind — der eine klappt auf, der andere grinst dazu. Ein enger Ausschnitt zeigt
+   * entweder das eine oder das andere.
+   */
   toGate(): gsap.core.Tween {
-    return this.focus(LAYOUT.gate.x - 90, LAYOUT.gate.y - 60, 1.08, CAMERA.toGate);
+    return this.focus(LAYOUT.gate.x - 140, LAYOUT.gate.y - 150, 1, CAMERA.toGate);
   }
 
   /**

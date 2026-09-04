@@ -13,6 +13,7 @@ import type { ColorId } from '@/config/theme';
 import { createSeededRng } from '@/core/rng';
 import type { PlayerId } from '@/core/types';
 import { noteStageBuild } from '@/dev/stageProbe';
+import { BribeDirector } from './BribeDirector';
 import { GateDirector } from './GateDirector';
 import { getHallApp, loadHallAssets, type HallAppHandle } from './HallApp';
 import { HallView } from './HallView';
@@ -41,6 +42,7 @@ export interface Stage {
   readonly hints: HintDirector;
   readonly inspect: InspectDirector;
   readonly gate: GateDirector;
+  readonly bribe: BribeDirector;
   /** Hängt das Canvas in einen Host — beim Screenwechsel, ohne Neuaufbau. */
   attach(host: HTMLElement): void;
   detach(): void;
@@ -66,11 +68,13 @@ export async function ensureStage(request: StageRequest): Promise<Stage> {
 
   const [app, assets] = await Promise.all([getHallApp(), loadHallAssets()]);
 
+  /* Die Inszenierung darf seeded sein — sie entscheidet nichts (CLAUDE.md). */
+  const rng = createSeededRng(request.seed);
+
   const view = new HallView({
     app,
     assets,
-    /* Die Inszenierung darf seeded sein — sie entscheidet nichts (CLAUDE.md). */
-    rng: createSeededRng(request.seed),
+    rng,
     players: request.players,
     officerId: request.officerId,
     travelerIds: request.travelerIds,
@@ -99,9 +103,10 @@ export async function ensureStage(request: StageRequest): Promise<Stage> {
   current = {
     app,
     view,
-    hints: new HintDirector(view),
-    inspect: new InspectDirector(view),
-    gate: new GateDirector(view),
+    hints: new HintDirector(view, rng),
+    inspect: new InspectDirector(view, rng),
+    gate: new GateDirector(view, rng),
+    bribe: new BribeDirector(view),
     roundKey: request.roundKey,
     stopTicker: () => {
       app.app.ticker.remove(tick);
@@ -132,6 +137,7 @@ export function disposeStage(): void {
   current.hints.stop();
   current.inspect.stop();
   current.gate.stop();
+  current.bribe.stop();
   current.detach();
   current.view.destroy();
   current = undefined;

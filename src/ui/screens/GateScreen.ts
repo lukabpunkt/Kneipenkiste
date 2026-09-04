@@ -43,6 +43,8 @@ export function createGateScreen(ctx: ScreenContext): ScreenInstance {
   let stage: Awaited<ReturnType<typeof stageHost.ready>> | undefined;
   let cancelled = false;
   let timers: ReturnType<typeof setTimeout>[] = [];
+  /** Wird gesetzt, wenn jemand den laufenden Durchgang wegtippt. */
+  let skipCurrent: (() => void) | undefined;
 
   const wait = (ms: number): Promise<void> =>
     new Promise((resolve) => {
@@ -59,25 +61,41 @@ export function createGateScreen(ctx: ScreenContext): ScreenInstance {
   async function run(): Promise<void> {
     if (!stage) return;
 
-    for (const entry of gate) {
+    for (const [index, entry] of gate.entries()) {
       if (cancelled) return;
 
       board.textContent = t('gate.next', { name: ctx.session.nameOf(entry.suitcaseOf) });
       banner.hidden = true;
 
-      await stage.gate.play(entry, () => {
+      const timeline = stage.gate.play(entry, itemSet, () => {
         banner.hidden = false;
         banner.textContent = bannerText(entry);
         banner.dataset.kind = entry.kind;
         vibrate('stamp');
       });
 
+      /*
+       * Überspringen ist ab dem **zweiten** Koffer erlaubt und nie beim letzten
+       * (Architektur §6). Der erste braucht seinen Auftritt, damit alle verstehen, was
+       * hier passiert — und der letzte ist der, auf den die ganze Runde hinausläuft
+       * (ADR-4: Schmuggler zuletzt).
+       */
+      const skippable = index > 0 && index < gate.length - 1;
+      el.dataset.skippable = String(skippable);
+      skipCurrent = skippable ? () => timeline.progress(1) : undefined;
+
+      await timeline;
+
+      skipCurrent = undefined;
       if (cancelled) return;
       await wait(BANNER_MS * 0.35);
     }
 
     if (!cancelled) ctx.fsm.send({ type: 'allPassed' });
   }
+
+  /* Ein Tap auf die Bühne springt ans Ende des laufenden Durchgangs. */
+  stageHost.el.addEventListener('pointerdown', () => skipCurrent?.());
 
   return {
     el,

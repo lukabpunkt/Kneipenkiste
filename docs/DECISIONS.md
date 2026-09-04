@@ -46,3 +46,12 @@ Kontext: Ein einziger Atlas wäre bei @2x über 2048 px gegangen, und PIXI + GSA
 
 ## ADR-15 · 2026-09-05 · Die Kamera zentriert, statt den Punkt festzuhalten
 Kontext: `Camera.focus()` hielt den Zielpunkt an seiner Bildschirmposition und zoomte darum herum. Beim Schwenk auf den Röntgenmonitor hing der halb außerhalb des Bildes. Entscheidung: `focus()` nimmt den Weltpunkt in die Bildmitte; die Kamera bleibt auf dem Monitor, bis das Banner gestanden hat. Konsequenz: Der Kern-Moment des Spiels läuft in der Bildmitte ab, nicht am Rand.
+
+## ADR-16 · 2026-09-05 · Sounds werden zur Laufzeit synthetisiert
+Kontext: GDD §6 listet 32 Cues. Die Toolchain hat keinen OGG/MP3-Encoder (kein ffmpeg, kein sox), und ein Audio-Sprite hätte Bytes gekostet, die nach Architektur §1 knapp sind. Entscheidung: Wie bei Drinkshot erzeugt `AudioManager` jeden Cue per Web Audio aus einem Rezept (Oszillator + Rauschen + Tiefpass + Hüllkurve); `play(cue, when)` plant auf der **AudioContext-Uhr**, nicht per `setTimeout`. Konsequenz: Null Bytes im Bundle, offline ab dem ersten Start — und die ± 50 ms aus Audit A3 sind überhaupt erst haltbar, weil ein `setTimeout` im Renderloop stärker schwankt. Die Fassade (`play`, `startBelt`, `duckMusic`) ist die eines howler-Sprites; in M6 lässt sich der Erzeuger tauschen, ohne einen Aufrufer anzufassen.
+
+## ADR-17 · 2026-09-05 · Das Bestechungsangebot steht auf der Bühne, nicht im HUD
+Kontext: Das Angebot ist laut GDD §3.7 **öffentlich** — wer besticht, wirkt schuldig, oder tut nur so. Als Zeile im HUD des Beamten wäre es eine Zahl unter vielen. Entscheidung: Das Angebot erscheint als Sprechblase über dem Koffer des Reisenden; im HUD stehen nur die beiden Knöpfe des Beamten. Bei Annahme klickt ein Schloss zu und die Tokens fliegen sichtbar zu ihm. Konsequenz: Der Tisch sieht, wer bietet und was — und der Unterschied zwischen „gehört dem Reisenden" und „gehört dem Beamten" ist auf einem Handy in der Mitte genau das, was man sehen muss.
+
+## ADR-18 · 2026-09-05 · Wer die Schranke passiert hat, verlässt die Bühne
+Kontext: Alle Reisenden liefen an dieselbe Stelle vor der Schranke und blieben dort. Bei sieben Koffern stand am Ende eine Menschentraube statt eines Durchgangs. Entscheidung: Nach jedem Reveal laufen Reisender und Koffer nach rechts aus dem Bild und blenden aus. Konsequenz: Die Schranke liest sich als Durchgang, und der jeweils nächste steht frei — wichtig, weil der letzte Koffer der Höhepunkt der Runde ist (ADR-4).

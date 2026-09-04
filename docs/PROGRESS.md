@@ -5,7 +5,7 @@
 | M0 Setup & Regelkern | ✅ fertig (⏳ 3 manuelle Checks offen) | `v0.0.1` | A0 bestanden |
 | M1 UI-Flow (DOM-Halle) | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.1.0` | A1 bestanden |
 | M2 PIXI-Halle, Koffer, Charaktere | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.2.0` | A2 bestanden |
-| M3 Hinweise, Schranke, Audio | ⬜ offen | – | – |
+| M3 Hinweise, Schranke, Audio | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.3.0` | A3 bestanden |
 | M4 Röntgen-Sequenzen | ⬜ offen | – | – |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
 | M6 Playtest & Release | ⬜ offen | – | – |
@@ -136,3 +136,41 @@ Sechs Fehler, alle erst am Bild sichtbar:
 - [ ] Deuteranopie-Simulation über `m2-hall-8.png`: Sind alle acht Koffer unterscheidbar?
 
 **Hinweis zur Testumgebung:** Auf diesem Rechner (8 GB, parallel laufende VM) beendet macOS den Preview-Server während langer E2E-Läufe per SIGKILL. Die Suiten laufen deshalb lokal in Blöcken; in der CI mit mehr Speicher läuft `npm run test:e2e` in einem Stück.
+
+## Audit A3 — 2026-09-05
+
+**Ergebnis:** BESTANDEN (alle automatisierbaren MUSS-Checks grün; 2 Checks brauchen echte Ohren bzw. echte Menschen)
+
+| Check | Status | Notiz |
+|---|---|---|
+| 6 Hinweis-Sequenzen + Bark registriert, Dev-Preview, ≤ 1.8 s | ✅ | Eine Sequenz je Hinweis-Typ (`hint_wobble` … `hint_dog`), Dauer 1.5 s. Waldis Bellen ist ein eigener Beat im `HintDirector`. Preview unter `?dev=1&panel=sequences`. |
+| **Nach der Animation sehen Koffer mit/ohne Hinweis identisch aus** | ✅ | Kein Screenshot-Diff von außen, sondern ein Silhouetten-Vergleich im Browser: Der Bildausschnitt beider Koffer wird zur Bitmaske (dunkle Outline gegen Rest) und Pixel für Pixel verglichen — **97,9 % Übereinstimmung**. Farbe und Name unterscheiden sich zwangsläufig; ein systematischer Unterschied (Neigung, Versatz, anderer Ton) schlüge hier sofort durch. |
+| 4 Schranken-Sequenzen ≤ 3 s; Schmuggler-Stall 600 ms; Skip ab Koffer 2, nie beim letzten | ✅ | `gate_clean_wave`, `gate_clean_relief`, `gate_smuggler_moonwalk`, `gate_smuggler_bow`. Der Stall hält die Ampel auf **gelb** — grün wäre gelogen, rot verriete das Ergebnis. Skip-Regel im `GateScreen` (`data-skippable`). |
+| Bestechungs-Inszenierung korrekt (Schloss, Tokens) | ✅ | Sprechblase auf der Bühne (ADR-17), Vorhängeschloss mit Overshoot, Tokens fliegen einzeln zum Beamten. Screenshots `m3-bribe-offer.png`, `m3-bribe-accepted.png`. |
+| Angezeigte Zustände == `publicView` je Phase | ✅ | Die Bühne bekommt weiterhin nur `publicView`; der Sequenz-Kontext enthält Menge und Item-Set erst, wenn das Röntgenbild sie gezeigt hat. Hinweis-Sequenzen bekommen `amount: 0` — sie **dürfen** die Menge nicht kennen. Der Lint-Test aus dem Standing Audit deckt `src/game/` mit ab. |
+| Perf-Test grün | ✅ | Unverändert trotz Partikeln und Sequenzen: p50 **16,7 ms**, p95 17,7 ms, **3 Draw-Calls**, Update p50 0 ms. |
+| Sound-Sync ± 50 ms | ✅ | Cues werden auf der AudioContext-Uhr geplant (`play(cue, when)`), nicht per `setTimeout` — ADR-16 erklärt, warum das der eigentliche Grund ist, dass die Toleranz haltbar ist. |
+| Stumm voll spielbar | ✅ | Eigener Test: Ohne `AudioContext` (jsdom) laufen alle 32 Cues, alle Schleifen und alle Regler still durch, ohne zu werfen. |
+| Wake-Lock; Tab-Wechsel Pause/Resume | ✅ | Wake-Lock aus M1; neu: `visibilitychange` hält Audio an und weckt es wieder, damit die Uhr nicht in der Hosentasche weitertickt. |
+| Hinweis-Test (3 Personen sehen 5 Hall-Phasen) | ⏳ manuell | Braucht echte Menschen. |
+| Klingt es gut? | ⏳ manuell | Braucht echte Ohren — die Rezepte sind auf einen Handylautsprecher in einer lauten Runde ausgelegt. |
+
+### Was gebaut wurde
+- **`Sequence.ts` + Registry:** gewichtete Auswahl mit einem Sperrfenster von 3. Ist alles gesperrt, wird die Sperre für einen Zug ignoriert — lieber eine Wiederholung als gar keine Sequenz.
+- **6 Hinweis-Sequenzen**, jede mit eigenem Ton und eigenem Effekt (Tropfen, Federn, Waldi), jede mit vollständigem Reset.
+- **4 Schranken-Sequenzen** inklusive Item-Fontäne, Konfetti und Stempel-Slam; danach verlassen Reisender und Koffer die Bühne (ADR-18).
+- **`FxKit`** mit `ParticlePool`: Sprites werden wiederverwendet, jeder Pool hat eine harte Obergrenze und recycelt statt zu wachsen.
+- **`AudioManager`** mit allen 32 Cues aus GDD §6, Band-Schleife und Uhr-Tick.
+- **`BribeDirector`** + `SpeechBubble`, **Sequenz-Preview** unter `?dev=1&panel=sequences`.
+
+### Was gefunden und behoben wurde
+1. **Die Sprechblase lief über den Bühnenrand** — beim ersten und letzten Koffer war das Angebot halb abgeschnitten und damit nicht mehr öffentlich lesbar. Jetzt wird sie in die Bühne geklemmt.
+2. **Die Bestechungs-Chips überlappten sich** ab fünf Koffern, weil sie ein Wortlabel trugen. Das Label steckt jetzt nur noch in `aria-label` und `title`.
+3. **Die Reisenden stapelten sich an der Schranke** (ADR-18).
+4. **Die Kamera an der Schranke stand zu eng** — Koffer und Reisender passten nicht zusammen ins Bild.
+
+**Offene SOLL-Follow-ups:** keine.
+
+**Manuelle Checks für Luka vor M4:**
+- [ ] Ton anhören: Sind die sechs Hinweise auseinanderzuhalten, ohne hinzusehen? Hebt sich Waldis Bellen ab (es ist der einzige Hinweis, der nie lügt)?
+- [ ] Hinweis-Test aus A3: Drei Personen sehen fünf Hall-Phasen — sagen mindestens zwei, sie hätten den Hinweisen „eher geglaubt"?

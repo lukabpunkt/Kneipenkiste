@@ -16,6 +16,13 @@ import {
   loadSession,
   type SessionController,
 } from '@/core/session';
+import {
+  resumeAudio,
+  setAudioEnabled,
+  setMusicVolume,
+  suspendAudio,
+  unlockAudio,
+} from '@/audio/AudioManager';
 import { detectLocale, t } from '@/core/i18n';
 import { maxAmount } from '@/core/modes';
 import { packView, publicView, resultView } from '@/core/publicView';
@@ -58,6 +65,19 @@ export function createApp(host: HTMLElement): App {
   if (!stored) session.setSettings({ locale: detectLocale() });
   setLocale(session.settings().locale);
   setHapticsEnabled(session.settings().haptics);
+  setAudioEnabled(session.settings().sound);
+  setMusicVolume(session.settings().music);
+
+  /*
+   * iOS gibt Audio erst nach einer echten Nutzergeste frei — und die Geste muss
+   * **synchron** im Event-Handler ankommen. Deshalb hier am Dokument und nicht in einem
+   * Screen: Der erste Tap irgendwo entsperrt, egal welcher Screen gerade steht.
+   */
+  const unlockOnce = (): void => {
+    unlockAudio();
+    document.removeEventListener('pointerdown', unlockOnce, true);
+  };
+  document.addEventListener('pointerdown', unlockOnce, true);
 
   const dev = isDevMode();
   const seed = devSeed();
@@ -153,6 +173,13 @@ export function createApp(host: HTMLElement): App {
 
   const unwatch = watchWakeLock(() => PUBLIC_STATES.includes(fsm.state));
 
+  /* Im Hintergrund schweigt das Spiel — sonst tickt die Uhr in der Hosentasche weiter. */
+  const onVisibility = (): void => {
+    if (document.hidden) suspendAudio();
+    else resumeAudio();
+  };
+  document.addEventListener('visibilitychange', onVisibility);
+
   /* --- Zurueck-Taste des Browsers = "Runde abbrechen?" --- */
   const onPopState = (): void => {
     askToAbort();
@@ -176,6 +203,9 @@ export function createApp(host: HTMLElement): App {
       unsubscribe();
       unwatch();
       globalThis.removeEventListener('popstate', onPopState);
+      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('pointerdown', unlockOnce, true);
+      suspendAudio();
       devPanel?.remove();
       void releaseWakeLock();
     },
