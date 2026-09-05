@@ -10,6 +10,7 @@ import gsap from 'gsap';
 import type { Container } from 'pixi.js';
 import { CAMERA } from '@/config/choreo';
 import { LAYOUT, STAGE } from '@/config/theme';
+import { prefersReducedMotion } from '@/ui/motion';
 import type { HallLayout } from './HallApp';
 
 export class Camera {
@@ -98,6 +99,13 @@ export class Camera {
    * Kamera versetzt zurücklässt, verschiebt die Trefferflächen der Koffer.
    */
   shake(amplitude = STAGE.alarmShakePx, durationSec = CAMERA.shake): gsap.core.Tween {
+    /*
+     * Kein Schütteln, wenn der Nutzer Bewegung reduziert hat. Es ist der eine Effekt im
+     * Spiel, der Menschen wirklich schlecht machen kann — und er trägt keine Information,
+     * die nicht auch im Banner steht.
+     */
+    if (prefersReducedMotion()) return gsap.to({}, { duration: 0 });
+
     this.shakeTween?.kill();
     const baseX = this.world.position.x;
     const baseY = this.world.position.y;

@@ -28,7 +28,7 @@ import {
   MIN_PLAYERS,
 } from '@/config/rules';
 import { XRAY, XRAY_LABELS, GATE, HINTS } from '@/config/choreo';
-import { PLAYER_COLORS, UI_COLORS, colorById, textColorOn } from '@/config/theme';
+import { COLOR_IDS, PLAYER_COLORS, UI_COLORS, colorById, textColorOn } from '@/config/theme';
 
 describe('rules.ts enthaelt die GDD-Werte', () => {
   it('Spielerzahl 4–8', () => {
@@ -113,10 +113,15 @@ describe('theme.ts und tokens.css bleiben synchron', () => {
     expect(() => colorById('lila' as 'red')).toThrow();
   });
 
-  it('gibt hellen Farben dunklen Text', () => {
-    expect(textColorOn('yellow')).toBe(UI_COLORS.ink);
-    expect(textColorOn('cyan')).toBe(UI_COLORS.ink);
-    expect(textColorOn('red')).toBe(UI_COLORS.paper);
+  it('setzt auf jede Spielerfarbe dunklen Text', () => {
+    /*
+     * Alle acht, nicht nur die hellen: `paper` auf Rot, Blau, Lila, Orange und Pink
+     * erreicht keine 4,5:1 (gemessen in `scripts/check-contrast.mjs`). Die Farben sind
+     * unveränderlich, also musste der Text weichen.
+     */
+    for (const color of COLOR_IDS) {
+      expect(textColorOn(color), color).toBe(UI_COLORS.ink);
+    }
   });
 
   it('fuehrt jede Spielerfarbe auch im CSS', () => {

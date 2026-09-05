@@ -35,11 +35,20 @@ export function colorById(id: ColorId): (typeof PLAYER_COLORS)[number] {
   return found;
 }
 
-/** Weisser Text auf Gelb/Cyan/Gruen ist verboten — diese bekommen `ink`. */
-const DARK_TEXT_COLORS: readonly ColorId[] = ['yellow', 'cyan', 'green'];
-
-export function textColorOn(id: ColorId): number {
-  return DARK_TEXT_COLORS.includes(id) ? UI_COLORS.ink : UI_COLORS.paper;
+/**
+ * Text auf einer Spielerfarbe ist **immer** `ink`.
+ *
+ * Ursprünglich bekamen nur Gelb, Cyan und Grün dunklen Text, der Rest hellen. Gemessen
+ * (`npm run check:contrast`) fiel `paper` auf Rot, Blau, Lila, Orange und Pink durch —
+ * zwischen 2,4:1 und 3,5:1, verlangt sind 4,5:1. Mit `ink` liegen alle acht zwischen
+ * 4,7:1 und 12,8:1.
+ *
+ * Die Spielerfarben selbst sind unveränderlich (Art Direction §2.1, identisch zu den
+ * Schwesterspielen) — also musste der Text weichen. Er passt ohnehin besser zum
+ * Sticker-Look, in dem jede Outline `ink` ist.
+ */
+export function textColorOn(_id: ColorId): number {
+  return UI_COLORS.ink;
 }
 
 /* ------------------------------------------------------------------ */

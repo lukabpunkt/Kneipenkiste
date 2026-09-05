@@ -29,6 +29,7 @@ import { packView, publicView, resultView } from '@/core/publicView';
 import { createDevPanel, devSeed, isDevMode } from '@/dev/devPanel';
 import { confirmDialog } from '@/ui/components/sheet';
 import { setHapticsEnabled } from '@/ui/haptics';
+
 import { SCREEN_FOR_STATE, createRouter, type ScreenId } from '@/ui/router';
 import { acquireWakeLock, releaseWakeLock, watchWakeLock } from '@/ui/wakeLock';
 import { createDistributeScreen } from '@/ui/screens/DistributeScreen';
@@ -173,6 +174,18 @@ export function createApp(host: HTMLElement): App {
 
   const unwatch = watchWakeLock(() => PUBLIC_STATES.includes(fsm.state));
 
+  /*
+   * „Bewegung reduzieren" gilt sofort und auch, wenn sie mitten im Spiel umgestellt wird
+   * — ein Neustart wäre für eine Zugänglichkeitseinstellung die falsche Antwort.
+   *
+   * Die GSAP-Seite davon liegt im Bühnen-Chunk: Sie erst mit ihm zu laden ist kein
+   * Kompromiss, denn ohne Bühne gibt es auch keine GSAP-Animation.
+   */
+  let unwatchMotion: (() => void) | undefined;
+  void import('@/game/reducedMotion').then((module) => {
+    unwatchMotion = module.syncReducedMotion();
+  });
+
   /* Im Hintergrund schweigt das Spiel — sonst tickt die Uhr in der Hosentasche weiter. */
   const onVisibility = (): void => {
     if (document.hidden) suspendAudio();
@@ -202,6 +215,7 @@ export function createApp(host: HTMLElement): App {
     destroy() {
       unsubscribe();
       unwatch();
+      unwatchMotion?.();
       globalThis.removeEventListener('popstate', onPopState);
       document.removeEventListener('visibilitychange', onVisibility);
       document.removeEventListener('pointerdown', unlockOnce, true);

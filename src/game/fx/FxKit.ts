@@ -9,6 +9,7 @@
 import gsap from 'gsap';
 import { Container, Graphics, Text, type Spritesheet, type Texture } from 'pixi.js';
 import { FONTS, PARTICLE_BUDGET, STAGE, STAMP, UI_COLORS } from '@/config/theme';
+import { prefersReducedMotion } from '@/ui/motion';
 import type { ItemSet } from '@/core/types';
 import { ParticlePool } from './ParticlePool';
 
@@ -118,6 +119,18 @@ export class FxKit {
     if (this.lowEffects) return gsap.timeline();
 
     this.alarm.alpha = 0;
+
+    /*
+     * Bei „Bewegung reduzieren" nicht blinken, sondern einmal ruhig aufleuchten und
+     * wieder ausgehen: Die Information „Alarm" bleibt, das Flackern geht.
+     */
+    if (prefersReducedMotion()) {
+      return gsap
+        .timeline()
+        .to(this.alarm, { alpha: 0.18, duration: durationSec * 0.35, ease: 'none' })
+        .to(this.alarm, { alpha: 0, duration: durationSec * 0.65, ease: 'none' });
+    }
+
     return gsap
       .timeline()
       .to(this.alarm, {

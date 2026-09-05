@@ -55,7 +55,8 @@
     "highSeason": {
       "name": "Hochsaison",
       "hint": "Bis zu 10 Stück schmuggeln, eine Öffnung mehr."
-    }
+    },
+    "openingsNow": "Der Beamte öffnet {count}"
   },
   "officerIntro": {
     "headline": "{name} ist Zollbeamter.",
@@ -129,7 +130,8 @@
     "bannerDiplomat": "DIPLOMAT · {officer} trinkt {sips}",
     "pickSuitcase": "Welcher Koffer?",
     "revealClean": "Socken, Zahnbürste, ein Teddy.",
-    "revealDiplomat": "Ein Diplomatenpass."
+    "revealDiplomat": "Ein Diplomatenpass.",
+    "snifferNote": "Waldi kostet eine"
   },
   "gate": {
     "headline": "Schranke",
@@ -181,7 +183,11 @@
       "caught": "erwischt · trinkt {sips}",
       "harassment": "Belästigung · trinkt {sips}",
       "diplomat": "Diplomat · trinkt {sips}"
-    }
+    },
+    "share": "Teilen",
+    "shareThrough": "{name} hat {amount} über die Grenze gebracht 🛃",
+    "shareCaught": "{officer} hat {name} mit {amount} erwischt 🛃",
+    "shareHonest": "Bei {officer} kam niemand durch — es hatte aber auch keiner was dabei 🛃"
   },
   "rules": {
     "headline": "Regeln",
@@ -237,5 +243,10 @@
     "click": "Der tickende Koffer",
     "feather": "Der Koffer mit der Feder",
     "dog": "Der beschnüffelte Koffer"
+  },
+  "fatal": {
+    "headline": "Der Zoll hat zu",
+    "body": "Das Spiel konnte nicht starten. Ein neuer Versuch setzt die gespeicherte Runde zurück.",
+    "retry": "Nochmal versuchen"
   }
 }

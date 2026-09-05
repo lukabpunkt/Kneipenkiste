@@ -31,6 +31,9 @@ jobs:
       - name: Lint (max. 5 Warnings, Standing Audit)
         run: npm run lint -- --max-warnings 5
 
+      - name: Kontrast der Textfarben (Audit A5)
+        run: npm run check:contrast
+
       - name: Unit-Tests mit Coverage
         run: npm run test:coverage
 
@@ -110,6 +113,36 @@ jobs:
 
       - name: E2E-Flow
         run: npm run test:e2e
+
+      - name: Sequenzen und Polish (Audits A3–A5)
+        run: npx playwright test tests/e2e/hints.spec.ts tests/e2e/xray.spec.ts tests/e2e/polish.spec.ts --project="Pixel 5"
+
+      - name: Performance und Interaktion (Audit A2)
+        # Der Frame-Zeit-Test überspringt sich selbst, wenn der Runner ohne GPU per
+        # SwiftShader rendert; Draw-Calls, JS-Zeit und Heap werden trotzdem geprüft.
+        run: npm run test:perf
+
+  lighthouse:
+    name: Lighthouse (Audit A5)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Preview starten
+        run: |
+          npm run preview -- --port 4173 --strictPort &
+          npx wait-on http://127.0.0.1:4173/Zoll/ --timeout 60000
+
+      - name: Perf / A11y / Best Practices ≥ 90
+        run: npm run check:lighthouse
 
       - if: failure()
         uses: actions/upload-artifact@v4

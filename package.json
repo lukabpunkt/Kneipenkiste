@@ -17,10 +17,13 @@
     "test:unit:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test tests/e2e/flow.spec.ts",
-    "test:perf": "playwright test tests/e2e/perf.spec.ts",
+    "test:perf": "playwright test tests/e2e/perf.spec.ts --project=\"Pixel 5\"",
     "build:atlas": "node scripts/build-atlas.mjs",
     "build:audio": "node scripts/build-audio-sprite.mjs",
-    "preview:sequences": "vite --host --open \"/?dev=1&panel=sequences\""
+    "preview:sequences": "vite --host --open \"/?dev=1&panel=sequences\"",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "test:sequences": "playwright test tests/e2e/hints.spec.ts tests/e2e/xray.spec.ts tests/e2e/polish.spec.ts --project=\"Pixel 5\"",
+    "check:lighthouse": "node scripts/check-lighthouse.mjs"
   },
   "dependencies": {
     "gsap": "^3.13.0",
@@ -43,7 +46,8 @@
     "typescript-eslint": "^8.18.0",
     "vite": "^6.0.5",
     "vite-plugin-pwa": "^0.21.1",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "wait-on": "^9.1.0"
   },
   "engines": {
     "node": ">=20"

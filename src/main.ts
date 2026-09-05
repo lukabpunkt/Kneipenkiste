@@ -24,16 +24,64 @@ function applyStaticTranslations(): void {
   }
 }
 
+/**
+ * Zeigt eine lesbare Meldung statt einer weissen Seite.
+ *
+ * Ein Spiel, das auf einem Tisch liegt, kann nicht "die Konsole oeffnen". Wenn der Start
+ * scheitert — kaputter localStorage, fehlendes WebGL, ein Fehler in einem Modul —, soll
+ * dastehen, was los ist und was hilft.
+ */
+function showFatal(root: HTMLElement, error: unknown): void {
+  console.error('[zoll] Start fehlgeschlagen', error);
+
+  root.replaceChildren();
+  const box = document.createElement('main');
+  box.className = 'screen screen--fatal';
+  box.setAttribute('role', 'alert');
+
+  const title = document.createElement('h1');
+  title.className = 'fatal__title';
+  title.textContent = t('fatal.headline');
+
+  const body = document.createElement('p');
+  body.className = 'fatal__body';
+  body.textContent = t('fatal.body');
+
+  const retry = document.createElement('button');
+  retry.type = 'button';
+  retry.className = 'btn btn--primary';
+  retry.textContent = t('fatal.retry');
+  retry.addEventListener('click', () => {
+    /*
+     * Beim zweiten Versuch die gespeicherte Session wegwerfen: Der haeufigste Grund fuer
+     * einen Start, der zweimal scheitert, sind kaputte Daten im localStorage.
+     */
+    try {
+      globalThis.localStorage?.removeItem('zoll.session.v1');
+    } catch {
+      /* Wenn selbst das nicht geht, hilft nur noch Neuladen. */
+    }
+    location.reload();
+  });
+
+  box.append(title, body, retry);
+  root.append(box);
+}
+
 function boot(): void {
   const root = document.querySelector<HTMLElement>('#app');
   if (!root) throw new Error('#app fehlt im Dokument.');
 
-  /* Gespeicherte Sprache schlaegt die des Browsers — `app.ts` setzt sie gleich erneut. */
-  setLocale(loadSession()?.settings.locale ?? detectLocale());
-  applyStaticTranslations();
+  try {
+    /* Gespeicherte Sprache schlaegt die des Browsers — `app.ts` setzt sie gleich erneut. */
+    setLocale(loadSession()?.settings.locale ?? detectLocale());
+    applyStaticTranslations();
 
-  const app = createApp(root);
-  Reflect.set(globalThis, '__zoll', { app, version: __APP_VERSION__ });
+    const app = createApp(root);
+    Reflect.set(globalThis, '__zoll', { app, version: __APP_VERSION__ });
+  } catch (error) {
+    showFatal(root, error);
+  }
 }
 
 boot();

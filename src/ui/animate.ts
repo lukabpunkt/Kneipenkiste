@@ -9,11 +9,9 @@
  */
 
 import { UI_TIMING } from '@/config/theme';
+import { prefersReducedMotion } from './motion';
 
-/** Nutzer hat "Bewegung reduzieren" gesetzt — dann keine Zeitschleifen (Audit A5). */
-export function prefersReducedMotion(): boolean {
-  return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-}
+export { prefersReducedMotion } from './motion';
 
 /**
  * Zählt eine Zahl von 0 auf `value` hoch.

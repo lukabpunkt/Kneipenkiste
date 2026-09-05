@@ -7,6 +7,7 @@
 
 import { t } from '@/core/i18n';
 import { createButton } from '../components/button';
+import { createTitleLoop } from '../components/titleLoop';
 import { openRulesSheet } from './RulesSheet';
 import { openSettingsSheet } from './SettingsSheet';
 import type { ScreenContext, ScreenInstance } from '../router';
@@ -22,6 +23,8 @@ export function createTitleScreen(ctx: ScreenContext): ScreenInstance {
   const tagline = document.createElement('p');
   tagline.className = 'title__tagline';
   tagline.textContent = t('app.tagline');
+
+  const loop = createTitleLoop();
 
   const actions = document.createElement('div');
   actions.className = 'title__actions';
@@ -46,7 +49,10 @@ export function createTitleScreen(ctx: ScreenContext): ScreenInstance {
     })
   );
 
-  el.append(logo, tagline, actions);
+  el.append(logo, tagline, loop.el, actions);
 
-  return { el };
+  return {
+    el,
+    destroy: () => loop.destroy(),
+  };
 }

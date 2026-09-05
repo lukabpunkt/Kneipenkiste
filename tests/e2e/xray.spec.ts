@@ -238,3 +238,46 @@ test.describe('A4 — Effekte', () => {
     expect(peak, 'Partikel-Budget überschritten').toBeLessThanOrEqual(200);
   });
 });
+
+test.describe('A5 — Zugänglichkeit', () => {
+  test('die Koffer sind auch per Tastatur zu öffnen', async ({ page }) => {
+    test.setTimeout(180_000);
+    await toInspect(page, 5201, [4, 0, 0, 0]);
+
+    /*
+     * Die Koffer liegen auf einem Canvas. Wer nicht tippen kann, braucht einen anderen
+     * Weg — und der muss zum selben Ergebnis führen, nicht zu einem Ersatzspiel.
+     */
+    const keys = page.locator('.inspect__keys button:not([disabled])');
+    await expect(keys).toHaveCount(4);
+
+    /* Der Fokus muss sichtbar werden, sonst ist er keiner. */
+    await keys.first().focus();
+    await page.waitForTimeout(80);
+    const visible = await keys.first().evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      return rect.width > 1 && rect.height > 1;
+    });
+    expect(visible, 'der fokussierte Knopf bleibt unsichtbar').toBe(true);
+
+    /* Und er trägt denselben Namen wie der Koffer auf der Bühne. */
+    await expect(keys.first()).toContainText(/\w+/);
+
+    await keys.first().press('Enter');
+    await expect(page.locator('.inspect__banner')).toHaveAttribute('data-kind', /scanning/, {
+      timeout: 10_000,
+    });
+    await expect(page.locator('.inspect__banner')).toHaveAttribute('data-kind', /caught|clean|diplomat/, {
+      timeout: 25_000,
+    });
+  });
+
+  test('Banner melden sich bei Screenreadern', async ({ page }) => {
+    test.setTimeout(180_000);
+    await toInspect(page, 5202, [3, 0, 0, 0]);
+
+    /* Was sich ändert, ohne dass man es angestoßen hat, muss angesagt werden. */
+    await expect(page.locator('.inspect__banner')).toHaveAttribute('aria-live', 'polite');
+    await expect(page.locator('.openings')).toBeVisible();
+  });
+});

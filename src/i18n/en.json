@@ -55,7 +55,8 @@
     "highSeason": {
       "name": "High season",
       "hint": "Smuggle up to 10 items, one extra opening."
-    }
+    },
+    "openingsNow": "The officer opens {count}"
   },
   "officerIntro": {
     "headline": "{name} is the customs officer.",
@@ -129,7 +130,8 @@
     "bannerDiplomat": "DIPLOMAT · {officer} drinks {sips}",
     "pickSuitcase": "Which case?",
     "revealClean": "Socks, a toothbrush, a teddy.",
-    "revealDiplomat": "A diplomatic passport."
+    "revealDiplomat": "A diplomatic passport.",
+    "snifferNote": "Waldi costs one"
   },
   "gate": {
     "headline": "Gate",
@@ -181,7 +183,11 @@
       "caught": "busted · drinks {sips}",
       "harassment": "harassment · drinks {sips}",
       "diplomat": "diplomat · drinks {sips}"
-    }
+    },
+    "share": "Share",
+    "shareThrough": "{name} smuggled {amount} across the border 🛃",
+    "shareCaught": "{officer} busted {name} with {amount} 🛃",
+    "shareHonest": "Nobody got past {officer} — then again, nobody was carrying 🛃"
   },
   "rules": {
     "headline": "Rules",
@@ -237,5 +243,10 @@
     "click": "The ticking case",
     "feather": "The case with the feather",
     "dog": "The sniffed case"
+  },
+  "fatal": {
+    "headline": "Customs is closed",
+    "body": "The game could not start. Trying again resets the saved session.",
+    "retry": "Try again"
   }
 }

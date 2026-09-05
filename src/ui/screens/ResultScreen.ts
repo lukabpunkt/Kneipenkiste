@@ -7,6 +7,7 @@
  * wird (Design-Pfeiler 2).
  */
 
+import { MOTION } from '@/config/theme';
 import { t } from '@/core/i18n';
 import { biggestRun } from '@/core/payout';
 import { bestNose, boldestSmuggler, hitRate } from '@/core/session';
@@ -15,6 +16,8 @@ import { createButton } from '../components/button';
 import { hintIcon } from '../components/suitcaseCard';
 import { openSheet } from '../components/sheet';
 import { itemSetName } from './InspectScreen';
+import { growBar, prefersReducedMotion, safeAnimate } from '../animate';
+import { shareResult, canShare } from '../share';
 import type { ScreenContext, ScreenInstance } from '../router';
 
 export function createResultScreen(ctx: ScreenContext): ScreenInstance {
@@ -63,10 +66,12 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
   const caseList = document.createElement('ul');
   caseList.className = 'result__cases';
 
-  for (const suitcase of view.suitcases) {
+  for (const [index, suitcase] of view.suitcases.entries()) {
     const item = document.createElement('li');
     item.className = 'result__case';
     item.dataset.opened = String(suitcase.opened);
+    /* Die Welle: jede Zeile klappt etwas später auf als die davor. */
+    item.style.setProperty('--row', String(index));
 
     item.append(
       createBadge({
@@ -133,9 +138,15 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
         })
       : t('result.hintFalseLine', { hint: t(`hintSubject.${hint.type}`) });
 
+    /*
+     * Der „stimmte/log"-Stempel. Er ist leicht gedreht wie ein echter Stempel — und der
+     * Winkel kommt aus der Position, nicht aus Zufall: So sieht dieselbe Runde bei einem
+     * zweiten Blick gleich aus.
+     */
     const verdict = document.createElement('span');
     verdict.className = 'result__verdict';
     verdict.textContent = hint.truthful ? t('result.hintTrue') : t('result.hintFalse');
+    verdict.style.setProperty('--stamp-tilt', `${((hint.suitcaseOf.length * 7) % 11) - 5}deg`);
 
     item.append(text, verdict);
     hintList.append(item);
@@ -157,13 +168,57 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
       label: t('result.stats'),
       variant: 'secondary',
       onClick: () => openStats(),
-    }),
+    })
+  );
+
+  /*
+   * Teilen nur, wenn das Gerät es kann. Ein Knopf, der beim Tippen nichts tut, ist
+   * schlechter als kein Knopf — und auf dem Desktop gibt es die Web Share API meist nicht.
+   */
+  if (canShare()) {
+    actions.append(
+      createButton({
+        label: t('result.share'),
+        variant: 'ghost',
+        onClick: () => void shareResult(shareText()),
+      })
+    );
+  }
+
+  actions.append(
     createButton({
       label: t('result.changePlayers'),
       variant: 'ghost',
       onClick: () => ctx.fsm.send({ type: 'changePlayers' }),
     })
   );
+
+  /**
+   * Der Text zum Teilen (Roadmap M5.3).
+   *
+   * Er erzählt die Runde in einem Satz — und zwar die Pointe, nicht die Statistik:
+   * „Rudi hat 14 Gartenzwerge über die Grenze gebracht 🛃".
+   */
+  function shareText(): string {
+    const best = biggestRun(view.gate);
+    if (best) {
+      return t('result.shareThrough', {
+        name: ctx.session.nameOf(best.suitcaseOf),
+        amount: itemSetName(view.itemSet, best.amount),
+      });
+    }
+
+    const caught = view.openings.find((o) => o.kind === 'caught');
+    if (caught) {
+      return t('result.shareCaught', {
+        officer: ctx.session.nameOf(view.officerId),
+        name: ctx.session.nameOf(caught.suitcaseOf),
+        amount: itemSetName(view.itemSet, caught.amount),
+      });
+    }
+
+    return t('result.shareHonest', { officer: ctx.session.nameOf(view.officerId) });
+  }
 
   el.append(banner, drinkers, cases, hints, actions);
 
@@ -185,13 +240,27 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
         const table = document.createElement('ul');
         table.className = 'stats';
 
-        for (const player of ctx.session.players()) {
+        /*
+         * Der Balken zeigt „über die Grenze gebracht" relativ zum Besten der Runde.
+         * Eine Zahl allein sagt niemandem, ob 6 viel ist — ein Balken neben dem längsten
+         * sagt es sofort.
+         */
+        const most = Math.max(1, ...Object.values(stats).map((s) => s.smuggledThrough));
+
+        for (const [index, player] of ctx.session.players().entries()) {
           const entry = stats[player.id];
           if (!entry) continue;
 
           const row = document.createElement('li');
           row.className = 'stats__row';
           row.append(createBadge({ name: player.name, colorId: player.colorId, small: true }));
+
+          const bar = document.createElement('span');
+          bar.className = 'stats__bar';
+          bar.style.setProperty('--bar-color', `var(--c-player-${player.colorId})`);
+          bar.setAttribute('aria-hidden', 'true');
+          row.append(bar);
+          growBar(bar, (entry.smuggledThrough / most) * 100, index * MOTION.staggerMs);
 
           const rate = hitRate(entry);
           const values = document.createElement('span');
@@ -211,21 +280,66 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
 
         body.append(table);
 
+        /* Die beiden Auszeichnungen als Badges, nicht als Textzeile. */
         const boldest = boldestSmuggler(stats);
         const nose = bestNose(stats);
-        const badges = document.createElement('p');
+        const badges = document.createElement('div');
         badges.className = 'stats__badges';
-        badges.textContent = [
-          boldest ? `${t('result.boldestSmuggler')}: ${ctx.session.nameOf(boldest.playerId)}` : null,
-          nose ? `${t('result.bestNose')}: ${ctx.session.nameOf(nose.playerId)}` : null,
-        ]
-          .filter((line): line is string => line !== null)
-          .join(' · ');
 
-        if (badges.textContent.length > 0) body.append(badges);
+        if (boldest) {
+          badges.append(
+            award(t('result.boldestSmuggler'), ctx.session.nameOf(boldest.playerId), ctx.session.colorOf(boldest.playerId))
+          );
+        }
+        if (nose) {
+          badges.append(
+            award(t('result.bestNose'), ctx.session.nameOf(nose.playerId), ctx.session.colorOf(nose.playerId))
+          );
+        }
+        if (badges.childElementCount > 0) body.append(badges);
       },
     });
   }
 
-  return { el };
+  return {
+    el,
+
+    activate() {
+      /*
+       * Die Aufklapp-Welle. Sie läuft nach dem Wipe, damit sie nicht mit ihm konkurriert
+       * — und sie fällt bei „Bewegung reduzieren" weg, weil sie nichts erzählt, was nicht
+       * schon dasteht.
+       */
+      if (prefersReducedMotion()) return;
+
+      for (const [index, row] of [...el.querySelectorAll<HTMLElement>('.result__case')].entries()) {
+        void safeAnimate(
+          row,
+          [
+            { opacity: 0, transform: 'translateY(10px) scaleY(0.86)' },
+            { opacity: 1, transform: 'none' },
+          ],
+          {
+            duration: MOTION.base,
+            delay: index * MOTION.staggerMs,
+            easing: 'cubic-bezier(.2,.9,.3,1.2)',
+            fill: 'backwards',
+          }
+        );
+      }
+    },
+  };
+}
+
+/** Eine Auszeichnung im Statistik-Sheet. */
+function award(title: string, name: string, colorId: Parameters<typeof createBadge>[0]['colorId']): HTMLElement {
+  const el = document.createElement('div');
+  el.className = 'award';
+
+  const label = document.createElement('span');
+  label.className = 'award__title';
+  label.textContent = title;
+
+  el.append(label, createBadge({ name, colorId, small: true }));
+  return el;
 }

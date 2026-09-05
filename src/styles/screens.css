@@ -867,3 +867,162 @@
   font-size: var(--fs-sm);
   color: rgb(255 248 231 / 80%);
 }
+
+/* ------------------------------------------------------------------ */
+/* Title-Loop (GDD §5)                                                 */
+/* ------------------------------------------------------------------ */
+
+.title-loop {
+  width: min(300px, 86%);
+  margin: var(--space-4) 0;
+}
+
+.title-loop__scene {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/*
+ * Der Koffer fährt von links nach rechts durch das Gerät. Eine reine CSS-Animation:
+ * Sie läuft ohne JavaScript, kostet keinen Frame im Hauptthread und hört bei
+ * "Bewegung reduzieren" über die Media-Query unten von selbst auf.
+ */
+.title-loop__case {
+  animation: title-belt 5s linear infinite;
+}
+
+@keyframes title-belt {
+  0% {
+    transform: translate(-30px, 118px);
+  }
+  100% {
+    transform: translate(250px, 118px);
+  }
+}
+
+/* Der Scan-Balken im Monitor läuft von oben nach unten — die Scanline im Kleinen. */
+.title-loop__silhouette {
+  animation: title-scan 5s ease-in-out infinite;
+}
+
+@keyframes title-scan {
+  0%,
+  20% {
+    opacity: 0;
+  }
+  38%,
+  70% {
+    opacity: 1;
+  }
+  88%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title-loop__case {
+    animation: none;
+    transform: translate(110px, 118px);
+  }
+
+  .title-loop__silhouette {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Fehlerfall (M5.5)                                                   */
+/* ------------------------------------------------------------------ */
+
+.screen--fatal {
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.fatal__title {
+  font-size: var(--fs-xl);
+  color: var(--c-alarm);
+}
+
+.fatal__body {
+  margin: 0;
+  max-width: 30ch;
+  color: rgb(255 248 231 / 78%);
+}
+
+/* ------------------------------------------------------------------ */
+/* Result-Juice (M5.3)                                                 */
+/* ------------------------------------------------------------------ */
+
+/* Der "stimmte/log"-Stempel: leicht gedreht wie ein echter. */
+.result__verdict {
+  transform: rotate(var(--stamp-tilt, -3deg));
+  border: 2px solid var(--c-ink);
+}
+
+.stats__bar {
+  flex: 0 0 54px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgb(255 248 231 / 12%);
+  overflow: hidden;
+}
+
+.stats__bar::after {
+  content: '';
+  display: block;
+  width: var(--score-fill, 0%);
+  height: 100%;
+  border-radius: 999px;
+  background: var(--bar-color, var(--c-customs));
+  transition: width var(--t-slow) var(--ease-snappy);
+}
+
+.stats__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.award {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border: 2px dashed var(--c-customs);
+  border-radius: var(--radius-sm);
+}
+
+.award__title {
+  font-size: var(--fs-xs);
+  color: var(--c-customs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Der Spürhund-Hinweis am Öffnungs-Chip. */
+.openings__note {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+/* Was ein Modus konkret bewirkt, sobald er an ist. */
+.mode__effect {
+  margin-top: 2px;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  color: var(--c-customs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stats__bar::after {
+    transition: none;
+  }
+}

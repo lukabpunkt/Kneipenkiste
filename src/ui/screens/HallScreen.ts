@@ -23,6 +23,7 @@ import type { PublicHint } from '@/core/publicView';
 import { createBadge } from '../components/badge';
 import { createButton, createOfficerButton } from '../components/button';
 import { createBribeChip } from '../components/chips';
+import { showCoachmark } from '../components/coachmark';
 import { createCountdownRing } from '../components/countdownRing';
 import { hintIcon } from '../components/suitcaseCard';
 import { vibrate } from '../haptics';
@@ -280,6 +281,12 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
 
     hintsDone = true;
     renderMarkers();
+
+    /*
+     * Der Hinweis kommt **nach** den Animationen: Vorher wäre er eine Behauptung, danach
+     * ist er eine Einordnung dessen, was man gerade gesehen hat.
+     */
+    showCoachmark(el, 'hall', t('onboarding.hall'));
 
     stage.view.setMode('interrogation');
     status.textContent = t('hall.interrogation');

@@ -10,11 +10,19 @@ import { t } from '@/core/i18n';
 import type { BribeAmount } from '@/core/types';
 import { symbolSvg } from './button';
 
-/** "Öffnungen: ● ● ○" — wie viele Koffer der Beamte noch oeffnen darf. */
+/**
+ * "Öffnungen: ● ● ○" — wie viele Koffer der Beamte noch oeffnen darf.
+ *
+ * Im Spuerhund-Modus steht daneben, **warum** es eine weniger ist. Ohne diesen Hinweis
+ * wirkt die Regel wie ein Fehler: Der Beamte hat einen verlaesslichen Hinweis bekommen
+ * und darf dafuer seltener oeffnen (GDD §3.7) — das ist ein Tausch, kein Malus.
+ */
 export function createOpeningsChip(options: {
   left: number;
   max: number;
   colorId: ColorId;
+  /** Spuerhund-Modus aktiv. */
+  sniffer?: boolean;
 }): HTMLElement {
   const el = document.createElement('div');
   el.className = 'openings';
@@ -35,6 +43,15 @@ export function createOpeningsChip(options: {
   }
 
   el.append(label, dots);
+
+  if (options.sniffer === true) {
+    const note = document.createElement('span');
+    note.className = 'openings__note';
+    note.textContent = t('inspect.snifferNote');
+    note.title = t('modes.sniffer.hint');
+    el.append(note);
+  }
+
   return el;
 }
 

@@ -10,6 +10,7 @@ import { INTERROGATION_PRESETS, MAX_PLAYERS, MIN_PLAYERS, PACK_TIMER_PRESETS } f
 import type { GameModeId, InterrogationSec, PackTimerSec } from '@/config/rules';
 import { GAME_MODES } from '@/config/rules';
 import { t } from '@/core/i18n';
+import { maxOpenings } from '@/core/modes';
 import { preloadStage } from '../stageHost';
 import { createBadge } from '../components/badge';
 import { ICON_HOME, createButton, createIconButton, symbolSvg } from '../components/button';
@@ -150,6 +151,19 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
       hint.textContent = t(`modes.${mode}.hint`);
 
       button.append(name, hint);
+
+      /*
+       * Was der Modus konkret bewirkt, sobald er an ist: wie viele Koffer der Beamte
+       * dann oeffnen darf. Die Regel steht im GDD, aber am Tisch zaehlt die Zahl.
+       */
+      if (active && (mode === 'sniffer' || mode === 'highSeason')) {
+        const effect = document.createElement('span');
+        effect.className = 'mode__effect';
+        effect.textContent = t('modes.openingsNow', {
+          count: maxOpenings(ctx.session.players().length, ctx.session.settings().modes),
+        });
+        button.append(effect);
+      }
       button.addEventListener('click', () => {
         ctx.session.setModes({ [mode]: !active } as Partial<Record<GameModeId, boolean>>);
         renderModes();

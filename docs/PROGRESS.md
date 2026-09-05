@@ -7,7 +7,7 @@
 | M2 PIXI-Halle, Koffer, Charaktere | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.2.0` | A2 bestanden |
 | M3 Hinweise, Schranke, Audio | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.3.0` | A3 bestanden |
 | M4 Röntgen-Sequenzen | ✅ fertig (⏳ 1 manueller Check offen) | `v0.4.0` | A4 bestanden |
-| M5 Polish, Modi, A11y | ⬜ offen | – | – |
+| M5 Polish, Modi, A11y | ✅ fertig (⏳ 1 manueller Check offen) | `v0.5.0` | A5 bestanden |
 | M6 Playtest & Release | ⬜ offen | – | – |
 
 ## Audit-Reports
@@ -221,3 +221,38 @@ Gemessen auf der echten Bühne, nicht an den Konstanten aus `choreo.ts` — ein 
 
 **Manueller Check für Luka vor M5:**
 - [ ] „Lustig-Test" aus A4: Drei Personen sehen die sieben Sequenzen (`?dev=1&panel=sequences`) — grinsen mindestens zwei?
+
+## Audit A5 — 2026-09-05
+
+**Ergebnis:** BESTANDEN (alle MUSS-Checks grün; ein manueller Check offen)
+
+| Check | Status | Notiz |
+|---|---|---|
+| Lighthouse Mobile: Performance / A11y / Best Practices ≥ 90 | ✅ | **99 / 100 / 100.** FCP 1,3 s, LCP 2,0 s, TBT 0 ms, CLS 0. Als eigenes Gate (`npm run check:lighthouse`) mit den Schwellen an einer Stelle, dazu ein CI-Job. |
+| PWA installierbar | ✅ | Manifest mit `standalone`, 192er, 512er und maskierbarem Icon; Service Worker wird ausgeliefert. Eigener E2E-Test. |
+| JS ≤ 450 KB gzip; Hall-Chunk lazy | ✅ | **251 KB gzip gesamt**, Einstiegs-Chunk **30,3 KB**. Geprüft, dass weder PIXI noch GSAP im Einstieg landen. |
+| Kontrast ≥ 4,5:1 | ✅ | `npm run check:contrast` prüft **22 echte Paarungen** — nicht alle möglichen, sondern die, die im Spiel wirklich übereinanderliegen. Führte zu ADR-21. |
+| Reduced-Motion | ✅ | Kein Kamera-Schütteln, kein Blinken, kein Title-Loop; GSAP-Eases werden zu `steps(1)`, damit die **Reihenfolge** der Beats bleibt und nur der Weg verschwindet. E2E: eine ganze Runde läuft damit durch. |
+| Tastatur (SOLL) | ✅ | Die Koffer haben ein unsichtbares, fokussierbares Gegenstück im DOM (ADR-23) — dieselbe Runde, kein Ersatzspiel. |
+| EN vollständig | ✅ | 163 Keys in beiden Sprachen, kein leerer Wert, kein `[missing:]`, gleich viele Fragevorschläge. Dazu ein Test, der deutsche Wörter im englischen Wörterbuch findet. |
+| Alle Modus-Kombinationen spielbar | ✅ | Alle **16** Kombinationen × 5 Spielerzahlen: immer ≥ 1 Öffnung, nie mehr Öffnungen als Reisende, immer gültige Mengen. |
+| Title-Loop 10 min ohne Leak | ✅ | 45 s / ~19 Silhouetten-Wechsel ohne ein einziges nachgewachsenes Element; beim Verlassen des Titels bleibt nichts zurück. Zehn Minuten wären hier nur zehn Minuten Wartezeit. |
+| Share-Text | ✅ | Web Share API, Knopf nur wenn das Gerät sie hat. Der Text erzählt die Pointe, nicht die Statistik: „Rudi hat 4 Ananas über die Grenze gebracht 🛃". |
+| Fehlerfälle | ✅ | Scheitert der Start, steht eine lesbare Meldung statt einer weißen Seite — und der zweite Versuch wirft die gespeicherte Session weg, weil kaputte Daten im `localStorage` der häufigste Grund sind. |
+| Onboarding-Tooltips | ✅ | Zwei Sätze, einmal pro Gerät. Der Hall-Hinweis kommt **nach** den Animationen: davor wäre er eine Behauptung, danach eine Einordnung. |
+| Modi im UI erklärt | ✅ | Ein Satz je Modus in der Lobby, plus die konkrete Auswirkung („Der Beamte öffnet 2"), sobald er an ist. Am Öffnungs-Chip steht „Waldi kostet eine" — die Regel ist ein Tausch, kein Malus. |
+| Result-Juice | ✅ | Aufklapp-Welle über die Koffer-Übersicht, „stimmte/log" als gedrehte Stempel, Statistik-Balken relativ zum Besten, Auszeichnungen als Badges. |
+
+### Was gebaut wurde
+`check-contrast.mjs` und `check-lighthouse.mjs` als Gates · Title-Loop (SVG, ADR-22) · Onboarding-Hinweise · Web-Share · Tastatur-Gegenstück der Koffer (ADR-23) · Reduced-Motion durchgängig · Fehlerseite · Result-Juice · Modus-Auswirkungen im UI.
+
+### Was gefunden und behoben wurde
+1. **Fünf von acht Spielerfarben hatten zu wenig Kontrast** — gemessen zwischen 2,4:1 und 3,5:1, verlangt 4,5:1 (ADR-21). Das war seit M1 im Spiel und wäre ohne Messung nicht aufgefallen.
+2. **GSAP war in den Einstiegs-Chunk gerutscht** (26 → 59 KB gzip), weil das neue `ui/motion.ts` es importierte. Der GSAP-Teil liegt jetzt unter `src/game/`, wo er hingehört — 30,3 KB.
+3. **Der Spürhund-Malus war unsichtbar.** Er sah aus wie ein Fehler, statt wie der Tausch, der er ist.
+4. **Ein Regel-Randfall, den ich beim Testen fand:** Bei vier Spielern kann der Spürhund keine Öffnung abziehen (Untergrenze 1) — Hochsaison legt aber trotzdem eine drauf. Kein Fehler, sondern zwei einzeln richtige Regeln; jetzt als Test dokumentiert.
+
+**Offene SOLL-Follow-ups:** keine.
+
+**Manueller Check für Luka vor M6:**
+- [ ] Auf einem echten Gerät installieren und offline starten; dann Systemeinstellung „Bewegung reduzieren" einschalten und eine Runde spielen.

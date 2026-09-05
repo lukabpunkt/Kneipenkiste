@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Bluffspiel für 4–8 Personen. Alle sind Reisen
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot), [Der Tresor](https://github.com/lukabpunkt/Tresor) und [Sprengmeister](https://github.com/lukabpunkt/Sprengmeister) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M4 fertig (`v0.4.0`) — das Herzstück steht: sechs Röntgen-Sequenzen plus Diplomaten-Overlay, jede unter 3,5 s und in einer Sekunde lesbar. Als Nächstes M5 (Polish, Modi, Accessibility).
+**Status:** M5 fertig (`v0.5.0`) — Lighthouse 99/100/100, Kontrast geprüft, Tastatur-Bedienung, Title-Loop, Share. Als Nächstes M6 (Playtest & Release 1.0).
 
 ## Planung
 
@@ -27,9 +27,12 @@ Vite 6 · TypeScript · PixiJS v8 · GSAP 3 · howler.js · vite-plugin-pwa · V
 ```
 npm install
 npm run dev          # Vite --host
-npm test             # typecheck + lint + 241 Unit-Tests
+npm test             # typecheck + lint + 260 Unit-Tests
 npm run test:e2e     # Playwright, iPhone 12 + Pixel 5
 npm run test:perf    # Render- und Interaktions-Audit (A2)
+npm run test:sequences # Sequenzen, Hinweise und Polish (A3–A5)
+npm run check:contrast  # 22 Farbpaarungen gegen 4,5:1
+npm run check:lighthouse # Perf/A11y/Best Practices ≥ 90 (Preview muss laufen)
 npm run build:atlas  # SVG → Atlas (@1x/@2x)
 ```
 
@@ -42,5 +45,5 @@ Läuft auf Port 4173 schon etwas anderes: `PREVIEW_PORT=4183 npm run test:e2e`.
 ```
 cd /Users/lukabloemendal/Documents/Zoll
 claude
-> Lies CLAUDE.md und docs/. Setze Milestone M5 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A5 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
+> Lies CLAUDE.md und docs/. Setze Milestone M6 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A6 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
 ```

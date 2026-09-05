@@ -179,5 +179,8 @@ export const DEFAULT_SETTINGS: Settings = {
 export const STORAGE_KEY = 'zoll.session.v1';
 export const STORAGE_KEY_ONBOARDING = 'zoll.onboarding.v1';
 
+/** Wie lange ein Onboarding-Hinweis stehen bleibt, wenn niemand ihn wegtippt. */
+export const COACHMARK_MS = 5200;
+
 /** Wie viele Runden die Session-History haelt. */
 export const MAX_ROUND_HISTORY = 50;

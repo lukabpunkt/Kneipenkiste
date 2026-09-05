@@ -14,6 +14,7 @@ import { t } from '@/core/i18n';
 import { maxAmount } from '@/core/modes';
 import type { ItemSet } from '@/core/types';
 import { createButton } from '../components/button';
+import { showCoachmark } from '../components/coachmark';
 import { createRiskLine } from '../components/riskLine';
 import { createAmountStepper } from '../components/stepper';
 import { showToast } from '../components/toast';
@@ -146,6 +147,8 @@ export function createPackScreen(ctx: ScreenContext): ScreenInstance {
   return {
     el,
     activate() {
+      showCoachmark(el, 'pack', t('onboarding.pack'));
+
       const seconds = ctx.session.settings().packTimerSec;
       if (seconds <= 0) return;
       timer = globalThis.setTimeout(() => {
