@@ -71,10 +71,16 @@ export function createDevPanel(fsm: Fsm): HTMLElement {
 
   const line = document.createElement('pre');
   line.className = 'dev-panel__line';
+  /*
+   * Stabiler Testanker. Klasse allein reicht nicht mehr: Seit der Simulation stehen zwei
+   * Buttons und zwei Zeilen im Panel, und ein Selektor auf die Klasse traefe beide.
+   */
+  line.dataset.dev = 'state';
 
   const reveal = document.createElement('button');
   reveal.type = 'button';
   reveal.className = 'dev-panel__btn';
+  reveal.dataset.dev = 'reveal';
   reveal.textContent = 'reveal';
 
   let revealed = false;
@@ -91,10 +97,12 @@ export function createDevPanel(fsm: Fsm): HTMLElement {
   const simulate = document.createElement('button');
   simulate.type = 'button';
   simulate.className = 'dev-panel__btn';
+  simulate.dataset.dev = 'simulate';
   simulate.textContent = 'simulate 10k';
 
   const simOut = document.createElement('pre');
   simOut.className = 'dev-panel__line';
+  simOut.dataset.dev = 'simulation';
 
   simulate.addEventListener('click', () => {
     simOut.textContent = 'rechne …';

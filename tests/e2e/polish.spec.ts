@@ -50,11 +50,21 @@ test.describe('A5 — Title-Loop', () => {
     await page.goto('./');
     await expect(screen(page)).toHaveAttribute('data-screen', 'title');
 
-    const count = async (): Promise<number> =>
-      page.evaluate(() => document.querySelectorAll('.title-loop *').length);
+    /*
+     * Gezaehlt wird alles ausser der Silhouette selbst. Sie wird bei jedem Wechsel
+     * ersetzt, und die Item-Sets bestehen aus unterschiedlich vielen SVG-Elementen
+     * (Kaese 1, Enten 3) — wer sie mitzaehlt, misst das Item-Set und nicht ein Leck.
+     * Dass die Silhouette ihrerseits nicht waechst, steht als eigene Schranke daneben.
+     */
+    const count = async (): Promise<{ frame: number; silhouette: number }> =>
+      page.evaluate(() => {
+        const all = document.querySelectorAll('.title-loop *').length;
+        const silhouette = document.querySelectorAll('.title-loop__silhouette *').length;
+        return { frame: all - silhouette, silhouette };
+      });
 
     const before = await count();
-    expect(before).toBeGreaterThan(5);
+    expect(before.frame).toBeGreaterThan(5);
 
     /*
      * 45 s statt 10 min: In der Zeit laufen ~19 Silhouetten-Wechsel — genug, um einen
@@ -64,7 +74,8 @@ test.describe('A5 — Title-Loop', () => {
     await page.waitForTimeout(45_000);
     const after = await count();
 
-    expect(after, `${before} → ${after} Elemente`).toBe(before);
+    expect(after.frame, `${before.frame} → ${after.frame} Elemente`).toBe(before.frame);
+    expect(after.silhouette, `Silhouette: ${after.silhouette} Elemente`).toBeLessThanOrEqual(3);
   });
 
   test('lässt beim Verlassen des Titels nichts zurück', async ({ page }) => {

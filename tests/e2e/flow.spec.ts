@@ -10,7 +10,7 @@
  * soll der Test finden: Screens, die den Spielzustand nicht mehr abbilden.
  */
 
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import './probe';
 
@@ -85,6 +85,61 @@ async function waitForInspectableBoard(page: Page): Promise<void> {
 }
 
 /**
+ * Wo der Koffer wirklich liegt — erst, wenn er stillsteht.
+ *
+ * Die Kamera ist ein Tween. Wenn der Banner „idle" meldet, kann sie noch fahren, und eine
+ * Position, die mitten in der Fahrt gelesen wurde, ist beim Tippen schon veraltet. Ein
+ * Finger trifft trotzdem, weil er die Buehne sieht; der Test muss warten, bis zwei
+ * Messungen dasselbe sagen.
+ */
+async function restingRect(page: Page, playerId: string): Promise<{ x: number; y: number }> {
+  const read = async (): Promise<{ x: number; y: number } | undefined> => {
+    const rects = await page.evaluate(() => window.__zollStage!.suitcases());
+    return rects.find((r) => r.playerId === playerId);
+  };
+
+  let previous = await read();
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    await page.waitForTimeout(100);
+    const current = await read();
+    if (
+      previous &&
+      current &&
+      Math.abs(previous.x - current.x) < 1 &&
+      Math.abs(previous.y - current.y) < 1
+    ) {
+      return current;
+    }
+    previous = current;
+  }
+
+  expect(previous, `Koffer ${playerId} kommt nicht zur Ruhe`).toBeTruthy();
+  return previous!;
+}
+
+/**
+ * Tippt auf einen Koffer und vergewissert sich, dass der Tap angekommen ist.
+ *
+ * Geht er ins Leere — die Buehne war noch nicht so weit —, tippt der Test noch einmal,
+ * genau wie ein Mensch, dessen erster Tap nichts bewirkt hat.
+ */
+async function tapSuitcase(page: Page, playerId: string, banner: Locator): Promise<void> {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const rect = await restingRect(page, playerId);
+    await page.mouse.click(rect.x, rect.y);
+
+    try {
+      await expect(banner).toHaveAttribute('data-kind', 'scanning', { timeout: 3_000 });
+      return;
+    } catch {
+      /* Naechster Versuch mit frisch gemessener Position. */
+    }
+  }
+
+  await expect(banner).toHaveAttribute('data-kind', 'scanning');
+}
+
+/**
  * Oeffnet einen Koffer und wartet den kompletten Scan ab.
  *
  * Getippt wird auf das Canvas an der Position, die die Dev-Sonde meldet — dieselbe
@@ -100,15 +155,9 @@ async function openCase(page: Page, playerId: string): Promise<string> {
     timeout: 30_000,
   });
 
-  const rect = (await page.evaluate(() => window.__zollStage!.suitcases())).find(
-    (r) => r.playerId === playerId
-  );
-  expect(rect, `Koffer ${playerId} liegt nicht auf der Buehne`).toBeTruthy();
-  await page.mouse.click(rect!.x, rect!.y);
-
-  const banner = page.locator('.inspect__banner');
   /* Waehrend des Scans darf das Ergebnis nirgends stehen — "Scanline ist heilig". */
-  await expect(banner).toHaveAttribute('data-kind', 'scanning');
+  const banner = page.locator('.inspect__banner');
+  await tapSuitcase(page, playerId, banner);
   await expect(banner).toHaveText(/Röntgen läuft/);
 
   await expect(banner).toHaveAttribute('data-kind', /caught|clean|diplomat/, { timeout: 20_000 });
@@ -243,8 +292,8 @@ test.describe('Drei Runden', () => {
     await waitForInspectableBoard(page);
 
     /* Wer der Diplomat ist, verraet nur das Dev-Panel. */
-    await page.locator('.dev-panel__btn').click();
-    const debug = (await page.locator('.dev-panel__line').textContent()) ?? '';
+    await page.locator('[data-dev="reveal"]').click();
+    const debug = (await page.locator('[data-dev="state"]').textContent()) ?? '';
     const diplomatId = /diplomat: (\w+)/.exec(debug)?.[1];
     expect(diplomatId).toBeTruthy();
 

@@ -138,8 +138,8 @@ test.describe('A3 — Hinweise', () => {
     await toHallAfterHints(page, 3104, [4, 0, 1, 0]);
 
     /* Das Dev-Panel kennt die Wahrheit — der Screen darf sie nicht kennen. */
-    await page.locator('.dev-panel__btn').click();
-    const debug = (await page.locator('.dev-panel__line').textContent()) ?? '';
+    await page.locator('[data-dev="reveal"]').click();
+    const debug = (await page.locator('[data-dev="state"]').textContent()) ?? '';
     const expected = [...debug.matchAll(/hint (\w+)@(\w+)/g)].map((m) => m[2]!);
     expect(expected.length).toBeGreaterThan(0);
 

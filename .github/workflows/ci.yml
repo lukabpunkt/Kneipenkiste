@@ -41,8 +41,11 @@ jobs:
         # Kein Screen und kein Director greift an `publicView` vorbei auf die Runde zu.
         # `publicView.test.ts` prueft dasselbe genauer (inkl. erlaubtem Reveal); hier
         # steht die grobe Variante als eigener, sofort lesbarer Schritt.
+        # Kommentarzeilen zaehlen nicht: Der Satz, der die Regel erklaert, nennt sie
+        # zwangslaeufig beim Namen und liess den Schritt sonst an sich selbst scheitern.
         run: |
-          if grep -rnE '\.packs\b|context\.round\b' src/ui src/game 2>/dev/null; then
+          if grep -rnE '\.packs\b|context\.round\b' src/ui src/game 2>/dev/null \
+            | grep -vE ':[[:space:]]*(\*|//|/\*)'; then
             echo "::error::Ein Screen oder Director greift direkt auf die Runde zu."
             exit 1
           fi
