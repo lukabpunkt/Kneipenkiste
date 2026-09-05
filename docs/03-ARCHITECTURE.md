@@ -49,12 +49,13 @@ Sprengmeister/
 │  │  ├─ Digger.ts       # Shotling + Helm/Weste/Schaufel/Ruß-Slots, walkTo(), dig(), soot(), reset()
 │  │  ├─ Camera.ts       # Zoom auf Platte, Shake
 │  │  ├─ DigDirector.ts  # spielt einen DigResult ab: Anticipation → Sequenz → Banner → Board-Update → Event 'digShown'
-│  │  ├─ fx/ (ParticlePool, Smoke, DirtBurst, ColorRing, SpeechBubble, KillFeedToast)
+│  │  ├─ fx/ (ParticlePool, FxLayer: Rauch, Erde, Sternchen, Blaetter, Konfetti — gepoolt, Budget aus Art Dir. §8)
 │  │  └─ sequences/
 │  │     ├─ Sequence.ts          # Interfaces + Registries (hit, dud, treasure, empty) + gewichtete Auswahl + No-Repeat
 │  │     ├─ index.ts             # meldet alle Sequenzen an (ein Aufruf statt Import-Nebenwirkungen)
 │  │     ├─ preview.ts           # Dev-Vorschau (`?dev=1&panel=sequences`), nur dynamisch geladen
 │  │     ├─ empty/index.ts       # Worm, Beetle, Bone, Boot — Varianten desselben Ablaufs, deshalb eine Datei
+│  │     ├─ hit/shared.ts (blast + standUp: der gemeinsame Kopf jeder Explosion)
 │  │     ├─ hit/ClassicLaunch.ts, SootFace.ts, HelmetRocket.ts, ShovelPretzel.ts, TreeLanding.ts, CraterHop.ts, ChainDance.ts, DudThenBoom.ts
 │  │     ├─ dud/Pfff.ts
 │  │     └─ treasure/Fanfare.ts, TooHeavy.ts, Greed.ts

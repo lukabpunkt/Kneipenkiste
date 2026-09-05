@@ -6,11 +6,78 @@
 | M1 UI-Flow (DOM-Feld) | ✅ fertig | `v0.1.0` | A1 bestanden |
 | M2 PIXI-Feld, Tiles, Diggers | ✅ fertig | `v0.2.0` | A2 bestanden |
 | M3 Sequenzen Teil 1 | ✅ fertig | `v0.3.0` | A3 bestanden |
-| M4 Hit-Sequenzen | ⬜ offen | – | – |
+| M4 Hit-Sequenzen | ✅ fertig | `v0.4.0` | A4 bestanden |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
 | M6 Playtest & Release | ⬜ offen | – | – |
 
 ## Audit-Reports
+
+## Audit A4 — 2026-09-05
+
+**Ergebnis:** BESTANDEN
+
+Pro Hit-Sequenz eine Zeile (GDD §4.1). Alle acht bestehen die vier messbaren Kriterien —
+Dauer ≤ 3,5 s, Ring ≤ 300 ms nach dem Knall, Rauch und Erde vorhanden, Digger steht am
+Ende wieder aufrecht auf seinem Platz. Was sie voneinander unterscheidet, steht daneben.
+
+| Sequenz | Dauer | Ring | Der Gag — und das Prinzip dahinter |
+|---|---|---|---|
+| `hit_classic_launch` | 2,35 s | 120 ms | Senkrecht aus dem Bild, **eine Sekunde Stille**, kopfüber zurück in den Krater, Beine strampeln. Der Helm landet 300 ms später obendrauf — Follow-Through. |
+| `hit_soot_face` | 2,20 s | 120 ms | Er bleibt stehen. Schwarzes Gesicht, Haarfächer, ein Rauchringchen — und kippt dann **steif** nach hinten (`power2.in` ohne Federung, wie ein Brett). |
+| `hit_helmet_rocket` | 2,35 s | 120 ms | Der Helm fliegt als Rakete davon, kreist, der Digger schaut hinterher — und dann trifft er ihn. Sternchen. Zweiter Treffer = Follow-Through in Reinform. |
+| `hit_shovel_pretzel` | 2,20 s | 120 ms | Schaufel zur Brezel verbogen, er hält sie verwirrt hoch — und **dann** fällt ihm die Erde auf den Kopf. Der Gag ist das Warten. |
+| `hit_tree_landing` | 2,89 s | 120 ms | Wurfparabel in den Baum am Feldrand (x linear, y hoch/runter — Schwerkraft aus zwei Eases). Baum wackelt, Blätter rieseln, drei Rucke abwärts. |
+| `hit_crater_hop` | 2,50 s | 120 ms | Er versinkt im Krater statt auszublenden, halbe Sekunde nichts — dann die weiße Fahne. Die ruhige unter den acht. |
+| `hit_chain_dance` | 2,28 s | 120 ms | Nur ab Stapel 2: erster Wurf hoch, zweiter Treffer **in der Luft**, Landung als Häufchen, beide Legerfarben blinken abwechselnd statt nebeneinander. |
+| `hit_dud_then_boom` | 2,05 s | 120 ms | Erst „klick", Erleichterung, Wegdrehen — BUMM in den Rücken. Nie im Doppelagent-Modus. Der Ring hängt hier am Knall (bei 0,85 s), nicht am Aufdecken (→ ADR-18). |
+
+| Gesamt-Check | Status | Notiz |
+|---|---|---|
+| In 1 s lesbar: wer trinkt, wie viel, wer war's | ✅ | Schlucke und Name stehen im Banner, das beim Aufdecken erscheint; der Farbring folgt 120 ms nach dem Explosions-Frame. Der Test misst Frame + Ring gegen 1 s + 300 ms — das ist die Grenze, an der `hit_dud_then_boom` gekürzt wurde (ADR-18). |
+| Anticipation, Squash & Stretch, Overshoot, Hit-Stop, Follow-Through, Sound-Sync | ✅ | Anticipation im `DigDirector` (Laufen, drei Stöße, zitternde Platte); Squash & Stretch in `blastOut()`; Hit-Stop `ANIM.hitStopMs` direkt nach dem Frame; Follow-Through in jeder Sequenz einzeln (Helm, Erde, zweiter Treffer); Sound-Sync über die vorgeplanten Cues (ADR-13). |
+| ColorRing ≤ 300 ms nach Explosion; Drink-Banner parallel | ✅ | Der gemeinsame `blast()`-Kopf setzt beide Labels; kein Weg an ihm vorbei. Das Banner läuft seit ADR-15 parallel zur Sequenz. |
+| Dauer ≤ 3,5 s; Digger endet rußig auf der Bank; Reset-Invariante | ✅ | Längste ist `hit_tree_landing` mit 2,89 s. `standUp()` stellt ihn am Ende jeder Sequenz wieder hin — der Test prüft Position, Drehung und Skalierung, weil die Runde nach einer Explosion **weitergeht**. |
+| ≤ 2 Long-Tasks | ✅ | Gemessen über `PerformanceObserver`: **0 Long-Tasks in 5 Grabungen** (erlaubt wären 10). |
+| Partikel-Budget ≤ 200 aktive Sprites | ✅ | Höhepunkt **29** während der Explosionen. Alle Sprites kommen aus Pools; die Test-Brücke meldet die aktive Zahl. |
+| `hit_chain_dance` nur bei Stapel ≥ 2, `hit_dud_then_boom` nie im Doppelagent-Modus | ✅ | Je ein Test über 40 Ziehungen mit und ohne Bedingung. |
+| No-Repeat 3 über 1 000 Runden | ✅ | 1 000 Runden × 8 Grabungen: keine Wiederholung innerhalb des Fensters, und alle acht kommen vor (ein Gewicht von null wäre ein toter Gag). |
+| Video `docs/screens/m4-hits.mp4` | ⏳ manuell | Braucht ein echtes Gerät — gehört zum Look-Check. |
+| „Lustig-Test": ≥ 2 von 3 grinsen | ⏳ manuell | Lukas Runde. |
+
+**Zahlen:** 309 Unit-Tests (+15) · 36 E2E-Tests (18 × 2 Geräte, beide vollständig grün) · 4 Perf-Tests grün · 16 Sequenzen · p50 16,7 ms bei **einem** Draw-Batch · Einstiegs-Chunk 25,4 KB gzip, Board-Chunk 13,3 KB lazy · 251 KB gzip gesamt (Budget 450)
+
+### Was dabei aufgefallen ist
+
+**(1) `fromTo` schreibt seine Startwerte sofort — auch wenn die Sequenz erst später läuft.** Eine `DigSequence` wird gebaut, während der Digger noch auf der Bank sitzt; abgespielt wird sie nach der Anticipation. GSAP setzt die `from`-Werte aber beim Erzeugen (`immediateRender` steht per Vorgabe auf `true`). In `hit_crater_hop` sprang der Digger dadurch schon beim Bauen an die Krater-Position — und weil die Sequenz sich seinen Standplatz erst beim Abspielen merkt, kam er danach nie wieder heraus. Gefunden hat es die Reset-Invariante, die für M4 auf die Hit-Sequenzen ausgeweitet wurde. Jetzt trägt jedes `fromTo` `immediateRender: false`, und ein eigener Test vergleicht die Bühne vor und nach `build()` (→ **ADR-17**).
+
+**(2) Das Banner verrät die Pointe, bevor die Sequenz sie erzählt.** `hit_dud_then_boom` hielt den Knall 1,35 s zurück — aber der `DigDirector` zeigt das Trink-Banner beim **Aufdecken**. Am Tisch stand also längst „Anna trinkt 2", während der Digger sich noch erleichtert die Stirn wischte. Ein kurzer Vorsprung ist ein Witz, anderthalb Sekunden sind ein Widerspruch. Der Aufschub ist jetzt 0,85 s, und für alle künftigen Sequenzen gilt: Der Explosions-Frame liegt höchstens eine Sekunde nach dem Sequenzstart (→ **ADR-18**).
+
+**(3) Acht Sequenzen, ein Kopf.** Jede Explosion fängt gleich an — Deckel weg, Rauchpilz, Erde, Kamera-Ruck, Ruß, und der Farbring 120 ms später. Stünde dieser Block acht Mal einzeln da, würde er irgendwann in einer der acht verrutschen, und genau dort wäre die wichtigste Information des Spiels zu spät. Er steht deshalb in `hit/shared.ts`, und keine Sequenz kommt an ihm vorbei.
+
+**(4) Effekte gehören nicht in die Sequenzen.** Rauch, Erde, Sternchen und Blätter liegen jetzt in einer gepoolten Ebene (`fx/`); die Sequenzen bekommen davon nur `FxKit` mit fünf Methoden und sagen **wo** und **wie groß**. Damit ist das Partikel-Budget an einer Stelle durchsetzbar statt an acht, während einer Explosion wird nichts allokiert — und ein Test kann den Effekt-Kasten fälschen und prüfen, dass jede Explosion Rauch **und** Erde anfordert (Design-Priorität 4: Lesbarkeit des Feldes) (→ **ADR-16**).
+
+**(5) Der Digger muss aufstehen.** Nach einer Explosion geht die Runde weiter — er läuft anschließend zur Bank. Wer als Häufchen liegen bleibt, rutscht quer über das Feld nach Hause, und der nächste Zug beginnt mit einem Digger, der auf dem Kopf steht. `standUp()` steht deshalb am Ende jeder Hit-Sequenz und stellt auch Helm, Schaufel und Fahne zurück. Die Treasure-Sequenzen brauchen das nicht: Nach dem Kistenfund ist die Runde vorbei, und dass er unter der Kiste liegt, ist die Pointe.
+
+**(6) PixiJS beschwert sich in jsdom, sobald man es importiert.** Beim Import fragt es, ob der Browser moderne Canvas-Blendmodi kann — jsdom kennt `getContext` nicht und schreibt bei jedem Testlauf einen Stacktrace ins Log. Die Tests liefen trotzdem, aber die Ausgabe war unlesbar. `tests/setup.ts` stellt jetzt das kleinste Canvas hin, das PixiJS zufriedenstellt.
+
+### Abweichungen von der Planung
+
+- **`hit_dud_then_boom` dauert 0,85 s bis zum Knall** statt der ursprünglich gebauten 1,35 s (ADR-18).
+- **`treasure_greed` benutzt seit M4 den gemeinsamen Effekt-Kasten** — derselbe Rauchpilz, dieselbe Erde wie die Hit-Sequenzen, dazu graues Konfetti. Der Plan sah dafür `basic_hit` als Platzhalter vor; den gibt es nicht mehr.
+- **Der Baum kennt seine eigene Position** (`Field.treeTop`), statt dass `hit_tree_landing` die Zahl ein zweites Mal führt. Verschiebt sich der Baum, fliegt der Digger von selbst richtig.
+- **`perf.spec.ts` hat fünf Fälle statt drei**: Leerlauf, Heap, Sequenzen — und neu Partikel-Budget und Long-Tasks (beide aus Audit A4).
+
+**Offene SOLL-Follow-ups:** Video `docs/screens/m4-hits.mp4` (braucht ein Gerät).
+
+**Manuelle Checks für Luka vor M5:**
+
+- [ ] **Alle acht Hits ansehen** — `npm run preview:sequences`, Runde starten, im Dev-Panel jede einzeln abspielen. Die Frage ist nicht „sieht gut aus", sondern: **Grinsen zwei von drei?** (Audit A4). Welche fallen ab?
+- [ ] **Lesbarkeit prüfen**: Erkennt man in der ersten Sekunde, wer die Mine gelegt hat — auch bei `hit_classic_launch`, wo alle nach oben schauen?
+- [ ] **Auf dem Referenzgerät messen**: 6 × 6 mit 8 Spielern während der Explosionen. Das Dev-Panel zeigt p50 und Draw-Calls (`?dev=1`).
+- [ ] **Ruß über die Runde beobachten**: Sieht man der Bank nach fünf Grabungen an, wie die Runde lief?
+- [ ] **Video für `docs/screens/m4-hits.mp4`** aufnehmen (SOLL aus A4).
+- [ ] Weiterhin offen aus A0–A3: **Repo pushen**, Pages auf „GitHub Actions" stellen, **PWA auf echtem Gerät installieren**, **eine Runde zu viert spielen**, Ton am Handy-Lautsprecher hören.
+
 
 ## Audit A3 — 2026-09-05
 
