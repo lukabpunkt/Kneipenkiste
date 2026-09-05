@@ -67,7 +67,8 @@
     "comboNightHighroller": "Späte Schicht: Große Tresore, keine Verhandlung. Kurz und teuer.",
     "comboAllOn": "Alles an. Viel Glück.",
     "witness": "Kronzeuge",
-    "witnessHint": "Ein Dieb darf auspacken und halbiert seine Strafe. Der Verpfiffene trinkt sie."
+    "witnessHint": "Ein Dieb darf auspacken und halbiert seine Strafe. Der Verpfiffene trinkt sie.",
+    "comboOathNight": "Achtung: In der Nachtschicht gibt es keine Verhandlung — dort kann niemand schwören, der Eid bleibt wirkungslos."
   },
   "negotiation": {
     "headline": "Verhandelt.",
@@ -258,5 +259,60 @@
     "line": "{witness} hat {accused} verpfiffen.",
     "perjurerBlocked": "kann nicht auspacken, hat den Eid gebrochen",
     "backOut": "Doch nicht"
+  },
+  "modeGuide": {
+    "headline": "Was die Modi ändern",
+    "intro": "Beliebig kombinierbar. Was hier steht, gilt zusätzlich zu den normalen Regeln.",
+    "oath": {
+      "title": "Eid",
+      "lines": [
+        "In der Verhandlung tippt jeder auf sein Zeichen, der schwören will. Das Siegel sieht der ganze Tisch — und man kann es bis zum Ende der Verhandlung wieder abnehmen.",
+        "Schwören und teilen: nichts passiert.",
+        "Schwören und stehlen ist Meineid. Als Alleindieb trinkst du 2 Schlücke selbst und hast 2 weniger zu verteilen.",
+        "Als einer von mehreren Dieben trinkst du das Doppelte deines Anteils.",
+        "Wer nicht schwört, zahlt nie extra. Er ist nur verdächtig."
+      ],
+      "note": "Der Maulwurf kann keinen Meineid begehen — er muss ja stehlen."
+    },
+    "mole": {
+      "title": "Maulwurf",
+      "lines": [
+        "Zu Rundenbeginn zieht das Spiel geheim einen Spieler.",
+        "Nur er sieht auf seinem Wahl-Screen „Du bist der Maulwurf“. TEILEN ist für ihn gesperrt.",
+        "Damit gibt es jede Runde mindestens einen Dieb.",
+        "Stehlen zwei oder mehr, trinkt er nur die Hälfte seines Anteils, aufgerundet.",
+        "Am Ende der Aufdeckung fällt ihm ein Helm auf den Kopf. Erst dann wissen alle, wer es war."
+      ],
+      "note": "Jeder kann behaupten, er sei der Maulwurf gewesen. Einmal pro Runde stimmt es."
+    },
+    "nightShift": {
+      "title": "Nachtschicht",
+      "lines": [
+        "Keine Verhandlung. Stattdessen zehn Sekunden Stille mit tickender Uhr.",
+        "An Auszahlung, Tresor und Aufdeckung ändert sich nichts."
+      ],
+      "note": "Zusammen mit dem Eid wirkungslos: Ohne Verhandlung kann niemand schwören."
+    },
+    "highroller": {
+      "title": "Highroller",
+      "lines": [
+        "Überschreibt die Härte-Einstellung komplett.",
+        "Der Tresor startet bei 6 und wächst um 4 pro Friedensrunde.",
+        "Der Jackpot liegt bei 24.",
+        "Kein Deckel: Der Tresor wächst über die Jackpot-Schwelle hinaus, statt dort zu warten."
+      ],
+      "note": "Die Gebühr bleibt 1 Schluck. Frieden kostet gleich viel — und ist viel mehr wert."
+    },
+    "witness": {
+      "title": "Kronzeuge",
+      "lines": [
+        "Greift nach der Aufdeckung, und nur wenn mindestens zwei gestohlen haben.",
+        "Das Handy bleibt in der Mitte. Wer auspacken will, tippt vor allen erst sein eigenes Zeichen, dann das eines anderen Diebes.",
+        "Sein Anteil halbiert sich, aufgerundet. Die Differenz trinkt der Verpfiffene.",
+        "Die Summe der Runde bleibt gleich: Der Verrat verschiebt Schlücke, er erlässt keine.",
+        "„Keiner packt aus“ steht gleichberechtigt daneben."
+      ],
+      "note": "Wer den Eid gebrochen hat, kann nicht auspacken. Verpfiffen werden kann er sehr wohl."
+    }
   }
 }

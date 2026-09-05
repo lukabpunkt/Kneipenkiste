@@ -468,3 +468,20 @@ Gemeldet: „Wenn die Karten aufgedeckt werden, stockt es ein bisschen." Nachgem
 - Nebenbefund behoben: `getStageApp()` war nicht gegen gleichzeitige Aufrufe geschützt und hätte zwei Renderer gebaut. Aufgefallen nur, weil der Vorlauf ihn zweimal rief.
 
 **Zahlen:** 758 Unit-Tests · 4 Perf-Fälle (einer neu, gedrosselt) · Aussetzer beim Aufbau ~280 ms bei 4× Drosselung, ~50 ms ungedrosselt.
+
+
+## Modi-Anleitung — 2026-09-05
+
+Aus dem Spiel gemeldet: „Mir war nicht klar, was genau sich bei jedem Spielmodus ändert." Zu Recht — die Lobby zeigt pro Modus **einen** Satz. Der sagt, worum es geht, aber nicht, was passiert: Trinkt der Maulwurf weniger? Kann ich meinen Schwur zurücknehmen? Wer zahlt, wenn der Kronzeuge auspackt?
+
+**Neu:** `src/ui/screens/ModesSheet.ts` — ein Blatt zum Nachschlagen mit allen fünf Modi. Pro Modus zwei bis fünf präzise Zeilen und eine abgesetzte Fußnote: die Ausnahme, die man beim ersten Spielen falsch erwartet und die sonst Streit am Tisch gibt.
+
+Erreichbar von zwei Stellen: unter der Modus-Liste in der Lobby (dort schaltet man sie ein) und aus den Regeln (dort schlägt man nach). Der gerade eingeschaltete Modus ist hervorgehoben — wer das Blatt aus der Lobby öffnet, hat meist genau einen im Kopf.
+
+Die Einzeiler in der Lobby bleiben: Sie reichen zum Wählen. Wer es genau wissen will, tippt einmal mehr (GDD Pfeiler 4).
+
+**Dabei aufgefallen — ein echter Fallstrick:** **Eid und Nachtschicht heben sich gegenseitig auf.** Der Schwur hängt am Verhandlungs-Screen, und die Nachtschicht ersetzt ihn durch zehn Sekunden Stille. Beides zusammen heißt: Niemand kann schwören, `setup.oaths` bleibt leer, es kann keinen Meineid geben. Das stand nirgends. Jetzt warnt die Lobby beim Einschalten, und es steht in der Anleitung.
+
+**Was den Text ehrlich hält:** Ein Test prüft für **beide** Sprachen, dass jeder Modus aus `MODE_IDS` einen Titel, mindestens zwei Zeilen und eine Fußnote hat. Wer einen sechsten Modus ergänzt und die Anleitung vergisst, fällt hier auf — und nicht am Tisch.
+
+**Zahlen:** 758 Unit-Tests (2 neu für die Vollständigkeit) · 4 neue E2E-Fälle · 5 erklärte Modi in DE und EN.

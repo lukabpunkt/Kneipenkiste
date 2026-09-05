@@ -2743,3 +2743,70 @@
   opacity: 0.4;
   filter: grayscale(1);
 }
+
+/* ------------------------------------------------------------------ */
+/* Modi-Anleitung (was sich in jedem Modus ändert)                     */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Ein Blatt zum Nachschlagen, kein Kartenstapel zum Wischen: Man sucht **einen** Modus,
+ * und Scrollen findet ihn schneller als Blättern.
+ */
+.modeGuide {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.modeGuide__intro {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: rgb(255 248 231 / 65%);
+}
+
+.modeGuide__mode {
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid rgb(255 248 231 / 14%);
+  border-radius: var(--radius-md);
+  background: var(--c-bg-panel-raised);
+}
+
+/* Der eingeschaltete Modus ist der, weswegen man das Blatt geöffnet hat. */
+.modeGuide__mode.is-active {
+  border-left-color: var(--c-gold);
+  background: rgb(255 201 60 / 8%);
+}
+
+.modeGuide__title {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  color: var(--c-gold);
+}
+
+.modeGuide__lines {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: var(--c-paper);
+}
+
+/*
+ * Die Fußnote ist die Ausnahme, die Streit am Tisch verhindert — abgesetzt, damit sie
+ * nicht als fünfter Aufzählungspunkt untergeht.
+ */
+.modeGuide__note {
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid rgb(255 248 231 / 12%);
+  font-size: var(--fs-sm);
+  color: rgb(255 248 231 / 72%);
+}
+
+.modes__guide,
+.rules__guide {
+  margin-top: var(--space-3);
+  width: 100%;
+}

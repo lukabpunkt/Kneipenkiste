@@ -67,7 +67,8 @@
     "comboNightHighroller": "Late shift: big vaults, no negotiation. Short and expensive.",
     "comboAllOn": "Everything on. Good luck.",
     "witness": "Crown witness",
-    "witnessHint": "One thief may talk and halve their penalty. The one they name drinks it."
+    "witnessHint": "One thief may talk and halve their penalty. The one they name drinks it.",
+    "comboOathNight": "Careful: the night shift has no negotiation — nobody can swear there, so the oath does nothing."
   },
   "negotiation": {
     "headline": "Negotiate.",
@@ -258,5 +259,60 @@
     "line": "{witness} gave up {accused}.",
     "perjurerBlocked": "cannot talk, broke the oath",
     "backOut": "Never mind"
+  },
+  "modeGuide": {
+    "headline": "What the modes change",
+    "intro": "Freely combinable. Everything here applies on top of the normal rules.",
+    "oath": {
+      "title": "Oath",
+      "lines": [
+        "During the negotiation, anyone who wants to swear taps their own symbol. The whole table sees the seal — and it can be taken back until the negotiation ends.",
+        "Swear and share: nothing happens.",
+        "Swear and steal is perjury. As the lone thief you drink 2 sips yourself and have 2 fewer to hand out.",
+        "As one of several thieves you drink double your share.",
+        "Whoever doesn't swear never pays extra. They're just suspicious."
+      ],
+      "note": "The mole can't commit perjury — they have to steal."
+    },
+    "mole": {
+      "title": "Mole",
+      "lines": [
+        "At the start of the round the game secretly picks one player.",
+        "Only they see “You are the mole” on their choice screen. SHARE is locked for them.",
+        "So every round has at least one thief.",
+        "If two or more steal, they only drink half their share, rounded up.",
+        "At the end of the reveal a helmet drops on their head. Only then does everyone know."
+      ],
+      "note": "Anyone can claim they were the mole. Once a round it's true."
+    },
+    "nightShift": {
+      "title": "Night shift",
+      "lines": [
+        "No negotiation. Ten seconds of silence with a ticking clock instead.",
+        "Payout, vault and reveal are unchanged."
+      ],
+      "note": "Useless together with the Oath: without a negotiation nobody can swear."
+    },
+    "highroller": {
+      "title": "Highroller",
+      "lines": [
+        "Overrides the hardness setting completely.",
+        "The vault starts at 6 and grows by 4 per peaceful round.",
+        "The jackpot sits at 24.",
+        "No cap: the vault grows past the jackpot threshold instead of waiting there."
+      ],
+      "note": "The fee stays 1 sip. Peace costs the same — and is worth far more."
+    },
+    "witness": {
+      "title": "Crown witness",
+      "lines": [
+        "Kicks in after the reveal, and only if at least two stole.",
+        "The phone stays in the middle. Whoever wants to talk taps their own symbol first, then another thief's — in front of everyone.",
+        "Their share halves, rounded up. The difference is drunk by the one they named.",
+        "The round's total stays the same: betrayal moves sips, it doesn't forgive them.",
+        "“Nobody talks” is an equal option."
+      ],
+      "note": "Whoever broke an oath can't talk. They can be named, though."
+    }
   }
 }

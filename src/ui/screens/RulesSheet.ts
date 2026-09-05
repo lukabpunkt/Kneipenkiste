@@ -12,7 +12,9 @@
 
 import type { Settings } from '@/config/rules';
 import { t } from '@/core/i18n';
+import { createButton } from '@/ui/components/button';
 import { openSheet, type SheetHandle } from '@/ui/components/sheet';
+import { createModesSheet } from './ModesSheet';
 
 const CARDS = ['vault', 'negotiate', 'choose', 'payout'] as const;
 const WITNESS_CARD = 'witness' as const;
@@ -61,7 +63,19 @@ export function createRulesSheet(settings: Settings): SheetHandle {
     [...dots.children].forEach((dot, i) => dot.classList.toggle('is-active', i === index));
   });
 
-  content.append(track, dots);
+  /*
+   * Die Modi stehen nicht auf den Karten: Sie gelten nur, wenn sie an sind, und vier
+   * zusaetzliche Karten wuerden die vier Grundregeln verwaessern. Stattdessen ein Weg
+   * dorthin — wer die Regeln nachschlaegt, sucht oft genau das.
+   */
+  const guide = createButton({
+    label: t('modeGuide.headline'),
+    variant: 'ghost',
+    className: 'rules__guide',
+    onClick: () => createModesSheet(settings),
+  });
+
+  content.append(track, dots, guide);
 
   return openSheet({ title: t('rules.headline'), content, className: 'sheet__panel--tall' });
 }

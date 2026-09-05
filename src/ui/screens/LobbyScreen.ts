@@ -22,6 +22,7 @@ import {
 import { t } from '@/core/i18n';
 import { safeAnimate } from '@/ui/animate';
 import { createButton } from '@/ui/components/button';
+import { createModesSheet } from './ModesSheet';
 import { createPlayerBadge } from '@/ui/components/badge';
 import { showToast } from '@/ui/components/toast';
 import { vibrate } from '@/ui/haptics';
@@ -188,6 +189,12 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
    */
   function comboHint(active: Readonly<Record<ModeId, boolean>>): string {
     if (MODE_IDS.every((id) => active[id])) return t('modes.comboAllOn');
+    /*
+     * Der Eid haengt am Verhandlungs-Screen — die Nachtschicht ersetzt ihn durch Stille.
+     * Zusammen ist der Eid also wirkungslos, und das muss dastehen, bevor jemand einen
+     * Abend lang auf einen Meineid wartet, den es nicht geben kann.
+     */
+    if (active.oath && active.nightShift) return t('modes.comboOathNight');
     if (active.oath && active.mole) return t('modes.comboOathMole');
     if (active.nightShift && active.highroller) return t('modes.comboNightHighroller');
     return '';
@@ -245,6 +252,20 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
       line.textContent = combo;
       modes.append(line);
     }
+
+    /*
+     * Ein Satz pro Modus reicht, um zu waehlen — nicht, um zu verstehen, was passiert.
+     * Wer es genau wissen will, tippt hier; wer nur spielen will, sieht einen kleinen
+     * Knopf und ignoriert ihn (GDD Pfeiler 4).
+     */
+    modes.append(
+      createButton({
+        label: t('modeGuide.headline'),
+        variant: 'ghost',
+        className: 'modes__guide',
+        onClick: () => createModesSheet(ctx.session.state.settings),
+      })
+    );
   }
 
   /** Ein Chip pro Einstellung; Tap schaltet auf den naechsten Wert weiter. */

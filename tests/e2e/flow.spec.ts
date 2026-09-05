@@ -579,3 +579,42 @@ test.describe('Vertrauens-Historie', () => {
     await expect(page.locator('.score__row--history')).toHaveCount(0);
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* Modi-Anleitung                                                      */
+/* ------------------------------------------------------------------ */
+
+test.describe('Modi-Anleitung', () => {
+  test('erklärt jeden Modus und hebt den eingeschalteten hervor', async ({ page }) => {
+    await startGame(page);
+    await enableMode(page, 'Maulwurf');
+
+    await page.getByRole('button', { name: 'Was die Modi ändern' }).first().click();
+    await expect(page.locator('.modeGuide')).toBeVisible();
+
+    // Fünf Modi, fünf Abschnitte — und jeder mit Erklärung, nicht nur mit Überschrift.
+    const sections = page.locator('.modeGuide__mode');
+    await expect(sections).toHaveCount(5);
+    for (let i = 0; i < 5; i++) {
+      await expect(sections.nth(i).locator('.modeGuide__title')).not.toBeEmpty();
+      expect(await sections.nth(i).locator('li').count()).toBeGreaterThanOrEqual(2);
+    }
+
+    // Der eingeschaltete Modus ist markiert — man sucht meist genau den.
+    await expect(page.locator('.modeGuide__mode.is-active')).toHaveCount(1);
+    await expect(page.locator('.modeGuide__mode.is-active')).toContainText('Maulwurf');
+  });
+
+  test('warnt, wenn Eid und Nachtschicht sich gegenseitig aufheben', async ({ page }) => {
+    await startGame(page);
+    await enableMode(page, 'Eid');
+    await enableMode(page, 'Nachtschicht');
+
+    /*
+     * Der Eid haengt am Verhandlungs-Screen, den die Nachtschicht ersetzt. Wer beides
+     * anschaltet, wartet sonst einen Abend lang auf einen Meineid, den es nicht geben kann.
+     */
+    await expect(page.locator('.modes__combo')).toContainText('Nachtschicht');
+    await expect(page.locator('.modes__combo')).toContainText('wirkungslos');
+  });
+});

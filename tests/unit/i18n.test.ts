@@ -3,6 +3,7 @@
  */
 
 import { afterEach, describe, expect, it } from 'vitest';
+import { MODE_IDS } from '@/config/rules';
 import { detectLocale, flatKeys, getLocale, LOCALES, plural, setLocale, t, tList } from '@/core/i18n';
 
 afterEach(() => {
@@ -110,6 +111,34 @@ describe('tList()', () => {
     setLocale('en');
     expect(tList('kassel.negotiation')).toContain('Cards, please.');
   });
+});
+
+describe('Modi-Anleitung ist vollständig', () => {
+  /*
+   * Jeder Modus braucht eine Erklaerung, in beiden Sprachen. Wer einen sechsten Modus
+   * ergaenzt und die Anleitung vergisst, faellt hier auf — und nicht erst am Tisch, wo
+   * jemand fragt, was der Modus eigentlich macht.
+   */
+  for (const locale of LOCALES) {
+    it(`${locale}: erklärt jeden Modus aus MODE_IDS`, () => {
+      setLocale(locale);
+      for (const id of MODE_IDS) {
+        const title = t(`modeGuide.${id}.title`);
+        expect(title.startsWith('[missing:'), `${id}: Titel fehlt`).toBe(false);
+
+        const lines = tList(`modeGuide.${id}.lines`);
+        // Ein Satz reicht nicht — dafuer gibt es den Einzeiler in der Lobby.
+        expect(lines.length, `${id}: zu wenige Zeilen`).toBeGreaterThanOrEqual(2);
+        for (const line of lines) {
+          expect(line.trim().length, `${id}: leere Zeile`).toBeGreaterThan(0);
+        }
+
+        const note = t(`modeGuide.${id}.note`);
+        expect(note.startsWith('[missing:'), `${id}: Fussnote fehlt`).toBe(false);
+      }
+      setLocale('de');
+    });
+  }
 });
 
 describe('DE und EN sind deckungsgleich (DoD M5)', () => {
