@@ -76,7 +76,7 @@ Pro Sequenz (6 + Diplomat) eine Zeile in PROGRESS.md:
 | ≤ 2 Long-Tasks | MUSS |
 | "Lustig-Test": ≥ 2 von 3 grinsen | SOLL (manuell) |
 
-Gesamt: Diplomat-Overlay ersetzt caught/clean korrekt; No-Repeat 3 über 1 000 Runden; Silhouetten-Layouts aller 8 Item-Sets vorhanden; Video `docs/screens/m4-xray.mp4` (SOLL).
+Gesamt: Diplomat-Overlay ersetzt caught/clean korrekt; No-Repeat 3 über 1 000 Runden; Silhouetten-Layouts aller 8 Item-Sets vorhanden; Filmstreifen `docs/screens/m6-scanline.png` (SOLL; als Video geplant, aber Playwright nimmt den PIXI-Canvas nicht auf).
 
 ## A5 — Polish-, Accessibility- & Bundle-Audit
 

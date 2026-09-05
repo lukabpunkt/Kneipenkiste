@@ -6,6 +6,12 @@ Alle nennenswerten Änderungen an **Der Zoll**. Format nach
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+- `docs/screens/m6-scanline.png` — der Röntgen-Scan in sechs Einzelbildern von 110 bis
+  1100 ms. Er schließt den seit M4 offenen Video-Punkt aus Audit A4: Playwrights
+  Videoaufnahme lässt den PIXI-Canvas weiß, Screenshots erfassen ihn
+- Aktueller Hallen-Screenshot mit den neuen Zoll-Vermerken
+
 ### Ausstehend für 1.0
 - Playtest mit 5–6 Personen über mindestens 8 Runden (`docs/PLAYTEST-01.md`)
 - Balancing-Pass auf Basis des Playtests

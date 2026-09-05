@@ -20,10 +20,15 @@ Menschen (`docs/PLAYTEST-01.md`) und der Balancing-Pass danach.
 
 | | |
 |---|---|
-| ![Titel](docs/screens/m5-title.png) | ![Zollhalle](docs/screens/m2-hall-8.png) |
-| Der Titel — ein Koffer rollt durchs Röntgen | Die Zollhalle mit acht Spielern |
+| ![Titel](docs/screens/m5-title.png) | ![Zollhalle](docs/screens/m6-hall-notes.png) |
+| Der Titel — ein Koffer rollt durchs Röntgen | Die Zollhalle: zwei Koffer tragen einen Vermerk |
 | ![Röntgen](docs/screens/m4-sweat-flood.png) | ![Result](docs/screens/m5-stats.png) |
 | Erwischt: die Pfütze, der Ausrutscher | Am Ende ist alles öffentlich |
+
+![Der Scan, Bild für Bild](docs/screens/m6-scanline.png)
+
+Der Röntgen-Scan baut sich zeilenweise auf, stockt in der Mitte, und **das Ergebnis ist
+nie vor 100 % erkennbar**. Bei 990 ms sieht man, dass etwas drin ist — nicht, was.
 
 ## Planung
 

@@ -209,7 +209,7 @@ Gemessen auf der echten Bühne, nicht an den Konstanten aus `choreo.ts` — ein 
 | Silhouetten-Layouts aller 8 Item-Sets | ✅ | Aus M2; neu ist, dass die Silhouette der sauberen Ware zur gezogenen Sequenz passt (ADR-19). |
 | Item-Fontäne fliegt wirklich | ✅ | Eigener Test misst lebende Partikel während der Sequenz (> 0) und hält das Budget aus Art Direction §8 ein (≤ 200). |
 | „Lustig-Test": ≥ 2 von 3 grinsen | ⏳ manuell | Braucht drei Menschen. |
-| Video `docs/screens/m4-xray.mp4` | ⏳ SOLL | Stattdessen sieben Screenshots, einer je Sequenz. |
+| Video `docs/screens/m4-xray.mp4` | ✅ (anders gelöst) | **Nachgetragen am 5. September:** Playwrights Videoaufnahme zeigt den PIXI-Canvas nicht — das Bild bleibt genau dort weiß, wo das Spiel stattfindet, und ein Video davon wäre wertlos gewesen. Stattdessen `docs/screens/m6-scanline.png`: sechs Einzelbilder eines Scans von 110 bis 1100 ms. Screenshots erfassen den Canvas, und für die Aussage „nie vor 100 % erkennbar" ist ein Streifen ohnehin besser als ein Video — man sieht die Beweisführung nebeneinander statt nacheinander. |
 
 ### Was gefunden und behoben wurde
 1. **Die Registry konnte dieselbe Sequenz zweimal hintereinander ziehen** — bei Zug 9 im 1000er-Test. Der Fallback ignorierte die gesamte Historie statt nur das Fenster (ADR-20).
@@ -217,7 +217,7 @@ Gemessen auf der echten Bühne, nicht an den Konstanten aus `choreo.ts` — ein 
 3. **Das Alarmlicht war zu stark** (Alpha 0,34) — die ganze Halle ertrank in Rosa, und weder die fliegende Ware noch das Gesicht des Reisenden waren zu sehen. Jetzt 0,22.
 4. **Die Koffer sprangen nicht sichtbar auf.** Das Asset `lid_open` lag ungenutzt herum; jetzt klappt der Deckel nach hinten weg — beim Fang mit Overshoot, beim sauberen Koffer ruhig. Der Unterschied ist in einer Sekunde lesbar, und genau darum geht es.
 
-**Offene SOLL-Follow-ups:** Video (1).
+**Offene SOLL-Follow-ups:** keine (Video am 5. September als Filmstreifen nachgetragen).
 
 **Manueller Check für Luka vor M5:**
 - [ ] „Lustig-Test" aus A4: Drei Personen sehen die sieben Sequenzen (`?dev=1&panel=sequences`) — grinsen mindestens zwei?
@@ -293,7 +293,7 @@ in [`PLAYTEST-01.md`](PLAYTEST-01.md) und wartet auf Luka.
 3. **Der Title-Loop-Test maß das Item-Set statt ein Leck:** Die Silhouetten bestehen aus unterschiedlich vielen SVG-Elementen (Käse 1, Enten 3). Dass er je grün war, lag am zufälligen Startindex.
 4. **Ein Koffer-Tap kann danebengehen, solange die Kamera fährt** — auf dem langsamen CI-Runner reproduzierbar, lokal nie. Der Test wartet jetzt, bis der Koffer stillsteht.
 
-**Offene SOLL-Follow-ups:** Balancing-Pass nach dem Playtest (nur `rules.ts`, mit ADR) · Video.
+**Offene SOLL-Follow-ups:** Balancing-Pass nach dem Playtest (nur `rules.ts`, mit ADR).
 
 Hochsaison ist zur Hälfte erledigt: Der **Text** sagt jetzt, was der Modus tut (kaum mehr kommt durch, doppelt so viel wird erwischt und getrunken). Ob die **Regel** bleibt, entscheidet der Playtest — eine Balancing-Änderung vorher wäre geraten.
 
