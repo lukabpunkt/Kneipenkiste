@@ -7,9 +7,9 @@ stehen in [`docs/DECISIONS.md`](docs/DECISIONS.md), die Audit-Berichte in
 Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
-## [Unveröffentlicht]
+## [1.0.0-rc.2] — 2026-09-05 — Vier Befunde vom Gerät
 
-### Behoben — vier Befunde aus dem ersten Gerätetest
+### Behoben
 
 - **Die Explosion war unsichtbar, und daran waren zwei echte Fehler schuld.** Die Partikel
   wurden beim _Bauen_ der Sequenz sichtbar, also fast eine Sekunde vor dem Knall: Neun

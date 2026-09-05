@@ -8,9 +8,103 @@
 | M3 Sequenzen Teil 1 | ✅ fertig | `v0.3.0` | A3 bestanden |
 | M4 Hit-Sequenzen | ✅ fertig | `v0.4.0` | A4 bestanden |
 | M5 Polish, Modi, A11y | ✅ fertig | `v0.5.0` | A5 bestanden |
-| M6 Playtest & Release | 🟡 technisch fertig | `v1.0.0-rc.1` | A6 Teil 1 bestanden, Playtest offen |
+| M6 Playtest & Release | 🟡 technisch fertig | `v1.0.0-rc.2` | A6 Teil 1 bestanden, Vorab-Befunde 01 behoben, Playtest offen |
 
 ## Audit-Reports
+
+## Vorab-Befunde 01 — 2026-09-05 (erster Durchgang am Gerät, vor dem Playtest)
+
+**Ergebnis:** Vier Befunde von der Live-URL auf dem Handy, alle behoben. Drei davon
+hatten eine gemeinsame Wurzel, die keine Design-Frage war, sondern zwei echte Fehler.
+Protokoll und Ursachen stehen in [`PLAYTEST-01.md`](PLAYTEST-01.md), die Entscheidungen
+in ADR-23 bis ADR-28.
+
+### Was dabei aufgefallen ist
+
+**(1) Die Explosion war unsichtbar — und zwar aus zwei Gründen gleichzeitig.** `fx.smoke()`
+und `fx.dirt()` werden beim *Bauen* der Sequenz gerufen, `ParticlePool.acquire()` setzte
+das Sprite sofort auf `visible = true`, die GSAP-Tweens starten aber erst am `boom`-Label
+— rund 980 ms später. Ab dem Tap saßen neun Rauchwolken bewegungslos auf der noch
+**geschlossenen** Platte: Das verriet die Mine, und beim Aufdecken *erschien* nichts mehr,
+es fing nur an, sich zu bewegen. Dazu kam der Kamera-Ruck in Welteinheiten statt
+Bildschirmpixeln — aus 12 px wurden auf einem 390er-Handy 4,7. Der Pool reserviert jetzt,
+ohne zu zeigen; sichtbar wird ein Partikel im `onStart` seines ersten Tweens (→ **ADR-23**,
+**ADR-24**).
+
+**(2) Dieselbe Fehlerklasse steckte an drei weiteren Stellen.** Das ist ADR-17
+(`fromTo`/`immediateRender`) eine Ebene tiefer: `detachHelmet()` in `ClassicLaunch` und
+`HelmetRocket` löste den Helm eine Sekunde zu früh, `camera.shake()` und `digger.soot()`
+liefen im `DigDirector` außerhalb ihres Callbacks. Der erweiterte Reinheitstest in
+`sequences.test.ts` prüft jetzt auch FX-Sichtbarkeit, Helm, Ruß, Requisiten und
+Kamera-Rucke — genau diese Erweiterung hätte alle vier gefangen.
+
+**(3) Ein Pool war nie aufgeräumt worden.** Der neue `fxLayer.test.ts` fiel beim ersten
+Lauf durch: `smokeL` fehlte im privaten `pools`-Getter, wurde also weder geleert noch
+zerstört noch gezählt. Der Getter trägt jetzt einen Kommentar, der jeden neuen Pool
+einfordert.
+
+**(4) Der Blindgänger war fertig im Atlas und wurde nirgends benutzt.** `mines/dud_sign`
+— das Schild aus GDD §4.1 — liegt seit M2 im Spritesheet. Der Blindgänger nutzte
+stattdessen dieselbe Bodentextur wie ein leeres Feld, und der Kill-Feed sagte „Rudi →
+Anna", was im Krater-Fall „hat sie gesprengt" bedeutet: beim Blindgänger eine
+Falschaussage (→ **ADR-26**). Wichtig für ADR-2: `board.ts` filtert den *eigenen*
+Blindgänger heraus, ein selbst aufgegrabener Dud kommt als `empty` an — alles hier
+betrifft nur den fremden.
+
+**(5) Die Konsequenz war da und trotzdem nicht zu sehen.** Sie stand 2,2 s als Banner am
+**oberen** Bildrand, während der Blick unten am Krater klebte, und war danach spurlos weg.
+Wer in dem Moment das Handy weiterreichte, hat die Zahl nie gesehen. Das Banner fährt
+jetzt unten **im Feld** ein, und ein Schluck-Zähler in der Fußzeile hält fest, wer wie
+viel trinkt — ohne Bestätigen-Tap, GDD §3.5 will ausdrücklich, dass es weitergeht
+(→ **ADR-27**).
+
+**(6) Der teuerste Umweg: die gedeckelte Feldhöhe.** Der erste Versuch gegen den
+Scroll-Befund deckelte die Host-**Höhe** je Feldgröße. CI meldete daraufhin eine Platte
+von **55,284 px** — unter den 56, die GDD §5 als MUSS führt. Zwei Ursachen: Das echte
+Viewport ist **390 × 664**, nicht 844 (die Browserleiste frisst 180 px), und der scrollende
+Rumpf beschnitt die negativen Ränder des Hosts, rechnete also mit 366 statt 386 px Breite.
+Der Deckel ist ersatzlos gestrichen; an seiner Stelle steht ein **Boden**
+(`minStageHeightPx` / `--stage-min-h`), und das horizontale Padding sitzt jetzt in Rumpf
+und Fuß statt im Screen (→ **ADR-28**).
+
+**(7) Der neue Layout-Test fand zwei Screens nach, nach denen niemand gesucht hatte.**
+Gemeldet war der Place-Screen. `layout.spec.ts` zeigte, dass die **Lobby** dasselbe
+Problem hatte — „Feld verminen" lag rund 400 px unter der Falz — und der **Dig-Screen**
+um 40 px überlief, mit dem frisch eingebauten Schluck-Zähler ganz unten. Durchgekommen
+war das alles, weil die Suite bis dahin nur **Quer**scrollen prüfte, und das auch nur auf
+dem Titel.
+
+**(8) Was nicht geht, steht als „geht nicht" da.** Bei 5 × 5 **mit** Doppelagent passt das
+Feld auf 664 px Höhe nicht vollständig über die Falz: 560 px sichtbarer Rumpf, davon
+229 px Kopf, Werkzeug-Chips, Tooltip und Abstände; für 58-px-Platten braucht das Feld 470.
+Der Knopf sitzt fest, das Feld scrollt dort. `tapCell` im E2E-Helfer scrollt eine Platte
+deshalb ins Bild, bevor es klickt — was der Mensch dort auch tut.
+
+### Abweichungen von der Planung
+
+- **`STAGE.hostAspect` gibt es nicht mehr.** Der Plan sah einen Deckel vor; gegen die
+  56-px-Regel war er nicht zu halten (siehe (6)). Ersetzt durch das Gegenteil, eine
+  Mindesthöhe.
+- **`BoardStage.resetRound()`** wurde nie gerufen — jetzt verdrahtet, damit eine
+  abgebrochene Sequenz ihre Sprites nicht für immer reserviert hält.
+- **`Element.animate` fehlt in jsdom und in alten WebViews.** Schluck-Zähler und
+  Token-Stapel laufen deshalb über `safeAnimate`; ein Pop ist ein Bonus, kein Spielzug.
+
+**Verifikation:** typecheck · lint · 368 Unit-Tests · E2E 28/28 auf iPhone 12 **und**
+Pixel 5 · Perf 8/8 (p50 16,7–17,0 ms, ein Draw-Batch, Partikel-Höhepunkt 29 von 200) ·
+CI grün.
+
+**Manuelle Checks für Luka:**
+
+- [ ] **Knallt es jetzt sichtbar — mit stummgeschaltetem Handy?** Das ist der eigentliche
+      Test; Haptik gibt es auf iOS nicht, und Web Audio schweigt bei gestelltem
+      Klingelschalter.
+- [ ] **Sieht man vor dem Aufdecken noch Rauch auf der geschlossenen Platte?** Darf nicht.
+- [ ] **Ist ein Krater von einem leeren Feld auf einen Blick zu unterscheiden?**
+- [ ] **Erkennt jemand einen Blindgänger, ohne die Lobby-Beschreibung gelesen zu haben?**
+- [ ] **Steht nach dem Banner noch da, wer wie viel trinkt?**
+- [ ] **Ist „Vergraben" bei 3, 6 und 8 Spielern ohne Scrollen erreichbar** — mit und ohne
+      Timer, mit und ohne Doppelagent?
 
 ## Audit A6 — 2026-09-05 (Teil 1: technischer Release-Stand)
 
