@@ -545,7 +545,7 @@ Die beiden Perf-Faelle darueber haben dafuer laengst eine Weiche: messen und mel
 
 Der Ticker treibt GSAP. Wo ein Frame laenger als 100 ms braucht, bekommt die Show weniger Zeit gutgeschrieben, als real vergeht — **sie zieht sich in Wanduhr-Zeit**. Auf dem Software-Renderer um rund die Haelfte: Aus zwanzig Sekunden Show werden ueber dreissig. Die 40-Sekunden-Fenster dahinter waren damit auf Kante genaeht, und ein etwas langsamerer Runner kippte sie.
 
-Wartebedingungen, die ein Stueck Show ueberspannen, haben jetzt ihr eigenes Fenster (`AFTER_SHOW_MS`, 90 s) mit der Begruendung im Code. Gewartet wird weiter auf einen **Zustand** — nur laenger, wenn die Maschine langsam zeichnet.
+Wartebedingungen, die ein Stueck Show ueberspannen, haben jetzt ihr eigenes Fenster (`AFTER_SHOW_MS`, 90 s) mit der Begruendung im Code. Gewartet wird weiter auf einen **Zustand** — nur laenger, wenn die Maschine langsam zeichnet. Dieselbe Rechnung trifft das Test-Timeout: Drei Runden mit je einer um die Haelfte gedehnten Show passen nicht in zwei Minuten, also stehen dort jetzt fuenf.
 
 **Das ist nicht nur eine Test-Eigenschaft.** Faellt ein echtes Geraet unter 10 fps, zieht sich die Show dort genauso. Die Gegenmassnahme dafuer steht seit M5: Low-Effects greift ab einem Frame-Median von 22 ms und nimmt Laser, Schatten und Vignette heraus, bevor es so weit kommt.
 
