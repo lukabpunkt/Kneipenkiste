@@ -8,6 +8,7 @@
 
 import { expect, test } from '@playwright/test';
 import {
+  AFTER_SHOW_MS,
   atScreen,
   distributeAllToFirst,
   enableMode,
@@ -171,7 +172,7 @@ test.describe('Drei Runden', () => {
     expect(await vaultValue(page)).toBe(4);
     await playChoices(page, ['share', 'share', 'share', 'share']);
     await runReveal(page);
-    await atScreen(page, 'result');
+    await atScreen(page, 'result', AFTER_SHOW_MS);
 
     await expect(page.locator('.result__banner')).toHaveText('Ehre unter Dieben');
     // Bankgebuehr: jeder einen Schluck (ADR-2).
@@ -187,7 +188,7 @@ test.describe('Drei Runden', () => {
     await runReveal(page);
 
     await distributeAllToFirst(page);
-    await atScreen(page, 'result');
+    await atScreen(page, 'result', AFTER_SHOW_MS);
     await expect(page.locator('.result__banner')).toHaveText('Der Alleingang');
     // Alles auf eine Person ist erlaubt (ADR-4): eine Trinkerzeile mit sechs Schluecken.
     await expect(page.locator('.result__drinker')).toHaveCount(1);
@@ -200,7 +201,7 @@ test.describe('Drei Runden', () => {
     expect(await vaultValue(page)).toBe(4);
     await playChoices(page, ['steal', 'steal', 'share', 'share']);
     await runReveal(page);
-    await atScreen(page, 'result');
+    await atScreen(page, 'result', AFTER_SHOW_MS);
 
     await expect(page.locator('.result__banner')).toHaveText('Zu viele Köche');
     // ⌈4/2⌉ = 2 pro Dieb.
@@ -314,7 +315,7 @@ test.describe('Eid', () => {
     await runReveal(page);
 
     // Meineid: Er trinkt 2 selbst und verteilt nur die restlichen 2 (GDD §3.7).
-    await atScreen(page, 'distribute');
+    await atScreen(page, 'distribute', AFTER_SHOW_MS);
     await expect(page.locator('.distribute__headline')).toContainText('2');
 
     await distributeAllToFirst(page);
@@ -362,7 +363,7 @@ test.describe('Maulwurf', () => {
     await runReveal(page);
 
     // Genau ein Dieb → Alleingang, und der Maulwurf ist die letzte Karte.
-    await atScreen(page, 'distribute');
+    await atScreen(page, 'distribute', AFTER_SHOW_MS);
     await distributeAllToFirst(page);
     await atScreen(page, 'result');
     await expect(page.locator('.result__banner')).toHaveText('Der Alleingang');
@@ -467,7 +468,7 @@ test.describe('Kronzeuge', () => {
     await playChoices(page, ['steal', 'steal', 'share']);
     await runReveal(page);
 
-    await atScreen(page, 'witness');
+    await atScreen(page, 'witness', AFTER_SHOW_MS);
     await page.getByRole('button', { name: 'Keiner packt aus' }).click();
     await atScreen(page, 'result');
 
@@ -489,7 +490,7 @@ test.describe('Kronzeuge', () => {
     // Ein Dieb: Es gibt niemanden zu verpfeifen — es geht direkt zum Verteilen.
     await playChoices(page, ['steal', 'share', 'share']);
     await runReveal(page);
-    await atScreen(page, 'distribute');
+    await atScreen(page, 'distribute', AFTER_SHOW_MS);
   });
 });
 
@@ -514,7 +515,7 @@ test.describe('Vertrauens-Historie', () => {
     await skipNegotiation(page);
     await playChoices(page, ['share', 'share', 'share']);
     await runReveal(page);
-    await atScreen(page, 'result');
+    await atScreen(page, 'result', AFTER_SHOW_MS);
 
     await page.getByRole('button', { name: 'Statistik' }).click();
     const history = page.locator('.score__row--history');
@@ -545,7 +546,7 @@ test.describe('Vertrauens-Historie', () => {
     await skipNegotiation(page);
     await playChoices(page, ['share', 'share', 'share']);
     await runReveal(page);
-    await atScreen(page, 'result');
+    await atScreen(page, 'result', AFTER_SHOW_MS);
 
     await page.getByRole('button', { name: 'Statistik' }).click();
     /*

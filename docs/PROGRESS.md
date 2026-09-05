@@ -541,4 +541,12 @@ Die beiden Perf-Faelle darueber haben dafuer laengst eine Weiche: messen und mel
 
 **Nebenbei:** GitHub meldet in jedem Lauf, dass `checkout@v4`, `setup-node@v4`, `upload-artifact@v4` und `configure-pages@v5` auf abgekuendigtem Node 20 laufen und nur notgedrungen auf Node 24 gestartet werden — heute eine Warnung, spaeter ein roter Lauf. Alle sechs Actions stehen jetzt auf ihrem Node-24-Major. Die drei Pages-Actions kann nur ein Push auf `main` beweisen; faellt der Deploy, bleibt die bisher veroeffentlichte Seite live.
 
-**Zahlen:** 2 rote CI-Befunde (ein Rennen, eine fehlende Weiche) · 4 Tests umgestellt · 6 Actions auf Node-24-Majors · 31 E2E-Fälle lokal grün · 0 Produktionscode geändert.
+**Nachtrag 2: Warum die Show auf CI ueberhaupt in Zeitfenster laeuft.** Der zweite PR-Lauf kam durch die Perf-Stufe und fiel dafuer an drei Flow-Tests, die alle dasselbe warteten: einen Screen **hinter** der Show, mit 40 Sekunden Geduld. Die Ursache steht in einer Zahl aus dem Perf-Log: Das Dev-Panel meldet auf dem Runner exakt `p50 100,0 ms` — das ist nicht gemessen, das ist PixiJS' `maxElapsedMS`-Deckel. Rohe Frames brauchen dort bis zu 150 ms.
+
+Der Ticker treibt GSAP. Wo ein Frame laenger als 100 ms braucht, bekommt die Show weniger Zeit gutgeschrieben, als real vergeht — **sie zieht sich in Wanduhr-Zeit**. Auf dem Software-Renderer um rund die Haelfte: Aus zwanzig Sekunden Show werden ueber dreissig. Die 40-Sekunden-Fenster dahinter waren damit auf Kante genaeht, und ein etwas langsamerer Runner kippte sie.
+
+Wartebedingungen, die ein Stueck Show ueberspannen, haben jetzt ihr eigenes Fenster (`AFTER_SHOW_MS`, 90 s) mit der Begruendung im Code. Gewartet wird weiter auf einen **Zustand** — nur laenger, wenn die Maschine langsam zeichnet.
+
+**Das ist nicht nur eine Test-Eigenschaft.** Faellt ein echtes Geraet unter 10 fps, zieht sich die Show dort genauso. Die Gegenmassnahme dafuer steht seit M5: Low-Effects greift ab einem Frame-Median von 22 ms und nimmt Laser, Schatten und Vignette heraus, bevor es so weit kommt.
+
+**Zahlen:** 3 rote CI-Befunde (ein Rennen, eine fehlende Weiche, ein zu enges Zeitfenster) · 13 Wartestellen umgestellt · 6 Actions auf Node-24-Majors · 31 E2E-Fälle lokal grün · 0 Produktionscode geändert.

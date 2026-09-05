@@ -21,6 +21,22 @@ export type ScreenId =
   | 'distribute'
   | 'result';
 
+/**
+ * Wartezeit fuer alles, was **hinter** der Show liegt.
+ *
+ * Die Aufdeckung dauert nicht ueberall gleich lang. PixiJS deckelt `ticker.deltaMS` bei
+ * `maxElapsedMS` = 100 ms, und der Ticker treibt GSAP: Wo ein Frame laenger als 100 ms
+ * braucht, bekommt die Show weniger Zeit gutgeschrieben, als real vergeht — sie zieht
+ * sich in Wanduhr-Zeit. Auf dem CI-Runner zeichnet Chromium in Software; dort meldet das
+ * Dev-Panel exakt 100,0 ms je Frame (also den Deckel), waehrend rohe Frames bis 150 ms
+ * brauchen. Eine 20-Sekunden-Show dauert dort ueber eine halbe Minute.
+ *
+ * Deshalb bekommen Wartebedingungen, die ein Stueck Show ueberspannen, ihr eigenes
+ * Fenster. Es ersetzt keine Zustandspruefung — gewartet wird weiter auf einen Zustand,
+ * nur eben laenger, wenn die Maschine langsam zeichnet.
+ */
+export const AFTER_SHOW_MS = 90_000;
+
 /** Wartet, bis genau dieser Screen gemountet ist. */
 export async function atScreen(page: Page, id: ScreenId, timeout = 40_000): Promise<void> {
   await page.waitForFunction(
@@ -137,7 +153,7 @@ export async function revealedCards(page: Page): Promise<string[]> {
 }
 
 /** Wartet, bis der Mitschreiber `count` Karten gesehen hat. */
-export async function waitForRevealed(page: Page, count: number, timeout = 40_000): Promise<void> {
+export async function waitForRevealed(page: Page, count: number, timeout = AFTER_SHOW_MS): Promise<void> {
   await page.waitForFunction(
     (want) =>
       ((globalThis as unknown as { __revealLog?: string }).__revealLog ?? '')
