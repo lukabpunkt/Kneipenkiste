@@ -116,6 +116,36 @@ test.describe('A5 — PWA', () => {
   });
 });
 
+test.describe('Regeln', () => {
+  /* Auf Deutsch, weil die Stichproben unten deutsche Saetze sind. */
+  test.use({ locale: 'de-DE' });
+
+  test('erklaeren die ganze Runde und stehen mit echten Zahlen da', async ({ page }) => {
+    await page.goto('./');
+    await expect(screen(page)).toHaveAttribute('data-screen', 'title');
+
+    await page.locator('.title__actions .btn').nth(1).click();
+    await expect(page.locator('.sheet__panel')).toBeVisible();
+
+    /* Die Runde in ihrer Reihenfolge: Rollen, Packen, Hinweise, Verhoer, Kontrolle,
+       Schranke, Modi, Ende. Weniger waere wieder eine Gedaechtnisstuetze statt Regeln. */
+    await expect(page.locator('.rules__card')).toHaveCount(8);
+    expect(await page.locator('.rules__points li').count()).toBeGreaterThan(20);
+
+    /*
+     * Die Zahlen stehen in `config/rules.ts` und werden eingesetzt. Bleibt eine Klammer
+     * stehen, fehlt der Wert in `ruleNumbers()` — und am Tisch liest jemand "{caught}"
+     * vor. Das faellt sonst niemandem auf, weil der Text ja da ist.
+     */
+    const text = (await page.locator('.rules').innerText()).replace(/\s+/g, ' ');
+    expect(text, 'ein Platzhalter ist nicht ersetzt worden').not.toMatch(/[{}]/);
+
+    /* Und die Zahlen sind wirklich die aus dem Regelwerk, nicht irgendwelche. */
+    expect(text).toContain('0 bis 6');
+    expect(text).toContain('2 Schlücke je gefundenem Stück');
+  });
+});
+
 test.describe('A5 — Title-Loop', () => {
   test('läuft lange, ohne Elemente nachwachsen zu lassen', async ({ page }) => {
     test.setTimeout(180_000);

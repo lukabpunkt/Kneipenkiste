@@ -51,6 +51,42 @@ export function hintIcon(type: HintType): HTMLElement {
   return icon;
 }
 
+/**
+ * Der Hinweis als Zoll-Vermerk — ein Zettel, den jemand an den Koffer geheftet hat.
+ *
+ * Vorher hing ein nacktes weisses Icon frei ueber dem Band: Es sah aus wie ein
+ * verrutschtes Bedienelement, und man musste raten, zu welchem Koffer es gehoert. Ein
+ * Zettel mit Spitze nach unten zeigt, worauf er sich bezieht, und sagt gleich, was
+ * beobachtet wurde („tickt") statt nur „hier ist etwas".
+ *
+ * **Der Koffer selbst bleibt unangetastet** (Art Direction §7): kein Glow, kein Rand,
+ * keine andere Farbe. Nur ein Zettel daneben — denn der Hinweis ist eine Beobachtung
+ * ueber den Koffer, keine Eigenschaft von ihm.
+ */
+export function hintNote(type: HintType, reliable = false): HTMLElement {
+  const note = document.createElement('div');
+  note.className = 'hint-note';
+  note.dataset.hint = type;
+  if (reliable) note.dataset.reliable = 'true';
+  note.setAttribute('aria-label', t(`hints.${type}`));
+
+  const icon = document.createElement('span');
+  icon.className = 'hint-note__icon';
+  icon.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${HINT_ICONS[type]}</svg>`;
+
+  /*
+   * Auf dem Zettel steht die Kurzform („tickt"), im Vorlesetext der ganze Satz. Bei vier
+   * Koffern nebeneinander bleiben pro Vermerk rund 64 px — „beschnueffelt" haette den
+   * Nachbarn verdeckt, und ein abgeschnittenes Wort sieht aus wie ein Fehler.
+   */
+  const word = document.createElement('span');
+  word.className = 'hint-note__word';
+  word.textContent = t(`hintsShort.${type}`);
+
+  note.append(icon, word);
+  return note;
+}
+
 export function createSuitcaseCard(options: SuitcaseCardOptions): HTMLElement {
   const color = colorById(options.colorId);
 

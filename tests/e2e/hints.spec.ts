@@ -61,15 +61,15 @@ test.describe('A3 — Hinweise', () => {
     test.setTimeout(180_000);
     await toHallAfterHints(page, 3103, [3, 0, 2, 0]);
 
-    /* Welche Koffer einen Hinweis tragen, verrät die Marker-Leiste im HUD. */
+    /* Welche Koffer einen Hinweis tragen, verrät der Zettel im HUD über dem Koffer. */
     const withHint = await page
       .locator('.hall__marker')
-      .filter({ has: page.locator('.hint-icon') })
+      .filter({ has: page.locator('.hint-note') })
       .first()
       .getAttribute('data-player');
     const withoutHint = await page
       .locator('.hall__marker')
-      .filter({ hasNot: page.locator('.hint-icon') })
+      .filter({ hasNot: page.locator('.hint-note') })
       .first()
       .getAttribute('data-player');
 
@@ -133,7 +133,7 @@ test.describe('A3 — Hinweise', () => {
     expect(agreement, `Silhouetten stimmen nur zu ${(agreement * 100).toFixed(1)} % überein`).toBeGreaterThan(0.97);
   });
 
-  test('die Hinweis-Icons hängen an den Koffern, die der Kern gewählt hat', async ({ page }) => {
+  test('die Vermerke hängen an den Koffern, die der Kern gewählt hat', async ({ page }) => {
     test.setTimeout(180_000);
     await toHallAfterHints(page, 3104, [4, 0, 1, 0]);
 
@@ -145,7 +145,7 @@ test.describe('A3 — Hinweise', () => {
 
     const marked: string[] = [];
     for (const marker of await page.locator('.hall__marker').all()) {
-      if ((await marker.locator('.hint-icon').count()) > 0) {
+      if ((await marker.locator('.hint-note').count()) > 0) {
         marked.push((await marker.getAttribute('data-player'))!);
       }
     }

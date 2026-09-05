@@ -191,21 +191,83 @@
   },
   "rules": {
     "headline": "Rules",
-    "pack": {
-      "title": "Packing",
-      "body": "Every traveller secretly packs 0 to 6 items of contraband. 0 is clean and safe. More is more risk and more loot."
-    },
-    "hints": {
-      "title": "Hints lie sometimes",
-      "body": "The officer sees small hints on the cases. They are only mostly right — and they never reveal how much is inside."
-    },
-    "inspect": {
-      "title": "Interrogation & inspection",
-      "body": "The officer asks, everyone answers. Then they open up to k cases in the scanner. Busted means drinking double; opening an innocent case means the officer drinks."
-    },
-    "payout": {
-      "title": "Payout",
-      "body": "Whoever gets through hands out one sip per item. The officer keeps what they catch."
+    "lead": "Everyone is a traveller with a suitcase — except one. That one is the customs officer and wants to know what is in those cases. You play with a single phone that gets passed around.",
+    "sections": {
+      "roles": {
+        "title": "Who is who",
+        "body": "Each round exactly one person is the customs officer, taking turns. Everyone else travels and has a suitcase in their colour.",
+        "points": [
+          "The officer is the only one who taps. Their buttons carry their colour.",
+          "The travellers talk — you answer out loud, not on the phone.",
+          "After the round the officer changes."
+        ]
+      },
+      "pack": {
+        "title": "1. Packing",
+        "body": "The phone goes around. Each traveller sees their case alone and packs {min} to {max} items of contraband. Nobody else sees the number — until the end of the round.",
+        "points": [
+          "{min} is clean: no risk, no loot. That is a real choice, not a fallback.",
+          "The more is in there, the more there is to hand out — and the more a bust costs.",
+          "What you pack is always silly: rubber ducks, cheese, garden gnomes."
+        ]
+      },
+      "hints": {
+        "title": "2. The hints",
+        "body": "Once everyone has packed, the cases roll across the belt. The officer gets {hints} small observations: a case ticks, drips, wobbles, is heavy, springs back. Everyone sees them.",
+        "points": [
+          "A hint is only mostly right. Roughly {truth} in 10 point at a case that really holds something — the rest point at a clean one.",
+          "A hint never says how much is inside. A ticking case may hold one item or six. Or nothing.",
+          "So a case without a hint is not a clean case. It is only one nobody said anything about.",
+          "How many hints there are depends on the number of players: {min_hints} to {max_hints}."
+        ]
+      },
+      "interrogation": {
+        "title": "3. The interrogation",
+        "body": "For {seconds} seconds the officer may ask anything, and everyone has to answer. This is the heart of the game — this is where people lie, sweat and overdo it.",
+        "points": [
+          "The phone lies in the middle. It only shows the time and a question prompt when the officer runs dry.",
+          "Lying is allowed. Including for those carrying nothing.",
+          "The officer may end the interrogation at any time."
+        ]
+      },
+      "inspect": {
+        "title": "4. The inspection",
+        "body": "Now the officer opens cases in the scanner — but only a limited number. With {min_players} players it is one, with six it is two, above that three.",
+        "points": [
+          "They tap a case, the image builds up line by line and stalls halfway. Before that nothing is readable — that is on purpose.",
+          "Busted: the traveller drinks {caught} sips per item found.",
+          "Clean case opened: the officer drinks {harassment} sips. Searching without cause has a price.",
+          "An opened case is done. The others stay shut."
+        ]
+      },
+      "gate": {
+        "title": "5. The border",
+        "body": "Every case that was not opened crosses the border. Only here does the table see what made it through.",
+        "points": [
+          "Whoever gets contraband through hands out one sip per item — to whoever they like.",
+          "Whoever was clean and never opened has won nothing and lost nothing.",
+          "If not a single item made it through, the officer gets {bonus_all} sips to hand out.",
+          "If they opened only smugglers and no innocent, there is {bonus_instinct} extra sip for good instinct."
+        ]
+      },
+      "modes": {
+        "title": "Extra modes",
+        "body": "Four switches in the lobby. They are independent and combine freely.",
+        "points": [
+          "Bribery: travellers may openly offer the officer {min_bribe} to {max_bribe} sips. If they accept, the case stays shut — and everyone saw who paid.",
+          "Sniffer dog: Waldi sniffs one case. His hint is always right — in exchange the officer opens one case fewer.",
+          "Diplomat: one traveller has secret immunity. If their case is opened, nothing happens to them and the officer drinks {diplomat} sips.",
+          "High season: up to {max_high} items per case and one more opening. Considerably more goes wrong — in both directions."
+        ]
+      },
+      "end": {
+        "title": "End of the round",
+        "body": "At the end everything is public: every amount, every hint with the truth behind it, and who the diplomat was. Then the next person is the officer.",
+        "points": [
+          "There are no points and no end of game. You stop when you want to stop.",
+          "Drinking is always voluntary — water counts."
+        ]
+      }
     }
   },
   "settings": {
@@ -248,5 +310,13 @@
     "headline": "Customs is closed",
     "body": "The game could not start. Trying again resets the saved session.",
     "retry": "Try again"
+  },
+  "hintsShort": {
+    "wobble": "wobbles",
+    "drip": "drips",
+    "heavy": "heavy",
+    "click": "ticks",
+    "feather": "feather",
+    "dog": "Waldi"
   }
 }

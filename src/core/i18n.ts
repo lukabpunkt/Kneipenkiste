@@ -93,7 +93,7 @@ export function flatKeys(locale: Locale): string[] {
  * Fehlt der Key oder ist er keine Liste, kommt ein leeres Array zurueck; die Sprechblase
  * bleibt dann leer, statt `[missing:…]` auf die Buehne zu schreiben.
  */
-export function tList(key: string): string[] {
+export function tList(key: string, params?: TranslationParams): string[] {
   const path = key.split('.');
   const read = (dict: Dict): string[] | undefined => {
     let node: string | string[] | Dict | undefined = dict;
@@ -103,5 +103,6 @@ export function tList(key: string): string[] {
     }
     return Array.isArray(node) ? node : undefined;
   };
-  return read(DICTS[current]) ?? read(DICTS.de) ?? [];
+  const list = read(DICTS[current]) ?? read(DICTS.de) ?? [];
+  return params ? list.map((entry) => interpolate(entry, params)) : list;
 }

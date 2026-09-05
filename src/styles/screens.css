@@ -424,6 +424,7 @@
 /* Marker über den Koffern: Hinweis-Icons und Bestechungs-Chips. */
 .hall__marker {
   position: absolute;
+  /* Die Unterkante sitzt am Koffer; alles Weitere wächst nach oben. */
   transform: translate(-50%, -100%);
   display: flex;
   flex-direction: column;
@@ -431,14 +432,40 @@
   gap: 4px;
 }
 
-/* Die Icon-Zeile behält ihre Höhe, auch wenn sie leer ist — sonst wäre die
+/* Die Zettel-Zeile behält ihre Höhe, auch wenn sie leer ist — sonst wäre die
    Verschiebung der Chips selbst ein Hinweis (Art Direction §7). */
 .hall__icons {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 3px;
-  min-height: 22px;
+  min-height: 24px;
+  padding-bottom: 6px;
+}
+
+/*
+ * Die Spitze unter dem Zettelstapel. Sie zeigt auf den Koffer, dem der Vermerk gilt —
+ * ohne sie hing die Notiz irgendwo in der Luft, und bei acht Koffern nebeneinander war
+ * nicht zu sehen, welcher gemeint ist. Sie haengt an der Zettel-Zeile und nicht am
+ * ganzen Marker: Darunter kann noch ein Bestechungs-Chip stehen.
+ */
+.hall__marker[data-noted='true'] .hall__icons::after {
+  content: '';
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  transform: translate(-50%, 0) rotate(45deg);
+  border-right: 1.5px solid var(--c-ink);
+  border-bottom: 1.5px solid var(--c-ink);
+  background: var(--c-paper);
+}
+
+/* Steht dort Waldis Vermerk, muss auch die Spitze seine Farbe haben. */
+.hall__marker[data-noted='true'] .hall__icons:has(> .hint-note[data-reliable='true'])::after {
+  background: var(--c-customs);
 }
 
 .hall__dog {
@@ -838,6 +865,15 @@
   gap: var(--space-3);
 }
 
+/*
+ * Linksbuendig, entgegen dem Rest des Spiels. Ueberall sonst stehen ein bis zwei Zeilen
+ * mittig — hier stehen Absaetze, und zentrierter Fliesstext mit wechselnden Zeilenlaengen
+ * ist genau das, was niemand am Tisch zu Ende liest.
+ */
+.rules {
+  text-align: left;
+}
+
 .settings__row {
   display: flex;
   align-items: center;
@@ -865,7 +901,49 @@
 .rules__text {
   margin: 0;
   font-size: var(--fs-sm);
+  line-height: 1.5;
   color: rgb(255 248 231 / 80%);
+}
+
+/* Der Einstiegssatz steht ueber den Karten und traegt das ganze Spiel in drei Zeilen. */
+.rules__lead {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: rgb(255 248 231 / 90%);
+}
+
+/*
+ * Die Punkte sind das, was am Tisch wirklich gelesen wird — kurze Zeilen, ein Zoll-Strich
+ * davor statt eines Aufzaehlungspunkts. Eingerueckt wird ueber `padding`, damit eine
+ * zweite Zeile unter der ersten steht und nicht unter dem Strich.
+ */
+.rules__points {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.rules__points li {
+  position: relative;
+  padding-left: 14px;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: rgb(255 248 231 / 80%);
+}
+
+.rules__points li::before {
+  content: '';
+  position: absolute;
+  top: 0.62em;
+  left: 0;
+  width: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--c-customs);
 }
 
 /* ------------------------------------------------------------------ */

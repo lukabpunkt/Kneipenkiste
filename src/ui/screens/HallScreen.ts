@@ -25,7 +25,7 @@ import { createButton, createOfficerButton } from '../components/button';
 import { createBribeChip } from '../components/chips';
 import { showCoachmark } from '../components/coachmark';
 import { createCountdownRing } from '../components/countdownRing';
-import { hintIcon } from '../components/suitcaseCard';
+import { hintNote } from '../components/suitcaseCard';
 import { vibrate } from '../haptics';
 import { createStageHost } from '../stageHost';
 import type { ScreenContext, ScreenInstance } from '../router';
@@ -154,13 +154,14 @@ export function createHallScreen(ctx: ScreenContext): ScreenInstance {
       const icons = document.createElement('div');
       icons.className = 'hall__icons';
       for (const hint of shownHints.filter((h) => h.suitcaseOf === suitcase.playerId)) {
-        icons.append(hintIcon(hint.type));
+        icons.append(hintNote(hint.type));
       }
       if (view.dogHint?.suitcaseOf === suitcase.playerId && hintsDone) {
-        const dog = hintIcon('dog');
-        dog.dataset.reliable = 'true';
-        icons.append(dog);
+        icons.append(hintNote('dog', true));
       }
+      /* Die Spitze gehoert an den Zettelstapel, nicht an jeden Zettel — und nur, wenn
+         ueberhaupt einer da ist. Ein Koffer ohne Hinweis zeigt nichts. */
+      marker.dataset.noted = String(icons.childElementCount > 0);
       marker.append(icons);
 
       if (view.modes.bribery && !suitcase.locked) {

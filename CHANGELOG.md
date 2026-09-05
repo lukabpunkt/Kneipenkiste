@@ -6,6 +6,12 @@ Alle nennenswerten Änderungen an **Der Zoll**. Format nach
 
 ## [Unveröffentlicht]
 
+### Geändert
+- **Die Regeln erklären jetzt das ganze Spiel** statt es in vier Sätzen zu streifen: acht
+  Abschnitte in der Reihenfolge der Runde, mit den echten Zahlen aus `rules.ts` (ADR-27)
+- **Der Hinweis am Koffer ist ein Zoll-Vermerk geworden** — ein Zettel mit Spitze auf den
+  Koffer statt eines nackten Icons, das über dem Band schwebte (ADR-26)
+
 ### Hinzugefügt
 - Veröffentlicht auf https://lukabpunkt.github.io/Zoll/
 - Balancing-Simulation: `npm run balance` rechnet 20 000 Runden je Parametersatz
