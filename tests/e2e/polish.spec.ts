@@ -33,14 +33,86 @@ test.describe('A5 — PWA', () => {
     expect(manifest.icons.some((i) => i.purpose === 'maskable')).toBe(true);
   });
 
-  test('registriert einen Service Worker', async ({ page }) => {
+  test('registriert einen Service Worker, der die Seite auch wirklich kontrolliert', async ({
+    page,
+  }) => {
     await page.goto('./');
-    const registered = await page.evaluate(async () => {
-      /* Die Datei muss da sein — ob der Browser sie im Test aktiviert, ist zweitrangig. */
-      const response = await fetch('./sw.js');
-      return response.ok;
+
+    /*
+     * Nicht „die Datei wird ausgeliefert" — das war sie auch, als niemand sie anmeldete,
+     * und offline blieb die App leer. Geprueft wird, was zaehlt: Ein Worker uebernimmt
+     * das Dokument, und der Precache steht (ADR-25).
+     */
+    const state = await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready;
+      while (!navigator.serviceWorker.controller) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      const names = await caches.keys();
+      const precache = names.find((name) => name.includes('precache'));
+      const entries = precache ? (await (await caches.open(precache)).keys()).length : 0;
+      return { scope: registration.scope, controlled: true, entries };
     });
-    expect(registered).toBe(true);
+
+    expect(state.controlled).toBe(true);
+    expect(state.scope).toContain('/Zoll/');
+    /* Ohne Atlanten, Fonts und den Hall-Chunk waere „offline" ein leeres Versprechen. */
+    expect(state.entries).toBeGreaterThan(20);
+  });
+
+  test('startet ohne Netz', async ({ page, context }) => {
+    await page.goto('./');
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+      while (!navigator.serviceWorker.controller) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+    });
+
+    /*
+     * Der Test, der bisher ein Mensch mit einem Geraet im Flugmodus war. Ein Partyspiel
+     * im Keller oder im Zug muss starten, auch wenn nichts geht.
+     */
+    await context.setOffline(true);
+    await page.reload();
+
+    await expect(screen(page)).toHaveAttribute('data-screen', 'title');
+    await expect(page.locator('.screen--title .btn--primary')).toBeVisible();
+
+    await context.setOffline(false);
+  });
+
+  test('faengt einen Chunk aus einem alten Build ab und laedt genau einmal neu', async ({
+    page,
+  }) => {
+    await page.goto('./');
+
+    let loads = 0;
+    page.on('load', () => {
+      loads += 1;
+    });
+
+    /*
+     * Genau die Lage nach einem Deploy: Die `index.html` liegt noch im Cache und
+     * verweist auf Chunks, die der Server nicht mehr hat. Der Einstieg ist zu diesem
+     * Zeitpunkt geladen — alles Weitere sind die nachgeladenen Bruchstuecke.
+     */
+    await page.route('**/assets/*.js', (route) => route.fulfill({ status: 404, body: '' }));
+
+    /* In die Lobby: Dort startet der Nachladevorgang der Halle. */
+    await page.locator('.screen--title .btn--primary').click();
+
+    await expect
+      .poll(() => loads, { timeout: 15_000, message: 'Die Seite hat nicht neu geladen' })
+      .toBe(1);
+
+    /*
+     * Und danach Ruhe. Ein zweiter Fehlschlag liegt nicht am Cache; eine Schleife aus
+     * Neuladen waere schlimmer als eine Fehlermeldung.
+     */
+    await page.waitForTimeout(4_000);
+    expect(loads, 'mehr als einmal neu geladen').toBe(1);
+    expect(await page.evaluate(() => sessionStorage.getItem('zoll.staleChunkReload'))).toBe('1');
   });
 });
 

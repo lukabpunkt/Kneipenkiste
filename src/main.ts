@@ -16,6 +16,22 @@ import { loadSession } from '@/core/session';
 
 declare const __APP_VERSION__: string;
 
+/**
+ * Meldet den Service Worker an.
+ *
+ * Ohne diesen Aufruf wird `sw.js` zwar ausgeliefert, aber nie installiert — die App
+ * waere „installierbar" und trotzdem offline leer (ADR-25). Der Import ist dynamisch,
+ * damit der Registrierungs-Code nicht im Einstiegs-Chunk landet, und ein Fehlschlag ist
+ * folgenlos: Das Spiel laeuft online genauso.
+ */
+function registerServiceWorker(): void {
+  if (!('serviceWorker' in navigator)) return;
+
+  void import('virtual:pwa-register')
+    .then(({ registerSW }) => registerSW({ immediate: true }))
+    .catch((error: unknown) => console.warn('[zoll] Service Worker nicht angemeldet', error));
+}
+
 /** Texte, die direkt im `index.html` stehen (Landscape-Overlay). */
 function applyStaticTranslations(): void {
   for (const node of document.querySelectorAll<HTMLElement>('[data-i18n]')) {
@@ -79,6 +95,9 @@ function boot(): void {
 
     const app = createApp(root);
     Reflect.set(globalThis, '__zoll', { app, version: __APP_VERSION__ });
+
+    /* Erst wenn das Spiel steht — der Precache darf den ersten Bildaufbau nicht bremsen. */
+    registerServiceWorker();
   } catch (error) {
     showFatal(root, error);
   }

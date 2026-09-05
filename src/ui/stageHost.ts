@@ -21,11 +21,55 @@ import type { ScreenContext } from './router';
  */
 const gameModule = (): Promise<typeof gameExports> => import('@/game');
 
+/**
+ * Ein Chunk, den es auf dem Server nicht mehr gibt.
+ *
+ * Nach einem Deploy liegt die alte `index.html` noch im Browser-Cache (GitHub Pages gibt
+ * ihr zehn Minuten), und die verweist auf Chunk-Namen aus dem alten Build. Der Import
+ * scheitert dann mit „Failed to fetch dynamically imported module" — und die Halle ließe
+ * sich bis zum Ablauf des Caches kein einziges Mal mehr öffnen.
+ */
+function isStaleChunk(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /dynamically imported module|Importing a module script failed/i.test(message);
+}
+
+const RELOAD_MARK = 'zoll.staleChunkReload';
+
+/**
+ * Holt einmal die neue `index.html` und macht damit weiter.
+ *
+ * Genau **einmal** pro Sitzung: Scheitert es danach wieder, liegt es nicht am Cache, und
+ * eine Schleife aus Neuladen wäre schlimmer als eine ehrliche Fehlermeldung.
+ */
+function reloadOnceForStaleChunk(error: unknown): boolean {
+  if (!isStaleChunk(error)) return false;
+
+  try {
+    if (globalThis.sessionStorage?.getItem(RELOAD_MARK)) return false;
+    globalThis.sessionStorage?.setItem(RELOAD_MARK, '1');
+  } catch {
+    /* Ohne sessionStorage gibt es keine Schleifenbremse — dann lieber nicht neu laden. */
+    return false;
+  }
+
+  console.warn('[stage] Chunk aus einem alten Build — lade neu', error);
+  location.reload();
+  return true;
+}
+
 /** Startet den Nachladevorgang, ohne auf ihn zu warten — läuft in der Lobby. */
 export function preloadStage(): void {
   void gameModule()
     .then((game) => game.preloadHallAssets())
-    .catch((error: unknown) => console.warn('[stage] Preload fehlgeschlagen', error));
+    .catch((error: unknown) => {
+      /*
+       * Der beste Ort für das Neuladen: In der Lobby ist noch keine Runde im Gang, und
+       * die Namen stehen in der gespeicherten Session. Es kostet nichts.
+       */
+      if (reloadOnceForStaleChunk(error)) return;
+      console.warn('[stage] Preload fehlgeschlagen', error);
+    });
 }
 
 export interface StageHost {
@@ -74,7 +118,16 @@ export function createStageHost(ctx: ScreenContext, view: PublicRound): StageHos
     hud,
 
     async ready() {
-      const game = await gameModule();
+      /*
+       * Auch hier neu laden, wenn der Chunk aus einem alten Build stammt: Die Runde ist
+       * dann zwar verloren — ohne Neuladen aber das ganze Spiel, denn die Halle käme bis
+       * zum Ablauf des Caches kein einziges Mal mehr hoch.
+       */
+      const game = await gameModule().catch((error: unknown) => {
+        reloadOnceForStaleChunk(error);
+        throw error;
+      });
+
       stage = await game.ensureStage({
         roundKey: `${view.index}`,
         seed: view.index * 7919 + 13,

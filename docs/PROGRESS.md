@@ -229,7 +229,7 @@ Gemessen auf der echten Bühne, nicht an den Konstanten aus `choreo.ts` — ein 
 | Check | Status | Notiz |
 |---|---|---|
 | Lighthouse Mobile: Performance / A11y / Best Practices ≥ 90 | ✅ | **99 / 100 / 100.** FCP 1,3 s, LCP 2,0 s, TBT 0 ms, CLS 0. Als eigenes Gate (`npm run check:lighthouse`) mit den Schwellen an einer Stelle, dazu ein CI-Job. |
-| PWA installierbar | ✅ | Manifest mit `standalone`, 192er, 512er und maskierbarem Icon; Service Worker wird ausgeliefert. Eigener E2E-Test. |
+| PWA installierbar | ✅ | Manifest mit `standalone`, 192er, 512er und maskierbarem Icon. **Korrigiert am 5. September:** Der Service Worker wurde damals nur ausgeliefert, nie angemeldet — „offline" war ein leeres Versprechen, und der E2E-Test prüfte nur, dass die Datei existiert. Seit ADR-25 meldet `main.ts` ihn an; der Test lädt die Seite jetzt im Flugmodus neu. |
 | JS ≤ 450 KB gzip; Hall-Chunk lazy | ✅ | **251 KB gzip gesamt**, Einstiegs-Chunk **30,3 KB**. Geprüft, dass weder PIXI noch GSAP im Einstieg landen. |
 | Kontrast ≥ 4,5:1 | ✅ | `npm run check:contrast` prüft **22 echte Paarungen** — nicht alle möglichen, sondern die, die im Spiel wirklich übereinanderliegen. Führte zu ADR-21. |
 | Reduced-Motion | ✅ | Kein Kamera-Schütteln, kein Blinken, kein Title-Loop; GSAP-Eases werden zu `steps(1)`, damit die **Reihenfolge** der Beats bleibt und nur der Weg verschwindet. E2E: eine ganze Runde läuft damit durch. |
@@ -256,3 +256,48 @@ Gemessen auf der echten Bühne, nicht an den Konstanten aus `choreo.ts` — ein 
 
 **Manueller Check für Luka vor M6:**
 - [ ] Auf einem echten Gerät installieren und offline starten; dann Systemeinstellung „Bewegung reduzieren" einschalten und eine Runde spielen.
+
+## Audit A6 — 2026-09-05
+
+**Ergebnis:** TEILWEISE — alles Technische steht, der Playtest mit Menschen fehlt.
+
+A6 ist zur Hälfte ein Audit, das kein Rechner bestehen kann: „Lachen beim Röntgen ≥ 6 von 8"
+misst niemand mit einem Skript. Was messbar war, ist gemessen; was Menschen braucht, steht
+in [`PLAYTEST-01.md`](PLAYTEST-01.md) und wartet auf Luka.
+
+| Check | Status | Notiz |
+|---|---|---|
+| Balancing: Anteil Runden mit ≥ 1 Fang 40–70 % | ❌ **Simulation** | **85,4 %** bei 55 % Schmugglern, über jeder plausiblen Schmuggelrate zu hoch. `npm run balance`, 20 000 Runden je Zeile. Kein Eingriff vor dem Playtest — die Simulation weiß, was die Zahlen tun, nicht ob es Spaß macht. |
+| Anteil „Belästigung"-Runden ≤ 30 % | ✅ Simulation | 21,8 % bei 55 % Schmugglern. |
+| Hinweise sind glaubwürdig, aber unzuverlässig | ⚠️ Simulation | Ein Hinweis trifft mit p_true = 0,6, blindes Raten mit der Schmugglerquote. **Ab ~60 % Schmugglern ist ein Hinweis schlechter als Raten** (−3,6 Punkte bei 80 %). Design-Säule 2 hält nur unterhalb dieser Schwelle. |
+| Hochsaison bringt mehr durch | ❌ Simulation | 4,08 → 4,11 Stück durch die Grenze, aber 3,05 → 6,67 erwischt und 6,2 → 13,4 Schlücke. Es ist ein Trinkmodus, kein Schmuggelmodus — der UI-Text verspricht das Falsche. |
+| Abstürze | ❌ → ✅ | **Auf der veröffentlichten Seite stand „Die Halle konnte nicht geladen werden".** Gefunden, indem ich die Live-URL selbst durchgespielt habe. Ursache und Reparatur: ADR-25. |
+| Offline spielbar | ❌ → ✅ | Der Service Worker wurde nie angemeldet (ADR-25). Der A5-Eintrag ist korrigiert. |
+| CI auf GitHub grün | ✅ | Nach drei Reparaturen: der Standing Audit stolperte über seinen eigenen Kommentar, `.dev-panel__btn` traf seit der Simulation zwei Knöpfe, und ein Koffer-Tap las die Position, während die Kamera noch fuhr. |
+| Live-URL spielbar | ✅ | https://lukabpunkt.github.io/Zoll/ — Titel, Lobby, Packen, Halle mit acht Sprites, Röntgen. Von Hand durchgespielt. |
+| Gerätematrix, README, CHANGELOG, Tag | ✅ | `DEVICES.md`, `README.md`, `CHANGELOG.md`; Tags v0.0.1–v0.5.0. |
+| Zeit bis erstes Röntgen ≤ 120 s | ⏳ manuell | Playtest. |
+| Verhör wird zum Reden genutzt ≥ 6 von 8 | ⏳ manuell | Playtest. |
+| Lachen beim Röntgen ≥ 6 von 8 | ⏳ manuell | Playtest. |
+| Beamter fällt auf einen falschen Hinweis rein ≥ 2 von 8 | ⏳ manuell | Playtest — und die schärfste Frage des Protokolls. |
+| Jemand schmuggelt ≥ 5 und kommt durch | ⏳ manuell | Playtest. |
+| „Nochmal spielen?" ≥ 80 % Ja | ⏳ manuell | Playtest. |
+| „Was war verwirrend?" Top-5 | ⏳ manuell | Playtest. |
+
+### Was gebaut wurde
+`core/simulate.ts` und `scripts/balance.mjs` (20 000 Runden je Parametersatz, drei Beamten-Strategien) · `docs/PLAYTEST-01.md` mit dem Vorbefund als Ausgangspunkt · Service-Worker-Anmeldung und Chunk-Reparatur (ADR-25) · drei CI-Reparaturen.
+
+### Was gefunden und behoben wurde
+1. **Die veröffentlichte Seite war kaputt** — für jeden, der nach einem Deploy wiederkam. GitHub Pages gibt der `index.html` zehn Minuten Cache, und die alte Datei verweist auf Chunks, die es nicht mehr gibt. Kein Test hat das gesehen, weil Tests immer frisch laden. Gefunden nur, weil ich die Live-URL selbst gespielt habe.
+2. **Der Service Worker wurde nie angemeldet.** Der A5-Test prüfte, dass `sw.js` ausgeliefert wird — nicht, dass ihn jemand installiert. „Offline spielbar" war seit M5 falsch dokumentiert.
+3. **Der Title-Loop-Test maß das Item-Set statt ein Leck:** Die Silhouetten bestehen aus unterschiedlich vielen SVG-Elementen (Käse 1, Enten 3). Dass er je grün war, lag am zufälligen Startindex.
+4. **Ein Koffer-Tap kann danebengehen, solange die Kamera fährt** — auf dem langsamen CI-Runner reproduzierbar, lokal nie. Der Test wartet jetzt, bis der Koffer stillsteht.
+
+**Offene SOLL-Follow-ups:** Balancing-Pass nach dem Playtest (nur `rules.ts`, mit ADR) · Hochsaison-Text oder -Regel geradeziehen · Video.
+
+**Manuelle Checks für Luka vor 1.0:**
+- [ ] **Playtest nach `docs/PLAYTEST-01.md`** — 5–6 Personen, ≥ 8 Runden. Ohne ihn kein 1.0.
+- [ ] „Lustig-Test" aus A4: Drei Personen sehen die sieben Sequenzen (`?dev=1&panel=sequences`) — grinsen mindestens zwei?
+- [ ] A3-Hinweis-Test mit drei Personen: Halten sie den Hinweis für glaubwürdig?
+- [ ] Auf einem echten Gerät installieren und offline starten (automatisch geprüft, aber der Installations-Dialog braucht ein Gerät).
+- [ ] Look-Check und Deuteranopie-Simulation.

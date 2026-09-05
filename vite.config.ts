@@ -30,7 +30,13 @@ export default defineConfig({
   },
   plugins: [
     VitePWA({
-      registerType: 'prompt',
+      /*
+       * `autoUpdate`: Der neue Service Worker uebernimmt sofort (skipWaiting +
+       * clientsClaim). Mit `prompt` haette ein Update auf ein Fenster gewartet, das bei
+       * einem Partyspiel oft tagelang offen bleibt — und der Ladefehler aus einem alten
+       * Chunk waere die Regel statt der Ausnahme (ADR-25).
+       */
+      registerType: 'autoUpdate',
       strategies: 'generateSW',
       injectRegister: null,
       manifest: false, // wir liefern public/manifest.webmanifest selbst aus

@@ -4,8 +4,10 @@ Ein Mobile-First Pass-the-Phone-Bluffspiel für 4–8 Personen. Alle sind Reisen
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot), [Der Tresor](https://github.com/lukabpunkt/Tresor) und [Sprengmeister](https://github.com/lukabpunkt/Sprengmeister) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** Spielbereit. Fehlt für 1.0 nur noch der Playtest mit echten Menschen
-(`docs/PLAYTEST-01.md`) und der Balancing-Pass danach.
+**Spielen:** https://lukabpunkt.github.io/Zoll/ — Handy in die Mitte, los.
+
+**Status:** Veröffentlicht und spielbar. Fehlt für 1.0 nur noch der Playtest mit echten
+Menschen (`docs/PLAYTEST-01.md`) und der Balancing-Pass danach.
 
 | | |
 |---|---|
@@ -61,12 +63,15 @@ Läuft auf Port 4173 schon etwas anderes: `PREVIEW_PORT=4183 npm run test:e2e`.
 
 **Dev-Modus:** `?dev=1` blendet ein Panel mit Zustand, Seed und „reveal" ein (deckt Mengen, Diplomat und die Wahrheit hinter den Hinweisen auf). `?dev=1&seed=123` macht eine Runde reproduzierbar — produktiv würfeln Hinweise, Diplomat und Item-Set immer über `crypto`. `?dev=1&panel=sequences` blendet die Sequenz-Preview ein: jede Animation auf Knopfdruck, auf der echten Bühne.
 
-### Nächster Meilenstein
+### Nächster Schritt
+
+Der Playtest. Er ist das Einzige, was noch zwischen dem Spiel und 1.0 steht — und das
+Einzige, was kein Skript erledigen kann.
 
 ```
 cd /Users/lukabloemendal/Documents/Zoll
 claude
-> Lies CLAUDE.md und docs/. Setze Milestone M6 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A6 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
+> Ich habe den Playtest gespielt und docs/PLAYTEST-01.md ausgefüllt. Werte ihn aus und mach den Balancing-Pass (nur rules.ts, mit ADR).
 ```
 
 ## Balancing

@@ -6,10 +6,25 @@ Alle nennenswerten Änderungen an **Der Zoll**. Format nach
 
 ## [Unveröffentlicht]
 
+### Hinzugefügt
+- Veröffentlicht auf https://lukabpunkt.github.io/Zoll/
+- Balancing-Simulation: `npm run balance` rechnet 20 000 Runden je Parametersatz
+- Playtest-Protokoll `docs/PLAYTEST-01.md` mit dem Vorbefund aus der Simulation
+- Der Service Worker wird angemeldet — das Spiel startet jetzt wirklich ohne Netz (ADR-25)
+
+### Behoben
+- **Die veröffentlichte Seite blieb bei „Die Halle konnte nicht geladen werden" stehen**, wenn
+  jemand nach einem Deploy wiederkam: Der Browser hielt die alte `index.html` und fragte nach
+  Chunks, die es nicht mehr gab. Ein solcher Fehler lädt die Seite jetzt genau einmal neu.
+- Drei rote CI-Checks: der Standing Audit stolperte über seinen eigenen Kommentar, ein
+  Testselektor traf seit der Simulation zwei Knöpfe, und ein Koffer-Tap las die Position,
+  während die Kamera noch fuhr.
+- Der Title-Loop-Test zählte die wechselnde Silhouette mit und maß damit das Item-Set statt
+  ein Speicherleck.
+
 ### Ausstehend für 1.0
 - Playtest mit 5–6 Personen über mindestens 8 Runden (`docs/PLAYTEST-01.md`)
 - Balancing-Pass auf Basis des Playtests
-- Erster Deploy auf GitHub Pages
 
 ## [0.5.0] — 2026-09-05 — Polish, Modi, Zugänglichkeit
 
