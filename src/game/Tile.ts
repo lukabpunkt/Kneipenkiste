@@ -31,6 +31,8 @@ const FRAME = {
   bombLit: 'mines/bomb_lit',
   ring: 'fx/ring',
   phew: 'fx/phew',
+  /** Das "Blindgaenger"-Schild aus GDD §4.1. */
+  dudSign: 'mines/dud_sign',
 } as const;
 
 const HINT_FRAME: Record<Exclude<Hint, 'none'>, string> = {
@@ -285,12 +287,31 @@ export class Tile {
     this.showHint(hint);
   }
 
-  /** Blindgaenger: Rauchwoelkchen, Leger sichtbar, sonst nichts (GDD §3.6). */
+  /**
+   * Blindgaenger: entschaerfte Bombe, Schild, Leger sichtbar (GDD §3.6, §4.1).
+   *
+   * ## Warum hier mehr steht als frueher
+   *
+   * Bis zum ersten Playtest zeigte ein Blindgaenger dieselbe Bodentextur wie ein leeres
+   * Feld, ein graues Woelkchen, das die Sequenz danach fast wegblendet, und dieselben
+   * Farbringe wie ein Krater. Ein Ring bedeutet im Spiel sonst "hier hat es geknallt, und
+   * der da war schuld" — beim Blindgaenger las sich das als Explosion ohne Folgen. Wer
+   * die Modusbeschreibung in der Lobby nicht gelesen hatte, hatte keine Chance.
+   *
+   * Jetzt liegt die **entschaerfte** Bombe im Loch (dieselbe, die man beim Legen sieht)
+   * und darueber das Schild aus GDD §4.1 mit dem Wort. Beides in `marks`, nicht in
+   * `content`: Die Sequenz blendet `contentView` aus — was stehen bleiben soll, muss aus
+   * diesem Container heraus.
+   *
+   * Die Grundtextur bleibt das Loch. Es ist kein Krater, und ein dritter Farbton macht es
+   * nicht lesbarer; die Unterscheidung leisten Bombe und Schild.
+   */
   dud(blamed: readonly ColorId[], hint: Hint): void {
     this.currentState = 'dud';
     this.openLid(FRAME.hole);
     this.content.removeChildren();
 
+    // Das Woelkchen gehoert der Sequenz — sie laesst es verpuffen.
     const puff = new Sprite(this.sheet.textures['fx/smoke_s']);
     puff.anchor.set(0.5);
     puff.tint = UI_COLORS.smoke;
@@ -298,8 +319,42 @@ export class Tile {
     puff.scale.set((this.size * 0.6) / puff.texture.width);
     this.content.addChild(puff);
 
+    const bomb = new Sprite(this.sheet.textures[FRAME.bomb]);
+    bomb.anchor.set(0.5, 0.62);
+    bomb.scale.set((this.size * 0.5) / bomb.texture.width);
+    bomb.position.set(0, this.size * 0.08);
+    this.marks.addChild(bomb);
+
     this.showRings(blamed);
+    this.showDudSign();
     this.showHint(hint);
+  }
+
+  /**
+   * Das "Blindgaenger"-Schild ueber der Platte (GDD §4.1).
+   *
+   * Der Text kommt aus `i18n` und nicht aus der Textur — dasselbe Argument wie beim
+   * "Puh"-Schild im Replay: Ein eingebranntes Wort waere auf Englisch falsch beschriftet.
+   */
+  private showDudSign(): void {
+    const sign = new Sprite(this.sheet.textures[FRAME.dudSign]);
+    sign.anchor.set(0.5, 1);
+    sign.scale.set((this.size * 0.86) / sign.texture.width);
+    sign.position.set(0, -this.size * 0.24);
+    this.marks.addChild(sign);
+
+    const label = new Text({
+      text: t('dig.dudSign'),
+      style: {
+        fontFamily: FONTS.display,
+        fontSize: this.size * 0.14,
+        fill: UI_COLORS.ink,
+      },
+    });
+    label.anchor.set(0.5, 1);
+    // Auf dem Schild, nicht auf seiner Spitze: Die unteren ~30 % sind der Zeiger.
+    label.position.set(0, -this.size * 0.24 - sign.height * 0.34);
+    this.marks.addChild(label);
   }
 
   /** Kiste. Bei "Preis der Gier" kommen die Ringe der Leger dazu. */

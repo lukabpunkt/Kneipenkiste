@@ -100,7 +100,12 @@
     "tooltip": "Hot = the crate is right next door.",
     "minesRemaining": "{count} still buried",
     "timeUp": "Time's up — a random plate was dug.",
-    "chestsRemaining": "{count} chests left"
+    "chestsRemaining": "{count} chests left",
+    "dudSign": "DUD",
+    "dudHeadline": "DUD",
+    "dudFeed": "{layer} planted this one",
+    "sipsOf": "{name} {count}",
+    "sipsLabel": "Sips"
   },
   "hint": {
     "hot": "Hot",
@@ -161,6 +166,10 @@
     "payout": {
       "title": "Payout",
       "body": "Whoever gets blown up drinks straight away. Planters and the finder collect tokens and hand them out at the end of the round — just not to themselves."
+    },
+    "dud": {
+      "title": "Duds",
+      "body": "In double-agent mode everyone buries one live mine and one dud. A dud only goes \"pfff\" — it costs nothing. The layer’s colour still shows: you see who planted it, but never whether it will blow."
     }
   },
   "settings": {

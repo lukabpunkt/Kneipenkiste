@@ -1,7 +1,8 @@
 /**
  * Regeln (GDD §5, Screen 8).
  *
- * Vier Karten: Minen legen, Graben, Hinweise, Auszahlung. Mehr braucht das Spiel nicht —
+ * Fuenf Karten: Minen legen, Graben, Hinweise, Blindgaenger, Auszahlung. Mehr braucht das
+ * Spiel nicht —
  * wer nach einer Runde noch fragt, hat entweder nicht zugesehen oder wir haben die
  * Erfolgskriterien verfehlt (GDD §9.1: Regeln nach einer Runde ohne Erklaerung verstanden).
  */
@@ -9,13 +10,19 @@
 import { t } from '@/core/i18n';
 import { openSheet, type SheetHandle } from '@/ui/components/sheet';
 
-const CARDS = ['place', 'dig', 'hints', 'payout'] as const;
+/*
+ * Fuenf Karten. Die Blindgaenger-Karte kam nach dem ersten Playtest dazu: Die Dig-Karte
+ * sagt "die Farbe des Legers leuchtet ueber dem Krater" — im Doppelagent-Modus ist das
+ * genau die falsche Erwartung, und erklaert wurde der Modus nirgends.
+ */
+const CARDS = ['place', 'dig', 'hints', 'dud', 'payout'] as const;
 
 /** Das Icon je Karte — Emoji, bis der Atlas in M2 steht. */
 const CARD_ICON: Record<(typeof CARDS)[number], string> = {
   place: '💣',
   dig: '⛏️',
   hints: '🔥',
+  dud: '🧨',
   payout: '🍺',
 };
 

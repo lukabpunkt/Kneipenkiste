@@ -571,20 +571,21 @@
 /* Trink-Banner und Kill-Feed (Art Direction §4.3)                     */
 /* ================================================================== */
 
+/*
+ * Das Trink-Banner liegt **ueber der Buehne**, nicht im Fluss darueber (ADR-27).
+ *
+ * Vorher war es ein eigenes Flex-Kind ganz oben: Es erschien am oberen Bildrand, waehrend
+ * der Blick unten am Krater klebte, und schob beim Erscheinen das Feld nach unten. Der
+ * untere Streifen der Welt ist die Digger-Bank, keine Tippflaeche — hier verdeckt es also
+ * nichts, was man treffen muesste. `pointer-events: none`, damit es keinen Tap frisst.
+ */
 .banner-host {
-  position: relative;
-  /*
-   * `flex: none` ist Pflicht: Der Screen ist eine Flex-Spalte, und mit `min-height: 4px`
-   * duerfte der Host sonst auf genau diese 4 px schrumpfen — das Banner liefe ueber die
-   * oberste Plattenreihe und verdeckte im Moment der Explosion genau das Feld, um das
-   * es geht.
-   */
-  flex: none;
-  min-height: 4px;
-}
-
-.banner-host:empty {
-  min-height: 0;
+  position: absolute;
+  z-index: 2;
+  right: 8px;
+  bottom: 8px;
+  left: 8px;
+  pointer-events: none;
 }
 
 .drink-banner {
@@ -609,6 +610,13 @@
   background: var(--treasure);
   box-shadow: 0 5px 0 #d4a800;
   color: var(--ink);
+}
+
+/* Die kleine Zeile unter der Ueberschrift — beim Blindgaenger das "Pfff.". */
+.drink-banner__note {
+  margin: -4px 0 0;
+  font-size: var(--fs-sm);
+  opacity: 0.85;
 }
 
 .drink-banner__headline {
@@ -638,6 +646,28 @@
 /* ================================================================== */
 /* Token-Stapel (Art Direction §4.4)                                   */
 /* ================================================================== */
+
+/*
+ * Der Schluck-Zaehler der laufenden Runde. Groesser als die Token-Chips und **nicht**
+ * `aria-hidden`: Das ist die Konsequenz, nicht Deko (ADR-27).
+ */
+.sip-counter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.sip-chip {
+  padding: 2px 8px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sip-color, var(--hazard));
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  white-space: nowrap;
+}
 
 .token-stack {
   display: flex;

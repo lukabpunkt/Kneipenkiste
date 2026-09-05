@@ -100,7 +100,12 @@
     "tooltip": "Heiß = Kiste ist direkt daneben.",
     "minesRemaining": "Noch {count} im Boden",
     "timeUp": "Zeit um — es wurde zufällig gegraben.",
-    "chestsRemaining": "Noch {count} Kisten"
+    "chestsRemaining": "Noch {count} Kisten",
+    "dudSign": "BLINDGÄNGER",
+    "dudHeadline": "BLINDGÄNGER",
+    "dudFeed": "{layer} hat hier gelegt",
+    "sipsOf": "{name} {count}",
+    "sipsLabel": "Getrunken"
   },
   "hint": {
     "hot": "Heiß",
@@ -161,6 +166,10 @@
     "payout": {
       "title": "Auszahlung",
       "body": "Wer gesprengt wurde, trinkt sofort. Leger und Kistenfinder sammeln Tokens und verteilen sie am Rundenende — nur nicht an sich selbst."
+    },
+    "dud": {
+      "title": "Blindgänger",
+      "body": "Im Doppelagent-Modus legt jeder eine echte Mine und einen Blindgänger. Der macht beim Aufgraben nur „Pfff\" — er kostet nichts. Die Farbe des Legers erscheint trotzdem: Man sieht, wer gelegt hat, aber nie vorher, ob es knallt."
     }
   },
   "settings": {

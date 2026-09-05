@@ -32,6 +32,8 @@ export interface DrinkBannerOptions {
   kills: readonly KillLine[];
   /** Ueberschreibt die Schluecke-Zeile, z. B. "DER PREIS DER GIER". */
   headline?: string;
+  /** Kleine Zeile unter der Ueberschrift — beim Blindgaenger das "Pfff.". */
+  note?: string;
   variant?: 'boom' | 'dud' | 'treasure';
   haptics?: boolean;
 }
@@ -71,9 +73,24 @@ export function createBannerHost(): BannerHost {
           : '');
       if (headline.textContent) banner.append(headline);
 
+      if (options.note) {
+        const note = document.createElement('p');
+        note.className = 'drink-banner__note';
+        note.textContent = options.note;
+        banner.append(note);
+      }
+
       if (options.kills.length > 0) {
         const feed = document.createElement('div');
         feed.className = 'drink-banner__feed';
+
+        /*
+         * **Ein Blindgaenger hat kein Opfer.** "Rudi → Anna" heisst im Krater-Fall "Rudi
+         * hat Anna gesprengt" — beim Blindgaenger waere es eine Falschaussage, und genau
+         * daran ist im Playtest niemand mehr durchgestiegen. Dort nennt die Zeile nur den
+         * Leger, und das zweite Badge faellt weg.
+         */
+        const isDud = options.variant === 'dud';
 
         for (const kill of options.kills) {
           const line = document.createElement('div');
@@ -82,10 +99,12 @@ export function createBannerHost(): BannerHost {
 
           const text = document.createElement('span');
           text.className = 'kill-feed__text';
-          text.textContent = t('dig.killFeed', { layer: kill.layerName, victim: kill.victimName });
+          text.textContent = isDud
+            ? t('dig.dudFeed', { layer: kill.layerName })
+            : t('dig.killFeed', { layer: kill.layerName, victim: kill.victimName });
           line.append(text);
 
-          line.append(createPlayerBadge({ colorId: kill.victimColor, size: 'sm' }));
+          if (!isDud) line.append(createPlayerBadge({ colorId: kill.victimColor, size: 'sm' }));
           feed.append(line);
         }
         banner.append(feed);

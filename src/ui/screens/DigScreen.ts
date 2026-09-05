@@ -19,6 +19,7 @@ import { seedActive } from '@/ui/devSeed';
 import { createBannerHost, type KillLine } from '@/ui/components/drinkBanner';
 import { STORAGE_KEY_ONBOARDING } from '@/config/rules';
 import { tickTurn } from '@/audio/AudioManager';
+import { createSipCounter } from '@/ui/components/sipCounter';
 import { createStageHost } from '@/ui/components/stageHost';
 import { createTimerRing, type TimerRing } from '@/ui/components/timerRing';
 import { createTokenStack } from '@/ui/components/tokenStack';
@@ -47,6 +48,11 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
   const stage = createStageHost({ showBanner: (result) => void present(result) });
 
   const tokenStack = createTokenStack({ colorOf, nameOf });
+  /*
+   * Die Konsequenz, die stehen bleibt (ADR-27). Das Banner ist nach 2,2 s weg; wer in
+   * dem Moment das Handy weiterreicht, hat die Zahl nie gesehen.
+   */
+  const sipCounter = createSipCounter({ colorOf, nameOf });
 
   const footer = document.createElement('div');
   footer.className = 'dig__footer';
@@ -71,8 +77,17 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
   chestsLeft.setAttribute('aria-live', 'polite');
   chestsLeft.hidden = !fsm.context.settings.modes.twoChests;
 
-  footer.append(minesLeft, chestsLeft, tokenStack.el);
-  el.append(turnBanner.el, bannerHost.el, stage.el, footer);
+  footer.append(minesLeft, chestsLeft, sipCounter.el, tokenStack.el);
+
+  /*
+   * **Das Trink-Banner liegt ueber dem Feld, nicht darueber im Layout** (ADR-27).
+   *
+   * Vorher stand es als eigenes Flex-Kind zwischen Turn-Banner und Feld: Es erschien am
+   * oberen Bildrand, waehrend der Blick unten am Krater war, und schob beim Erscheinen
+   * das ganze Feld nach unten. Jetzt faehrt es dort ein, wo gerade etwas passiert ist.
+   */
+  stage.el.append(bannerHost.el);
+  el.append(turnBanner.el, stage.el, footer);
 
   if (seedActive()) {
     const note = document.createElement('p');
@@ -206,6 +221,8 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
       tokens[playerId] = (tokens[playerId] ?? 0) + amount;
     }
     tokenStack.render(tokens);
+    // Schluecke gibt es nur bei Krater und Preis der Gier — beides oeffentliche Ergebnisse.
+    sipCounter.add(result.by, payout.sips);
 
     const kills: KillLine[] = payout.kills.flatMap((kill) => {
       const layer = playerById(kill.layer);
@@ -264,7 +281,16 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
             },
           ];
         });
-        await bannerHost.show({ headline: t('dig.dud'), kills: layers, variant: 'dud' });
+        /*
+         * Die Ueberschrift nennt das Wort. "Pfff." allein hat im Playtest niemandem
+         * gesagt, was gerade passiert ist — der Ton stimmte, die Information fehlte.
+         */
+        await bannerHost.show({
+          headline: t('dig.dudHeadline'),
+          note: t('dig.dud'),
+          kills: layers,
+          variant: 'dud',
+        });
         return;
       }
 

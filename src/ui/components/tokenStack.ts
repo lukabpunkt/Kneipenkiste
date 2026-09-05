@@ -8,7 +8,7 @@
 
 import { colorById, hex, type ColorId } from '@/config/theme';
 import type { PlayerId } from '@/core/types';
-import { prefersReducedMotion } from '@/ui/animate';
+import { safeAnimate } from '@/ui/animate';
 
 export interface TokenStackOptions {
   colorOf: (playerId: PlayerId) => ColorId | undefined;
@@ -56,8 +56,9 @@ export function createTokenStack(options: TokenStackOptions): TokenStack {
         chip.append(icon, value);
         el.append(chip);
 
-        if (count > (shown.get(playerId) ?? 0) && !prefersReducedMotion()) {
-          chip.animate([{ transform: 'scale(0.4)' }, { transform: 'scale(1)' }], {
+        // Ueber `safeAnimate`, weil `Element.animate` in alten WebViews fehlen kann.
+        if (count > (shown.get(playerId) ?? 0)) {
+          void safeAnimate(chip, [{ transform: 'scale(0.4)' }, { transform: 'scale(1)' }], {
             duration: 320,
             easing: 'cubic-bezier(.34,1.56,.64,1)',
           });
