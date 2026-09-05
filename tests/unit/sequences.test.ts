@@ -91,6 +91,7 @@ function fakeDigger(): FakeDigger {
     view: animatable(),
     body: animatable(),
     helmet: animatable(),
+    helmetView: animatable(),
     helmetAttached: true,
     faces: [],
     hints: [],
@@ -104,7 +105,6 @@ function fakeDigger(): FakeDigger {
     },
     detachHelmet: () => {
       digger.helmetAttached = false;
-      return digger.helmet;
     },
     attachHelmet: () => {
       digger.helmetAttached = true;
@@ -127,22 +127,43 @@ function fakeDigger(): FakeDigger {
  */
 interface FakeFx extends FxKit {
   calls: { kind: string; x: number; y: number; count: number }[];
+  /** Wieviele Partikel gerade **sichtbar** waeren. */
+  visible: number;
 }
 
 function fakeFx(): FakeFx {
   const calls: FakeFx['calls'] = [];
+  const state = { visible: 0 };
   const record = (kind: string, x: number, y: number, count = 1): gsap.core.Timeline => {
     calls.push({ kind, x, y, count });
-    // Eine echte, aber leere Timeline: Die Sequenz haengt sie ein wie die richtige.
-    return gsap.timeline().to({}, { duration: 0.3 });
+    /*
+     * Der Ersatz zaehlt nicht beim Anfordern, sondern im `onStart` — genau wie die
+     * echte `FxLayer` das Sprite erst dort sichtbar macht (ADR-23). Damit kann der
+     * Reinheitstest unten sehen, ob eine Sequenz beim **Bauen** schon etwas zeigt.
+     */
+    return gsap.timeline().to(
+      {},
+      {
+        duration: 0.3,
+        onStart: () => {
+          state.visible += 1;
+        },
+      }
+    );
   };
   return {
     calls,
+    get visible() {
+      return state.visible;
+    },
     smoke: (x, y, scale = 1) => record('smoke', x, y, scale),
     dirt: (x, y, count = 12) => record('dirt', x, y, count),
     stars: (x, y, count = 5) => record('stars', x, y, count),
     leaves: (x, y, count = 8) => record('leaves', x, y, count),
     confetti: (x, y) => record('confetti', x, y),
+    clear: () => {
+      state.visible = 0;
+    },
   };
 }
 
@@ -430,6 +451,21 @@ describe('Alle Sequenzen', () => {
       expect(pose(test.tile.marksView), sequence.id).toEqual(before.marks);
       // Und kein Ton faellt vorzeitig: Cues werden geplant, nicht gespielt.
       expect(test.cues, sequence.id).toHaveLength(0);
+
+      /*
+       * Die zweite Haelfte, und sie hat gefehlt: **kein Partikel und keine Requisite**
+       * darf beim Bauen schon zu sehen sein. Genau daran ist im Spiel jeder Knall
+       * gescheitert — neun Rauchwolken sassen fast eine Sekunde bewegungslos auf der
+       * geschlossenen Platte, und beim Aufdecken *erschien* nichts mehr, es fing nur an
+       * sich zu bewegen (Playtest-Finding 01, ADR-23).
+       */
+      expect(test.fx.visible, `${sequence.id} zeigt Partikel beim Bauen`).toBe(0);
+      expect(test.digger.helmetAttached, `${sequence.id} loest den Helm beim Bauen`).toBe(true);
+      expect(test.digger.sooty, `${sequence.id} rust beim Bauen`).toBe(false);
+      expect(test.digger.kicking, sequence.id).toBe(false);
+      expect(Object.values(test.digger.props).some(Boolean), sequence.id).toBe(false);
+      expect(test.digger.faces, `${sequence.id} setzt beim Bauen ein Gesicht`).toHaveLength(0);
+      expect(test.shakes, `${sequence.id} wackelt beim Bauen`).toBe(0);
     }
   });
 

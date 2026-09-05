@@ -165,6 +165,7 @@ export const ANIM: {
   followThroughMs: readonly [number, number];
   shakeMs: number;
   shakeAmplitudePx: number;
+  shakeMaxUnits: number;
   sequenceMaxMs: number;
   treasureMaxMs: number;
   colorRingMaxDelayMs: number;
@@ -179,7 +180,22 @@ export const ANIM: {
    * Doppelstapel schlaegt haerter zu und skaliert den Wert (`DigDirector`).
    */
   shakeMs: 250,
+  /**
+   * Ausschlag des Screen-Shakes in **CSS-Pixeln** — so, wie es in der Art Direction
+   * steht und wie man es am Geraet misst.
+   *
+   * Die Kamera bewegt aber die Welt, und die ist auf einem 390er-Handy auf etwa 0,39
+   * skaliert. Wer diese Zahl direkt auf die Weltposition schreibt, bekommt statt 12 px
+   * knapp 5 — praktisch nicht wahrnehmbar. `Camera.shakeUnits()` rechnet um
+   * (Playtest-Finding 01, ADR-24).
+   */
   shakeAmplitudePx: 12,
+  /**
+   * Deckel in Welteinheiten. Auf einem sehr gestauchten Host (kleines Fenster, breites
+   * Geraet) wuerde die Umrechnung sonst die halbe Buehne verschieben — 60 Einheiten sind
+   * etwa ein Drittel Platte.
+   */
+  shakeMaxUnits: 60,
   /** Erlaubte Dauer einer DigSequence (Audit A3/A4). Treasure darf laenger. */
   sequenceMaxMs: 3500,
   treasureMaxMs: 5000,
@@ -203,6 +219,34 @@ export const PARTICLE_BUDGET = {
   colorRing: { max: 2, lifeMs: 700 },
   /** Harte Obergrenze aktiver Sprites auf der Buehne (Art Direction §8). */
   maxActiveSprites: 200 as number,
+} as const;
+
+/**
+ * Groessen der Effekt-Partikel in **Welteinheiten** (Art Direction §8).
+ *
+ * Bis zum ersten Playtest hat `FxLayer` als einzige Ebene die rohen Atlas-Pixelmasse mit
+ * einem Faktor ≤ 1,2 benutzt — und weil ein `dirt`-Sprite nur 32 px breit gezeichnet ist,
+ * kamen auf einem 390er-Handy Erdklumpen von 4 bis 9 Pixeln heraus. Die Explosion bestand
+ * aus Kruemeln. `Tile` und `Field` rechnen laengst in Welteinheiten
+ * (`sprite.width = size`); hier steht dasselbe fuer die Partikel.
+ *
+ * Zur Einordnung: Eine Platte ist 185 (5 x 5) bzw. 153 (6 x 6) Einheiten breit.
+ */
+export const FX_SIZE = {
+  /** Erdklumpen — auf dem Referenzgeraet rund 13 px statt 4. */
+  dirt: 34,
+  /** Die kleinen Wolken im Stiel des Rauchpilzes. */
+  smokePuff: 90,
+  /** Der Kopf des Pilzes: etwa eine Plattenbreite. */
+  smokeHead: 200,
+  /** Wie hoch der Pilz steigt. */
+  plumeRise: 300,
+  star: 46,
+  leaf: 30,
+  confetti: 20,
+  /** Was im Krater liegen bleibt (Restrauch, Trümmer). */
+  craterSmoke: 120,
+  craterDebris: 26,
 } as const;
 
 /* ------------------------------------------------------------------ */

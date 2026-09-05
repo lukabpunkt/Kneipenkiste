@@ -84,13 +84,25 @@ export interface SequenceDigger {
   reactToHint(hint: Hint): void;
   soot(): void;
   /**
+   * Der Helm als Tween-Ziel — **ohne** ihn abzuloesen.
+   *
+   * Eine Sequenz braucht die Referenz beim Bauen, das Abloesen aber erst beim Abspielen:
+   * `detachHelmet()` haengt den Helm in eine andere Ebene um, und beim Bauen laeuft noch
+   * die Anticipation. Wer dort abloest, laesst den Helm eine Sekunde zu frueh vom Kopf
+   * fallen (ADR-23).
+   */
+  readonly helmetView: Animatable;
+
+  /**
    * Loest den Helm vom Kopf, damit er eigenstaendig fliegen kann. Er behaelt seine
    * Weltposition; zurueck kommt er mit `attachHelmet()`.
+   *
+   * **Gehoert in einen Timeline-Callback**, nicht in den Rumpf von `build()`.
    *
    * Der Helm traegt die Spielerfarbe (Art Direction §5) — wenn der Digger durchs Bild
    * fliegt, ist er oft das Einzige, was man noch zuordnen kann.
    */
-  detachHelmet(): Animatable;
+  detachHelmet(): void;
   attachHelmet(): void;
   /** Haarfaecher, Brezel-Schaufel, weisse Fahne. */
   setProp(prop: DiggerProp, on: boolean): void;
@@ -138,6 +150,15 @@ export interface FxKit {
   leaves(x: number, y: number, count?: number): gsap.core.Timeline;
   /** Konfetti (Kistenfund). `tint` faerbt es grau fuer den Preis der Gier. */
   confetti(x: number, y: number, tint?: number): gsap.core.Timeline;
+  /**
+   * Alles einsammeln.
+   *
+   * Ein Partikel gibt sich am Ende seiner Bewegung selbst frei (`onComplete`). Wird eine
+   * Inszenierung **abgebrochen** — Screenwechsel mitten in der Explosion —, kommt dieses
+   * Ende nie, und die Sprites blieben fuer immer belegt. `DigDirector.stop()` raeumt
+   * deshalb hier auf.
+   */
+  clear(): void;
 }
 
 /**

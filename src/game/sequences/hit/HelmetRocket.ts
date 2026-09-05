@@ -33,7 +33,13 @@ export const helmetRocketSequence: DigSequence = {
     const state = blast(context, timeline);
     const cues: CueAt[] = state.cues;
 
-    const helmet = digger.detachHelmet();
+    /*
+     * Die Referenz braucht der Tween beim Bauen, das **Abloesen** gehoert ins Abspielen:
+     * Sonst faellt der Helm schon waehrend der Anticipation vom Kopf (ADR-23). Dasselbe
+     * Muster wie `liftLid()` in `Sequence.ts`.
+     */
+    const helmet = digger.helmetView;
+    timeline.add(() => digger.detachHelmet(), 0);
 
     /* --- Start: senkrecht hoch, dann eine Schleife -------------------- */
     timeline.to(helmet, { y: `-=${size * 2.6}`, duration: 0.3, ease: 'power3.out' }, 0.05);

@@ -75,7 +75,26 @@ export const createPlaceScreen: ScreenFactory = ({ fsm, router }) => {
   const timerSlot = document.createElement('div');
   timerSlot.className = 'place__timer';
 
-  el.append(header, tools, stage.el, tooltip, timerSlot, bury);
+  /*
+   * **Der Vergraben-Knopf liegt ausserhalb des Scroll-Bereichs** (Playtest-Finding 01).
+   *
+   * Vorher war der Screen eine einzige Flex-Spalte mit `overflow-y: auto`, und das Feld
+   * traegt ein festes Seitenverhaeltnis — auf einem 390 x 844-Geraet blieb der Knopf
+   * damit rund 116 px unter der Falz. Am Tisch heisst das: Jeder muss erst scrollen, um
+   * seine Minen ueberhaupt vergraben zu koennen, und niemand kommt von selbst darauf.
+   *
+   * Jetzt scrollt nur noch der Rumpf; die primaere Aktion steht fest am unteren Rand —
+   * dasselbe Muster wie `.dig__footer { margin-top: auto }`.
+   */
+  const body = document.createElement('div');
+  body.className = 'place__body';
+  body.append(header, tools, stage.el, tooltip, timerSlot);
+
+  const footer = document.createElement('div');
+  footer.className = 'place__footer';
+  footer.append(bury);
+
+  el.append(body, footer);
 
   let ring: TimerRing | null = null;
   let detachTap: (() => void) | undefined;

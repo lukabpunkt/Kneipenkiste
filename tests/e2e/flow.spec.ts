@@ -555,9 +555,7 @@ test.describe('Modus-Kombinationen (Audit A5)', () => {
     ).toBeVisible();
   });
 
-  test('haelt auch im Nachtgraeber-Modus die Draw-Batches bei hoechstens drei', async ({
-    page,
-  }) => {
+  test('haelt auch im Nachtgraeber-Modus die Draw-Batches bei hoechstens drei', async ({ page }) => {
     /*
      * Der Nachtmodus legt eine dunkle Scheibe und zwei additiv gemischte Laternen ueber
      * das Feld. Beides kann einen zusaetzlichen Batch kosten — und drei ist die Grenze

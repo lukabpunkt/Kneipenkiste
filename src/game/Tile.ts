@@ -12,7 +12,7 @@
 
 import { Container, Sprite, Text, type Spritesheet } from 'pixi.js';
 import { PLATE } from '@/config/choreo';
-import { colorById, FONTS, hex, UI_COLORS, type ColorId, type CritterId } from '@/config/theme';
+import { colorById, FONTS, FX_SIZE, hex, UI_COLORS, type ColorId, type CritterId } from '@/config/theme';
 import type { Hint } from '@/config/rules';
 import { t } from '@/core/i18n';
 import type { Cell } from '@/core/types';
@@ -235,11 +235,52 @@ export class Tile {
     this.showHint(hint);
   }
 
-  /** Krater mit den Ringen der Leger. Der Ring ist die Information, nicht die Deko. */
+  /**
+   * Krater mit den Ringen der Leger. Der Ring ist die Information, nicht die Deko.
+   *
+   * ## Warum hier Restrauch und Truemmer liegen
+   *
+   * Bis zum ersten Playtest war ein Krater optisch ein Loch mit einem Farbton weniger:
+   * dieselbe Form wie ein leeres Feld, nur dunkler — und **leerer**, denn ein leeres Feld
+   * hat wenigstens einen Wurm drin. Wer ueber das Brett schaute, sah nicht, wo es
+   * geknallt hatte. Jetzt bleibt liegen, was eine Explosion hinterlaesst.
+   *
+   * **Das ist ausdruecklich kein Bruch von ADR-2.** `BoardView.paintOpened` trennt
+   * `empty` und `crater` in zwei Zweige; hierher kommt man nur mit mindestens einer
+   * **fremden** Mine. Der stumme eigene Trittstein laeuft durch `openEmpty()` und wird
+   * von dieser Methode nie beruehrt.
+   */
   crater(blamed: readonly ColorId[], hint: Hint): void {
     this.currentState = 'crater';
     this.openLid(FRAME.crater);
     this.content.removeChildren();
+
+    // Der Rauch, der nicht mehr aufsteigt: dunkel, ruhig, bleibt liegen.
+    const smoulder = new Sprite(this.sheet.textures['fx/smoke_s']);
+    smoulder.anchor.set(0.5);
+    smoulder.tint = UI_COLORS.soot;
+    smoulder.alpha = 0.35;
+    smoulder.scale.set((this.size * (FX_SIZE.craterSmoke / 185)) / smoulder.texture.width);
+    smoulder.position.set(0, -this.size * 0.06);
+    this.content.addChild(smoulder);
+
+    /*
+     * Drei Erdklumpen am Rand. Feste Positionen statt Zufall: Der Krater soll bei jedem
+     * Blick gleich aussehen, sonst flackert das Feld beim Neuzeichnen.
+     */
+    for (const [dx, dy, turn] of [
+      [-0.3, 0.26, 0.4],
+      [0.32, 0.3, -0.7],
+      [0.12, -0.3, 1.9],
+    ] as const) {
+      const debris = new Sprite(this.sheet.textures['fx/dirt']);
+      debris.anchor.set(0.5);
+      debris.scale.set((this.size * (FX_SIZE.craterDebris / 185)) / debris.texture.width);
+      debris.position.set(this.size * dx, this.size * dy);
+      debris.rotation = turn;
+      this.content.addChild(debris);
+    }
+
     this.showRings(blamed);
     this.showHint(hint);
   }

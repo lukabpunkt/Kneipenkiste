@@ -86,6 +86,15 @@ export const EXPLOSION = {
 export const CHAIN = {
   /** Versatz zwischen den Nachbar-Kratern — eine Welle, keine Salve. */
   stepMs: 80,
+  /**
+   * Wie gross Rauch und Erde eines mitgerissenen Kraters ausfallen.
+   *
+   * Deutlich kleiner als der Haupttreffer: Der Nachbar ist die **Folge**, nicht das
+   * Ereignis. Gleich gross waere die Kettenreaktion optisch ein zweiter Knall — und
+   * niemand wuesste mehr, wo man eigentlich hingetreten ist.
+   */
+  fxScale: 0.5,
+  dirtCount: 4,
 } as const;
 
 /* ------------------------------------------------------------------ */

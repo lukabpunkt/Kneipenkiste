@@ -1270,6 +1270,33 @@
 /* Place                                                               */
 /* ================================================================== */
 
+/*
+ * Place-Screen: Der Rumpf scrollt, die primaere Aktion nicht (Playtest-Finding 01).
+ *
+ * Das Feld traegt ein festes Seitenverhaeltnis und laesst sich nicht schrumpfen; ohne
+ * diese Trennung landet "Vergraben" auf einem 390 x 844-Geraet unter der Falz. Dasselbe
+ * Idiom wie `.dig__footer` — nur muss hier zusaetzlich der Rumpf das Scrollen uebernehmen,
+ * damit der Screen selbst es nicht tut.
+ */
+.screen--place {
+  overflow: hidden;
+}
+
+.place__body {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  gap: 12px;
+}
+
+.place__footer {
+  flex: none;
+  margin-top: auto;
+}
+
 .place__header {
   text-align: center;
 }

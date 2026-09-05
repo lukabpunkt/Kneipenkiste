@@ -16,8 +16,8 @@
  */
 
 import gsap from 'gsap';
-import { Container, type Spritesheet } from 'pixi.js';
-import { PARTICLE_BUDGET, UI_COLORS } from '@/config/theme';
+import { Container, type Sprite, type Spritesheet } from 'pixi.js';
+import { FX_SIZE, PARTICLE_BUDGET, UI_COLORS } from '@/config/theme';
 import type { SeededRng } from '@/core/rng';
 import type { FxKit } from '../sequences/Sequence';
 import { ParticlePool } from './ParticlePool';
@@ -25,11 +25,31 @@ import { ParticlePool } from './ParticlePool';
 /** Wieviele Wolken ein Rauchpilz hat. Zwoelf ist das Budget — neun sehen besser aus. */
 const SMOKE_PUFFS = 9;
 
+/**
+ * Macht ein Partikel sichtbar — **beim Start seines ersten Tweens**, nicht vorher.
+ *
+ * Der Grund ist der Fehler, der jeden Knall gekostet hat (Playtest-Finding 01, ADR-23):
+ * Eine Sequenz wird gebaut, waehrend die Anticipation noch laeuft, und erst knapp eine
+ * Sekunde spaeter abgespielt. Alles, was `build()` sofort sichtbar macht, sitzt so lange
+ * bewegungslos auf der **geschlossenen** Platte — die Mine ist verraten, und beim Knall
+ * erscheint nichts mehr, es faengt nur an sich zu bewegen.
+ *
+ * Bewusst `onStart` und **nicht** `timeline.set(...)`: Ein Tween ohne Dauer an Position 0
+ * rendert bei GSAP sofort beim Erzeugen — das waere exakt dieselbe Falle wie das
+ * `immediateRender` aus ADR-17, nur anders geschrieben.
+ */
+function reveal(sprite: Sprite): () => void {
+  return () => {
+    sprite.visible = true;
+  };
+}
+
 export class FxLayer implements FxKit {
   readonly view = new Container();
 
   private readonly smokeS: ParticlePool;
   private readonly smokeM: ParticlePool;
+  private readonly smokeL: ParticlePool;
   private readonly dirtPool: ParticlePool;
   private readonly starPool: ParticlePool;
   private readonly leafPool: ParticlePool;
@@ -46,12 +66,16 @@ export class FxLayer implements FxKit {
       new ParticlePool({ sheet, frame, max, layer: this.view });
 
     /*
-     * Zwei Rauchgroessen teilen sich das Budget: die kleinen Woelkchen tragen den Pilz,
-     * die mittleren sitzen in seinem Kopf. Zusammen bleiben sie unter den zwoelf aus
-     * Art Direction §8.
+     * **Drei** Rauchgroessen, wie GDD §8 sie verlangt: die kleinen tragen den Stiel, die
+     * mittleren den Uebergang, die grosse den Kopf des Pilzes. Zusammen genau die zwoelf
+     * aus Art Direction §8 — 6 · 4 · 2.
+     *
+     * `fx/smoke_l` lag bis zum ersten Playtest ungenutzt im Atlas; der Pilz bestand aus
+     * zwei Groessen und war entsprechend flach.
      */
-    this.smokeS = pool('fx/smoke_s', Math.ceil(PARTICLE_BUDGET.smoke.max * 0.6));
-    this.smokeM = pool('fx/smoke_m', Math.floor(PARTICLE_BUDGET.smoke.max * 0.4));
+    this.smokeS = pool('fx/smoke_s', 6);
+    this.smokeM = pool('fx/smoke_m', 4);
+    this.smokeL = pool('fx/smoke_l', 2);
     this.dirtPool = pool('fx/dirt', PARTICLE_BUDGET.dirt.max);
     this.starPool = pool('fx/star', PARTICLE_BUDGET.stars.max);
     this.leafPool = pool('fx/leaf', PARTICLE_BUDGET.leaves.max);
@@ -84,16 +108,26 @@ export class FxLayer implements FxKit {
     const puffs = this.budget(SMOKE_PUFFS);
 
     for (let i = 0; i < puffs; i++) {
-      // Die letzten beiden sind der Kopf des Pilzes und kommen aus dem groesseren Pool.
-      const head = i >= puffs - 2;
-      const pool = head ? this.smokeM : this.smokeS;
+      /*
+       * Der Pilz von unten nach oben: Stiel aus kleinen Wolken, darueber zwei mittlere,
+       * ganz oben der grosse Kopf. Die Groesse steht in **Welteinheiten** und wird auf
+       * die Textur umgerechnet — dasselbe Idiom wie in `Tile` und `Field`.
+       */
+      const head = i === puffs - 1;
+      const upper = !head && i >= puffs - 3;
+      const pool = head ? this.smokeL : upper ? this.smokeM : this.smokeS;
       const sprite = pool.acquire();
 
-      const spread = this.rng.range(-0.35, 0.35) * 90 * scale;
-      const rise = (head ? 1 : this.rng.range(0.35, 0.85)) * 210 * scale;
-      const size = (head ? this.rng.range(0.9, 1.2) : this.rng.range(0.4, 0.8)) * scale;
+      const spread = this.rng.range(-0.35, 0.35) * FX_SIZE.smokePuff * scale;
+      const rise = (head ? 1 : this.rng.range(0.35, 0.85)) * FX_SIZE.plumeRise * scale;
+      const units =
+        (head ? FX_SIZE.smokeHead : upper ? FX_SIZE.smokeHead * 0.6 : FX_SIZE.smokePuff) *
+        this.rng.range(0.8, 1.15) *
+        scale;
+      const size = units / sprite.texture.width;
 
       sprite.position.set(x, y);
+      // Klein anfangen, gross werden: Der Pilz waechst, er erscheint nicht.
       sprite.scale.set(size * 0.3);
       sprite.tint = UI_COLORS.smoke;
       sprite.alpha = 0.9;
@@ -108,6 +142,7 @@ export class FxLayer implements FxKit {
           alpha: 0,
           duration: PARTICLE_BUDGET.smoke.lifeMs / 1000,
           ease: 'power1.out',
+          onStart: reveal(sprite),
           onComplete: () => pool.release(sprite),
         },
         delay
@@ -137,7 +172,7 @@ export class FxLayer implements FxKit {
       const peak = this.rng.range(90, 200);
 
       sprite.position.set(x, y);
-      sprite.scale.set(this.rng.range(0.3, 0.7));
+      sprite.scale.set((FX_SIZE.dirt * this.rng.range(0.7, 1.25)) / sprite.texture.width);
 
       timeline.to(
         sprite,
@@ -146,6 +181,7 @@ export class FxLayer implements FxKit {
           rotation: this.rng.range(-4, 4),
           duration: life,
           ease: 'none',
+          onStart: reveal(sprite),
         },
         0
       );
@@ -177,7 +213,7 @@ export class FxLayer implements FxKit {
       const orbit = { t: 0 };
 
       sprite.position.set(x + Math.cos(phase) * radius, y);
-      sprite.scale.set(0.5);
+      sprite.scale.set(FX_SIZE.star / sprite.texture.width);
 
       timeline.to(
         orbit,
@@ -185,6 +221,7 @@ export class FxLayer implements FxKit {
           t: 1,
           duration: life,
           ease: 'none',
+          onStart: reveal(sprite),
           onUpdate: () => {
             const angle = phase + orbit.t * Math.PI * 2.5;
             sprite.x = x + Math.cos(angle) * radius;
@@ -212,7 +249,7 @@ export class FxLayer implements FxKit {
       const drift = this.rng.range(-70, 70);
 
       sprite.position.set(x + this.rng.range(-40, 40), y);
-      sprite.scale.set(this.rng.range(0.4, 0.7));
+      sprite.scale.set((FX_SIZE.leaf * this.rng.range(0.8, 1.2)) / sprite.texture.width);
 
       const delay = i * 0.08;
       timeline.to(
@@ -221,6 +258,7 @@ export class FxLayer implements FxKit {
           y: y + this.rng.range(180, 280),
           duration: life,
           ease: 'sine.in',
+          onStart: reveal(sprite),
           onComplete: () => this.leafPool.release(sprite),
         },
         delay
@@ -253,7 +291,7 @@ export class FxLayer implements FxKit {
       if (tint !== undefined) sprite.tint = tint;
 
       sprite.position.set(x + this.rng.range(-60, 60), y - this.rng.range(0, 60));
-      sprite.scale.set(this.rng.range(0.3, 0.6));
+      sprite.scale.set((FX_SIZE.confetti * this.rng.range(0.7, 1.3)) / sprite.texture.width);
 
       const delay = this.rng.range(0, 0.35);
       timeline.to(
@@ -264,6 +302,7 @@ export class FxLayer implements FxKit {
           rotation: this.rng.range(-8, 8),
           duration: life,
           ease: 'sine.in',
+          onStart: reveal(sprite),
           onComplete: () => this.confettiPool.release(sprite),
         },
         delay
@@ -285,8 +324,21 @@ export class FxLayer implements FxKit {
     return this.pools.reduce((sum, pool) => sum + pool.active, 0);
   }
 
+  /**
+   * Alle Pools. **Jeder neue Pool gehoert hier hinein** — sonst zaehlt `active` ihn nicht,
+   * `clear()` raeumt ihn nicht auf und `destroy()` gibt seine Sprites nie frei. Genau das
+   * ist beim dritten Rauch-Pool einmal passiert und erst im Test aufgefallen.
+   */
   private get pools(): readonly ParticlePool[] {
-    return [this.smokeS, this.smokeM, this.dirtPool, this.starPool, this.leafPool, this.confettiPool];
+    return [
+      this.smokeS,
+      this.smokeM,
+      this.smokeL,
+      this.dirtPool,
+      this.starPool,
+      this.leafPool,
+      this.confettiPool,
+    ];
   }
 
   destroy(): void {

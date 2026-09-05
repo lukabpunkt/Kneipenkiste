@@ -196,8 +196,15 @@ export class DigDirector {
      * kommen — er ist Regel, nicht Inszenierung (Design-Prioritaet 2).
      */
     if (isBlast && !sequence) {
-      camera.shake(result.foreignMines.length > 1 ? ANIM.shakeAmplitudePx * 1.4 : undefined);
+      /*
+       * Alles drei **im Callback**, nicht im Rumpf: Was hier direkt steht, passiert beim
+       * Bauen der Timeline — also im Moment des Taps, eine knappe Sekunde vor dem Knall
+       * (ADR-23). Beim Ruck und beim Russ hat man das lange nicht gesehen, weil dieser
+       * Zweig nur greift, solange es fuer eine Ergebnisart noch keine Sequenz gibt.
+       */
       timeline.add(() => {
+        camera.shake(result.foreignMines.length > 1 ? ANIM.shakeAmplitudePx * 1.4 : undefined);
+        digger?.soot();
         playCue(explosionCue(result.foreignMines.length));
       }, EXPLOSION.frameLabel);
 
@@ -216,7 +223,6 @@ export class DigDirector {
           EXPLOSION.ringLabel
         );
       }
-      digger?.soot();
     }
 
     /* --- Kettenreaktion: eine Welle, keine Salve --------------------- */
@@ -225,6 +231,15 @@ export class DigDirector {
         () => {
           board.revealCell(view, reveal.cell);
           playCue('explosion_s', 0, -index * 40);
+          /*
+           * Auch ein mitgerissener Krater ist eine Explosion. Ohne Rauch und Erde
+           * ploppte er bisher stumm auf — man sah einen neuen Farbring und wusste nicht,
+           * warum (Playtest-Finding 01). Kleiner dosiert als der Haupttreffer: Er ist
+           * die Folge, nicht das Ereignis.
+           */
+          const at = board.positionOf(reveal.cell);
+          this.options.fx.smoke(at.x, at.y, CHAIN.fxScale);
+          this.options.fx.dirt(at.x, at.y, CHAIN.dirtCount);
         },
         `+=${CHAIN.stepMs / 1000}`
       );
@@ -272,10 +287,17 @@ export class DigDirector {
     };
   }
 
-  /** Bricht eine laufende Inszenierung ab — Screenwechsel, Rundenabbruch. */
+  /**
+   * Bricht eine laufende Inszenierung ab — Screenwechsel, Rundenabbruch.
+   *
+   * Die Partikel muessen mit: Sie geben sich am Ende ihrer Bewegung selbst frei, und
+   * dieses Ende kommt nach einem `kill()` nie. Ohne das Aufraeumen blieben sie belegt,
+   * und der Pool haette beim naechsten Knall weniger Sprites zur Verfuegung.
+   */
   stop(): void {
     this.timeline?.kill();
     this.timeline = undefined;
+    this.options.fx.clear();
   }
 
   get isPlaying(): boolean {

@@ -30,6 +30,20 @@ export class ParticlePool {
   private readonly max: number;
   /** Alle Sprites, die es gibt — in der Reihenfolge ihrer Erzeugung. */
   private readonly sprites: Sprite[] = [];
+  /**
+   * Welche Sprites gerade vergeben sind.
+   *
+   * **Reserviert ist nicht dasselbe wie sichtbar** — und genau daran hing ein Fehler,
+   * der im Spiel jeden Knall gekostet hat: Eine Sequenz wird gebaut, waehrend die
+   * Anticipation noch laeuft, abgespielt wird sie fast eine Sekunde spaeter. Wer beim
+   * Herausgeben sofort `visible = true` setzt, hat neun Rauchwolken bewegungslos auf
+   * einer geschlossenen Platte liegen: Die Mine ist verraten, und beim Knall erscheint
+   * nichts mehr, es faengt nur an sich zu bewegen (Playtest-Finding 01, ADR-23).
+   *
+   * Deshalb zwei getrennte Zustaende. Ohne dieses Set wuerde die Freiliste ein gerade
+   * vergebenes, aber noch unsichtbares Sprite ein zweites Mal herausgeben.
+   */
+  private readonly reserved = new Set<Sprite>();
   /** Naechster Kandidat beim Umlauf, wenn alles belegt ist. */
   private cursor = 0;
 
@@ -43,15 +57,19 @@ export class ParticlePool {
   }
 
   /**
-   * Holt ein Sprite heraus, sichtbar und auf Ausgangswerten.
+   * Holt ein Sprite heraus — reserviert und auf Ausgangswerten, aber **unsichtbar**.
    *
-   * Es kommt **nicht** zurueck in eine Freiliste — wer es benutzt, blendet es am Ende
-   * seiner Timeline aus (`release`). Solange das Budget reicht, entsteht ein neues; ist
-   * es ausgeschoepft, wird reihum das aelteste wiederverwendet, auch wenn es noch
+   * Sichtbar macht es der Aufrufer erst, wenn seine Bewegung tatsaechlich losgeht
+   * (`FxLayer` tut das im `onStart` des ersten Tweens). Zwischen Herausgeben und
+   * Loslaufen liegt eine knappe Sekunde Anticipation — in der darf auf der Platte nichts
+   * zu sehen sein.
+   *
+   * Zurueck kommt es ueber `release()`. Solange das Budget reicht, entsteht ein neues;
+   * ist es ausgeschoepft, wird reihum das aelteste wiederverwendet, auch wenn es noch
    * laeuft. Ein abgeschnittener Rauchfaden faellt niemandem auf, ein Ruckler schon.
    */
   acquire(): Sprite {
-    let sprite = this.sprites.find((candidate) => !candidate.visible);
+    let sprite = this.sprites.find((candidate) => !this.reserved.has(candidate));
 
     if (!sprite) {
       if (this.sprites.length < this.max) {
@@ -65,7 +83,8 @@ export class ParticlePool {
       }
     }
 
-    sprite.visible = true;
+    this.reserved.add(sprite);
+    sprite.visible = false;
     sprite.alpha = 1;
     sprite.rotation = 0;
     sprite.scale.set(1);
@@ -74,19 +93,26 @@ export class ParticlePool {
     return sprite;
   }
 
-  /** Zurueck in den Pool: unsichtbar heisst frei. */
+  /** Zurueck in den Pool: nicht mehr reserviert, nicht mehr sichtbar. */
   release(sprite: Sprite): void {
+    this.reserved.delete(sprite);
     sprite.visible = false;
   }
 
-  /** Alles einsammeln — Rundenstart, Screenwechsel. */
+  /** Alles einsammeln — Rundenstart, Screenwechsel, abgebrochene Sequenz. */
   releaseAll(): void {
+    this.reserved.clear();
     for (const sprite of this.sprites) sprite.visible = false;
   }
 
-  /** Wieviele Sprites gerade laufen. Der Perf-Test liest das mit. */
+  /**
+   * Wieviele Sprites gerade vergeben sind — reserviert **oder** laufend.
+   *
+   * Das ist die Groesse, die das Partikel-Budget begrenzt: Ein reserviertes Sprite ist
+   * belegt, auch wenn man es noch nicht sieht.
+   */
   get active(): number {
-    return this.sprites.reduce((count, sprite) => count + (sprite.visible ? 1 : 0), 0);
+    return this.reserved.size;
   }
 
   get size(): number {

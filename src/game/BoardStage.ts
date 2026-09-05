@@ -104,7 +104,8 @@ export class BoardStage {
     // Nachtgraeber: dunkles Feld, zwei Laternen (GDD §3.6, Roadmap M5.2).
     this.board.field.setNight(options.modes.nightDigger);
 
-    this.camera = new Camera(this.cameraLayer);
+    // Der Ruck kommt in Bildschirmpixeln herein und muss durch die Weltskalierung (ADR-24).
+    this.camera = new Camera(this.cameraLayer, 1, () => app.layout.scale);
     /*
      * Die Sequenzen werden hier angemeldet, nicht per Import-Nebenwirkung: Der
      * Board-Chunk ist der erste Ort, an dem sie ueberhaupt gebraucht werden, und der
@@ -187,6 +188,11 @@ export class BoardStage {
   /**
    * Neue Runde: Platten zu, Diggers sauber und zurueck auf die Bank.
    * **Nur hier** verschwindet der Russ — waehrend einer Runde bleibt er (Art Dir. §7).
+   *
+   * **Wird derzeit nicht gerufen, und das ist in Ordnung:** Jede Runde bekommt einen
+   * frischen Seed (`fsm.beginRound`), der Seed steht in der Buehnen-Signatur, also wird
+   * die Buehne ohnehin neu gebaut. Die Methode bleibt trotzdem stehen — sobald der Seed
+   * einmal ueber Rundengrenzen konstant bliebe, waere sie der einzig richtige Weg.
    */
   resetRound(): void {
     this.director.stop();

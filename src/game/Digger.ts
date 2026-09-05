@@ -338,9 +338,9 @@ export class Digger {
    * Position und Groesse auf dem Bildschirm — sonst springt er im Moment des Abloesens,
    * und genau dieser Moment ist die Pointe von `hit_helmet_rocket`.
    */
-  detachHelmet(): Container {
+  detachHelmet(): void {
     const parent = this.view.parent;
-    if (!parent || this.helmet.parent === parent) return this.helmet;
+    if (!parent || this.helmet.parent === parent) return;
 
     const global = this.helmet.getGlobalPosition();
     parent.addChild(this.helmet);
@@ -348,6 +348,10 @@ export class Digger {
     // Der Digger ist skaliert, die Feld-Ebene nicht — die Differenz muss mit.
     this.helmet.scale.set(this.baseScale);
     this.helmet.rotation = 0;
+  }
+
+  /** Der Helm als Tween-Ziel, ohne ihn anzufassen (siehe `detachHelmet`). */
+  get helmetView(): Container {
     return this.helmet;
   }
 

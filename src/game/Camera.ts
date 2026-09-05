@@ -5,7 +5,7 @@
  *
  * - **Zoom auf die aktive Platte** (1.12×) waehrend der Grabung. Er macht aus einer
  *   Platte unter fuenfundzwanzig *diese* Platte — der Nervenmoment braucht ein Zentrum.
- * - **Shake bei der Explosion** (12 px, 250 ms).
+ * - **Shake bei der Explosion** (12 **Bildschirm**-Pixel, 250 ms — siehe `shakeUnits`).
  *
  * Kein Slow-Mo: Explosionen sind knackig, das Suspense-Halten passiert vorher in der
  * Anticipation.
@@ -20,6 +20,20 @@ import { prefersReducedMotion } from '@/ui/animate';
 /** Weltmitte — Pivot und Ruhelage der Kamera. */
 const CENTRE = { x: STAGE.worldSize / 2, y: STAGE.worldHeight / 2 } as const;
 
+/**
+ * Rechnet einen Ausschlag in Bildschirmpixeln in Welteinheiten um.
+ *
+ * Die Kamera verschiebt die **Welt**, und die wird auf das Geraet skaliert
+ * (`BoardApp.layout.scale`, auf einem 390er-Handy ≈ 0,39). Ein Ausschlag von 12, direkt
+ * auf die Weltposition geschrieben, kommt deshalb als knapp 5 Bildschirmpixel an — der
+ * Ruck bei der Explosion war praktisch unsichtbar (Playtest-Finding 01, ADR-24).
+ *
+ * Rein und exportiert, damit der Test die Zahl nachrechnen kann, ohne eine Buehne zu bauen.
+ */
+export function shakeUnits(px: number, worldScale: number): number {
+  return Math.min(px / Math.max(worldScale, 1e-4), ANIM.shakeMaxUnits);
+}
+
 export class Camera {
   /** Der Container, den die Kamera bewegt — die Welt der `BoardApp`. */
   private readonly target: Container;
@@ -27,9 +41,13 @@ export class Camera {
   private readonly restScale: number;
   private shakeTween: gsap.core.Tween | undefined;
 
-  constructor(target: Container, restScale = 1) {
+  /** Wie stark die Welt gerade skaliert ist — lebt in `BoardApp.layout`. */
+  private readonly worldScale: () => number;
+
+  constructor(target: Container, restScale = 1, worldScale: () => number = () => 1) {
     this.target = target;
     this.restScale = restScale;
+    this.worldScale = worldScale;
     this.target.pivot.set(CENTRE.x, CENTRE.y);
     this.target.position.set(CENTRE.x, CENTRE.y);
   }
@@ -87,6 +105,8 @@ export class Camera {
   shake(amplitude = ANIM.shakeAmplitudePx, durationMs = ANIM.shakeMs): void {
     if (prefersReducedMotion()) return;
 
+    // Die Aufrufer geben Bildschirmpixel an; bewegt wird die Welt (ADR-24).
+    const units = shakeUnits(amplitude, this.worldScale());
     const baseX = this.target.position.x;
     const baseY = this.target.position.y;
     this.shakeTween?.kill();
@@ -100,8 +120,8 @@ export class Camera {
         // Abklingend: der erste Schlag ist der harte, danach wird es ruhiger.
         const decay = 1 - state.t;
         this.target.position.set(
-          baseX + (Math.random() - 0.5) * 2 * amplitude * decay,
-          baseY + (Math.random() - 0.5) * 2 * amplitude * decay
+          baseX + (Math.random() - 0.5) * 2 * units * decay,
+          baseY + (Math.random() - 0.5) * 2 * units * decay
         );
       },
       onComplete: () => {

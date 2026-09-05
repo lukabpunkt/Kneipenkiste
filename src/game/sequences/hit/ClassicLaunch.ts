@@ -39,7 +39,13 @@ export const classicLaunchSequence: DigSequence = {
 
     /* --- Kerzengerade nach oben aus dem Bild ------------------------- */
     blastOut(timeline, context, 0);
-    const helmet = digger.detachHelmet();
+    /*
+     * Die Referenz braucht der Tween beim Bauen, das **Abloesen** gehoert ins Abspielen:
+     * Sonst faellt der Helm schon waehrend der Anticipation vom Kopf (ADR-23). Dasselbe
+     * Muster wie `liftLid()` in `Sequence.ts`.
+     */
+    const helmet = digger.helmetView;
+    timeline.add(() => digger.detachHelmet(), 0);
     timeline.to(digger.view, { y: `-=${size * 9}`, duration: 0.5, ease: 'power2.out' }, 0.06);
     timeline.to(digger.view, { rotation: 0.4, duration: 0.5, ease: 'none' }, 0.06);
     timeline.to(helmet, { y: `-=${size * 11}`, rotation: 6, duration: 0.6, ease: 'power2.out' }, 0.06);
