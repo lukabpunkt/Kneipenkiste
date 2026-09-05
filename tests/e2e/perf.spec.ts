@@ -86,17 +86,6 @@ test.describe('A2 — Bühne', () => {
     });
 
     console.log('A2 Messung:', JSON.stringify(stats));
-    expect(stats.frames).toBeGreaterThan(100);
-
-    /*
-     * Draw-Calls sind hardware-unabhängig — die Zahl gilt überall. Ein Batch je Atlas,
-     * der gerade sichtbar ist: Halle, Koffer, Shotlings (+ Röntgen im Inspect).
-     */
-    expect(stats.drawCalls).toBeGreaterThan(0);
-    expect(stats.drawCalls).toBeLessThanOrEqual(6);
-
-    /* Die reine JS-Zeit ebenfalls: Sie hängt an der CPU, nicht an der GPU. */
-    expect(stats.updateP50).toBeLessThanOrEqual(4);
 
     /*
      * Frame-Zeiten nur bewerten, wenn wirklich eine GPU dahinter steckt. Sonst misst der
@@ -108,6 +97,24 @@ test.describe('A2 — Bühne', () => {
       const renderer = info ? String(gl?.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
       return /swiftshader|llvmpipe|software/i.test(renderer);
     });
+
+    /*
+     * Auch die **Anzahl** der Frames ist eine Eigenschaft der Maschine: Auf einem Runner
+     * ohne GPU kamen in acht Sekunden 71 statt der geforderten 100. Gemessen wird dort
+     * nur noch, dass die Uhr ueberhaupt laeuft — alles darueber waere eine Aussage ueber
+     * SwiftShader.
+     */
+    expect(stats.frames).toBeGreaterThan(software ? 20 : 100);
+
+    /*
+     * Draw-Calls sind hardware-unabhängig — die Zahl gilt überall. Ein Batch je Atlas,
+     * der gerade sichtbar ist: Halle, Koffer, Shotlings (+ Röntgen im Inspect).
+     */
+    expect(stats.drawCalls).toBeGreaterThan(0);
+    expect(stats.drawCalls).toBeLessThanOrEqual(6);
+
+    /* Die reine JS-Zeit ebenfalls: Sie hängt an der CPU, nicht an der GPU. */
+    expect(stats.updateP50).toBeLessThanOrEqual(4);
 
     if (software) {
       console.log('A2: Software-Rendering erkannt — Frame-Zeiten werden nicht bewertet.');
