@@ -13,7 +13,7 @@
  */
 
 import { expect, test, type Page } from '@playwright/test';
-import './probe';
+import { tapSuitcase } from './probe';
 
 test.use({ locale: 'de-DE' });
 
@@ -126,7 +126,7 @@ test.describe('A4 — Röntgen-Sequenzen', () => {
     const rects = await page.evaluate(() => window.__zollStage!.suitcases());
     const banner = page.locator('.inspect__banner');
 
-    await page.mouse.click(rects[0]!.x, rects[0]!.y);
+    await tapSuitcase(page, rects[0]!.playerId);
 
     /*
      * Während des gesamten Scans darf nichts anderes dastehen als „Röntgen läuft".
@@ -219,7 +219,7 @@ test.describe('A4 — Effekte', () => {
     expect(before).toBe(0);
 
     const rects = await page.evaluate(() => window.__zollStage!.suitcases());
-    await page.mouse.click(rects[0]!.x, rects[0]!.y);
+    await tapSuitcase(page, rects[0]!.playerId);
 
     /*
      * Irgendwann zwischen Scan-Ende und Banner muss die Fontäne fliegen. Gemessen wird
