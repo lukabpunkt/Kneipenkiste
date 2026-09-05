@@ -37,10 +37,10 @@ jobs:
       - name: Build (base = /Zoll/)
         run: npm run build
 
+      # Kein `enablement: true`: Das darf der Workflow-Token nicht und liess den ersten
+      # Deploy scheitern. Pages ist einmalig ueber die API aktiviert worden
+      # (`gh api --method POST repos/<owner>/Zoll/pages -f build_type=workflow`).
       - uses: actions/configure-pages@v5
-        with:
-          # Aktiviert Pages beim ersten Lauf selbst, statt einen manuellen Klick zu verlangen.
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
