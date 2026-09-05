@@ -295,6 +295,14 @@ in [`PLAYTEST-01.md`](PLAYTEST-01.md) und wartet auf Luka.
 
 **Offene SOLL-Follow-ups:** Balancing-Pass nach dem Playtest (nur `rules.ts`, mit ADR) · Hochsaison-Text oder -Regel geradeziehen · Video.
 
+### Nach A6 nachgezogen (auf Zuruf von Luka)
+
+| Änderung | Warum |
+|---|---|
+| **Die Regeln erklären das ganze Spiel** (ADR-27) | Vier Sätze waren eine Gedächtnisstütze, keine Regeln. Jetzt acht Abschnitte in der Reihenfolge der Runde — und ausdrücklich die drei Sätze, ohne die Design-Säule 2 nicht funktioniert: Ein Hinweis stimmt nur meistens, er sagt nie die Menge, und ein Koffer ohne Hinweis ist kein sauberer Koffer. Alle Zahlen kommen aus `rules.ts`; ein E2E-Test fängt einen nicht ersetzten Platzhalter ab. |
+| **Der Hinweis ist ein Zoll-Vermerk** (ADR-26) | Das nackte Icon schwebte über dem Band und gehörte sichtbar zu keinem Koffer. Jetzt ein Zettel mit Spitze auf den Koffer, mit dem Wort darauf statt nur dem Piktogramm. Die A3-Silhouettenprüfung läuft unverändert durch — der Koffer selbst ist unangetastet. |
+| **Zwei Tests maßen die Maschine statt das Spiel** | Der Partikel-Test verlangte eine Fontäne auch dort, wo das Spiel absichtlich sparsam rendert (vier Kerne), und der A2-Test verlangte 100 Frames auf einem Runner ohne GPU. Beide prüfen jetzt das, was sie prüfen wollten — und der sparsame Pfad hat zum ersten Mal einen eigenen Test. |
+
 **Manuelle Checks für Luka vor 1.0:**
 - [ ] **Playtest nach `docs/PLAYTEST-01.md`** — 5–6 Personen, ≥ 8 Runden. Ohne ihn kein 1.0.
 - [ ] „Lustig-Test" aus A4: Drei Personen sehen die sieben Sequenzen (`?dev=1&panel=sequences`) — grinsen mindestens zwei?
