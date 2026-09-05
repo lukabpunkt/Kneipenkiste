@@ -2,7 +2,7 @@
 
 | Meilenstein | Status | Tag | Audit |
 |---|---|---|---|
-| M0 Setup & Regelkern | ✅ fertig (⏳ 3 manuelle Checks offen) | `v0.0.1` | A0 bestanden |
+| M0 Setup & Regelkern | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.0.1` | A0 bestanden |
 | M1 UI-Flow (DOM-Halle) | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.1.0` | A1 bestanden |
 | M2 PIXI-Halle, Koffer, Charaktere | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.2.0` | A2 bestanden |
 | M3 Hinweise, Schranke, Audio | ✅ fertig (⏳ 2 manuelle Checks offen) | `v0.3.0` | A3 bestanden |
@@ -33,8 +33,8 @@ _(werden von Claude Code nach jedem Meilenstein angehängt — Vorlage in `05-AU
 | `core/` ≥ 95 % | ✅ | 99.44 % Statements, **97.53 % Branch**, 100 % Functions. `hints.ts`, `fsm.ts`, `payout.ts`, `modes.ts`, `store.ts` je 100 % Branch. |
 | CI grün | ✅ | `typecheck` + `lint` (0 Warnings) + 181 Unit-Tests + 12 E2E auf iPhone 12 (WebKit) und Pixel 5 (Chromium) lokal grün. Build: 24.1 KB JS → **9.5 KB gzip** (Budget 450 KB). |
 | Titel auf dem Handy | ⏳ manuell | Läuft im Emulator; echtes Gerät fehlt. |
-| PWA installierbar | ⏳ manuell | Manifest wird ausgeliefert und vom E2E-Test validiert (Name, `standalone`, 3 Icons), Service Worker wird gebaut (11 Einträge, 149 KB precache). Der Installations-Dialog braucht ein echtes Gerät. |
-| CI auf GitHub grün | ⏳ manuell | Workflows liegen bereit; das Repo ist noch nicht gepusht. |
+| PWA installierbar | ⏳ manuell | Manifest wird ausgeliefert und vom E2E-Test validiert (Name, `standalone`, 3 Icons). **Korrigiert am 5. September:** Der Service Worker wurde damals gebaut, aber nie angemeldet (ADR-25); jetzt kontrolliert er die Seite, 51 Einträge im Precache, und ein E2E-Test startet das Spiel im Flugmodus. Nur der Installations-Dialog braucht noch ein echtes Gerät. |
+| CI auf GitHub grün | ✅ | **Nachgetragen am 5. September:** Repo veröffentlicht, alle drei Jobs grün. Es hat vier Anläufe gebraucht — der Standing Audit stolperte über seinen eigenen Kommentar, ein Testselektor traf zwei Knöpfe, ein Koffer-Tap las die Position während der Kamerafahrt, und zwei Tests maßen die Maschine statt das Spiel. |
 
 **Zusätzlich geprüft (über den Audit-Katalog hinaus):**
 - `i18n.test.ts`: DE und EN haben identische Keys (132), kein Wert ist leer, `[missing:…]`-Fallback funktioniert.
