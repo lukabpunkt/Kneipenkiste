@@ -129,5 +129,5 @@ Wenn Drinkshot bereits M1/M2 hinter sich hat: In M0 die dort fertigen Module kop
 
 - Weitere Outcome-Sequenzen (Ziel 20): `steal_solo_helicopter`, `steal_multi_banana`, `share_slow_clap`, `steal_all_pie_fight`.
 - "Kronzeuge"-Modus: Ein Dieb darf nach dem Reveal einen anderen Dieb "verpfeifen" und halbiert seine Strafe.
-- Gemeinsames `@party/core`-Package mit Drinkshot; Party-Hub-Launcher.
+- ~~Gemeinsames `@party/core`-Package mit Drinkshot; Party-Hub-Launcher.~~ **Gestrichen (ADR-37).** Der Umbau bräuchte das Schwesterprojekt, und dieses Repo ist das einzige, das wir anfassen. Das Problem dahinter — auseinanderlaufende Kopien — löst `tests/unit/boundaries.test.ts` innerhalb dieses Repos: Die Spielerfarben werden über alle drei Quellen abgeglichen, und die Infrastruktur darf nichts aus dem Regelkern importieren. Wer später doch trennen will, hebt die dort gelistete Dateimenge heraus.
 - Statistik über mehrere Abende ("Vertrauens-Historie").

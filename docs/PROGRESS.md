@@ -401,3 +401,29 @@ Damit sind die im Backlog angestrebten **20** erreicht. Jeder Fall hat jetzt min
 - **Der front-Atlas ist auf 2048 × 2048 gewachsen** (@1x, vorher 1024 × 2048). Draw-Calls und Bildrate bleiben unverändert bei 2 und p50 16,7 ms, auch der Speichertest ist grün. Wer weitere Requisiten hinzufügt, sollte den Wert im Auge behalten.
 
 **Zahlen:** 736 Unit-Tests · 20 Inszenierungen (3,4–5,7 s) + 2 Overlays · 44 Frames im front-Atlas · p50 16,7 ms · 2 Draw-Calls · gesamt 272,3 KB gzip.
+
+
+## Backlog: `@party/core` gestrichen, Grenzen bewacht — 2026-09-05
+
+Der Backlog-Punkt „Gemeinsames `@party/core`-Package mit Drinkshot" ist **gestrichen** (ADR-37). Drei Gründe, in dieser Reihenfolge:
+
+1. Der Umbau würde das Schwesterprojekt verändern. Dieses Repo ist das einzige, an dem wir arbeiten.
+2. Architektur §1 terminierte das Paket auf „nach v1.0 **beider** Spiele". Keines der beiden ist dort: Tresor steht auf `v1.0.0-rc.1` mit offenem Playtest, Drinkshot auf `v0.6.0` mit offenem M6.
+3. Die Idee steht ausschließlich in **diesen** Docs. Das Schwesterprojekt erwähnt weder ein geteiltes Paket noch dieses Projekt. Ein Paket, das nur eine Seite kennt, ist keine Vereinbarung.
+
+**Das Problem dahinter bleibt und wird hier gelöst.** `tests/unit/boundaries.test.ts` (22 Fälle) bewacht zwei Grenzen:
+
+| Grenze | Was geprüft wird |
+|---|---|
+| Eine Quelle für die Spielerfarben | Die acht Farben stehen in `theme.ts`, `tokens.css` **und** im Farb-Audit-Skript. Der Test gleicht alle drei ab, Grundfarbe, Schatten, Symbol und Reihenfolge — dazu den Samt-Hintergrund. |
+| Infrastruktur kennt das Spiel nicht | Acht Module hängen an **keinem** Projektmodul (RNG, Store, Wake-Lock, Haptik, Button, Dev-Panel, Partikel-Pool). Zehn weitere dürfen `config/` lesen, aber nichts aus `core/{fsm,session,payout,vault,modes,types,…}`, `game/outcomes`, `ui/screens` oder `ui/router`. |
+
+Die Grenze verläuft zwischen *Werten* und *Begriffen*: Eine Sprechblase darf wissen, welche Schriftgröße gilt. Sie darf nicht wissen, was ein Dieb ist.
+
+**Befunde**
+
+- **Die Palette liegt dreifach im Repo.** `scripts/check-colors.mjs` trägt eine eigene Kopie der acht Farben, weil ein Node-Skript `theme.ts` nicht importieren kann. Bisher hielt sie nur Disziplin zusammen — und Lila wurde schon einmal geändert (ADR-8). Ich habe den Wächter gegengeprüft: Mit einem absichtlich abweichenden Lila fällt er um und nennt Farbe und Sollwert.
+- **Der Test hat sofort eine Fehleinordnung von mir gefunden.** Ich hatte `toast.ts` als „hängt an nichts" geführt; es hängt an `ui/animate.ts`. Jetzt steht es in der richtigen Gruppe.
+- **Die Trennung hielt bisher von allein** — kein einziges Infrastruktur-Modul greift heute in den Regelkern. Genau deshalb ist jetzt der richtige Moment, sie festzuschreiben: Man bewacht eine Grenze, solange sie noch stimmt.
+
+**Zahlen:** 758 Unit-Tests · 18 bewachte Infrastruktur-Module · 3 abgeglichene Farbquellen.
