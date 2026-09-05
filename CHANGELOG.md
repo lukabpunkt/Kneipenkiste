@@ -6,6 +6,12 @@ Alle nennenswerten Änderungen an **Der Zoll**. Format nach
 
 ## [Unveröffentlicht]
 
+### Ausstehend für 1.0
+- Playtest mit 5–6 Personen über mindestens 8 Runden (`docs/PLAYTEST-01.md`)
+- Balancing-Pass auf Basis des Playtests
+
+## [0.6.0] — 2026-09-05 — Veröffentlicht, durchgerechnet, erklärt
+
 ### Geändert
 - **Hochsaison sagt jetzt, was der Modus wirklich tut:** Er bringt kaum mehr über die
   Grenze, sondern verdoppelt, was erwischt wird — und damit das Trinken. Der alte Text
@@ -30,10 +36,6 @@ Alle nennenswerten Änderungen an **Der Zoll**. Format nach
   während die Kamera noch fuhr.
 - Der Title-Loop-Test zählte die wechselnde Silhouette mit und maß damit das Item-Set statt
   ein Speicherleck.
-
-### Ausstehend für 1.0
-- Playtest mit 5–6 Personen über mindestens 8 Runden (`docs/PLAYTEST-01.md`)
-- Balancing-Pass auf Basis des Playtests
 
 ## [0.5.0] — 2026-09-05 — Polish, Modi, Zugänglichkeit
 

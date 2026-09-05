@@ -1,7 +1,7 @@
 {
   "name": "zoll",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.6.0",
   "type": "module",
   "description": "Der Zoll — Mobile-First Pass-the-Phone-Bluffspiel",
   "scripts": {
