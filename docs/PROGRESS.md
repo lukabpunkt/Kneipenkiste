@@ -33,7 +33,7 @@
 | Desktop zeigt Portrait-Frame | ✅ | Screenshot `docs/screens/m0-desktop.png`: 9:16-Rahmen, max. 480 px, 32 px Radius, Gold-/Samt-Hintergrund. |
 | E2E: App startet ohne Console-Fehler, keine externen Requests | ✅ | `tests/e2e/flow.spec.ts`, 4 Szenarien × iPhone 12 (WebKit) und Pixel 5 (Chromium): Titel sichtbar, Tresorstand 4, null Console-Errors, null Requests außerhalb von localhost/data:/blob: (Architektur §9), Landscape-Overlay erscheint im Querformat. |
 | App auf Handy im WLAN erreichbar (`--host`), Titel sichtbar | ⏳ manuell | `npm run dev` bindet über `server.host: true` auf alle Interfaces und gibt eine Network-URL aus. Gegen den Preview-Build mit iPhone-12- und Pixel-5-Emulation geprüft — der Test auf einem echten Gerät fehlt. |
-| CI läuft grün auf GitHub | ⏳ manuell | `ci.yml` und `deploy.yml` liegen vor und bilden lokal grüne Schritte ab (typecheck, lint, coverage, build, Bundle-Budget, E2E, perf). Das Repo ist lokal initialisiert, aber noch nicht gepusht — der erste CI-Lauf steht aus. |
+| CI läuft grün auf GitHub | ✅ | Repo gepusht, beide Workflows laufen. Der Deploy war immer grün, die CI-Stufe **nicht**: Sie fiel seit mehreren Commits an drei Befunden, die alle nichts mit dem Spiel zu tun hatten (Abschnitt *CI war rot*). Seit Lauf `33969705153` grün: Qualitätsstufe, 108 E2E-Fälle, Perf-Stufe. |
 
 **Offene SOLL-Follow-ups:** keine.
 
@@ -551,4 +551,8 @@ Zwei Stellen waren dabei leicht zu uebersehen. `distributeAllToFirst()` wartet a
 
 **Das ist nicht nur eine Test-Eigenschaft.** Faellt ein echtes Geraet unter 10 fps, zieht sich die Show dort genauso. Die Gegenmassnahme dafuer steht seit M5: Low-Effects greift ab einem Frame-Median von 22 ms und nimmt Laser, Schatten und Vignette heraus, bevor es so weit kommt.
 
-**Zahlen:** 3 rote CI-Befunde (ein Rennen, eine fehlende Weiche, ein zu enges Zeitfenster) · 13 Wartestellen umgestellt · 6 Actions auf Node-24-Majors · 31 E2E-Fälle lokal grün · 0 Produktionscode geändert.
+**Ergebnis:** Lauf `33969705153` ist grün — Qualitaetsstufe, 108 E2E-Faelle, Perf-Stufe (ein geprueft, drei auf dem Software-Renderer uebersprungen). Damit ist der seit M0 offene Punkt *CI laeuft gruen auf GitHub* geschlossen, und die Node-20-Abkuendigung ist aus den Laeufen verschwunden.
+
+**Was das ueber die Test-Suite sagt.** Keiner der vier Befunde war ein Fehler im Spiel — und keiner waere lokal je aufgefallen. Drei davon haben denselben Kern: Der Test nimmt an, die Maschine sei so schnell wie die eigene. Der vierte war eine Weiche, die zwei von drei Faellen hatten. Dass die Perf-Stufe dabei **zum ersten Mal ueberhaupt** auf CI lief, ist der eigentliche Befund: Ein roter Test davor verdeckt alles dahinter, und niemand sieht, was nie gelaufen ist.
+
+**Zahlen:** 4 rote CI-Befunde (ein Rennen, eine fehlende Weiche, ein zu enges Zeitfenster, eine verdeckte Wartestelle) · 14 Wartestellen umgestellt · 6 Actions auf Node-24-Majors · 108 E2E-Faelle auf CI gruen · 0 Produktionscode geaendert.
