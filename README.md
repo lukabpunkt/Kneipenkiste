@@ -28,6 +28,8 @@ npm run dev            # Vite mit --host, auch vom Handy im WLAN erreichbar
 | `npm run test:e2e` · `test:perf`                      | Playwright: Flow, A11y, Resilienz · Perf-Budget           |
 | `npm run build:atlas` · `build:audio` · `build:icons` | Assets aus `assets-src/` bzw. `audio-src/`               |
 | `npm run check:colors`                                | Farb-Audit: Deuteranopie/Protanopie über CIE Lab (A2)    |
+| `npm run check:contrast`                              | WCAG-AA-Kontrast aller Text/Flächen-Paare im CSS (A5)    |
+| `npm run measure:title`                               | Heap des Title-Loops über N Minuten messen (A5)          |
 | `npm run check:bundle`                                | Bundle-Budget nach `npm run build` (A5)                  |
 | `npm run preview:outcomes`                            | Jede Inszenierung und jedes Overlay einzeln abspielen    |
 

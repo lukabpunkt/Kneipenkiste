@@ -31,6 +31,14 @@ jobs:
       - name: Lint (max. 5 Warnings, Standing Audit)
         run: npm run lint -- --max-warnings 5
 
+      - name: Kontrast (Audit A5)
+        # WCAG AA fuer jede Text/Flaechen-Paarung im CSS — laeuft ohne Browser und
+        # deshalb in jedem CI-Lauf, nicht nur einmalig in Lighthouse.
+        run: npm run check:contrast
+
+      - name: Farb-Audit (Audit A2)
+        run: npm run check:colors
+
       - name: Unit-Tests mit Coverage
         # Die Schwellen stehen in vitest.config.ts: core/ >= 95 %, fsm.ts = 100 %.
         run: npm run test:coverage

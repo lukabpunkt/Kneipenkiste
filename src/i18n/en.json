@@ -84,8 +84,7 @@
     "tableEachDrinks": "{count} each",
     "tableNextVault": "Vault after: {vault}",
     "swear": "I swear to split",
-    "sworn": "Sworn",
-    "coachmark": "Talk. Swear. Lie."
+    "sworn": "Sworn"
   },
   "silence": {
     "headline": "Night shift.",
@@ -99,7 +98,6 @@
   "choice": {
     "headline": "Your call.",
     "sub": "Nobody sees it.",
-    "coachmark": "Nobody sees this. Really.",
     "sealed": "Sealed",
     "moleHeadline": "You're the mole.",
     "moleSub": "Act innocent.",

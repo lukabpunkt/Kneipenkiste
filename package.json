@@ -29,7 +29,9 @@
     "build:icons": "node scripts/build-icons.mjs",
     "preview:outcomes": "vite --host --open \"/?dev=1&panel=outcomes\"",
     "check:colors": "node scripts/check-colors.mjs",
-    "check:bundle": "node scripts/check-bundle.mjs"
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "measure:title": "node scripts/measure-title-heap.mjs"
   },
   "dependencies": {
     "gsap": "^3.13.0",

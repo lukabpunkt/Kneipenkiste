@@ -84,8 +84,7 @@
     "tableEachDrinks": "je {count}",
     "tableNextVault": "Tresor danach: {vault}",
     "swear": "Ich schwöre zu teilen",
-    "sworn": "Geschworen",
-    "coachmark": "Redet. Schwört. Lügt."
+    "sworn": "Geschworen"
   },
   "silence": {
     "headline": "Nachtschicht.",
@@ -99,7 +98,6 @@
   "choice": {
     "headline": "Deine Entscheidung.",
     "sub": "Niemand sieht sie.",
-    "coachmark": "Niemand sieht das. Wirklich.",
     "sealed": "Versiegelt",
     "moleHeadline": "Du bist der Maulwurf.",
     "moleSub": "Tu unschuldig.",

@@ -251,12 +251,12 @@
 | Lighthouse Mobile Perf/A11y/Best Practices ≥ 90 | ✅ | **Performance 99 · Accessibility 100 · Best Practices 100 · SEO 100** (Lighthouse 13.4, Mobile-Preset, Produktions-Build). FCP 1,3 s · LCP 1,9 s · TBT 0 ms. Desktop-Preset: 100/100/100/100. |
 | PWA installierbar | ✅ | Manifest, Icons und Service Worker stehen seit M1; der E2E-Fall "liefert ein installierbares Manifest" prüft Name, Start-URL, Display und Icon-Größen bei jedem Lauf. |
 | JS ≤ 450 KB gzip, Reveal-Chunk lazy | ✅ | **Einstieg 32,9 KB, gesamt 266,8 KB gzip.** `npm run check:bundle` folgt der statischen Import-Kette ab `index.html`, nicht nur der einen Datei aus dem `<script>`-Tag — nur so sieht man, ob die Bühne zurück in den Start gerutscht ist (ADR-28). Der Check fällt zusätzlich um, wenn ein Bühnen-Chunk statisch am Einstieg hängt. |
-| Kontrast ≥ 4,5:1 | ✅ | Lighthouse `color-contrast` grün. Der einzige Befund war der Titel: Die 4-px-Sticker-Kontur wird von axe als effektive Vordergrundfarbe gewertet — Tinte gegen Fast-Schwarz, 1,07:1. Die Kontur bleibt dort, wo sie etwas leistet (bunte Flächen), über dunklem Grund trägt der Schlagschatten allein (ADR-27). Optisch identisch. Die Spielerfarben prüft weiterhin `npm run check:colors`. |
+| Kontrast ≥ 4,5:1 | ✅ | Zuerst über Lighthouse `color-contrast` (grün). Einziger Befund dort war der Titel: Die 4-px-Sticker-Kontur wird von axe als effektive Vordergrundfarbe gewertet — Tinte gegen Fast-Schwarz, 1,07:1. Die Kontur bleibt seither dort, wo sie etwas leistet (bunte Flächen); über dunklem Grund trägt der Schlagschatten allein (ADR-27), optisch identisch. **Am 2026-09-05 nachgeschärft** (ADR-38/39): `npm run check:contrast` prüft jetzt **jede** Text/Flächen-Paarung im CSS statt nur die eine Seite, die Lighthouse sieht — 120 Paare, schlechtestes 3,44:1 (Großtext, Grenze 3:1). Dabei fielen zwei echte Verstöße auf, die Lighthouse nie zu sehen bekam, beide bei Kleintext: das MEINEID-Abzeichen (3,44:1) und der Tipp-Hinweis über der Bühne (3,63:1). Behoben. Die Spielerfarben prüft weiterhin `npm run check:colors`. |
 | Reduced-Motion | ✅ | E2E fand einen echten Fehler: Der Wackel-Knopf lief auch bei `reduce` weiter. Behoben — und ein Guard-Test liest jetzt das CSS und verlangt für **jede** Endlos-Animation eine Abschaltregel. Einmaliges Aufploppen bleibt erlaubt; was dauerhaft läuft, nicht. Zusätzlich prüft ein E2E-Fall über `document.getAnimations()`, dass auf dem Title bei `reduce` nichts mehr läuft — und dass sich der ganze Weg bis zur Aufdeckung trotzdem spielen lässt. |
 | Tastatur-Navigation (SOLL) | ✅ | Der Router setzt den Fokus nach jedem Wechsel in den neuen Screen (E2E-Fall), jeder Screen hat genau eine H1, jede Taste einen Namen — auch die Icon-Knöpfe über `aria-label`. Kassels Kommentare laufen über `aria-live="polite"`: Er ist Deko und darf den Countdown nicht unterbrechen. |
 | EN vollständig | ✅ | Drei maschinelle Fragen statt Hinsehen: identische Key-Mengen in beiden Sprachen, kein leerer Text, dieselben Platzhalter. Der letzte Punkt ist der stille Fehler — ein `{name}`, das nur in einer Sprache steht, lässt den Satz lesbar, nur fehlt der Name genau dort, wo er die Pointe trägt. |
 | Alle Modus-Kombinationen spielbar | ✅ | Eid + Maulwurf und Nachtschicht + Highroller laufen im E2E-Flow; die Payout-Property-Tests ziehen alle 16 Kombinationen über 10 000 Runden. Neu ist die **Ansage im UI**: Ein Satz unter den Modi erklärt, was zusammen passiert (GDD §3.7). |
-| Title-Loop 10 min ohne Leak | ⏳ manuell | Der Loop ist reines CSS auf zwei DOM-Knoten — es gibt nichts, was wachsen könnte, und der Screen wird beim Verlassen ersetzt. Eine echte Zehn-Minuten-Messung auf einem Gerät steht aus. |
+| Title-Loop 10 min ohne Leak | ✅ | **Gemessen, nicht behauptet** (nachgereicht 2026-09-05, ADR-38): `npm run measure:title` hält den Title-Screen zehn Minuten offen und liest den Heap nach erzwungener GC. **Start 9 766 KB → Ende 9 766 KB, Delta 0 KB**, 116 DOM-Knoten, 8 laufende Animationen. Das Skript stammt aus dem Schwesterprojekt und ist angepasst. |
 | Share-Text korrekt | ✅ | `core/share.ts` ist eine reine Funktion und wird wie eine Regel getestet: fünf Ausgänge, fünf verschiedene Sätze, Meineid schlägt den Alleingang, keine offenen Platzhalter, beide Sprachen, und ein Spieler, der nicht mehr in der Liste steht, bringt nichts zum Absturz. Geteilt wird über die Web-Share-API, Zwischenablage als Rückfall, Toast als letzter. |
 | Fehlerfälle (Offline, Atlas-Fehler) | ✅ | `resilience.spec.ts`: Netzabbruch mitten in der Runde (die Aufdeckung läuft aus dem Speicher weiter), fehlender Atlas (DOM-Kartenreihe übernimmt, die Runde endet regulär in der Verteil-UI), unbrauchbarer `localStorage` (Safari Private Mode). Der erste Fall fand einen echten Fehler — siehe unten. |
 
@@ -427,3 +427,23 @@ Die Grenze verläuft zwischen *Werten* und *Begriffen*: Eine Sprechblase darf wi
 - **Die Trennung hielt bisher von allein** — kein einziges Infrastruktur-Modul greift heute in den Regelkern. Genau deshalb ist jetzt der richtige Moment, sie festzuschreiben: Man bewacht eine Grenze, solange sie noch stimmt.
 
 **Zahlen:** 758 Unit-Tests · 18 bewachte Infrastruktur-Module · 3 abgeglichene Farbquellen.
+
+
+## Werkzeuge aus dem Schwesterprojekt — 2026-09-05
+
+Mit der Freigabe, aus anderen Repos zu **lesen und zu kopieren** (aber dort nichts zu löschen), habe ich Drinkshot durchgesehen. Nicht die Spielmodule — Rig, Screens und Regelkern sind für ein anderes Spiel gebaut, und der Tresor hat seine eigenen. Wohl aber zwei **Werkzeuge**, die dort schon existierten und hier zwei namentlich offene Audit-Punkte schließen (ADR-38).
+
+| Kopiert | Was es hier tut |
+|---|---|
+| `scripts/check-contrast.mjs` | WCAG-AA-Kontrast für jede Text/Flächen-Paarung im CSS. Audit A5 verlangte den Nachweis, belegt war er nur über Lighthouse auf der Titelseite. Läuft ohne Browser und damit in jedem CI-Lauf. |
+| `scripts/measure-title-heap.mjs` | Heap des Title-Loops über N Minuten, nach erzwungener GC. Stand seit M5 als „⏳ manuell" im Report. |
+
+**Was die Kontrastprüfung sofort gefunden hat**
+
+- **Zwei echte Verstöße, beide bei Kleintext.** Das MEINEID-Abzeichen stand mit Papier auf Diebesrot bei 3,44:1, der Tipp-Hinweis über der Bühne mit 40 % Papier bei 3,63:1 — WCAG AA verlangt 4,5:1. Jetzt Tinte auf Rot (5,04:1) und 50 % (5,09:1). Optisch bleibt beides, was es war (ADR-39).
+- **Vierzig Zeilen toter Code.** Die Meldung `1,07:1` auf `.coachmark__text` war zunächst eine Falschmeldung — bis sich zeigte, dass die Komponente gar nicht existiert: CSS und zwei i18n-Schlüssel in beiden Sprachen stammen aus einer M1-Planung, umgesetzt wurde später `onboarding.ts`. Entfernt.
+- **Die Vorlage musste erweitert werden.** Diese Codebasis schreibt gedimmten Text als `rgb(255 248 231 / 62%)` — 62 Deklarationen, die das Original übersprang. Es pflegte stattdessen eine Tabelle abgelesener Hexwerte; genau die Sorte Kopie, vor der ADR-37 warnt. Hier wird die Farbe über den Hintergrund gerechnet. Und wo eine Regel ihren Hintergrund nicht selbst setzt, wird nach Block + Element aufgelöst statt geraten: Zuerst nach Block gefiltert, fielen 72 echte Paare mit heraus.
+
+**Was ich bewusst nicht kopiert habe:** `ShotlingBrain.ts` (die Crooks stehen im Halbkreis und sollen dort stehen bleiben), die Todes-Sequenzen, `Scope`, `lottery.ts`, `stepper.ts` und `coachmark.ts` — für Letzteres gibt es hier `onboarding.ts`, und zwei Wege zur selben Sache sind schlechter als einer.
+
+**Zahlen:** 758 Unit-Tests · 120 geprüfte Kontrastpaare · Title-Loop 10 min mit 0 KB Heap-Wachstum · 2 CI-Schritte mehr.

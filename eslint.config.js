@@ -63,6 +63,20 @@ export default tseslint.config(
     },
   },
   {
+    /*
+     * Mess-Skripte steuern einen Browser fern: Die Funktionen in `page.evaluate(...)`
+     * laufen **in der Seite**, nicht in Node. Sie brauchen deshalb beide Global-Saetze —
+     * sonst meldet ESLint `document is not defined` fuer Code, der nie in Node landet.
+     */
+    files: ['scripts/measure-*.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
+    },
+  },
+  {
     files: ['tests/**/*.ts'],
     rules: {
       'no-console': 'off',
