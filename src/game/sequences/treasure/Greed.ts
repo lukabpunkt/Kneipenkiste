@@ -15,6 +15,7 @@
 
 import gsap from 'gsap';
 import { EXPLOSION } from '@/config/choreo';
+import { UI_COLORS } from '@/config/theme';
 import type { CueAt, DigSequence } from '../Sequence';
 import { liftLid, scheduleCues } from '../Sequence';
 
@@ -32,7 +33,7 @@ export const greedSequence: DigSequence = {
   kind: 'greed',
   weight: 1,
   build(context) {
-    const { tile, digger, camera } = context;
+    const { tile, digger, camera, fx } = context;
     const timeline = gsap.timeline();
     const size = tile.size;
     const content = tile.contentView;
@@ -65,6 +66,13 @@ export const greedSequence: DigSequence = {
       digger.soot();
       camera.shake();
     }, 0);
+    /*
+     * Seit M4 kommt der Knall aus demselben Effekt-Kasten wie die Hit-Sequenzen (M4.4):
+     * derselbe Rauchpilz, dieselbe Erde. Der Preis der Gier soll aussehen wie eine
+     * Explosion, in der zufaellig eine Kiste stand — nicht wie ein eigenes Ereignis.
+     */
+    timeline.add(fx.smoke(tile.view.x, tile.view.y, 1.1), 0);
+    timeline.add(fx.dirt(tile.view.x, tile.view.y, 12), 0);
     timeline.to(digger.view, { y: `-=${size * 0.55}`, duration: 0.22, ease: 'power2.out' }, 0);
     timeline.to(digger.view, { y: `+=${size * 0.55}`, duration: 0.3, ease: 'bounce.out' });
 
@@ -73,22 +81,22 @@ export const greedSequence: DigSequence = {
     timeline.fromTo(
       tile.marksView.scale,
       { x: 0.5, y: 0.5 },
-      { x: 1, y: 1, duration: EXPLOSION.ringGrowMs / 1000, ease: 'back.out(2.4)' },
+      { x: 1, y: 1, duration: EXPLOSION.ringGrowMs / 1000, ease: 'back.out(2.4)', immediateRender: false },
       EXPLOSION.ringLabel
     );
 
     /* --- Und dann kommt die Kiste angesengt aus dem Rauch ------------ */
-    timeline.fromTo(content, { alpha: 0 }, { alpha: 1, duration: 0.2 }, 0.85);
+    timeline.fromTo(content, { alpha: 0 }, { alpha: 1, duration: 0.2, immediateRender: false }, 0.85);
     timeline.fromTo(
       content,
       { y: size * 0.3 },
-      { y: -size * 0.14, duration: 0.5, ease: 'back.out(1.8)' },
+      { y: -size * 0.14, duration: 0.5, ease: 'back.out(1.8)', immediateRender: false },
       0.85
     );
     timeline.fromTo(
       content.scale,
       { x: 0.6, y: 0.6 },
-      { x: 1, y: 1, duration: 0.5, ease: 'back.out(1.8)' },
+      { x: 1, y: 1, duration: 0.5, ease: 'back.out(1.8)', immediateRender: false },
       0.85
     );
 
@@ -98,6 +106,8 @@ export const greedSequence: DigSequence = {
      * Pointe der Sequenz und kommt erst, wenn die Kiste steht.
      */
     timeline.add(() => digger.setFace('smug_gap_tooth'), 1.3);
+    // Grauer Konfetti: Auch der Jubel ist angesengt (GDD §4.2).
+    timeline.add(fx.confetti(tile.view.x, tile.view.y - size * 0.6, UI_COLORS.smoke), 1.35);
 
     /*
      * Und dann hebt er sie doch noch hoch. Der Schlussakkord haelt die Sequenz bis

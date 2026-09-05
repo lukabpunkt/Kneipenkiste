@@ -63,7 +63,7 @@ function build(context: SequenceContext, variant: Variant): gsap.core.Timeline {
 
   /* --- Das Fundstueck ---------------------------------------------- */
   const content = tile.contentView;
-  timeline.fromTo(content, { alpha: 0 }, { alpha: 1, duration: 0.12 }, 0.08);
+  timeline.fromTo(content, { alpha: 0 }, { alpha: 1, duration: 0.12, immediateRender: false }, 0.08);
   variant.move(timeline, content, size);
 
   /* --- Das Temperatur-Symbol ploppt herein -------------------------- */
@@ -77,6 +77,7 @@ function build(context: SequenceContext, variant: Variant): gsap.core.Timeline {
         y: 1,
         duration: EMPTY_SEQUENCE.tempPopMs / 1000,
         ease: EMPTY_SEQUENCE.tempPopEase,
+        immediateRender: false,
       },
       CRITTER_AT
     );

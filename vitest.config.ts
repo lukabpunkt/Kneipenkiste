@@ -9,6 +9,8 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    // Stellt PixiJS in jsdom ein Canvas hin, damit die Ausgabe lesbar bleibt.
+    setupFiles: ['./tests/setup.ts'],
     include: ['tests/unit/**/*.test.ts'],
     globals: false,
     coverage: {

@@ -34,7 +34,7 @@ import { prefersReducedMotion } from '@/ui/animate';
 import type { BoardView } from './BoardView';
 import type { Camera } from './Camera';
 import type { Digger } from './Digger';
-import { kindFor, pickSequence, type SequenceContext } from './sequences';
+import { kindFor, pickSequence, type FxKit, type SequenceContext } from './sequences';
 
 export interface DigDirectorOptions {
   board: BoardView;
@@ -43,6 +43,8 @@ export interface DigDirectorOptions {
   diggerOf: (playerId: string) => Digger | undefined;
   /** Alle Diggers in Sitzreihenfolge — die Zuschauer der Sequenzen. */
   diggers: () => readonly Digger[];
+  /** Rauch, Erde, Sternchen — die gemeinsamen Effekte (Art Direction §8). */
+  fx: FxKit;
   /** Die aktiven Modi. Sie filtern die Registry (`excludeInModes`). */
   modes: () => Modes;
   /** Farbe eines Spielers — die Sequenz kennt nur Farben, keine Namen. */
@@ -174,6 +176,8 @@ export class DigDirector {
         digger,
         others: this.options.diggers().filter((other) => other !== digger),
         camera,
+        fx: this.options.fx,
+        field: { treeTop: board.field.treeTop, tree: board.field.treeView },
         blamedColors: result.foreignMines
           .map((playerId) => this.options.colorOf(playerId))
           .filter((color): color is ColorId => color !== undefined),

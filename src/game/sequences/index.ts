@@ -9,14 +9,16 @@
 
 import { dudSequence } from './dud/Pfff';
 import { EMPTY_SEQUENCES } from './empty';
+import { HIT_SEQUENCES } from './hit';
 import { fanfareSequence } from './treasure/Fanfare';
 import { greedSequence } from './treasure/Greed';
 import { tooHeavySequence } from './treasure/TooHeavy';
 import { allSequences, registerSequence, resetRegistry, type DigSequence } from './Sequence';
 
-/** Alles, was es gibt. Die acht Hit-Sequenzen kommen in M4 dazu. */
+/** Alles, was es gibt. */
 const ALL: readonly DigSequence[] = [
   ...EMPTY_SEQUENCES,
+  ...HIT_SEQUENCES,
   dudSequence,
   fanfareSequence,
   tooHeavySequence,

@@ -21,6 +21,7 @@ import {
   drawCalls,
   frameTimes,
   openLobby,
+  particles,
   startDigging,
   tapCell,
   waitForBoard,
@@ -181,5 +182,83 @@ test.describe('Feld-Performance (Audit A2)', () => {
     }
     expect(p50).toBeLessThanOrEqual(FRAME_BUDGET_MS);
     expect(p95).toBeLessThanOrEqual(DROPPED_FRAME_MS);
+  });
+
+  test('bleibt waehrend der Hit-Sequenzen unter dem Partikel-Budget (Art Direction §8)', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+
+    /*
+     * Die Obergrenze ist kein Schoenheitswert: Ueber 200 aktiven Sprites faengt das
+     * Zeichnen an, Frames zu kosten — und zwar genau dann, wenn am meisten passiert.
+     * Gemessen wird waehrend der Explosionen, nicht danach.
+     */
+    await openLobby(page, { players: 8, seed: 15 });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await buryMines(page, 8);
+    await startDigging(page);
+    await waitForBoard(page);
+
+    let peak = 0;
+    for (let cell = 0; cell < 6; cell++) {
+      if (!(await page.locator('[data-screen="dig"]').isVisible())) break;
+      await tapCell(page, cell, 6, 8);
+      // Mitten in der Sequenz messen, mehrfach — der Hoehepunkt liegt kurz nach dem Knall.
+      for (let sample = 0; sample < 6; sample++) {
+        await page.waitForTimeout(180);
+        peak = Math.max(peak, await particles(page));
+      }
+      await page.waitForTimeout(1500);
+    }
+
+    console.info(`[perf] Partikel-Hoehepunkt ${peak}`);
+    expect(peak).toBeGreaterThan(0);
+    expect(peak).toBeLessThanOrEqual(200);
+  });
+
+  test('kostet hoechstens zwei Long-Tasks je Grabung (Audit A4)', async ({ page }) => {
+    test.setTimeout(120_000);
+
+    /*
+     * Ein "Long Task" ist ein Frame-Block ueber 50 ms — der Browser meldet ihn selbst.
+     * Audit A4 erlaubt zwei je Sequenz: einen fuers Aufdecken, einen fuer den Aufbau der
+     * Timeline. Alles darueber sieht man als Ruckler genau im spannendsten Moment.
+     */
+    await openLobby(page, { players: 8, seed: 16 });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await buryMines(page, 8);
+    await startDigging(page);
+    await waitForBoard(page);
+
+    const supported = await page.evaluate(() => {
+      return PerformanceObserver.supportedEntryTypes?.includes('longtask') ?? false;
+    });
+    if (!supported) {
+      test.skip(true, 'Dieser Browser meldet keine Long-Tasks.');
+      return;
+    }
+
+    const digs = 5;
+    await page.evaluate(() => {
+      const scope = globalThis as unknown as { __longTasks: number };
+      scope.__longTasks = 0;
+      new PerformanceObserver((list) => {
+        scope.__longTasks += list.getEntries().length;
+      }).observe({ entryTypes: ['longtask'] });
+    });
+
+    let played = 0;
+    for (let cell = 0; cell < digs; cell++) {
+      if (!(await page.locator('[data-screen="dig"]').isVisible())) break;
+      await tapCell(page, cell, 6, 8);
+      await page.waitForTimeout(3200);
+      played += 1;
+    }
+
+    const long = await page.evaluate(() => (globalThis as unknown as { __longTasks: number }).__longTasks);
+    console.info(`[perf] ${long} Long-Tasks in ${played} Grabungen`);
+    expect(played).toBeGreaterThan(0);
+    expect(long).toBeLessThanOrEqual(played * 2);
   });
 });

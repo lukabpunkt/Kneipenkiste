@@ -66,17 +66,78 @@ export interface SequenceTile {
   dropLid(): void;
 }
 
-/** Was eine Sequenz am Digger anfassen darf. */
+/** Requisiten, die nur in den Hit-Sequenzen auftauchen (Art Direction §5). */
+export type DiggerProp = 'hairFan' | 'pretzelShovel' | 'whiteFlag';
+
+/**
+ * Was eine Sequenz am Digger anfassen darf.
+ *
+ * Bewusst Verben statt Rig-Teilen: `kickLegs()` statt eines Zugriffs auf die Beine. Wie
+ * ein Digger gebaut ist, geht die Sequenz nichts an — sonst haengt jede Sequenz an der
+ * Rig-Struktur, und ein neues Bein bricht acht Timelines.
+ */
 export interface SequenceDigger {
   readonly view: Animatable;
+  /** Der Koerper ohne Schatten — hier sitzt Squash & Stretch. */
+  readonly body: Animatable;
   setFace(face: FaceId): void;
   reactToHint(hint: Hint): void;
   soot(): void;
+  /**
+   * Loest den Helm vom Kopf, damit er eigenstaendig fliegen kann. Er behaelt seine
+   * Weltposition; zurueck kommt er mit `attachHelmet()`.
+   *
+   * Der Helm traegt die Spielerfarbe (Art Direction §5) — wenn der Digger durchs Bild
+   * fliegt, ist er oft das Einzige, was man noch zuordnen kann.
+   */
+  detachHelmet(): Animatable;
+  attachHelmet(): void;
+  /** Haarfaecher, Brezel-Schaufel, weisse Fahne. */
+  setProp(prop: DiggerProp, on: boolean): void;
+  /** Strampeln — die Beine zappeln, waehrend der Kopf im Krater steckt. */
+  kickLegs(active: boolean): void;
 }
 
 /** Was eine Sequenz mit der Kamera darf: wackeln. Zoomen gehoert dem Director. */
 export interface SequenceCamera {
   shake(amplitude?: number, durationMs?: number): void;
+}
+
+/**
+ * Die festen Punkte der Buehne, die eine Sequenz anfliegt (Art Direction §6).
+ *
+ * Nur, was wirklich gebraucht wird: Der Baum ist der Landeplatz von `hit_tree_landing`
+ * und muss dabei wackeln. Die Sequenz bekommt seine Position, damit sie die Zahl nicht
+ * ein zweites Mal fuehrt — verschiebt sich der Baum im Feld, fliegt der Digger sonst
+ * daneben.
+ */
+export interface SequenceField {
+  readonly treeTop: { x: number; y: number };
+  readonly tree: Animatable | undefined;
+}
+
+/**
+ * Die gemeinsamen Effekte (Art Direction §8, Roadmap M4.4).
+ *
+ * Acht Hit-Sequenzen brauchen dieselben vier Dinge: Rauch, Erde, Sternchen, Blaetter.
+ * Sie liegen deshalb hier und nicht in den Sequenzen — sonst haette jede ihre eigene
+ * Rauchwolke mit eigenem Timing, und das Partikel-Budget waere nirgends durchsetzbar.
+ *
+ * Alle Positionen sind Weltkoordinaten der Feld-Ebene, dieselben wie `tile.view.x/y`.
+ * Jede Methode gibt eine Timeline zurueck, die die Sequenz einhaengt — und die ihre
+ * Sprites am Ende selbst wieder freigibt.
+ */
+export interface FxKit {
+  /** Rauchpilz: mehrere Wolken steigen auf und laufen auseinander. */
+  smoke(x: number, y: number, scale?: number): gsap.core.Timeline;
+  /** Erdklumpen fliegen in alle Richtungen und fallen zurueck. */
+  dirt(x: number, y: number, count?: number): gsap.core.Timeline;
+  /** Sternchen kreisen ueber einem Punkt — der Cartoon-Schwindel. */
+  stars(x: number, y: number, count?: number): gsap.core.Timeline;
+  /** Blaetter rieseln vom Baum. */
+  leaves(x: number, y: number, count?: number): gsap.core.Timeline;
+  /** Konfetti (Kistenfund). `tint` faerbt es grau fuer den Preis der Gier. */
+  confetti(x: number, y: number, tint?: number): gsap.core.Timeline;
 }
 
 /**
@@ -93,6 +154,8 @@ export interface SequenceContext {
   /** Alle anderen — sie sitzen auf der Bank und schauen zu. */
   others: readonly SequenceDigger[];
   camera: SequenceCamera;
+  fx: FxKit;
+  field: SequenceField;
   /** Farben der Leger, in derselben Reihenfolge wie `result.foreignMines`. */
   blamedColors: readonly ColorId[];
   /** Reproduzierbar: dieselbe Runde sieht bei gleichem Seed gleich aus. */

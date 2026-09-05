@@ -30,6 +30,14 @@ export interface TestBridge {
   frameTimes(): number[];
   /** Ist das Feld gerade gesperrt (Inszenierung laeuft)? */
   locked(): boolean;
+  /**
+   * Wieviele Partikel gerade laufen (Art Direction §8: hoechstens 200 aktive Sprites).
+   *
+   * Verraet nichts: Rauch und Erde sind genau das, was ohnehin auf dem Bildschirm zu
+   * sehen ist — und wieviel davon, ist die einzige Zahl, mit der sich das Budget im
+   * echten Lauf pruefen laesst.
+   */
+  particles(): number;
 }
 
 declare global {
@@ -57,6 +65,7 @@ export function installTestBridge(stage: BoardStage, cellCount: number): void {
     drawCalls: () => stage.stats().drawCalls,
     frameTimes: () => [...stage.stats().frameTimes],
     locked: () => stage.board.locked,
+    particles: () => stage.fx.active,
   };
 }
 

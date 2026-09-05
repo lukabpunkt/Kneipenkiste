@@ -67,10 +67,10 @@ export const dudSequence: DigSequence = {
     timeline.fromTo(
       content.scale,
       { x: 0.3, y: 0.3 },
-      { x: 1.15, y: 1.15, duration: 0.4, ease: 'power2.out' },
+      { x: 1.15, y: 1.15, duration: 0.4, ease: 'power2.out', immediateRender: false },
       RECOIL_AT
     );
-    timeline.fromTo(content, { alpha: 0 }, { alpha: 1, duration: 0.14 }, RECOIL_AT);
+    timeline.fromTo(content, { alpha: 0 }, { alpha: 1, duration: 0.14, immediateRender: false }, RECOIL_AT);
     timeline.to(
       content,
       { y: -size * 0.24, alpha: 0.15, duration: 0.7, ease: 'sine.out' },
@@ -117,7 +117,7 @@ export const dudSequence: DigSequence = {
     timeline.fromTo(
       tile.marksView.scale,
       { x: 0.5, y: 0.5 },
-      { x: 1, y: 1, duration: EXPLOSION.ringGrowMs / 1000, ease: 'back.out(2.4)' },
+      { x: 1, y: 1, duration: EXPLOSION.ringGrowMs / 1000, ease: 'back.out(2.4)', immediateRender: false },
       EXPLOSION.ringLabel
     );
 

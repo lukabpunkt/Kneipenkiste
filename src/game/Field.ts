@@ -35,6 +35,9 @@ export class Field {
   readonly view = new Container();
   /** Hier haengt die `BoardView` ihre Platten ein — zwischen Deko und Diggers. */
   readonly boardLayer = new Container();
+  /** Weltposition der Baumkrone — Ziel von `hit_tree_landing`. */
+  readonly treeTop: { x: number; y: number } = { x: 0, y: 0 };
+  private tree: Sprite | undefined;
   readonly benchSlots: readonly BenchSlot[];
   /** Oberkante des Plattenfeldes in Welteinheiten. */
   readonly fieldTop: number;
@@ -67,12 +70,19 @@ export class Field {
     fence.position.set(width * 0.04, headroom * 0.78);
     this.view.addChild(fence);
 
-    // Der Baum ist der Landeplatz von hit_tree_landing (Art Direction §6).
+    /*
+     * Der Baum ist der Landeplatz von `hit_tree_landing` (Art Direction §6). Wo er steht,
+     * merkt sich das Feld: Die Sequenz muss dorthin zielen und darf die Zahlen nicht
+     * doppelt haben — verschiebt sich der Baum, fliegt der Digger sonst daneben.
+     */
     const tree = new Sprite(sheet.textures['field/tree']);
     tree.anchor.set(0.5, 1);
     tree.scale.set((width * 0.2) / tree.texture.width);
     tree.position.set(width * 0.86, headroom * 0.98);
     this.view.addChild(tree);
+    this.tree = tree;
+    // Die Krone, nicht der Stamm: Dort bleibt der Digger haengen.
+    this.treeTop = { x: tree.x, y: tree.y - tree.height * 0.62 };
 
     const sign = new Sprite(sheet.textures['field/sign_caution']);
     sign.anchor.set(0.5, 1);
@@ -111,6 +121,14 @@ export class Field {
     }
 
     this.view.addChild(this.boardLayer);
+  }
+
+  /**
+   * Der Baum wackelt — `hit_tree_landing` schuettelt ihn, wenn der Digger einschlaegt.
+   * Die Sequenz bekommt dafuer nur dieses eine Objekt, nicht den Sprite selbst.
+   */
+  get treeView(): Sprite | undefined {
+    return this.tree;
   }
 
   destroy(): void {

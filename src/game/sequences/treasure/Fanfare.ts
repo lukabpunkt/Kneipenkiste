@@ -29,7 +29,7 @@ export const fanfareSequence: DigSequence = {
   kind: 'treasure',
   weight: 3,
   build(context) {
-    const { tile, digger, others, lowEffects } = context;
+    const { tile, digger, others, fx, lowEffects } = context;
     const timeline = gsap.timeline();
     const size = tile.size;
     const content = tile.contentView;
@@ -57,22 +57,25 @@ export const fanfareSequence: DigSequence = {
     );
 
     /* --- Die Kiste springt heraus ----------------------------------- */
-    timeline.fromTo(content, { alpha: 0 }, { alpha: 1, duration: 0.1 }, 0.12);
+    timeline.fromTo(content, { alpha: 0 }, { alpha: 1, duration: 0.1, immediateRender: false }, 0.12);
     timeline.fromTo(
       content,
       { y: size * 0.4 },
-      { y: -size * 0.22, duration: 0.42, ease: 'back.out(2.6)' },
+      { y: -size * 0.22, duration: 0.42, ease: 'back.out(2.6)', immediateRender: false },
       0.12
     );
     timeline.fromTo(
       content.scale,
       { x: 0.5, y: 0.5 },
-      { x: 1, y: 1, duration: 0.42, ease: 'back.out(2.6)' },
+      { x: 1, y: 1, duration: 0.42, ease: 'back.out(2.6)', immediateRender: false },
       0.12
     );
     // Aufklappen: ein kurzes Ueberschwingen, damit die Kiste "auf" wirkt.
     timeline.to(content.scale, { x: 1.12, y: 0.92, duration: 0.14, ease: 'power2.out' }, 0.56);
     timeline.to(content.scale, { x: 1, y: 1, duration: 0.24, ease: 'elastic.out(1, 0.45)' });
+
+    // Konfetti zum Aufklappen — das ist der Moment, in dem die Runde gewonnen ist.
+    timeline.add(fx.confetti(tile.view.x, tile.view.y - size * 0.5), 0.56);
 
     /* --- Der Digger tanzt ------------------------------------------- */
     timeline.add(() => digger.setFace('happy'), 0.5);

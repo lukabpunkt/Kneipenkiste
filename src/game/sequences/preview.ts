@@ -116,6 +116,8 @@ export async function previewSequence(
     digger,
     others: diggers.slice(1),
     camera: stage.camera,
+    fx: stage.fx,
+    field: { treeTop: stage.board.field.treeTop, tree: stage.board.field.treeView },
     blamedColors: blamed,
     rng: createSeededRng(Date.now() & 0xffff),
     audio: (cue: AudioCue, when = 0, detune = 0) => play(cue, when, detune),

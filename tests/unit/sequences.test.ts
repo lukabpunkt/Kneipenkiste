@@ -18,7 +18,7 @@
 
 import gsap from 'gsap';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { EXPLOSION } from '@/config/choreo';
+import { EXPLOSION, NO_REPEAT_WINDOW } from '@/config/choreo';
 import { DEFAULT_MODES, type Hint, type Modes } from '@/config/rules';
 import { ANIM, type FaceId } from '@/config/theme';
 import { createSeededRng } from '@/core/rng';
@@ -36,6 +36,8 @@ import {
   type Animatable,
   type DigSequence,
   type SequenceContext,
+  type DiggerProp,
+  type FxKit,
   type SequenceDigger,
   type SequenceKind,
   type SequenceTile,
@@ -74,19 +76,74 @@ function fakeTile(): SequenceTile & { lid: Animatable; lidDropped: boolean; lift
   return tile;
 }
 
-function fakeDigger(): SequenceDigger & { faces: FaceId[]; hints: Hint[]; sooty: boolean } {
-  const digger = {
+interface FakeDigger extends SequenceDigger {
+  faces: FaceId[];
+  hints: Hint[];
+  sooty: boolean;
+  helmet: Animatable;
+  helmetAttached: boolean;
+  props: Record<DiggerProp, boolean>;
+  kicking: boolean;
+}
+
+function fakeDigger(): FakeDigger {
+  const digger: FakeDigger = {
     view: animatable(),
-    faces: [] as FaceId[],
-    hints: [] as Hint[],
+    body: animatable(),
+    helmet: animatable(),
+    helmetAttached: true,
+    faces: [],
+    hints: [],
     sooty: false,
-    setFace: (face: FaceId) => void digger.faces.push(face),
-    reactToHint: (hint: Hint) => void digger.hints.push(hint),
+    props: { hairFan: false, pretzelShovel: false, whiteFlag: false },
+    kicking: false,
+    setFace: (face) => void digger.faces.push(face),
+    reactToHint: (hint) => void digger.hints.push(hint),
     soot: () => {
       digger.sooty = true;
     },
+    detachHelmet: () => {
+      digger.helmetAttached = false;
+      return digger.helmet;
+    },
+    attachHelmet: () => {
+      digger.helmetAttached = true;
+    },
+    setProp: (prop, on) => {
+      digger.props[prop] = on;
+    },
+    kickLegs: (active) => {
+      digger.kicking = active;
+    },
   };
   return digger;
+}
+
+/**
+ * Ein Effekt-Kasten, der nichts zeichnet, aber mitzaehlt.
+ *
+ * Die echten Effekte haengen an PixiJS und an Pools; hier interessiert nur, **dass** und
+ * **wo** eine Sequenz sie anfordert — und dass sie das Budget nicht sprengt.
+ */
+interface FakeFx extends FxKit {
+  calls: { kind: string; x: number; y: number; count: number }[];
+}
+
+function fakeFx(): FakeFx {
+  const calls: FakeFx['calls'] = [];
+  const record = (kind: string, x: number, y: number, count = 1): gsap.core.Timeline => {
+    calls.push({ kind, x, y, count });
+    // Eine echte, aber leere Timeline: Die Sequenz haengt sie ein wie die richtige.
+    return gsap.timeline().to({}, { duration: 0.3 });
+  };
+  return {
+    calls,
+    smoke: (x, y, scale = 1) => record('smoke', x, y, scale),
+    dirt: (x, y, count = 12) => record('dirt', x, y, count),
+    stars: (x, y, count = 5) => record('stars', x, y, count),
+    leaves: (x, y, count = 8) => record('leaves', x, y, count),
+    confetti: (x, y) => record('confetti', x, y),
+  };
 }
 
 interface Played {
@@ -97,7 +154,8 @@ interface Played {
 interface Harness {
   context: SequenceContext;
   tile: ReturnType<typeof fakeTile>;
-  digger: ReturnType<typeof fakeDigger>;
+  digger: FakeDigger;
+  fx: FakeFx;
   cues: Played[];
   shakes: number;
 }
@@ -123,6 +181,7 @@ function digResult(overrides: Partial<DigResult> = {}): DigResult {
 function harness(result: DigResult, seed = 7, lowEffects = false): Harness {
   const tile = fakeTile();
   const digger = fakeDigger();
+  const fx = fakeFx();
   const cues: Played[] = [];
   const state = { shakes: 0 };
 
@@ -136,6 +195,9 @@ function harness(result: DigResult, seed = 7, lowEffects = false): Harness {
         state.shakes += 1;
       },
     },
+    fx,
+    // Der Baum steht rechts oben — dieselbe Ecke wie im echten Feld (Art Direction §6).
+    field: { treeTop: { x: 860, y: 150 }, tree: animatable() },
     blamedColors: ['red'],
     rng: createSeededRng(seed),
     audio: (cue, when = 0) => void cues.push({ cue, at: when }),
@@ -146,6 +208,7 @@ function harness(result: DigResult, seed = 7, lowEffects = false): Harness {
     context,
     tile,
     digger,
+    fx,
     cues,
     get shakes() {
       return state.shakes;
@@ -207,8 +270,9 @@ describe('Registry', () => {
     expect(allSequences()).toHaveLength(first);
   });
 
-  it('erfuellt das Soll aus GDD §4: 4 Leer-Varianten, 1 Blindgaenger, 3 Treasure', () => {
+  it('erfuellt das Soll aus GDD §9.5: 8 Hits, 1 Blindgaenger, 3 Treasure, 4 Leer-Varianten', () => {
     registerAllSequences();
+    expect(sequencesOf('hit')).toHaveLength(8);
     expect(sequencesOf('empty')).toHaveLength(4);
     expect(sequencesOf('dud')).toHaveLength(1);
     // "Preis der Gier" zaehlt als dritte Treasure-Sequenz, liegt aber unter `greed`.
@@ -335,6 +399,40 @@ describe('Alle Sequenzen', () => {
     }
   });
 
+  it('veraendert die Buehne beim Bauen nicht', () => {
+    /*
+     * **Der Test, der `fromTo` einfaengt.** Eine Sequenz wird gebaut, bevor die
+     * Anticipation ueberhaupt losgeht — der Digger sitzt zu diesem Zeitpunkt noch auf der
+     * Bank, die Platte ist zu. Ein `fromTo` schreibt seine Startwerte aber **sofort**
+     * (`immediateRender` steht per Vorgabe auf `true`), und dann steht der Digger schon
+     * im Krater, waehrend er eigentlich noch graebt.
+     *
+     * Genau das ist hier einmal passiert (`hit_crater_hop`): Der Digger sprang beim Bauen
+     * an die Krater-Position, und weil die Sequenz sich seinen Standplatz erst beim
+     * Abspielen merkt, kam er danach nie wieder heraus.
+     */
+    for (const sequence of allSequences()) {
+      const test = harness(resultFor(sequence.kind));
+      const before = {
+        digger: pose(test.digger.view),
+        body: pose(test.digger.body),
+        tile: pose(test.tile.view),
+        content: pose(test.tile.contentView),
+        marks: pose(test.tile.marksView),
+      };
+
+      sequence.build(test.context);
+
+      expect(pose(test.digger.view), sequence.id).toEqual(before.digger);
+      expect(pose(test.digger.body), sequence.id).toEqual(before.body);
+      expect(pose(test.tile.view), sequence.id).toEqual(before.tile);
+      expect(pose(test.tile.contentView), sequence.id).toEqual(before.content);
+      expect(pose(test.tile.marksView), sequence.id).toEqual(before.marks);
+      // Und kein Ton faellt vorzeitig: Cues werden geplant, nicht gespielt.
+      expect(test.cues, sequence.id).toHaveLength(0);
+    }
+  });
+
   it('holt den Deckel auch beim Abspielen noch einmal hervor', () => {
     /*
      * Der Fehler, gegen den dieser Test steht: Wer `liftLid()` nur beim **Bauen** ruft,
@@ -375,11 +473,18 @@ describe('Alle Sequenzen', () => {
 
   it('laesst den Digger nach einer weiterlaufenden Runde stehen, wo er stand', () => {
     /*
-     * Nur fuer Sequenzen, nach denen weitergegraben wird. Nach einem Kistenfund ist die
-     * Runde vorbei (GDD §3.5) — dass der Digger dort unter der Kiste liegen bleibt, ist
-     * die Pointe, kein Fehler; `BoardStage.resetRound()` raeumt ihn zum Rundenstart auf.
+     * Nur fuer Sequenzen, nach denen weitergegraben wird — und dazu gehoeren **alle acht
+     * Hits**: Eine Explosion beendet die Runde nicht. Wer als Haufen liegen bleibt,
+     * rutscht danach quer ueber das Feld zur Bank, und der naechste Zug faengt mit einem
+     * Digger an, der auf dem Kopf steht.
+     *
+     * Nach einem Kistenfund ist die Runde dagegen vorbei (GDD §3.5) — dass der Digger
+     * dort unter der Kiste liegen bleibt, ist die Pointe, kein Fehler;
+     * `BoardStage.resetRound()` raeumt ihn zum Rundenstart auf.
      */
-    const ongoing = allSequences().filter((s) => s.kind === 'empty' || s.kind === 'dud');
+    const ongoing = allSequences().filter(
+      (s) => s.kind === 'empty' || s.kind === 'dud' || s.kind === 'hit'
+    );
     for (const sequence of ongoing) {
       const test = harness(resultFor(sequence.kind));
       runToEnd(sequence.build(test.context));
@@ -404,6 +509,128 @@ describe('Alle Sequenzen', () => {
       expect(reduced, sequence.id).toBeLessThanOrEqual(full + 1e-6);
       expect(reduced, sequence.id).toBeGreaterThan(0);
     }
+  });
+});
+
+/* ------------------------------------------------------------------ */
+
+describe('Hit-Sequenzen (GDD §4.1, Audit A4)', () => {
+  beforeEach(() => {
+    resetAllSequences();
+    registerAllSequences();
+  });
+
+  const hits = (): readonly DigSequence[] => sequencesOf('hit');
+
+  it('macht jede Explosion sichtbar: Rauch und Erde', () => {
+    /*
+     * Design-Prioritaet 4 ist die Lesbarkeit des Feldes. Ein Krater, der ohne Rauch und
+     * ohne Erde entsteht, sieht aus wie eine Platte, die verschwunden ist.
+     */
+    for (const sequence of hits()) {
+      const test = harness(resultFor('hit'));
+      sequence.build(test.context);
+      const kinds = test.fx.calls.map((call) => call.kind);
+      expect(kinds, sequence.id).toContain('smoke');
+      expect(kinds, sequence.id).toContain('dirt');
+    }
+  });
+
+  it('macht den Digger russig und laesst ihn russig', () => {
+    // Der Russ ist der sichtbare Score der Runde (Art Direction §7).
+    for (const sequence of hits()) {
+      const test = harness(resultFor('hit'));
+      runToEnd(sequence.build(test.context));
+      expect(test.digger.sooty, sequence.id).toBe(true);
+    }
+  });
+
+  it('gibt dem Digger Helm und Haende zurueck', () => {
+    /*
+     * Vier der acht nehmen ihm etwas weg — den Helm, die Schaufel, die Fassung. Am Ende
+     * muss alles zurueck sein, sonst schleppt der naechste Zug eine Brezel-Schaufel oder
+     * eine weisse Fahne mit.
+     */
+    for (const sequence of hits()) {
+      const test = harness(resultFor('hit'));
+      runToEnd(sequence.build(test.context));
+      expect(test.digger.helmetAttached, sequence.id).toBe(true);
+      expect(test.digger.kicking, sequence.id).toBe(false);
+      expect(Object.values(test.digger.props).some(Boolean), sequence.id).toBe(false);
+    }
+  });
+
+  it('sagt in der ersten Sekunde, dass es geknallt hat', () => {
+    /*
+     * Audit A4: "In 1 s lesbar — wer trinkt, wie viel, wer war's." Der Name und die
+     * Schlucke stehen im Banner (`DigScreen`), hier zaehlt die Buehne: Knall auf dem
+     * Frame, Ring dahinter, beides deutlich innerhalb der Sekunde.
+     */
+    for (const sequence of hits()) {
+      const test = harness(resultFor('hit'));
+      const timeline = sequence.build(test.context);
+      runToEnd(timeline);
+
+      const frame = timeline.labels[EXPLOSION.frameLabel] ?? 0;
+      const boom = test.cues.find((played) => played.cue.startsWith('explosion_'));
+      expect(boom, `${sequence.id} knallt nicht`).toBeDefined();
+      expect(boom!.at, sequence.id).toBeCloseTo(frame, 2);
+
+      const ring = labelDelayMs(timeline, EXPLOSION.ringLabel);
+      expect(ring!, sequence.id).toBeLessThanOrEqual(ANIM.colorRingMaxDelayMs);
+      expect(frame * 1000 + ring!, `${sequence.id} braucht zu lange`).toBeLessThanOrEqual(
+        1000 + ANIM.colorRingMaxDelayMs
+      );
+    }
+  });
+
+  it('haelt `hit_chain_dance` zurueck, solange nur eine Mine unter der Platte lag', () => {
+    /*
+     * Kein Geschmack, sondern Wahrheit: Die Sequenz erzaehlt von **zwei** Legern. Bei
+     * einer einzelnen Mine waere der zweite Schlag gelogen.
+     */
+    const ids = (stack: number): string[] => {
+      const rng = createSeededRng(5);
+      resetHistory();
+      return Array.from({ length: 40 }, () => pickSequence({ kind: 'hit', modes: MODES, stack, rng })!.id);
+    };
+    expect(ids(1)).not.toContain('hit_chain_dance');
+    expect(ids(2)).toContain('hit_chain_dance');
+  });
+
+  it('spielt `hit_dud_then_boom` nie im Doppelagent-Modus (GDD §3.6)', () => {
+    /*
+     * Sonst waere ein echter Blindgaenger von einer Mine, die erst "klick" macht, nicht
+     * zu unterscheiden — und der ganze Bluff des Modus waere weg.
+     */
+    const ids = (modes: Modes): string[] => {
+      const rng = createSeededRng(11);
+      resetHistory();
+      return Array.from({ length: 40 }, () => pickSequence({ kind: 'hit', modes, stack: 1, rng })!.id);
+    };
+    expect(ids(MODES)).toContain('hit_dud_then_boom');
+    expect(ids({ ...MODES, doubleAgent: true })).not.toContain('hit_dud_then_boom');
+  });
+
+  it('wiederholt sich ueber 1 000 Runden nie innerhalb des Fensters (Audit A4)', () => {
+    const rng = createSeededRng(2718);
+    const seen: string[] = [];
+
+    for (let round = 0; round < 1000; round++) {
+      resetHistory();
+      // Acht Grabungen je Runde — mehr Explosionen, als eine Runde ueberhaupt hergibt.
+      const history: string[] = [];
+      for (let dig = 0; dig < 8; dig++) {
+        const picked = pickSequence({ kind: 'hit', modes: MODES, stack: 2, rng })!;
+        // Das Fenster haelt die letzten drei zurueck.
+        expect(history.slice(0, NO_REPEAT_WINDOW), `Runde ${round}`).not.toContain(picked.id);
+        history.unshift(picked.id);
+        seen.push(picked.id);
+      }
+    }
+
+    // Und alle acht kommen tatsaechlich vor — ein Gewicht von null waere ein toter Gag.
+    for (const sequence of hits()) expect(seen, sequence.id).toContain(sequence.id);
   });
 });
 

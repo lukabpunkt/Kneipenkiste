@@ -13,12 +13,14 @@
 import { Container, type Spritesheet } from 'pixi.js';
 import { MODE_IDS, type BoardSize, type Modes } from '@/config/rules';
 import { diggerHeightFor, type ColorId } from '@/config/theme';
+import { createSeededRng } from '@/core/rng';
 import type { Cell, DigResult, PlaceView, Player, PlayerId, PublicView, ReplayView } from '@/core/types';
 import { getBoardApp, loadBoardAssets, type BoardAppHandle } from './BoardApp';
 import { BoardView, type BoardMode } from './BoardView';
 import { Camera } from './Camera';
 import { DigDirector, type DigPlayback } from './DigDirector';
 import { Digger } from './Digger';
+import { FxLayer } from './fx/FxLayer';
 import { registerAllSequences, resetHistory } from './sequences';
 
 export interface BoardStageOptions {
@@ -34,6 +36,8 @@ export class BoardStage {
   readonly board: BoardView;
   readonly camera: Camera;
   readonly director: DigDirector;
+  /** Rauch, Erde, Sternchen, Blaetter — die gemeinsamen Effekte der Sequenzen. */
+  readonly fx: FxLayer;
 
   private readonly app: BoardAppHandle;
   private readonly diggers = new Map<PlayerId, Digger>();
@@ -86,6 +90,18 @@ export class BoardStage {
       this.diggers.set(player.id, digger);
     });
 
+    /*
+     * Die Effekte haengen im Feld-Layer **ueber** den Platten und Diggers: Rauch legt
+     * sich vor die Figur, sonst steht der Digger vor seiner eigenen Explosion. Derselbe
+     * Layer heisst auch: dieselben Koordinaten wie `tile.view.x/y`.
+     */
+    this.fx = new FxLayer({
+      sheet: sheets.board,
+      rng: createSeededRng(options.seed ^ 0x5f3a),
+      ...(options.lowEffects === undefined ? {} : { lowEffects: options.lowEffects }),
+    });
+    this.board.field.boardLayer.addChild(this.fx.view);
+
     this.camera = new Camera(this.cameraLayer);
     /*
      * Die Sequenzen werden hier angemeldet, nicht per Import-Nebenwirkung: Der
@@ -99,6 +115,7 @@ export class BoardStage {
       camera: this.camera,
       diggerOf: (id) => this.diggers.get(id),
       diggers: () => this.allDiggers(),
+      fx: this.fx,
       modes: () => options.modes,
       colorOf,
       seed: options.seed,
@@ -174,6 +191,7 @@ export class BoardStage {
     this.camera.stop();
     this.board.resetTiles();
     this.board.setLocked(false);
+    this.fx.clear();
     for (const digger of this.diggers.values()) digger.reset();
     // Jede Runde faengt mit einem leeren No-Repeat-Fenster an (Architektur §6).
     resetHistory();
@@ -196,6 +214,7 @@ export class BoardStage {
   destroy(): void {
     this.director.stop();
     this.camera.stop();
+    this.fx.destroy();
     for (const digger of this.diggers.values()) digger.destroy();
     this.diggers.clear();
     this.board.destroy();

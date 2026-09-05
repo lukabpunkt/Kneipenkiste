@@ -53,11 +53,11 @@ export const tooHeavySequence: DigSequence = {
     );
 
     /* --- Ziehen: sie kommt nur zaeh heraus -------------------------- */
-    timeline.fromTo(content, { alpha: 0 }, { alpha: 1, duration: 0.1 }, 0.1);
+    timeline.fromTo(content, { alpha: 0 }, { alpha: 1, duration: 0.1, immediateRender: false }, 0.1);
     timeline.fromTo(
       content,
       { y: size * 0.34 },
-      { y: -size * 0.06, duration: 0.55, ease: 'power1.out' },
+      { y: -size * 0.06, duration: 0.55, ease: 'power1.out', immediateRender: false },
       0.1
     );
     // Zwei Rucke: das Gewicht wird sichtbar, bevor es umkippt.

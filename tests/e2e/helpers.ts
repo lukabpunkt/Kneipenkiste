@@ -84,6 +84,11 @@ export function countTiles(page: Page, state: string): Promise<number> {
   return page.evaluate((s) => globalThis.__sprengmeister?.countTiles(s as never) ?? 0, state);
 }
 
+/** Wieviele Partikel gerade laufen (Art Direction §8: hoechstens 200). */
+export function particles(page: Page): Promise<number> {
+  return page.evaluate(() => globalThis.__sprengmeister?.particles() ?? 0);
+}
+
 export function drawCalls(page: Page): Promise<number> {
   return page.evaluate(() => globalThis.__sprengmeister?.drawCalls() ?? 0);
 }

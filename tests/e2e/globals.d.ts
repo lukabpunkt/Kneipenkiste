@@ -9,6 +9,7 @@ interface SprengmeisterTestBridge {
   drawCalls(): number;
   frameTimes(): number[];
   locked(): boolean;
+  particles(): number;
 }
 
 declare global {

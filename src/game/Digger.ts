@@ -17,6 +17,7 @@ import { Container, Sprite, type Spritesheet, type Texture } from 'pixi.js';
 import gsap from 'gsap';
 import { ANTICIPATION } from '@/config/choreo';
 import { colorById, diggerHeightFor, SOOT_ALPHA, type ColorId, type FaceId } from '@/config/theme';
+import type { DiggerProp } from './sequences/Sequence';
 
 /**
  * Rig-Layout in Textur-Pixeln (@1x), Ursprung zwischen den Fuessen, y negativ = oben.
@@ -58,7 +59,12 @@ export class Digger {
   readonly colorId: ColorId;
 
   private readonly sheet: Spritesheet;
-  private readonly body = new Container();
+  /**
+   * Alles ausser dem Schatten. Heisst `rig`, damit der oeffentliche Zugang `body` heissen
+   * kann — so steht in den Sequenzen `digger.body`, und hier drin bleibt sichtbar, dass
+   * es die Figur ohne ihren Schatten ist.
+   */
+  private readonly rig = new Container();
   private readonly shadow: Sprite;
   private readonly legL: Sprite;
   private readonly legR: Sprite;
@@ -77,6 +83,16 @@ export class Digger {
   /** Russ ueber Kopf und Torso — bleibt bis `reset()`. */
   private readonly sootHead: Sprite;
   private readonly sootBody: Sprite;
+  /**
+   * Die Requisiten der Hit-Sequenzen (Art Direction §5): Haarfaecher nach der Explosion
+   * ins Gesicht, weisse Fahne aus dem Krater. Sie haengen von Anfang an im Rig und sind
+   * nur unsichtbar — ein Sprite, das erst im Moment der Explosion entsteht, kostet genau
+   * dann Zeit, wenn am meisten los ist.
+   */
+  private readonly hairFan: Sprite;
+  private readonly whiteFlag: Sprite;
+  /** Laeuft gerade das Beinzappeln? */
+  private kicking: gsap.core.Tween | undefined;
 
   private readonly baseScale: number;
   /** Koerperhoehe in Welteinheiten — der Director stellt ihn danach auf. */
@@ -124,6 +140,16 @@ export class Digger {
     // Der Helm traegt die Spielerfarbe — deshalb getintet, anders als bei Drinkshot.
     this.helmet = this.sprite('gear/helmet', 0, RIG.helmet.y - RIG.head.y, RIG.helmet.anchorY, tint);
 
+    /*
+     * Der Haarfaecher sitzt hinter dem Kopf und schaut oben heraus — deshalb wird er
+     * vor dem Kopf gezeichnet und der Helm bleibt darueber liegen.
+     */
+    this.hairFan = this.sprite('gear/hair_fan', 0, RIG.helmet.y - RIG.head.y, 1, tint);
+    this.hairFan.visible = false;
+
+    this.whiteFlag = this.sprite('gear/flag_white', RIG.arm.x, RIG.arm.y, 1);
+    this.whiteFlag.visible = false;
+
     this.sootHead = this.sprite('gear/soot_overlay', 0, 0, 0.5);
     this.sootHead.alpha = SOOT_ALPHA;
     this.sootHead.visible = false;
@@ -133,10 +159,10 @@ export class Digger {
     this.sootBody.visible = false;
 
     this.head.position.set(RIG.head.x, RIG.head.y);
-    this.head.addChild(this.headShape, this.face, this.sootHead, this.helmet);
+    this.head.addChild(this.hairFan, this.headShape, this.face, this.sootHead, this.helmet);
 
     // Zeichenreihenfolge = Tiefenstaffelung.
-    this.body.addChild(
+    this.rig.addChild(
       this.footL,
       this.footR,
       this.legL,
@@ -147,11 +173,12 @@ export class Digger {
       this.sootBody,
       this.armL,
       this.shovel,
+      this.whiteFlag,
       this.armR,
       this.head
     );
 
-    this.view.addChild(this.shadow, this.body);
+    this.view.addChild(this.shadow, this.rig);
     this.height = options.height ?? diggerHeightFor(8);
     this.baseScale = this.height / RIG.height;
     this.view.scale.set(this.baseScale);
@@ -268,10 +295,10 @@ export class Digger {
     for (let i = 0; i < ANTICIPATION.shovelStrokes; i++) {
       timeline
         .to(this.shovel, { rotation: -0.5, duration: stroke * 0.45, ease: 'power2.out' })
-        .to(this.body.scale, { x: 1.06, y: 0.94, duration: stroke * 0.45, ease: 'power2.out' }, '<')
+        .to(this.rig.scale, { x: 1.06, y: 0.94, duration: stroke * 0.45, ease: 'power2.out' }, '<')
         .to(this.shovel, { rotation: 0.7, duration: stroke * 0.55, ease: 'power3.in' })
-        .to(this.body.scale, { x: 0.96, y: 1.04, duration: stroke * 0.3, ease: 'power3.in' }, '<')
-        .to(this.body.scale, { x: 1, y: 1, duration: stroke * 0.25, ease: 'back.out(2)' });
+        .to(this.rig.scale, { x: 0.96, y: 1.04, duration: stroke * 0.3, ease: 'power3.in' }, '<')
+        .to(this.rig.scale, { x: 1, y: 1, duration: stroke * 0.25, ease: 'back.out(2)' });
     }
     return timeline.to(this.shovel, { rotation: 0.25, duration: 0.08 });
   }
@@ -293,6 +320,84 @@ export class Digger {
 
   get isSooty(): boolean {
     return this.sooty;
+  }
+
+  /** Der Koerper ohne Schatten — hier setzen die Sequenzen Squash & Stretch an. */
+  get body(): Container {
+    return this.rig;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Requisiten der Hit-Sequenzen (Art Direction §5)                   */
+  /* ---------------------------------------------------------------- */
+
+  /**
+   * Loest den Helm vom Kopf, damit er eigenstaendig durchs Bild fliegen kann.
+   *
+   * Er wechselt in die Ebene, in der auch der Digger haengt, und behaelt dabei seine
+   * Position und Groesse auf dem Bildschirm — sonst springt er im Moment des Abloesens,
+   * und genau dieser Moment ist die Pointe von `hit_helmet_rocket`.
+   */
+  detachHelmet(): Container {
+    const parent = this.view.parent;
+    if (!parent || this.helmet.parent === parent) return this.helmet;
+
+    const global = this.helmet.getGlobalPosition();
+    parent.addChild(this.helmet);
+    this.helmet.position.copyFrom(parent.toLocal(global));
+    // Der Digger ist skaliert, die Feld-Ebene nicht — die Differenz muss mit.
+    this.helmet.scale.set(this.baseScale);
+    this.helmet.rotation = 0;
+    return this.helmet;
+  }
+
+  /** Helm zurueck auf den Kopf, in seiner Ruhelage. */
+  attachHelmet(): void {
+    this.head.addChild(this.helmet);
+    this.helmet.position.set(0, RIG.helmet.y - RIG.head.y);
+    this.helmet.scale.set(1);
+    this.helmet.rotation = 0;
+    this.helmet.alpha = 1;
+    this.helmet.visible = true;
+  }
+
+  /** Haarfaecher, Brezel-Schaufel, weisse Fahne. */
+  setProp(prop: DiggerProp, on: boolean): void {
+    switch (prop) {
+      case 'hairFan':
+        this.hairFan.visible = on;
+        return;
+      case 'whiteFlag':
+        this.whiteFlag.visible = on;
+        return;
+      case 'pretzelShovel':
+        this.shovel.texture = this.texture(on ? 'gear/shovel_pretzel' : 'gear/shovel');
+    }
+  }
+
+  /**
+   * Strampeln: die Beine zappeln gegenlaeufig weiter, ohne dass die Sequenz jeden
+   * Ausschlag selbst schreiben muss. Ein Tween statt eines Frame-Callbacks — so haengt
+   * das Zappeln an derselben Uhr wie alles andere (CLAUDE.md: eine Uhr).
+   */
+  kickLegs(active: boolean): void {
+    this.kicking?.kill();
+    this.kicking = undefined;
+    if (!active) {
+      this.legL.rotation = 0;
+      this.legR.rotation = 0;
+      return;
+    }
+    const swing = (LEG_SWING * Math.PI) / 180;
+    this.legL.rotation = swing;
+    this.legR.rotation = -swing;
+    this.kicking = gsap.to([this.legL, this.legR], {
+      rotation: (index: number) => (index === 0 ? -swing : swing),
+      duration: 0.12,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+    });
   }
 
   /**
@@ -324,7 +429,10 @@ export class Digger {
    * bewegt hat — sonst schleppt die naechste Runde einen halb umgekippten Koerper mit.
    */
   reset(): void {
-    gsap.killTweensOf([this.view, this.body, this.body.scale, this.head, this.shovel]);
+    gsap.killTweensOf([this.view, this.rig, this.rig.scale, this.head, this.shovel]);
+    this.kickLegs(false);
+    this.attachHelmet();
+    for (const prop of ['hairFan', 'pretzelShovel', 'whiteFlag'] as const) this.setProp(prop, false);
 
     this.sooty = false;
     this.sootHead.visible = false;
@@ -334,9 +442,9 @@ export class Digger {
     this.view.position.set(this.homeX, this.homeY);
     this.view.rotation = 0;
     this.view.alpha = 1;
-    this.body.position.set(0, 0);
-    this.body.rotation = 0;
-    this.body.scale.set(1);
+    this.rig.position.set(0, 0);
+    this.rig.rotation = 0;
+    this.rig.scale.set(1);
     this.head.rotation = 0;
     this.shovel.rotation = 0.25;
     this.shovel.position.set(RIG.shovel.x, RIG.shovel.y);
@@ -345,7 +453,7 @@ export class Digger {
   }
 
   destroy(): void {
-    gsap.killTweensOf([this.view, this.body, this.body.scale, this.head, this.shovel]);
+    gsap.killTweensOf([this.view, this.rig, this.rig.scale, this.head, this.shovel]);
     this.view.destroy({ children: true });
   }
 }
