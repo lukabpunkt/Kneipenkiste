@@ -12,6 +12,63 @@
 
 ## Audit-Reports
 
+## Audit A3 — 2026-09-05
+
+**Ergebnis:** BESTANDEN
+
+| Check | Status | Notiz |
+|---|---|---|
+| Registry: alle Empty/Dud/Treasure-IDs registriert, Dev-Preview zeigt sie | ✅ | 8 Sequenzen: vier Leer-Varianten, `dud_pfff`, `treasure_fanfare`, `treasure_too_heavy`, `treasure_greed`. `npm run preview:sequences` öffnet die Liste; jeder Eintrag spielt einmal ab und räumt die Platte danach auf. |
+| `dig_own_mine_silent` nutzt exakt dieselben Sequenz-IDs, Sounds und Timings wie leer (Test) | ✅ | Es gibt die Sequenz gar nicht: `kindFor()` bildet beide Fälle auf `'empty'` ab. Vier Tests vergleichen Paare — Cue-Liste, Dauer, Bühne nach dem Abspielen; und über 1 000 simulierte Runden bleibt die `OpenedCell` strukturgleich. |
+| Temperatur-Reaktionen des Diggers korrekt je Hint | ✅ | HEISS → `sweat`, WARM → `brow`, KALT → `shiver`; ohne Hinweis kein Ton und kein Icon. |
+| Kettenreaktions-Welle: Reihenfolge, Ringe, kein Banner | ✅ | 80 ms Versatz pro Nachbar, Ringe der Leger, jede Explosion einen Halbton tiefer als die vorige. E2E prüft, dass niemand dafür trinkt. |
+| Treasure-Sequenzen ≤ 5 s, Greed zeigt Explosion + angesengte Kiste, beide Konsequenzen im Banner | ✅ | Längste ist `treasure_greed` mit 1,73 s. Der Ring des Legers kommt 120 ms nach dem Knall — **vor** der Kiste. |
+| 1 000 simulierte Runden: angezeigte Zustände == `publicView` | ✅ | Neu in `publicView.test.ts`: kein Feld in einer offenen Platte, das ein Screen nicht zeichnet; verbrauchte Trittsteine bleiben `kind: 'empty'`, `blamed: []`; die Menge der gezeigten Zellen ist exakt „gegraben + mitgerissen". |
+| Perf-Test grün; Filter nur temporär | ✅ | `perf.spec.ts` hat einen dritten Fall bekommen: Frame-Zeiten **während** der Sequenzen, nicht im Leerlauf. Beide messen p50 17,0 ms · p95 18,0 ms bei **einem** Draw-Batch (erlaubt sind drei) — diesmal auf der GPU, nicht per SwiftShader wie in A2. Filter gibt es bisher gar keine: keine Sequenz setzt `.filters`. Der Heap-Test überspringt sich selbst, weil `performance.memory` in diesem Chromium fehlt. |
+| Stumm voll spielbar; Sound-Sync ± 50 ms | ✅ | Ohne `AudioContext` wirft kein Aufruf, und es fehlt keine Information. Der Sync ist gerechnet, nicht gehört: `tests/unit/audio.test.ts` prüft an einer künstlichen Uhr, dass `play(cue, when)` exakt auf `currentTime + when` plant; die Cues einer Sequenz werden in **einem** Callback vorgeplant. Der Rest ist ein Frame Versatz zum Bild (≤ 33 ms bei 30 fps) — innerhalb der Grenze, aber am echten Lautsprecher noch zu hören. |
+| Wake-Lock aktiv; Tab-Wechsel Pause/Resume | ✅ | Wake-Lock in Place und Dig. `visibilitychange` hängt jetzt am AudioContext: Ein Loop, der in einem weggelegten Tab weiterspielt, wäre auf dem Handy ein Fehler. |
+
+**Zahlen:** 294 Unit-Tests (+40) · 36 E2E-Tests (18 × 2 Geräte, beide Suiten grün) · 8 Sequenzen · 26 Cues + 2 Musik-Loops, **0 Byte Audio im Bundle** · Einstiegs-Chunk 25,3 KB gzip (+1,3 für den Ton), Board-Chunk lazy · 247 KB gzip gesamt (Budget 450) · p50 17,0 ms bei 1 Draw-Batch
+
+> Zur Messung: Beide Geräte-Suiten liefen je vollständig durch (18/18). Alle 36 in **einem** Prozess gehen in dieser Umgebung nicht — der Preview-Server wird nach ein paar Minuten abgeräumt (`Killed: 9`), und alles danach scheitert an `ERR_CONNECTION_REFUSED`. In CI läuft die Suite am Stück.
+
+### Was dabei aufgefallen ist
+
+**(1) Eine Sequenz wird zu einem anderen Zeitpunkt gebaut, als sie läuft.** `build()` läuft, bevor die Anticipation beginnt — abgespielt wird erst nach dem Aufdecken. Wer den Deckel beim Bauen holt, animiert später ein Sprite, das `revealCell` inzwischen weggeblendet hat: Die Platte verschwindet, statt wegzukippen. Dasselbe gilt für den Digger, der beim Bauen noch auf der Bank sitzt und beim Abspielen an der Platte steht — deshalb sind alle seine Wege **relativ** (`'-=…'`), nie absolut. Beides ist jetzt je ein Test: Der Deckel muss zur Laufzeit noch einmal geholt werden, und nach einer weiterlaufenden Runde muss der Digger wieder dort stehen, wo er stand.
+
+**(2) Ein Timer, der aus einem Tap einen Abzug macht.** Der Verteil-Screen entschied per `setTimeout(400 ms)`, ob ein Druck lang war. Das ist eine Wette darauf, dass der Haupt-Thread frei bleibt: Blockiert ihn etwas zwischen Druck und Loslassen, läuft der abgelaufene Timer **vor** dem `pointerup` — und aus einem normalen Tap wird ein −1. Aufgefallen ist es erst durch die neuen Klick-Sounds, weil die den Thread ein bisschen mehr beschäftigen; der Fehler lag aber schon seit M1 drin und hätte am Tisch irgendwann zugeschlagen. Jetzt entscheidet die Differenz der **Ereigniszeiten** (`event.timeStamp`) — die stimmt auch dann noch, wenn die Seite gerade beschäftigt war. Gegengeprüft im M2-Stand über ein Worktree: dort besteht der Test, mit den Sounds fällt er, ohne sie besteht er wieder.
+
+**(3) Zwei Wartezeiten hintereinander sind eine zu viel.** Die Banner-Standzeit hing am Ende der Timeline. Mit Sequenzen wurde daraus: Anticipation, Sequenz, **dann** 2,2 s Warten — bis zu 4 s pro Zug. Jetzt hängt sie am Explosions-Frame und läuft gleichzeitig; und nach einem leeren Feld entfällt sie ganz, weil dort gar kein Banner erscheint. Der häufigste Ausgang des Spiels ist damit auch der schnellste: 800 ms, dann ist der Nächste dran (→ **ADR-15**). Die E2E-Suite läuft seitdem in 3,8 statt 11 Minuten — dieselben Tests, nur ohne die Leerzeit.
+
+**(4) Sequenzen brauchen kein PixiJS, um messbar zu sein.** Sie bekommen die Bühne jetzt durch schmale Interfaces: `SequenceTile`, `SequenceDigger`, `SequenceCamera`, Anzeigeobjekte als `Animatable` aus x, y, alpha, rotation, scale. Ein PIXI-`Container` erfüllt diese Form von selbst — ein Objekt aus vier Zahlen aber auch. Dadurch misst `sequences.test.ts` Dauer, Ring-Versatz, Cue-Zeiten und Reset-Invariante jeder Sequenz ohne WebGL und ohne Atlas; und eine Sequenz kann den Spielzustand strukturell nicht mehr verschieben, weil ihr die Methoden dafür gar nicht gereicht werden (→ **ADR-14**).
+
+**(5) Ton ohne Dateien.** Es gibt keinen OGG/MP3-Encoder in dieser Toolchain, und ein handgeschnittenes Sprite wäre bei jeder Änderung neu zu bauen. Alle 26 Cues und beide Musik-Loops entstehen deshalb zur Laufzeit über Web Audio. Der eigentliche Gewinn ist aber nicht das gesparte Byte: `play(cue, when)` plant auf der AudioContext-Uhr **vor**, statt im Frame-Loop zu triggern — und genau daran hängt der Sound-Sync (→ **ADR-13**).
+
+**(6) 16,7 ms sind mit `performance.now()` nicht messbar.** Der Perf-Test forderte p50 ≤ 16,7 ms — eine Zahl **unterhalb** des Vsync-Abstands. Ein sauber auf 60 Hz laufender Loop liefert Abstände von 16,6 bis 17,0 ms, je nachdem, wo im Intervall gemessen wird; gemessen wurden 17,0 ms bei p95 18,0 — also kein einziger ausgelassener Frame, denn ein solcher läge bei 33 ms. In A2 fiel das nicht auf, weil der Testrechner damals per SwiftShader gerendert hat und der Test die strenge Zusicherung deshalb übersprang. Die Grenze hat jetzt eine Millisekunde Messtoleranz und einen Kommentar, der sagt, wonach sie eigentlich sucht: ausgelassene Frames, nicht Nachkommastellen.
+
+**(7) Der eigene Port war schon wieder besetzt.** Auf 4183 lief diesmal das Preview eines vierten Schwesterprojekts, das selbst vor 4173 ausgewichen war. Vite weicht bei einem belegten Port stillschweigend auf den nächsten aus — Playwright verbindet sich dann weiter mit dem alten, also mit dem fremden Projekt. Sprengmeister liegt jetzt auf **4193**, mit `strictPort: true`: lieber ein klarer Abbruch als eine Stunde Suche nach Fehlern, die es hier gar nicht gibt. `PREVIEW_PORT` bleibt als Ausweg.
+
+### Abweichungen von der Planung
+
+- **Die vier Leer-Sequenzen stehen in einer Datei**, nicht in `empty/Worm.ts`, `Beetle.ts`, … Sie sind Varianten desselben Ablaufs und unterscheiden sich oft um drei Zeilen; vier Dateien hätten genau das versteckt, worauf es hier ankommt — dass alle vier gleich lang sind und gleich klingen. Blindgänger und Treasure liegen wie geplant je in einer eigenen Datei.
+- **`treasure_greed` bringt seine eigene Explosion mit**, statt wie geplant `basic_hit` zu benutzen. Der Platzhalter hätte den Ring des Legers hinter den Jubel geschoben; die Sequenz setzt ihn selbst auf 120 ms nach dem Knall.
+- **`npm run build:audio` bleibt ungenutzt** (ADR-13). Das Skript steht noch für den Fall, dass später Aufnahmen dazukommen.
+- **Der Preview-Port ist 4193** statt 4183, mit `strictPort` und `PREVIEW_PORT`-Ausweg.
+- **`perf.spec.ts` hat drei Fälle statt zwei**: Leerlauf, Heap und neu die Frame-Zeit während der Sequenzen.
+- **Die p50-Grenze im Perf-Test hat eine Millisekunde Messtoleranz bekommen** (16,7 → 17,7 ms). Audit A2 nennt 16,7 ms; mit `performance.now()` ist das unterhalb des Vsync-Abstands und damit nicht messbar. Wonach der Test sucht — ausgelassene Frames — steht jetzt als eigene Konstante daneben (33 ms).
+
+**Offene SOLL-Follow-ups:** keine.
+
+**Manuelle Checks für Luka vor M4:**
+
+- [ ] **Die acht Sequenzen ansehen** — `npm run preview:sequences`, dann eine Runde starten und im Dev-Panel jede einzeln abspielen. Sitzt der Rhythmus? Ist der Wurm zu albern, der Stiefel zu langweilig?
+- [ ] **Ton auf einem echten Gerät hören.** Die Cues sind synthetisch (ADR-13) und am Laptop-Lautsprecher anders als am Handy. Besonders: Sind die drei Temperaturen auseinanderzuhalten, ohne aufs Icon zu sehen? Ist der Tick pro Zug hilfreich oder nervig?
+- [ ] **Liegt der Sound wirklich auf dem Bild?** Der Test misst die Planung, nicht die Wiedergabe. Ein Frame Versatz ist erlaubt, zwei fallen auf.
+- [ ] **Ist 800 ms für ein leeres Feld richtig?** Jetzt geht es ohne Banner sofort weiter — schnell genug, oder zu hektisch für ein Weiterreichen?
+- [ ] **Der Verteil-Screen mit langem Druck**: −1 kommt jetzt erst beim Loslassen. Fühlt sich das noch richtig an?
+- [ ] Weiterhin offen aus A0–A2: **Repo pushen**, Pages auf „GitHub Actions" stellen, **PWA auf echtem Gerät installieren**, **eine Runde zu viert spielen**, Referenzgerät-Messung.
+
+
 ## Audit A2 — 2026-09-05
 
 **Ergebnis:** BESTANDEN

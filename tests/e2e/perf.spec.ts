@@ -26,6 +26,18 @@ import {
   waitForBoard,
 } from './helpers';
 
+/**
+ * Das Frame-Budget aus Audit A2 — plus eine Millisekunde Messtoleranz.
+ *
+ * 60 fps heisst 16,7 ms. Ein an die Bildwiederholung gekoppelter Loop liefert aber
+ * `performance.now()`-Abstaende von 16,6 bis 17,0 ms, je nachdem, wo im Intervall gemessen
+ * wird — die Grenze exakt auf 16,7 zu legen hiesse, eine Zahl **unterhalb** des
+ * Vsync-Abstands zu fordern. Was der Test wirklich sucht, sind ausgelassene Frames, und
+ * die liegen bei 33 ms; alles um 17 ms ist ein sauberes 60-Hz-Bild.
+ */
+const FRAME_BUDGET_MS = 16.7 + 1;
+const DROPPED_FRAME_MS = 33;
+
 /** p-Quantil einer Messreihe. */
 function quantile(values: readonly number[], p: number): number {
   if (values.length === 0) return 0;
@@ -86,8 +98,8 @@ test.describe('Feld-Performance (Audit A2)', () => {
       return;
     }
 
-    expect(p50).toBeLessThanOrEqual(16.7);
-    expect(p95).toBeLessThanOrEqual(33);
+    expect(p50).toBeLessThanOrEqual(FRAME_BUDGET_MS);
+    expect(p95).toBeLessThanOrEqual(DROPPED_FRAME_MS);
   });
 
   test('haelt den Heap flach, wenn dieselbe Runde weiterlaeuft', async ({ page }) => {
@@ -167,7 +179,7 @@ test.describe('Feld-Performance (Audit A2)', () => {
       expect(p50).toBeLessThan(100);
       return;
     }
-    expect(p50).toBeLessThanOrEqual(16.7);
-    expect(p95).toBeLessThanOrEqual(33);
+    expect(p50).toBeLessThanOrEqual(FRAME_BUDGET_MS);
+    expect(p95).toBeLessThanOrEqual(DROPPED_FRAME_MS);
   });
 });

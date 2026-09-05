@@ -87,33 +87,41 @@ export const createDistributeScreen: ScreenFactory = ({ fsm, router }) => {
   /* ---------------------------------------------------------------- */
 
   /**
-   * Tap gibt +1, langes Druecken nimmt −1. Ein `pointerdown`-Timer statt `contextmenu`,
+   * Tap gibt +1, langes Druecken nimmt −1. `pointerdown`/`pointerup` statt `contextmenu`,
    * weil Long-Press auf iOS sonst die Textauswahl aufruft.
+   *
+   * ## Warum die Entscheidung an den Ereigniszeiten haengt und nicht an einem Timer
+   *
+   * Vorher lief beim Druecken ein `setTimeout(400 ms)`, der das −1 selbst ausloeste. Das
+   * ist eine Wette darauf, dass der Haupt-Thread frei bleibt: Blockiert ihn etwas
+   * zwischen Druck und Loslassen — ein Frame mit Sequenz und Ton, ein GC —, dann laeuft
+   * der abgelaufene Timer **vor** dem `pointerup`, und aus einem normalen Tap wird ein
+   * Abzug. Am Tisch heisst das: Man tippt einmal, und der Zaehler geht runter.
+   *
+   * `event.timeStamp` traegt den Zeitpunkt, an dem der Browser das Ereignis erzeugt hat,
+   * nicht den, an dem wir es bearbeiten. Die Differenz bleibt deshalb richtig, egal wie
+   * beschaeftigt die Seite war. Der Abzug kommt jetzt beim Loslassen — man sieht ihn
+   * einen Wimpernschlag spaeter, dafuer nie versehentlich.
    */
   function attachTapAndHold(element: HTMLElement, playerId: PlayerId): void {
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let longFired = false;
+    let downAt: number | undefined;
 
-    const clear = (): void => {
-      if (timer !== undefined) clearTimeout(timer);
-      timer = undefined;
+    element.addEventListener('pointerdown', (event) => {
+      downAt = event.timeStamp;
+    });
+
+    element.addEventListener('pointerup', (event) => {
+      if (downAt === undefined) return;
+      const held = event.timeStamp - downAt;
+      downAt = undefined;
+      change(playerId, held >= LONG_PRESS_MS ? -1 : +1);
+    });
+
+    const cancel = (): void => {
+      downAt = undefined;
     };
-
-    element.addEventListener('pointerdown', () => {
-      longFired = false;
-      timer = globalThis.setTimeout(() => {
-        longFired = true;
-        change(playerId, -1);
-      }, LONG_PRESS_MS);
-    });
-
-    element.addEventListener('pointerup', () => {
-      clear();
-      if (!longFired) change(playerId, +1);
-    });
-
-    element.addEventListener('pointercancel', clear);
-    element.addEventListener('pointerleave', clear);
+    element.addEventListener('pointercancel', cancel);
+    element.addEventListener('pointerleave', cancel);
   }
 
   function assigned(): number {
