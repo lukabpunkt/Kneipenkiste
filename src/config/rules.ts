@@ -176,6 +176,20 @@ export const STORAGE_KEY_ONBOARDING = 'tresor.onboarding.v1';
 export const STORAGE_KEY_INSTALL = 'tresor.install.v1';
 
 /**
+ * Vertrauens-Historie ueber mehrere Abende (Backlog nach 1.0).
+ *
+ * Eigener Schluessel, damit sie einen Session-Reset ueberlebt: Wer die Spieler wechselt,
+ * will nicht das Gedaechtnis des Abends verlieren.
+ */
+export const STORAGE_KEY_HISTORY = 'tresor.history.v1';
+
+/** Wieviele Namen die Historie behaelt. Wer am laengsten nicht spielte, fliegt zuerst. */
+export const HISTORY_MAX_PLAYERS = 24;
+
+/** Wieviele Spieltage je Name gemerkt werden. */
+export const HISTORY_MAX_DAYS = 60;
+
+/**
  * Ab welcher Runde nach der Installation gefragt wird (Roadmap M6.3).
  *
  * Beim ersten Oeffnen sagt jeder Nein — man weiss ja noch nicht, ob man das Ding behalten

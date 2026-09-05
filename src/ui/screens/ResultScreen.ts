@@ -6,6 +6,7 @@
  * Vertrauens-Index, Verrats-Streak, "Meistbetrogen" (GDD §7).
  */
 
+import { eveningsOf, historyRanking, loadHistory, trustIndexOf } from '@/core/history';
 import { t } from '@/core/i18n';
 import { mostBetrayed, traitorOfTheEvening } from '@/core/session';
 import { shareText } from '@/core/share';
@@ -259,6 +260,56 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
       row.append(name, bar, value);
       content.append(row);
       growBar(bar, entry.trustIndex ?? 0, 0);
+    }
+
+    /*
+     * Die Historie ueber mehrere Abende (ADR-35) — nur die Leute, die heute am Tisch
+     * sitzen, und nur, wenn ueberhaupt ein zweiter Abend dabei ist. Am ersten Abend
+     * stuende hier dieselbe Zahl wie eine Zeile darueber, und eine Statistik, die sich
+     * selbst wiederholt, liest niemand zweimal.
+     */
+    const names = session.players.map((player) => player.name);
+    const across = historyRanking(loadHistory(), names);
+    /*
+     * Erst ab dem zweiten Abend. Am ersten stuenden hier dieselben Zahlen wie eine Zeile
+     * darueber, und eine Statistik, die sich selbst wiederholt, liest niemand zweimal.
+     */
+    if (across.some((entry) => eveningsOf(entry) > 1)) {
+      const historyTitle = document.createElement('p');
+      historyTitle.className = 'score__title';
+      historyTitle.textContent = t('result.history');
+      content.append(historyTitle);
+
+      for (const entry of across) {
+        const player = session.players.find((p) => p.name === entry.name);
+        const row = document.createElement('div');
+        row.className = 'score__row score__row--trust score__row--history';
+
+        const name = document.createElement('span');
+        name.className = 'score__name';
+        const evenings = eveningsOf(entry);
+        name.textContent = entry.name;
+
+        // Die Abende stehen klein unter dem Namen — sonst schneidet die Spalte sie ab.
+        const since = document.createElement('span');
+        since.className = 'score__since';
+        since.textContent =
+          evenings === 1 ? t('result.historyEvening') : t('result.historyEvenings', { count: evenings });
+        name.append(since);
+
+        const bar = document.createElement('span');
+        bar.className = 'score__bar';
+        if (player) bar.style.setProperty('--score-color', hex(colorById(player.colorId).hex));
+
+        const value = document.createElement('span');
+        value.className = 'score__value';
+        const trust = trustIndexOf(entry);
+        value.textContent = trust === null ? '–' : `${trust}%`;
+
+        row.append(name, bar, value);
+        content.append(row);
+        growBar(bar, trust ?? 0, 0);
+      }
     }
 
     const footer = document.createElement('div');

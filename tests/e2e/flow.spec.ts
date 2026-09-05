@@ -516,3 +516,66 @@ test.describe('Kronzeuge', () => {
     await atScreen(page, 'distribute');
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* Vertrauens-Historie über mehrere Abende (Backlog nach 1.0)          */
+/* ------------------------------------------------------------------ */
+
+test.describe('Vertrauens-Historie', () => {
+  /** Ein Abend, der schon vorbei ist — sonst gäbe es nichts zu erinnern. */
+  const seedHistory = `
+    localStorage.setItem('tresor.history.v1', JSON.stringify({
+      'name 1': { name: 'Name 1', days: ['2026-08-29'], freeRounds: 10, shares: 2, steals: 8, sips: 30, perjuries: 1 },
+      'name 2': { name: 'Name 2', days: ['2026-08-29'], freeRounds: 10, shares: 9, steals: 1, sips: 8, perjuries: 0 }
+    }));`;
+
+  test('erinnert sich an den letzten Abend und überlebt den Session-Reset', async ({ page }) => {
+    await page.addInitScript(seedHistory);
+
+    await startGame(page);
+    await setPlayerCount(page, 3);
+    await openVault(page);
+    await skipNegotiation(page);
+    await playChoices(page, ['share', 'share', 'share']);
+    await runReveal(page);
+    await atScreen(page, 'result');
+
+    await page.getByRole('button', { name: 'Statistik' }).click();
+    const history = page.locator('.score__row--history');
+    await expect(history.first()).toBeVisible();
+
+    /*
+     * Der Unterschied ist der Punkt: Heute Abend hat jeder geteilt (100 %), über alle
+     * Abende steht Name 1 bei einem Fünftel. Genau dafür gibt es die Historie.
+     */
+    await expect(history.first()).toContainText('Name 1');
+    await expect(history.first()).toContainText('2 Abende');
+    await expect(history.first().locator('.score__value')).not.toHaveText('100%');
+
+    // Zurück und Session zurücksetzen — die Historie hängt an einem eigenen Schlüssel.
+    await page.locator('.sheet__close').click();
+    const survived = await page.evaluate(() => {
+      const before = localStorage.getItem('tresor.history.v1');
+      localStorage.removeItem('tresor.session.v1');
+      return before === localStorage.getItem('tresor.history.v1');
+    });
+    expect(survived).toBe(true);
+  });
+
+  test('zeigt am ersten Abend keine Historie', async ({ page }) => {
+    await startGame(page);
+    await setPlayerCount(page, 3);
+    await openVault(page);
+    await skipNegotiation(page);
+    await playChoices(page, ['share', 'share', 'share']);
+    await runReveal(page);
+    await atScreen(page, 'result');
+
+    await page.getByRole('button', { name: 'Statistik' }).click();
+    /*
+     * Am ersten Abend stünden hier dieselben Zahlen wie eine Zeile darüber — eine
+     * Statistik, die sich selbst wiederholt, liest niemand zweimal.
+     */
+    await expect(page.locator('.score__row--history')).toHaveCount(0);
+  });
+});

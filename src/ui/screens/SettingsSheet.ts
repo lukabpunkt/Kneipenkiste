@@ -7,8 +7,10 @@
  */
 
 import { LOCALES, type Locale } from '@/config/rules';
+import { clearHistory, loadHistory } from '@/core/history';
 import { setLocale, t } from '@/core/i18n';
 import { openSheet, type SheetHandle } from '@/ui/components/sheet';
+import { showToast } from '@/ui/components/toast';
 import { setHapticsEnabled, vibrate } from '@/ui/haptics';
 import type { ScreenContext } from '@/ui/router';
 
@@ -141,6 +143,28 @@ export function createSettingsSheet(ctx: ScreenContext): SheetHandle {
       }
     )
   );
+
+  /*
+   * Die Historie loeschen ist ein eigener Knopf und nicht Teil von "Session
+   * zuruecksetzen": Sie sind zwei verschiedene Dinge. Der Session-Reset ist Spielbetrieb
+   * (neue Runde, gleiche Leute), das hier ist Datensparsamkeit — auf dem Geraet liegen
+   * Namen mit Trinkdaten, und wer sie loswerden will, soll das koennen, ohne die laufende
+   * Runde anzufassen (ADR-35).
+   *
+   * Nur sichtbar, wenn es ueberhaupt etwas zu loeschen gibt.
+   */
+  if (Object.keys(loadHistory()).length > 0) {
+    const forget = document.createElement('button');
+    forget.type = 'button';
+    forget.className = 'btn btn--ghost settings__forget';
+    forget.textContent = t('settings.forgetHistory');
+    forget.addEventListener('click', () => {
+      clearHistory();
+      forget.remove();
+      showToast(t('settings.historyGone'));
+    });
+    content.append(forget);
+  }
 
   const reset = document.createElement('button');
   reset.type = 'button';

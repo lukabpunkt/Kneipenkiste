@@ -17,6 +17,10 @@ Alle nennenswerten Änderungen an **Der Tresor**. Format nach
 - `ctx.play()` nimmt jetzt eine Verstimmung entgegen — derselbe Klang sechsmal
   hintereinander klingt nach Maschinengewehr, minimal verstimmt nach sechs Händen.
 - `docs/screens/m4-outcomes.gif` — sechs Inszenierungen am Stück (offenes SOLL aus M4).
+- **Vertrauens-Historie über mehrere Abende**: Wer wie oft geteilt hat, überlebt jetzt den
+  Session-Reset. Schlüssel ist der Name (ADR-35), die Historie liegt unter eigenem
+  `localStorage`-Eintrag, ist auf 24 Namen und 60 Spieltage gedeckelt und lässt sich in
+  den Einstellungen löschen. Sichtbar ab dem zweiten Abend (ADR-36).
 - **Kronzeugen-Modus** (fünfter Modus): Ab zwei Dieben darf nach der Aufdeckung einer
   auspacken. Er halbiert seinen Beuteanteil, der Verpfiffene trinkt ihn — die Summe der
   Runde bleibt gleich (ADR-33). Wer den Eid gebrochen hat, darf nicht handeln. Der Screen

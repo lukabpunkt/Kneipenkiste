@@ -2364,6 +2364,32 @@
   color: var(--c-share);
 }
 
+/*
+ * Die Historie braucht zwei Zeilen im Namensfeld: Name oben, Abende klein darunter.
+ * In einer Zeile schnitt die 5,5-rem-Spalte "· 2 Abende" mitten im Wort ab.
+ */
+.score__row--history {
+  grid-template-columns: 7rem 1fr 2.6rem;
+  align-items: start;
+}
+
+.score__row--history .score__name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+.score__since {
+  font-size: var(--fs-xs);
+  color: rgb(255 248 231 / 52%);
+}
+
+.score__row--history .score__bar,
+.score__row--history .score__value {
+  margin-top: 2px;
+}
+
 .score__footer {
   margin-top: var(--space-3);
   padding-top: var(--space-3);

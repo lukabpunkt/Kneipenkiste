@@ -11,6 +11,7 @@ import '@/styles/components.css';
 
 import { createFsm } from '@/core/fsm';
 import { detectLocale, setLocale, t } from '@/core/i18n';
+import { loadHistory, recordRoundInHistory, saveHistory, todayKey } from '@/core/history';
 import { createSessionStore } from '@/core/session';
 import { confirmSheet } from '@/ui/components/sheet';
 import { showToast } from '@/ui/components/toast';
@@ -99,6 +100,14 @@ function boot(): void {
     if (to !== 'RESULT' || !context.result) return;
     if (event.type === 'payout' || context.result.outcome !== 'soloSteal') {
       session.recordRound(context.result);
+      /*
+       * Dieselbe Stelle, ein zweites Gedaechtnis: Die Session vergisst beim Spielerwechsel,
+       * die Historie nicht (ADR-35). Sie liegt unter eigenem Schluessel und ueberlebt
+       * jeden Reset — geloescht wird sie nur ueber die Einstellungen.
+       */
+      saveHistory(
+        recordRoundInHistory(loadHistory(), context.result, session.state.players, todayKey())
+      );
     }
   });
 

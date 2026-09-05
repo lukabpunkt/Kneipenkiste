@@ -371,4 +371,12 @@ Der Screen ist der einzige öffentliche Entscheidungs-Screen im Spiel (ADR-34): 
 
 **Befund:** Der Property-Test über 2 000 Deals hat ein echtes Loch gefunden — bei einem verpfiffenen Meineidigen verschwanden Schlücke, weil er gar keinen `split`-Eintrag hatte und die verschobenen Schlücke nirgends hinkonnten. Ohne die Zusicherung „die Summe bleibt" wäre das erst am Tisch aufgefallen, als Rechenfehler.
 
-**Zahlen:** 698 Unit-Tests · E2E auf vier Geräteprofilen (12 neue Fälle für den Kronzeugen) · 15 Inszenierungen (3,7–5,3 s) + 2 Overlays · 5 Modi · gesamt 269,8 KB gzip.
+**Vertrauens-Historie über mehrere Abende** — der letzte Backlog-Punkt, der ohne das Schwesterprojekt geht.
+
+Die Session-Statistik endet mit dem Abend. Was sie nicht beantwortet, ist die Frage, die nach dem dritten Abend am Tisch fällt: *Wem kann man eigentlich trauen?* `core/history.ts` sammelt freie Runden, Schlücke und Meineide pro **Name** (ADR-35) unter eigenem Speicher-Schlüssel — er überlebt jeden Session-Reset, ist auf 24 Namen und 60 Spieltage gedeckelt und lässt sich in den Einstellungen löschen. Sichtbar wird er ab dem zweiten Abend (ADR-36).
+
+Der Kontrast ist der Punkt: Im Screenshot steht dieselbe Person heute Abend auf 100 % Vertrauen und über alle Abende auf 31 %.
+
+**Was offen bleibt:** Der Name ist die einzige Identität ohne Konto. Wer sich umbenennt, fängt bei null an, und zwei Marcs an verschiedenen Abenden sind derselbe Marc. Für ein Trinkspiel unter Freunden ist das die richtige Näherung — ein Login wäre die falsche Antwort auf diese Frage.
+
+**Zahlen:** 711 Unit-Tests · E2E auf vier Geräteprofilen (12 neue Fälle für den Kronzeugen, 4 für die Historie) · 15 Inszenierungen (3,7–5,3 s) + 2 Overlays · 5 Modi · gesamt 270,9 KB gzip.
