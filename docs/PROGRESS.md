@@ -517,3 +517,20 @@ Der Rest ist die Shader-Übersetzung des ersten echten Bildes, direkt nach dem A
 **Was das festhält:** `tests/unit/boundaries.test.ts` lässt nur noch `stageModules.ts` Bühnen-Module nachladen. Wer künftig eines nur in der Aufdeckung ergänzt, bekommt keinen Tippfehler, sondern einen toten Reveal — und fällt hier auf, nicht am Tisch. Die Grenzen in `perf.spec.ts` gehen von 400 ms / 6 Frames auf 300 ms / 4 Frames; bewusst weiter als die gemessenen Werte, weil der Test die Größenordnung sichern soll und nicht das Rauschen.
 
 **Zahlen:** 762 Unit-Tests (2 neu) · gedrosselt schlechtester Frame 65 ms · ungedrosselt 19 ms und kein Frame über Budget · `Application.init()` 9,8 s früher · Einstiegs-Bundle 37,9 KB (Budget 40).
+
+
+## CI war rot — ein Rennen im Test, kein Fehler im Spiel — 2026-09-05
+
+Der erste Blick auf GitHub nach dem Push: **CI ist rot**, und war es schon vor dieser Arbeit. Der Deploy lief, die Qualitaets-Stufe lief, aber die E2E-Stufe fiel — seit mehreren Commits, an genau einem Test: „lässt die letzte Karte nicht wegtippen" (GDD §4.3), auf allen drei Versuchen, nie lokal.
+
+**Was der Artefakt-Bericht zeigte.** Die Seite stand beim Fehlschlag längst auf dem Ergebnis-Screen („Zu viele Köche", „Nächste Runde"). Der Test wartete darauf, dass `data-revealed` vier Karten meldet — dieses Attribut lebt aber auf dem Reveal-Screen, und der ist nach der Show samt Protokoll ausgetauscht. Wer danach fragt, bekommt einen leeren String, der nie mehr voll wird.
+
+**Warum ausgerechnet auf CI.** Der Test tippt zwanzig Mal auf die letzte Karte, um zu beweisen, dass sie sich nicht vorziehen lässt. Jeder dieser Taps ist ein Playwright-Aufruf mit Netzwerk-Umlauf; auf einem GitHub-Runner dauern zwanzig davon lange genug, dass die Show währenddessen zu Ende läuft. Lokal gewann derselbe Test das Rennen und sah gesund aus. Die Bildrate spielt dabei keine Rolle — der PIXI-Ticker treibt GSAP mit echter Zeit, die Show dauert auf einem langsamen Rechner also **gleich lang**, nur die Testschritte dauern länger.
+
+**Der Fix ist ein Mitschreiber, kein längeres Timeout.** `watchRevealLog()` hängt beim Betreten der Aufdeckung einen `MutationObserver` an den `<body>` und behält den längsten gesehenen Stand. Damit hängt die Zusicherung am **Inhalt**, nicht am Zeitpunkt der Frage — dieselbe Regel, die der Helfer-Kopf seit M1 aufstellt („Wartebedingungen hängen an Zuständen, nie an Uhrzeiten"), nur eine Ebene tiefer: Der Zustand muss den Screen überleben, an dem er hängt.
+
+Belegt lokal, indem die CI-Bedingung erzwungen wurde: zwanzig Sekunden Wartezeit nach den Taps, also weit jenseits des Screen-Wechsels. Vorher unmöglich zu bestehen, jetzt grün.
+
+**Mitgenommen:** Zwei weitere Stellen hatten dasselbe Rennen, nur unauffällig — „deckt Teiler zuerst und Diebe zuletzt auf" (wartet sofort nach dem Betreten und gewann deshalb immer) und der Atlas-Ausfall in `resilience.spec.ts` (wartet auf die dritte von drei Karten, also die letzte). Beide lesen jetzt aus dem Mitschreiber.
+
+**Zahlen:** 1 roter CI-Lauf seit drei Commits · 3 Tests umgestellt · 26 E2E-Fälle lokal grün · 0 Produktionscode geändert.

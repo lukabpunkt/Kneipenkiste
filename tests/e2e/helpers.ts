@@ -89,10 +89,63 @@ export async function playChoices(page: Page, choices: readonly ('share' | 'stea
   await atScreen(page, 'sealed');
 }
 
-/** Sealed → Reveal → (Distribute) → Result. */
+/** Sealed → Reveal → (Distribute) → Result. Schreibt dabei das Karten-Protokoll mit. */
 export async function runReveal(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Tresor öffnen' }).click();
   await atScreen(page, 'reveal');
+  await watchRevealLog(page);
+}
+
+/**
+ * Hält das Karten-Protokoll fest, **solange es existiert**.
+ *
+ * `data-revealed` lebt auf dem Reveal-Screen, und der Screen lebt nur bis zum Ende der
+ * Show: Danach ist er samt Protokoll ausgetauscht. Wer erst nach der letzten Karte danach
+ * fragt, fragt womöglich schon das Ergebnis — und bekommt einen leeren String, der nie
+ * mehr voll wird. Genau daran ist „lässt die letzte Karte nicht wegtippen" auf CI
+ * gescheitert: Die zwanzig Taps dauern dort lange genug, dass die Show währenddessen
+ * durchläuft. Lokal gewann derselbe Test das Rennen und sah gesund aus.
+ *
+ * Ein Beobachter am `<body>` schreibt jede Änderung mit und behält den längsten Stand.
+ * Damit hängt die Zusicherung am Inhalt, nicht am Zeitpunkt der Frage.
+ */
+export async function watchRevealLog(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const scope = globalThis as unknown as { __revealLog?: string };
+    // Pro Runde neu: Der nächste Reveal fängt wieder bei null Karten an.
+    scope.__revealLog = '';
+    const read = (): void => {
+      const log = document.querySelector<HTMLElement>('.screen--reveal')?.dataset['revealed'] ?? '';
+      if (log.length > (scope.__revealLog ?? '').length) scope.__revealLog = log;
+    };
+    new MutationObserver(read).observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['data-revealed'],
+    });
+    read();
+  });
+}
+
+/** Die mitgeschriebenen Karten als `playerId:choice`-Liste. */
+export async function revealedCards(page: Page): Promise<string[]> {
+  const log = await page.evaluate(
+    () => (globalThis as unknown as { __revealLog?: string }).__revealLog ?? ''
+  );
+  return log ? log.split(',') : [];
+}
+
+/** Wartet, bis der Mitschreiber `count` Karten gesehen hat. */
+export async function waitForRevealed(page: Page, count: number, timeout = 40_000): Promise<void> {
+  await page.waitForFunction(
+    (want) =>
+      ((globalThis as unknown as { __revealLog?: string }).__revealLog ?? '')
+        .split(',')
+        .filter(Boolean).length >= want,
+    count,
+    { timeout }
+  );
 }
 
 /**

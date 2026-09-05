@@ -13,6 +13,7 @@ import {
   enableMode,
   openVault,
   playChoices,
+  revealedCards,
   runReveal,
   screen,
   setPlayerCount,
@@ -20,6 +21,7 @@ import {
   startGame,
   takeTurn,
   vaultValue,
+  waitForRevealed,
 } from './helpers';
 
 /* ------------------------------------------------------------------ */
@@ -233,24 +235,13 @@ test.describe('Aufdeckung', () => {
      * Die Buehne ist ein Canvas — pruefbar ist sie ueber das Protokoll, das der Screen
      * mitschreibt: `playerId:choice` in genau der Reihenfolge, in der aufgedeckt wurde.
      */
-    await page.waitForFunction(
-      () =>
-        (document.querySelector<HTMLElement>('#app > section')?.dataset['revealed'] ?? '').split(',')
-          .length === 4,
-      undefined,
-      { timeout: 40_000 }
-    );
+    await waitForRevealed(page, 4);
 
-    const revealed = (await page.locator('#app > section').getAttribute('data-revealed')) ?? '';
-    expect(revealed.split(',').map((entry) => entry.split(':')[1])).toEqual([
-      'share',
-      'share',
-      'steal',
-      'steal',
-    ]);
+    const revealed = await revealedCards(page);
+    expect(revealed.map((entry) => entry.split(':')[1])).toEqual(['share', 'share', 'steal', 'steal']);
 
     // Jede Karte genau einmal, und alle vier Spieler kommen vor.
-    expect(new Set(revealed.split(',').map((entry) => entry.split(':')[0])).size).toBe(4);
+    expect(new Set(revealed.map((entry) => entry.split(':')[0])).size).toBe(4);
   });
 
   test('laesst die letzte Karte nicht wegtippen (GDD §4.3)', async ({ page }) => {
@@ -262,40 +253,25 @@ test.describe('Aufdeckung', () => {
     await playChoices(page, ['share', 'share', 'steal', 'steal']);
     await runReveal(page);
 
-    const revealed = async (): Promise<string[]> => {
-      const log = (await page.locator('#app > section').getAttribute('data-revealed')) ?? '';
-      return log ? log.split(',') : [];
-    };
-
     // Warten, bis die vorletzte Karte offen liegt, dann durchtippen.
-    await page.waitForFunction(
-      () =>
-        ((document.querySelector<HTMLElement>('#app > section')?.dataset['revealed'] ?? '').match(/,/g)
-          ?.length ?? -1) >= 2,
-      undefined,
-      { timeout: 40_000 }
-    );
+    await waitForRevealed(page, 3);
 
     /*
      * Ab hier ist die letzte Karte dran. Zwanzig Taps duerfen sie **nicht** vorziehen —
      * das ist die Regel, die den Moment schuetzt, fuer den es das Spiel gibt.
      */
-    const before = (await revealed()).length;
+    const before = (await revealedCards(page)).length;
     for (let i = 0; i < 20; i++) await page.locator('#app > section').click({ force: true });
     await page.waitForTimeout(400);
-    expect((await revealed()).length).toBeLessThanOrEqual(before + 1);
+    expect((await revealedCards(page)).length).toBeLessThanOrEqual(before + 1);
 
     /*
-     * Die Show laeuft trotzdem zu Ende — und alle vier Karten liegen offen. Abgelesen
-     * wird das **auf** dem Reveal-Screen: Danach ist er samt Protokoll ausgetauscht.
+     * Die Show laeuft trotzdem zu Ende — und alle vier Karten liegen offen. Gelesen wird
+     * aus dem Mitschreiber, nicht vom Screen: Auf einem langsamen Rechner dauern die
+     * zwanzig Taps laenger als der Rest der Show, und dann steht hier schon das Ergebnis.
      */
-    await page.waitForFunction(
-      () =>
-        (document.querySelector<HTMLElement>('#app > section')?.dataset['revealed'] ?? '').split(',')
-          .length === 4,
-      undefined,
-      { timeout: 40_000 }
-    );
+    await waitForRevealed(page, 4);
+    expect((await revealedCards(page)).length).toBe(4);
     await atScreen(page, 'result');
   });
 
