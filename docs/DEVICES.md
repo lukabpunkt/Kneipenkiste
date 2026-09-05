@@ -47,7 +47,20 @@ Die Emulation prüft Layout, Interaktion, Hit-Tests und Abläufe zuverlässig. S
 ## Bekannte Umgebungs-Eigenheiten
 
 - **Lokale Testläufe:** Auf einem Rechner mit 8 GB beendet macOS den Preview-Server
-  während langer E2E-Läufe per SIGKILL. Die Suiten laufen deshalb lokal in Blöcken; in der
-  CI mit mehr Speicher läuft alles am Stück.
+  während langer E2E-Läufe per SIGKILL. In der CI mit mehr Speicher läuft alles am Stück.
+
+  Was lokal hält, ist ein statischer Server auf dem Build statt `vite preview` — er hat
+  Sieben-Minuten-Läufe überstanden, wo der Preview nach anderthalb Minuten weg war:
+
+  ```
+  npm run build
+  mkdir -p /tmp/zoll-serve && ln -sf "$PWD/dist" /tmp/zoll-serve/Zoll
+  (cd /tmp/zoll-serve && python3 -m http.server 4187 --bind 127.0.0.1 &)
+  PREVIEW_PORT=4187 npx playwright test tests/e2e/flow.spec.ts --workers=1
+  ```
+
+  Ein Unterschied bleibt: Der Python-Server komprimiert nicht. Lighthouse misst dagegen
+  **94** statt 99 — das ist die fehlende Kompression, nicht die App. Für den
+  Lighthouse-Lauf also `npm run preview` nehmen, der ist kurz genug.
 - **Software-Rendering:** Ohne GPU rendert Chromium per SwiftShader. Der Perf-Test erkennt
   das und bewertet Frame-Zeiten dann nicht — Draw-Calls, JS-Zeit und Heap trotzdem.

@@ -6,7 +6,13 @@
  * dort kein "Fehler", sondern der Satz aus dem GDD.
  */
 
-import { INTERROGATION_PRESETS, MAX_PLAYERS, MIN_PLAYERS, PACK_TIMER_PRESETS } from '@/config/rules';
+import {
+  INTERROGATION_PRESETS,
+  MAX_AMOUNT_HIGH_SEASON,
+  MAX_PLAYERS,
+  MIN_PLAYERS,
+  PACK_TIMER_PRESETS,
+} from '@/config/rules';
 import type { GameModeId, InterrogationSec, PackTimerSec } from '@/config/rules';
 import { GAME_MODES } from '@/config/rules';
 import { t } from '@/core/i18n';
@@ -148,7 +154,8 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
       /* Ein Satz je Modus — sie aendern die Informationsstruktur, nicht nur Zahlen. */
       const hint = document.createElement('span');
       hint.className = 'mode__hint';
-      hint.textContent = t(`modes.${mode}.hint`);
+      /* Die Obergrenze steht in `rules.ts`; ein Balancing-Pass zieht den Text mit. */
+      hint.textContent = t(`modes.${mode}.hint`, { max: MAX_AMOUNT_HIGH_SEASON });
 
       button.append(name, hint);
 

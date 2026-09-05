@@ -293,7 +293,9 @@ in [`PLAYTEST-01.md`](PLAYTEST-01.md) und wartet auf Luka.
 3. **Der Title-Loop-Test maß das Item-Set statt ein Leck:** Die Silhouetten bestehen aus unterschiedlich vielen SVG-Elementen (Käse 1, Enten 3). Dass er je grün war, lag am zufälligen Startindex.
 4. **Ein Koffer-Tap kann danebengehen, solange die Kamera fährt** — auf dem langsamen CI-Runner reproduzierbar, lokal nie. Der Test wartet jetzt, bis der Koffer stillsteht.
 
-**Offene SOLL-Follow-ups:** Balancing-Pass nach dem Playtest (nur `rules.ts`, mit ADR) · Hochsaison-Text oder -Regel geradeziehen · Video.
+**Offene SOLL-Follow-ups:** Balancing-Pass nach dem Playtest (nur `rules.ts`, mit ADR) · Video.
+
+Hochsaison ist zur Hälfte erledigt: Der **Text** sagt jetzt, was der Modus tut (kaum mehr kommt durch, doppelt so viel wird erwischt und getrunken). Ob die **Regel** bleibt, entscheidet der Playtest — eine Balancing-Änderung vorher wäre geraten.
 
 ### Nach A6 nachgezogen (auf Zuruf von Luka)
 

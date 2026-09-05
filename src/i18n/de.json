@@ -54,7 +54,7 @@
     },
     "highSeason": {
       "name": "Hochsaison",
-      "hint": "Bis zu 10 Stück schmuggeln, eine Öffnung mehr."
+      "hint": "Bis zu {max} Stück und eine Öffnung mehr. Durch kommt kaum mehr — getrunken wird doppelt."
     },
     "openingsNow": "Der Beamte öffnet {count}"
   },
@@ -257,7 +257,7 @@
           "Bestechung: Reisende dürfen dem Beamten öffentlich {min_bribe} bis {max_bribe} Schlücke anbieten. Nimmt er an, bleibt der Koffer zu — und alle haben gesehen, wer gezahlt hat.",
           "Spürhund: Waldi schnüffelt an einem Koffer. Sein Hinweis stimmt immer — dafür darf der Beamte einen Koffer weniger öffnen.",
           "Diplomat: Ein Reisender hat geheime Immunität. Wird sein Koffer geöffnet, passiert ihm nichts, und der Beamte trinkt {diplomat} Schlücke.",
-          "Hochsaison: Bis zu {max_high} Stück im Koffer und eine Öffnung mehr. Es geht deutlich mehr kaputt — in beide Richtungen."
+          "Hochsaison: Bis zu {max_high} Stück und eine Öffnung mehr. Es kommt aber kaum mehr durch als sonst: Was der Modus wirklich verdoppelt, ist das, was erwischt wird — und damit das Trinken."
         ]
       },
       "end": {

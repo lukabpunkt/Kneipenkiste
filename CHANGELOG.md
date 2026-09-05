@@ -7,6 +7,9 @@ Alle nennenswerten Änderungen an **Der Zoll**. Format nach
 ## [Unveröffentlicht]
 
 ### Geändert
+- **Hochsaison sagt jetzt, was der Modus wirklich tut:** Er bringt kaum mehr über die
+  Grenze, sondern verdoppelt, was erwischt wird — und damit das Trinken. Der alte Text
+  las sich wie eine Einladung zum Schmuggeln (Befund aus Audit A6)
 - **Die Regeln erklären jetzt das ganze Spiel** statt es in vier Sätzen zu streifen: acht
   Abschnitte in der Reihenfolge der Runde, mit den echten Zahlen aus `rules.ts` (ADR-27)
 - **Der Hinweis am Koffer ist ein Zoll-Vermerk geworden** — ein Zettel mit Spitze auf den

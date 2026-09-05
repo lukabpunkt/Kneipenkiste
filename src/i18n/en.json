@@ -54,7 +54,7 @@
     },
     "highSeason": {
       "name": "High season",
-      "hint": "Smuggle up to 10 items, one extra opening."
+      "hint": "Up to {max} items and one more opening. Barely more gets through — but twice the drinking."
     },
     "openingsNow": "The officer opens {count}"
   },
@@ -257,7 +257,7 @@
           "Bribery: travellers may openly offer the officer {min_bribe} to {max_bribe} sips. If they accept, the case stays shut — and everyone saw who paid.",
           "Sniffer dog: Waldi sniffs one case. His hint is always right — in exchange the officer opens one case fewer.",
           "Diplomat: one traveller has secret immunity. If their case is opened, nothing happens to them and the officer drinks {diplomat} sips.",
-          "High season: up to {max_high} items per case and one more opening. Considerably more goes wrong — in both directions."
+          "High season: Up to {max_high} items and one more opening. But barely more gets through than usual: what the mode really doubles is what gets caught — and with it the drinking."
         ]
       },
       "end": {
