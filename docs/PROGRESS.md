@@ -447,3 +447,24 @@ Mit der Freigabe, aus anderen Repos zu **lesen und zu kopieren** (aber dort nich
 **Was ich bewusst nicht kopiert habe:** `ShotlingBrain.ts` (die Crooks stehen im Halbkreis und sollen dort stehen bleiben), die Todes-Sequenzen, `Scope`, `lottery.ts`, `stepper.ts` und `coachmark.ts` — für Letzteres gibt es hier `onboarding.ts`, und zwei Wege zur selben Sache sind schlechter als einer.
 
 **Zahlen:** 758 Unit-Tests · 120 geprüfte Kontrastpaare · Title-Loop 10 min mit 0 KB Heap-Wachstum · 2 CI-Schritte mehr.
+
+
+## Befund aus dem Spiel: Ruckler beim Aufdecken — 2026-09-05
+
+Gemeldet: „Wenn die Karten aufgedeckt werden, stockt es ein bisschen." Nachgemessen — und der Befund ist ein anderer, als er klingt.
+
+**Die Karten sind nicht das Problem.** Roh gemessen, jeder Frame einzeln, mit vierfach gedrosselter CPU: p50 16,7 ms, p99 17,7 ms, zwischen den acht Kartenflips kein einziger Ausreißer. Der Aussetzer liegt in den **ersten 0,5 Sekunden** der Aufdeckung, bevor die erste Karte kommt: ein Frame von rund 280 ms.
+
+**Woher er kommt:** Der Aufbau zerlegt sich in Atlanten 3 ms · `Application.init()` **280 ms** · Bühne bauen 15 ms · anhängen 7 ms. Es ist die PixiJS-Initialisierung — WebGL-Kontext anlegen und Shader übersetzen.
+
+**Warum meine Tests das nie sahen:** Sie lesen den gleitenden Median aus dem Dev-Panel. Ein Median über 240 Frames kann einen einzelnen 280-ms-Frame gar nicht zeigen. p95 16,7 ms war korrekt gemessen und trotzdem irreführend — das ist die unangenehmste Sorte grüner Test.
+
+**Was ich versucht und zurückgenommen habe:** Den Renderer während der Verhandlung vorwärmen, so wie es die Atlanten längst tun. In drei Varianten starb die Aufdeckung mit `Cannot read properties of undefined (reading 'updateRenderable')` — keine Karte drehte sich mehr. Zurückgenommen (ADR-40). Ein kaputtes Aufdecken ist schlimmer als ein Ruckler.
+
+**Was bleibt:**
+
+- `perf.spec.ts` misst jetzt **jeden Frame roh**, nicht nur Mediane, und meldet den schlechtesten.
+- Ein neuer Fall fährt die Aufdeckung mit vierfach gedrosselter CPU — die einzige Art, den Ruckler in der CI überhaupt zu sehen. Grenzen: kein Frame über 400 ms, höchstens sechs über 33 ms. Aktuell: schlechtester 150 ms, drei über 33 ms.
+- Nebenbefund behoben: `getStageApp()` war nicht gegen gleichzeitige Aufrufe geschützt und hätte zwei Renderer gebaut. Aufgefallen nur, weil der Vorlauf ihn zweimal rief.
+
+**Zahlen:** 758 Unit-Tests · 4 Perf-Fälle (einer neu, gedrosselt) · Aussetzer beim Aufbau ~280 ms bei 4× Drosselung, ~50 ms ungedrosselt.

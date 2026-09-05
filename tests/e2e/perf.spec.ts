@@ -20,6 +20,19 @@ import { atScreen, openVault, playChoices, setPlayerCount, skipNegotiation } fro
 const MEASURE_MS = 20_000;
 /** Aus Architektur §9 (Referenzgeraet). */
 const BUDGET = { p50: 16.7, p95: 33 } as const;
+
+/**
+ * Grenzen fuer **einzelne** Frames waehrend der Show (ADR-40).
+ *
+ * Das Dev-Panel zeigt einen gleitenden Median — der glaettet genau das weg, was man als
+ * Ruckler sieht. Deshalb misst dieser Test zusaetzlich jeden Frame roh.
+ *
+ * `maxMs` ist bewusst hoch: Beim Betreten der Aufdeckung legt PixiJS den WebGL-Kontext an
+ * und uebersetzt die Shader — gemessen rund 280 ms in einem Frame, auf einem vierfach
+ * gedrosselten Kern. Der Wert deckelt einen **bekannten** Aussetzer, damit er nicht
+ * unbemerkt waechst; er behauptet nicht, dass es keinen gaebe.
+ */
+const FRAME_LIMITS = { maxMs: 400, overBudget: 33, maxOverBudget: 6 } as const;
 /** Audit A2: eine Textur je Ebene, also drei Wechsel pro Frame (ADR-14). */
 const MAX_DRAW_CALLS = 3;
 
@@ -161,6 +174,23 @@ test.describe('Reveal-Show', () => {
     await openVault(page);
     await skipNegotiation(page);
     await playChoices(page, ['share', 'share', 'share', 'share', 'share', 'share', 'steal', 'steal']);
+    /*
+     * Jeden Frame roh mitschreiben, bevor die Show anfaengt. Der gleitende Median aus dem
+     * Dev-Panel sagt, wie es sich im Schnitt anfuehlt; diese Liste sagt, ob es geruckelt
+     * hat (ADR-40).
+     */
+    await page.evaluate(() => {
+      const window_ = globalThis as unknown as { __frames?: number[] };
+      window_.__frames = [];
+      let last = performance.now();
+      const tick = (now: number): void => {
+        window_.__frames?.push(now - last);
+        last = now;
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+
     await page.getByRole('button', { name: 'Tresor öffnen' }).click();
     await atScreen(page, 'reveal');
 
@@ -183,6 +213,17 @@ test.describe('Reveal-Show', () => {
     expect(frames.length).toBeGreaterThan(20);
     expect(Math.max(...draws)).toBeLessThanOrEqual(MAX_DRAW_CALLS);
 
+    /* --- Einzelne Frames: Gab es Ruckler? --- */
+    const raw = await page.evaluate(
+      () => (globalThis as unknown as { __frames?: number[] }).__frames ?? []
+    );
+    const worst = Math.max(...raw);
+    const overBudget = raw.filter((ms) => ms > FRAME_LIMITS.overBudget);
+    console.info(
+      `[perf/frames] ${raw.length} Frames · schlechtester ${worst.toFixed(0)} ms · ` +
+        `${overBudget.length} ueber ${FRAME_LIMITS.overBudget} ms`
+    );
+
     const sorted = [...frames].sort((a, b) => a - b);
     const p50 = sorted[Math.floor(sorted.length * 0.5)]!;
     const p95 = sorted[Math.floor(sorted.length * 0.95)]!;
@@ -193,6 +234,90 @@ test.describe('Reveal-Show', () => {
     test.skip(software, 'Software-Renderer: Frame-Zeiten sagen nichts ueber das Spiel aus.');
     expect(p50).toBeLessThanOrEqual(BUDGET.p50);
     expect(p95).toBeLessThanOrEqual(BUDGET.p95);
+
+    // Der bekannte Aussetzer beim Renderer-Aufbau darf nicht wachsen (ADR-40).
+    expect(worst, `schlechtester Frame ${worst.toFixed(0)} ms`).toBeLessThanOrEqual(FRAME_LIMITS.maxMs);
+    expect(
+      overBudget.length,
+      `${overBudget.length} Frames ueber ${FRAME_LIMITS.overBudget} ms: ${overBudget.map((ms) => ms.toFixed(0)).join(', ')}`
+    ).toBeLessThanOrEqual(FRAME_LIMITS.maxOverBudget);
+
     expect(problems).toEqual([]);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Der Aussetzer beim Betreten der Buehne (ADR-40)                     */
+/* ------------------------------------------------------------------ */
+
+test.describe('Gedrosselt', () => {
+  test.slow();
+
+  /**
+   * Dasselbe noch einmal, aber mit **vierfach gedrosselter CPU**.
+   *
+   * Ohne Drosselung liegt der schlechteste Frame bei 50 ms und man sieht nichts. Auf
+   * einem echten Handy ruckt es beim Aufdecken sichtbar — gemeldet aus dem Spiel, nicht
+   * aus dem Test. Gedrosselt ist der Grund messbar: PixiJS legt beim Betreten der
+   * Aufdeckung den WebGL-Kontext an und uebersetzt die Shader, rund 280 ms in einem
+   * einzigen Frame.
+   *
+   * Der Test behauptet nicht, dass das behoben sei (ADR-40 beschreibt, warum ein Vorlauf
+   * waehrend der Verhandlung PixiJS zerlegt). Er haelt fest, **wie schlimm** es ist —
+   * damit es nicht unbemerkt schlimmer wird und damit ein Versuch, es zu beheben,
+   * nachweisen kann, dass er wirkt.
+   */
+  test('haelt den Aussetzer beim Buehnen-Aufbau in Grenzen', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'CPU-Drosselung gibt es nur ueber das CDP.');
+
+    await page.goto('./');
+    await page.getByRole('button', { name: 'Spielen' }).click();
+    const confirm = page.getByRole('button', { name: 'Los' });
+    if (await confirm.isVisible().catch(() => false)) await confirm.click();
+    await atScreen(page, 'lobby');
+
+    await setPlayerCount(page, 4);
+    await openVault(page);
+    await skipNegotiation(page);
+    await playChoices(page, ['share', 'share', 'share', 'steal']);
+
+    await page.evaluate(() => {
+      const scope = globalThis as unknown as { __frames?: number[] };
+      scope.__frames = [];
+      let last = performance.now();
+      const tick = (now: number): void => {
+        scope.__frames?.push(now - last);
+        last = now;
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+
+    // Ab hier so langsam wie ein Mittelklasse-Handy.
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+
+    await page.getByRole('button', { name: 'Tresor öffnen' }).click();
+    await atScreen(page, 'reveal');
+    // Bis die erste Karte offen liegt — der Aufbau ist dann sicher durch.
+    await page.waitForFunction(
+      () => (document.querySelector<HTMLElement>('.screen--reveal')?.dataset['revealed'] ?? '') !== '',
+      undefined,
+      { timeout: 60_000 }
+    );
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+
+    const raw = await page.evaluate(
+      () => (globalThis as unknown as { __frames?: number[] }).__frames ?? []
+    );
+    const worst = Math.max(...raw);
+    const overBudget = raw.filter((ms) => ms > FRAME_LIMITS.overBudget);
+    console.info(
+      `[perf/gedrosselt] ${raw.length} Frames · schlechtester ${worst.toFixed(0)} ms · ` +
+        `${overBudget.length} ueber ${FRAME_LIMITS.overBudget} ms`
+    );
+
+    expect(worst, `schlechtester Frame ${worst.toFixed(0)} ms`).toBeLessThanOrEqual(FRAME_LIMITS.maxMs);
+    expect(overBudget.length).toBeLessThanOrEqual(FRAME_LIMITS.maxOverBudget);
   });
 });
