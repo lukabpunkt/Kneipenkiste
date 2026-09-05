@@ -36,6 +36,7 @@ export interface StageProbe {
   xraySequences(itemSet: string, amount: number): SequenceReport[];
   drawSequences(kind: string, count: number): string[];
   particles(): number;
+  setLowEffects(value: boolean): void;
 }
 
 declare global {

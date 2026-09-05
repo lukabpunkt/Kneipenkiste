@@ -218,6 +218,14 @@ test.describe('A4 — Effekte', () => {
     const before = await page.evaluate(() => window.__zollStage!.particles());
     expect(before).toBe(0);
 
+    /*
+     * Effekte ausdruecklich an. Sonst misst dieser Test die Maschine statt die Fontaene:
+     * Ein CI-Runner hat vier Kerne, `detectLowEffects()` schaltet dort auf sparsam, und
+     * dann fliegt voellig korrekt nichts. Der sparsame Modus hat weiter unten seinen
+     * eigenen Test.
+     */
+    await page.evaluate(() => window.__zollStage!.setLowEffects(false));
+
     const rects = await page.evaluate(() => window.__zollStage!.suitcases());
     await tapSuitcase(page, rects[0]!.playerId);
 
@@ -236,6 +244,41 @@ test.describe('A4 — Effekte', () => {
     expect(peak, 'keine Partikel während der Sequenz').toBeGreaterThan(0);
     /* Und das Budget aus Art Direction §8 wird eingehalten. */
     expect(peak, 'Partikel-Budget überschritten').toBeLessThanOrEqual(200);
+  });
+
+  test('bei „weniger Effekte" fliegt nichts', async ({ page }) => {
+    test.setTimeout(180_000);
+    await toInspect(page, 4107, [6, 0, 0, 0]);
+
+    /*
+     * Die Gegenprobe. Sparsam heisst nicht „ein bisschen weniger", sondern: keine
+     * Partikel. Auf einem schwachen Geraet ist die Fontaene das Erste, was das Bild
+     * kostet — und das Ergebnis steht ohnehin im Banner.
+     */
+    await page.evaluate(() => window.__zollStage!.setLowEffects(true));
+
+    const rects = await page.evaluate(() => window.__zollStage!.suitcases());
+    await tapSuitcase(page, rects[0]!.playerId);
+
+    /*
+     * Partikel und Banner im selben Durchlauf: Das Urteil steht nur waehrend der Sequenz
+     * da und ist danach wieder weg — wer erst hinterher nachsieht, findet „idle" und
+     * haelt eine fertige Runde faelschlich fuer eine ausgefallene.
+     */
+    let peak = 0;
+    let verdict = '';
+    const banner = page.locator('.inspect__banner');
+    const t0 = Date.now();
+    while (Date.now() - t0 < 9000) {
+      peak = Math.max(peak, await page.evaluate(() => window.__zollStage!.particles()));
+      const kind = (await banner.getAttribute('data-kind')) ?? '';
+      if (/caught|clean|diplomat/.test(kind)) verdict = kind;
+      await page.waitForTimeout(80);
+    }
+
+    expect(peak, 'sparsam, und trotzdem Partikel').toBe(0);
+    /* Die Runde laeuft trotzdem zu Ende — sparsam ist kein kaputtes Spiel. */
+    expect(verdict, 'die Sequenz kam nie zu einem Urteil').toMatch(/caught|clean|diplomat/);
   });
 });
 

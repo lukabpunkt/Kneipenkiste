@@ -68,6 +68,15 @@ export interface StageProbe {
   drawSequences(kind: string, count: number): string[];
   /** Wie viele Partikel gerade leben — das Budget aus Art Direction §8 liest das. */
   particles(): number;
+  /**
+   * Schaltet „weniger Effekte" um.
+   *
+   * Ohne diesen Schalter misst der A4-Test „ein Fang lässt die Ware wirklich fliegen"
+   * nicht die Fontäne, sondern die Maschine, auf der er läuft: Ein CI-Runner hat vier
+   * Kerne, das Spiel schaltet dort absichtlich auf sparsam, und dann fliegt korrekt
+   * nichts. So prüft der Test beide Zustände statt einem zufälligen.
+   */
+  setLowEffects(value: boolean): void;
 }
 
 let taps: PlayerId[] = [];
@@ -131,6 +140,10 @@ export function attachStageProbe(stage: Stage, canvasHost: HTMLElement): void {
     taps: () => [...taps],
     resetTaps: () => {
       taps = [];
+    },
+
+    setLowEffects(value: boolean) {
+      stage.view.setLowEffects(value);
     },
 
     isolateTaps() {
