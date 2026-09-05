@@ -4,13 +4,19 @@
 > niemand am Schreibtisch ausfüllen kann: Audit A6 fragt nach Reaktionen echter Menschen.
 > Was hier schon steht, ist der Aufbau und die Frage — der Rest kommt vom Tisch.
 
-**Datum:** ____________  **Ort:** ____________  **Build:** `v1.0.0-rc.1` / Commit ________
+**Datum:** ____________  **Ort:** ____________  **Build:** ____________ / Commit ________
+
+> Der Bogen wird mit dem Spiel mitgepflegt: Stand sind **20 Inszenierungen und 5 Modi**
+> (zuletzt ergänzt am 2026-09-05). Vor dem Abend kurz gegen `docs/PROGRESS.md` prüfen —
+> ein Bogen, der die Hälfte nicht kennt, verschenkt den Abend.
 
 ## Setup (A6)
 
 - [ ] 4–6 Personen, **ein** Handy
 - [ ] mindestens 8 Runden
-- [ ] davon ≥ 2 im **Eid**-Modus, ≥ 2 im **Maulwurf**-Modus
+- [ ] davon ≥ 2 im **Eid**-Modus, ≥ 2 im **Maulwurf**-Modus, ≥ 2 im **Kronzeugen**-Modus
+- [ ] Der Kronzeuge greift erst **ab zwei Dieben**. Läuft die Gruppe brav, den Modus mit
+      Maulwurf kombinieren — der garantiert einen Dieb, und der zweite findet sich meist.
 - [ ] Härte: Normal (Abweichung notieren: ________)
 - [ ] Gerät: ____________  Browser: ____________
 
@@ -49,24 +55,42 @@ Eine Zeile pro Runde. `k` = Zahl der Diebe.
 
 *Reaktion:* 0 = nichts, 1 = Grinsen, 2 = Lachen/Aufschrei, 3 = alle reden durcheinander.
 
-## Die elf Inszenierungen
+## Die zwanzig Inszenierungen
 
-Welche kam vor, und wie hat sie getragen? (Gewichte stehen in `src/game/outcomes/registry.ts`
-und sind aktuell alle 1 — hier entscheidet sich, welche häufiger kommen soll.)
+Welche kam vor, und wie hat sie getragen? Die Gewichte stehen in
+`src/game/outcomes/registry.ts` und sind **alle 1** — hier entscheidet sich, welche
+häufiger kommen soll und welche raus kann.
 
-| ID | gesehen | Reaktion (0–3) | häufiger / seltener / raus |
-|---|---|---|---|
-| `share_group_hug` |  |  |  |
-| `share_toast` |  |  |  |
-| `steal_solo_getaway` |  |  |  |
-| `steal_solo_moonwalk` |  |  |  |
-| `steal_solo_magician` |  |  |  |
-| `steal_multi_tugofwar` |  |  |  |
-| `steal_multi_anvil` |  |  |  |
-| `steal_multi_standoff` |  |  |  |
-| `steal_all_brawl` |  |  |  |
-| `steal_all_alarm` |  |  |  |
-| `jackpot_burst` |  |  |  |
+Erwarte nicht, alle zwanzig an einem Abend zu sehen: Bei acht Runden kommen etwa acht
+davon vor, und das No-Repeat-Fenster sorgt nur dafür, dass sich innerhalb eines Falls
+nichts sofort wiederholt. Was leer bleibt, bleibt eben leer — lieber ehrlich als geraten.
+
+| ID | Fall | gesehen | Reaktion (0–3) | häufiger / seltener / raus |
+|---|---|---|---|---|
+| `share_group_hug` | alle teilen |  |  |  |
+| `share_toast` | alle teilen |  |  |  |
+| `share_slow_clap` | alle teilen |  |  |  |
+| `share_bank_photo` | alle teilen |  |  |  |
+| `steal_solo_getaway` | Alleingang |  |  |  |
+| `steal_solo_moonwalk` | Alleingang |  |  |  |
+| `steal_solo_magician` | Alleingang |  |  |  |
+| `steal_solo_helicopter` | Alleingang |  |  |  |
+| `steal_solo_trapdoor` | Alleingang |  |  |  |
+| `steal_multi_tugofwar` | mehrere Diebe |  |  |  |
+| `steal_multi_anvil` | mehrere Diebe |  |  |  |
+| `steal_multi_standoff` | mehrere Diebe |  |  |  |
+| `steal_multi_banana` | mehrere Diebe |  |  |  |
+| `steal_multi_handcuffs` | mehrere Diebe |  |  |  |
+| `steal_all_brawl` | alle stehlen |  |  |  |
+| `steal_all_alarm` | alle stehlen |  |  |  |
+| `steal_all_pie_fight` | alle stehlen |  |  |  |
+| `steal_all_dominoes` | alle stehlen |  |  |  |
+| `jackpot_burst` | Jackpot |  |  |  |
+| `jackpot_dive` | Jackpot |  |  |  |
+
+**Wer nichts sieht, kann nachhelfen:** `npm run preview:outcomes` spielt jede Sequenz
+einzeln ab. Das ersetzt keine echte Runde — die Spannung fehlt —, taugt aber danach, um
+zu klären, welche man überhaupt nie zu Gesicht bekommen hat.
 
 ## Balancing
 
@@ -82,6 +106,7 @@ einen ADR (CLAUDE.md).
 | Meineid solo | 2 Schlücke |  |  |
 | Meineid mehrfach | ×2 |  |  |
 | Maulwurf-Rabatt | ÷2 |  |  |
+| Kronzeugen-Rabatt | ÷2 |  |  |
 | Verhandlungsdauer | 30 s |  |  |
 | Reveal-Tempo | Normal |  |  |
 
@@ -105,3 +130,7 @@ Wörtlich mitschreiben, nicht zusammenfassen. Die Formulierung ist der Befund.
 - Haptik: spürbar bei der letzten Karte? ____________
 - Lesbarkeit auf Armlänge (das Handy liegt in der Tischmitte): ____________
 - Akku nach 8 Runden: ____________
+- Kronzeuge: Hat jemand ausgepackt? Wie war die Reaktion des Verpfiffenen? ____________
+- Vertrauens-Historie: Ab dem zweiten Abend steht sie in der Statistik. Interessiert sie
+  jemanden — oder scrollt man daran vorbei? ____________
+- Teilen-Knopf am Ergebnis: benutzt ihn jemand von selbst? ____________
