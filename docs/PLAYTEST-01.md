@@ -100,6 +100,7 @@ Weniger Öffnungen bringen den Fang-Anteil ins Ziel, treiben aber die Belästigu
 | Ruckler | ≤ 1 | | |
 | Sound-Aussetzer | 0 | | |
 | Fehl-Taps | ≤ 1 | | |
+| **Wird die Schranke zu lang?** | keiner schaut weg | | Vier Reisende brauchen gemessene 14,5 s. Das ist die längste Stelle ohne Interaktion im ganzen Spiel — wenn jemand dabei zum Handy greift, gehört `GATE.maxSequenceDuration` gekürzt. |
 
 ### Regeln nach einer Runde verstanden?
 

@@ -23,9 +23,19 @@ const URL_WITH_SEED = (seed: number): string => `./?dev=1&seed=${seed}`;
 
 const screen = (page: Page) => page.locator('.screen');
 
-async function expectScreen(page: Page, id: string): Promise<void> {
-  await expect(screen(page)).toHaveAttribute('data-screen', id, { timeout: 20_000 });
+async function expectScreen(page: Page, id: string, timeout = 20_000): Promise<void> {
+  await expect(screen(page)).toHaveAttribute('data-screen', id, { timeout });
 }
+
+/**
+ * Die Schranke ist der laengste Abschnitt des Spiels.
+ *
+ * Pro Reisendem bis zu 3 s Sequenz (`GATE.maxSequenceDuration`) plus 0,77 s Banner —
+ * bei vier Reisenden lokal gemessene 14,5 s. Auf einem Runner ohne GPU dauert es
+ * laenger, und die Runde ist trotzdem in Ordnung. Deshalb hier eine Grenze, die sich
+ * aus der Choreografie ergibt statt aus einer runden Zahl.
+ */
+const GATE_TIMEOUT_MS = 8 * 5_000;
 
 /** Der Pass-Screen ist erst nach der Tap-Sperre scharf (rules.ts: PASS_TAP_LOCK_MS). */
 async function tapPass(page: Page): Promise<void> {
@@ -253,7 +263,8 @@ test.describe('Drei Runden', () => {
     await page.locator('.inspect__actions .btn--officer').click();
     await expectScreen(page, 'gate');
 
-    await expectScreen(page, 'distribute');
+    /* Vier Reisende laufen einzeln durch — das dauert. */
+    await expectScreen(page, 'distribute', GATE_TIMEOUT_MS);
     /* Der Bonus ist der einzige Token der Runde — der Beamte verteilt ihn. */
     await expect(page.locator('.distribute__headline')).toContainText('Rudi');
     await distributeAll(page);

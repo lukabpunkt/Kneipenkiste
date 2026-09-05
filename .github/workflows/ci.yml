@@ -125,6 +125,18 @@ jobs:
         # SwiftShader rendert; Draw-Calls, JS-Zeit und Heap werden trotzdem geprüft.
         run: npm run test:perf
 
+      - name: Report und Traces hochladen
+        # Ohne die steht bei einem roten Lauf nur die Fehlermeldung da, und jede
+        # Ursachensuche faengt beim Raten an.
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-e2e
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
   lighthouse:
     name: Lighthouse (Audit A5)
     runs-on: ubuntu-latest
