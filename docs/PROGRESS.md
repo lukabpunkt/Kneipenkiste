@@ -533,4 +533,12 @@ Belegt lokal, indem die CI-Bedingung erzwungen wurde: zwanzig Sekunden Wartezeit
 
 **Mitgenommen:** Zwei weitere Stellen hatten dasselbe Rennen, nur unauffällig — „deckt Teiler zuerst und Diebe zuletzt auf" (wartet sofort nach dem Betreten und gewann deshalb immer) und der Atlas-Ausfall in `resilience.spec.ts` (wartet auf die dritte von drei Karten, also die letzte). Beide lesen jetzt aus dem Mitschreiber.
 
-**Zahlen:** 1 roter CI-Lauf seit drei Commits · 3 Tests umgestellt · 26 E2E-Fälle lokal grün · 0 Produktionscode geändert.
+**Nachtrag: Der erste PR-Lauf hat einen zweiten roten Test freigelegt.** Der Flow-Fix wirkte — die E2E-Stufe kam durch —, und genau dadurch lief die **Perf-Stufe zum ersten Mal ueberhaupt auf CI**. Bis dahin brach der Flow davor immer ab, und `dee5051` hatte den gedrosselten Fall zwar eingefuehrt, aber nie dort laufen sehen.
+
+Was er dort meldete: Der GitHub-Runner zeichnet Chromium **in Software mit 10 fps**. Im ungedrosselten Reveal-Fall liegen 314 von 352 Frames ueber dem 33-ms-Budget, im gedrosselten 42 von 72. Das ist keine Aussage ueber das Spiel, sondern ueber den Mietrechner — und auch der urspruengliche Grenzwert von sechs Frames waere dort gefallen, nicht erst der auf vier verschaerfte.
+
+Die beiden Perf-Faelle darueber haben dafuer laengst eine Weiche: messen und melden immer, pruefen nur auf echter Grafik (`test.skip(software, ...)`). Der gedrosselte Fall hatte sie als einziger nicht. Jetzt hat er sie. Auf echter Grafik bleibt alles scharf — schlechtester Frame 99 ms bei Grenze 300, drei Frames ueber Budget bei Grenze vier.
+
+**Nebenbei:** GitHub meldet in jedem Lauf, dass `checkout@v4`, `setup-node@v4`, `upload-artifact@v4` und `configure-pages@v5` auf abgekuendigtem Node 20 laufen und nur notgedrungen auf Node 24 gestartet werden — heute eine Warnung, spaeter ein roter Lauf. Alle sechs Actions stehen jetzt auf ihrem Node-24-Major. Die drei Pages-Actions kann nur ein Push auf `main` beweisen; faellt der Deploy, bleibt die bisher veroeffentlichte Seite live.
+
+**Zahlen:** 2 rote CI-Befunde (ein Rennen, eine fehlende Weiche) · 4 Tests umgestellt · 6 Actions auf Node-24-Majors · 31 E2E-Fälle lokal grün · 0 Produktionscode geändert.
