@@ -7,10 +7,65 @@
 | M2 PIXI-Feld, Tiles, Diggers | ✅ fertig | `v0.2.0` | A2 bestanden |
 | M3 Sequenzen Teil 1 | ✅ fertig | `v0.3.0` | A3 bestanden |
 | M4 Hit-Sequenzen | ✅ fertig | `v0.4.0` | A4 bestanden |
-| M5 Polish, Modi, A11y | ⬜ offen | – | – |
+| M5 Polish, Modi, A11y | ✅ fertig | `v0.5.0` | A5 bestanden |
 | M6 Playtest & Release | ⬜ offen | – | – |
 
 ## Audit-Reports
+
+## Audit A5 — 2026-09-05
+
+**Ergebnis:** BESTANDEN, mit einem offenen manuellen Check (Lighthouse).
+
+| Check | Status | Notiz |
+|---|---|---|
+| Lighthouse Mobile Perf/A11y/Best Practices ≥ 90 | ⏳ manuell | Lighthouse liegt in dieser Umgebung nicht vor, und eine Zahl zu behaupten wäre schlimmer als keine. Was daran messbar ist, ist es: Bundle-Budget (CI), Kontrast (`contrast.test.ts`), Live-Regionen und zugängliche Namen (E2E), PWA-Installierbarkeit (E2E), stille Konsole beim Start (E2E), `lang` folgt der Sprachwahl. |
+| PWA installierbar | ✅ | E2E prüft Manifest, Icons, Start-URL und Display-Modus. |
+| JS ≤ 450 KB gzip, Board-Chunk lazy | ✅ | **253 KB gesamt**, Einstiegs-Chunk **27,1 KB** — und in ihm steht kein PixiJS (nachgeprüft am gebauten Bundle). Der Title-Loop ist deshalb DOM, nicht PIXI. |
+| Kontrast ≥ 4,5:1 | ✅ | Gerechnet statt geschätzt, in elf Tests. Dabei kam heraus, dass die Regel anders lautet als gedacht — siehe (1). |
+| Reduced-Motion (kein Shake, Welle → Fade) | ✅ | Zusätzlich fällt jetzt auch die **Kamerafahrt** weg (Zoom bewegt das ganze Bild) und das Platten-Wackeln. Ein E2E-Test spielt eine ganze Runde mit `reducedMotion: reduce` bis ins Replay durch: Alle sechs Minen erscheinen. |
+| Tastatur (SOLL) | ✅ | Router setzt den Fokus auf jeden neuen Screen (Unit-Test); alle Bedienelemente sind echte `<button>`/`<input>` mit Namen (E2E). |
+| EN vollständig | ✅ | 133 Schlüssel, DE und EN deckungsgleich (Unit-Test); kein `[missing:` auf irgendeinem Screen (E2E). |
+| Alle Modus-Kombinationen spielbar | ✅ | Die beiden Paare, die sich am stärksten ins Gehege kommen, laufen als E2E: **Doppelagent + Kettenreaktion** (was passiert, wenn eine Kette über einen Blindgänger läuft) und **Nachtgräber + Zwei Kisten** (die schwerste Runde des Spiels — sie muss trotzdem enden). |
+| Title-Loop 10 min ohne Leak | ✅ | Mit falscher Zeit gemessen: Nach zehn simulierten Minuten steht genau **ein** Timer aus, nach `stop()` keiner mehr. |
+| Share-Text | ✅ | Geteilt wird die schlimmste Paarung der Runde, nicht die Statistik. Web Share → Zwischenablage → Anzeige; kein Weg wirft. Ein Test hat dabei einen echten Fehler gefunden — siehe (3). |
+| Fehlerfälle | ✅ | Wirft eine Screen-Fabrik, zeigt der Router eine Ersatzseite mit Neu-laden-Knopf statt einer weißen Fläche. Session-Laden verträgt kaputte Einträge, Audio und Haptik fallen still aus, ohne Atlas bleibt der Platzhalter stehen. |
+| Draw-Batches auch im Nachtgräber-Modus ≤ 3 | ✅ | Die dunkle Scheibe und die zwei additiven Laternen kosten keinen zusätzlichen Batch: gemessen **1**. |
+
+**Zahlen:** 342 Unit-Tests (+22) · 50 E2E-Tests (25 × 2 Geräte, beide vollständig grün) · 5 Perf-Tests grün · p50 16,7 ms · **1 Draw-Batch** · Partikel-Höhepunkt 29 von 200 · **0 Long-Tasks** in 5 Grabungen · Heap 10,0 → 10,0 MB über zehn Grabungen · 253 KB gzip gesamt (Budget 450), Einstieg 27,1 KB ohne PixiJS · 133 i18n-Schlüssel DE/EN
+
+### Was dabei aufgefallen ist
+
+**(1) Der Kontrast-Test hat zweimal das Falsche gemessen — und dabei die eigentliche Regel freigelegt.** Erster Anlauf: Spielerfarbe gegen Wiese. Fiel durch (Rot auf Gras: 1,9:1). Das war die falsche Frage, denn jede Form trägt eine Ink-Kontur (`ring.svg`: 20 px Ink unter 12 px Farbe) — die Farbe berührt den Untergrund nie. Zweiter Anlauf: Ink-Kontur gegen jeden Untergrund. Fiel ebenfalls durch — Ink auf Krater sind 1,1:1, beides ist fast schwarz. Beides stimmt, und zusammen ergibt es die Regel, die das Bild wirklich trägt: **Auf hellem Grund trennt die Kontur, auf dunklem Grund die Farbe.** Der Test verlangt jetzt, dass für jeden Untergrund mindestens einer der beiden Wege 3:1 schafft — und genau das ist der Grund, warum ein Krater dunkel und die Wiese hell sein muss.
+
+**(2) Kontrast ist das falsche Maß für „sind zwei Farben verschieden".** Rot und Blau liegen bei 1,10:1 Kontrast und sind trotzdem für jeden sofort verschieden — sie unterscheiden sich in der Farbe, nicht in der Helligkeit. Der Test rechnet dafür jetzt ΔE (CIE76 über L\*a\*b\*) statt WCAG-Kontrast. Alle acht Spielerfarben liegen deutlich über der Schwelle; die Symbole bleiben trotzdem Pflicht (Deuteranopie, Audit A2).
+
+**(3) „In die Zwischenablage kopiert", ohne Zwischenablage.** `await nav?.clipboard?.writeText(text)` sieht sicher aus, ist es aber nicht: Fehlt die API, ergibt die Kette `undefined`, `await undefined` gelingt — und die App meldet Erfolg, obwohl nichts passiert ist. Jetzt wird die Funktion geprüft, nicht nur aufgerufen. Gefunden hat es der Test „sagt es, wenn beides fehlt".
+
+**(4) Ein Screen, der wirft, nahm die ganze Runde mit.** Der Router räumt den alten Screen ab, **bevor** er den neuen baut — wirft die Fabrik dabei, bleibt eine weiße Fläche. Am Tisch heißt das: Das Handy reagiert mitten in der Runde nicht mehr, und niemand weiß, ob die Runde weg ist. Jetzt steht dort eine Ersatzseite, die beides sagt: was passiert ist, und dass die Session gespeichert ist.
+
+**(5) Der Title-Loop darf kein PixiJS anfassen.** Der Titel ist der erste Screen; wer ihn mit dem Renderer baut, zieht PixiJS und GSAP (über 400 KB) in den Einstiegs-Chunk — und das Spiel startet langsamer, damit ein Logo wackelt. Die Schleife läuft deshalb über CSS-Transitionen und einen einzigen Timer, gesteuert von einem `data-phase`-Attribut. Der Einstiegs-Chunk bleibt bei 27 KB.
+
+**(6) Ein zu grobes Zeitraster übersieht die kurzen Phasen.** Der erste Title-Loop-Test tastete im Sekundenraster ab und sah die 900-ms-Phase `gone` nie — er hätte einen ausgefallenen Zustand nicht bemerkt. Jetzt tastet er in 100-ms-Schritten ab. Dieselbe Falle wie bei der Sound-Planung: Wer in Frames misst, misst das Raster mit.
+
+### Abweichungen von der Planung
+
+- **Der Nachtgräber-Look kommt ohne neues Asset aus.** Geplant waren Laternen; gebaut sind zwei additiv gemischte Kopien des Kisten-Glows in Bauhelm-Gelb. Dieselbe Textur heißt derselbe Atlas — und damit kein zusätzlicher Draw-Batch (nachgemessen: 1).
+- **Der Titel zeigt keinen gerigten Digger**, sondern eine Emoji-Schleife in vier Phasen. Ein PIXI-Digger auf dem Titel hätte den Board-Chunk in den Start gezogen (Architektur §1) — die Schleife erzählt dasselbe in fünf Sekunden.
+- **Lighthouse ist ein manueller Check geblieben** (siehe Tabelle). Die messbaren Anteile sind als Tests abgedeckt.
+- **Das Balken-Diagramm im Result ist eine Liste mit Balken**, keine Statistik-Grafik: Am Tisch schaut hier niemand länger als zwei Sekunden hin.
+
+**Offene SOLL-Follow-ups:** Lighthouse-Lauf auf einem echten Gerät.
+
+**Manuelle Checks für Luka vor M6:**
+
+- [ ] **Lighthouse Mobile** auf dem gebauten Stand laufen lassen (Perf / A11y / Best Practices ≥ 90). Das ist der einzige A5-Punkt, der hier offen bleiben musste.
+- [ ] **Den Titel ansehen**: Erzählt die Schleife das Spiel, oder wirkt sie albern? Sie ist das Erste, was jemand sieht.
+- [ ] **Nachtgräber auf dem Gerät**: Ist das Feld dunkel genug, um anders zu wirken — und hell genug, um die Platten noch zu treffen? Das ist die Grenze, an der der Modus steht oder fällt.
+- [ ] **Mit „Bewegung reduzieren" spielen** (iOS: Bedienungshilfen → Bewegung). Fehlt etwas, das man braucht?
+- [ ] **Den Share-Text an jemanden schicken**, der das Spiel nicht kennt. Versteht er ihn?
+- [ ] **Das Result mit vier Spielern ansehen**: Sind die Schluck-Balken lesbar, oder ist es zu viel auf einmal?
+- [ ] Weiterhin offen aus A0–A4: **Repo pushen**, Pages auf „GitHub Actions" stellen, **PWA installieren**, **eine Runde zu viert spielen**, Referenzgerät-Messung, Video `docs/screens/m4-hits.mp4`.
+
 
 ## Audit A4 — 2026-09-05
 

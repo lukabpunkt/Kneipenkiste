@@ -555,6 +555,25 @@ test.describe('Modus-Kombinationen (Audit A5)', () => {
     ).toBeVisible();
   });
 
+  test('haelt auch im Nachtgraeber-Modus die Draw-Batches bei hoechstens drei', async ({
+    page,
+  }) => {
+    /*
+     * Der Nachtmodus legt eine dunkle Scheibe und zwei additiv gemischte Laternen ueber
+     * das Feld. Beides kann einen zusaetzlichen Batch kosten — und drei ist die Grenze
+     * aus Audit A2. Deshalb wird hier nachgemessen statt gehofft.
+     */
+    await openLobby(page, { players: 8, seed: 37, modes: ['nightDigger'] });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await tapPass(page);
+    await waitForBoard(page);
+    await page.waitForTimeout(600);
+
+    const draws = await drawCalls(page);
+    expect(draws).toBeGreaterThan(0);
+    expect(draws).toBeLessThanOrEqual(3);
+  });
+
   test('spielt Nachtgraeber zusammen mit Zwei Kisten', async ({ page }) => {
     /*
      * Der Konflikt: Nachtgraeber nimmt die Temperatur-Hinweise weg, Zwei Kisten macht

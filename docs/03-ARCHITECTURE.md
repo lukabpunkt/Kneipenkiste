@@ -59,6 +59,8 @@ Sprengmeister/
 │  │     ├─ hit/ClassicLaunch.ts, SootFace.ts, HelmetRocket.ts, ShovelPretzel.ts, TreeLanding.ts, CraterHop.ts, ChainDance.ts, DudThenBoom.ts
 │  │     ├─ dud/Pfff.ts
 │  │     └─ treasure/Fanfare.ts, TooHeavy.ts, Greed.ts
+│  ├─ ui/components/titleLoop.ts   # Title-Schleife als DOM (ADR-19)
+│  ├─ ui/share.ts                 # Web Share + Zwischenablage, ohne Netzwerk
 │  ├─ audio/ · i18n/ · styles/
 ├─ tests/
 │  ├─ unit/board.test.ts, payout.test.ts, modes.test.ts, turn.test.ts, fsm.test.ts, sequences.test.ts, audio.test.ts, publicView.test.ts
