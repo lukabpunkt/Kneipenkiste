@@ -7,6 +7,8 @@ Alle nennenswerten Änderungen an **Der Zoll**. Format nach
 ## [Unveröffentlicht]
 
 ### Hinzugefügt
+- `docs/screens/m6-scan.gif` im README — der Röntgen-Moment als Schleife: Scan, Alarm,
+  Urteil. Damit ist Roadmap-Punkt „README mit GIF" erledigt
 - `docs/screens/m6-scanline.png` — der Röntgen-Scan in sechs Einzelbildern von 110 bis
   1100 ms. Er schließt den seit M4 offenen Video-Punkt aus Audit A4: Playwrights
   Videoaufnahme lässt den PIXI-Canvas weiß, Screenshots erfassen ihn

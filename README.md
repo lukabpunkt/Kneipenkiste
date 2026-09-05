@@ -12,11 +12,16 @@ Menschen (`docs/PLAYTEST-01.md`) und der Balancing-Pass danach.
 | | |
 |---|---|
 | Lighthouse Mobile | Performance **99** · Accessibility **100** · Best Practices **100** |
-| Bundle | 251 KB gzip gesamt, **30 KB** Einstieg (PIXI und GSAP laden erst mit der Halle) |
+| Bundle | 266 KB gzip gesamt, **34 KB** Einstieg (PIXI und GSAP laden erst mit der Halle) |
 | Rendering | p50 **16,7 ms**, 3 Draw-Calls bei 8 Spielern |
-| Tests | 269 Unit · 40 E2E auf iPhone 12 und Pixel 5 |
+| Tests | 269 Unit · 38 E2E (47 Läufe; der Spielablauf auf iPhone 12 **und** Pixel 5) |
+| Offline | Läuft ohne Netz — 51 Dateien im Precache, im E2E im Flugmodus geprüft |
 
 ## So sieht es aus
+
+<p align="center"><img src="docs/screens/m6-scan.gif" alt="Ein Koffer im Röntgengerät: der Scan, der Alarm, das Urteil" width="333"></p>
+
+Ein Koffer geht durchs Röntgen. Fünf Gartenzwerge — die Halle wird rot, Blue trinkt zehn.
 
 | | |
 |---|---|

@@ -295,6 +295,8 @@ in [`PLAYTEST-01.md`](PLAYTEST-01.md) und wartet auf Luka.
 
 **Offene SOLL-Follow-ups:** Balancing-Pass nach dem Playtest (nur `rules.ts`, mit ADR).
 
+**Roadmap M6 Punkt 3 vollständig:** Gerätematrix (`DEVICES.md`) · PWA-Feinschliff (ADR-25) · README mit GIF (`m6-scan.gif`) · CHANGELOG · Lizenz (MIT) · Deploy (live) · Tag (`v0.6.0`). Die Punkte 1 und 2 — Top-5-Findings und Balancing-Pass — hängen am Playtest und an sonst nichts.
+
 Hochsaison ist zur Hälfte erledigt: Der **Text** sagt jetzt, was der Modus tut (kaum mehr kommt durch, doppelt so viel wird erwischt und getrunken). Ob die **Regel** bleibt, entscheidet der Playtest — eine Balancing-Änderung vorher wäre geraten.
 
 ### Nach A6 nachgezogen (auf Zuruf von Luka)
