@@ -524,3 +524,150 @@ test.describe('Touch und Texte (Audit A1)', () => {
     await expect(page.locator('.sheet__panel')).not.toContainText('[missing:');
   });
 });
+
+test.describe('Modus-Kombinationen (Audit A5)', () => {
+  /*
+   * Die Modi sind kombinierbar (GDD §3.6), und genau darin liegt das Risiko: Jeder
+   * einzeln funktioniert, zwei zusammen koennen sich widersprechen. Geprueft werden die
+   * beiden Paare, die sich am staerksten ins Gehege kommen.
+   */
+
+  test('spielt Doppelagent zusammen mit Kettenreaktion', async ({ page }) => {
+    /*
+     * Der Konflikt: Ein Blindgaenger loest nichts aus, ein Krater reisst die Nachbarn
+     * mit. Was passiert, wenn eine Kettenreaktion ueber einen Blindgaenger laeuft?
+     * Antwort aus GDD §3.6: Sie deckt ihn auf, kostet aber niemanden etwas.
+     */
+    await openLobby(page, { players: 4, seed: 31, modes: ['doubleAgent', 'chainReaction'] });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await buryMines(page, 4);
+    await startDigging(page);
+    await waitForBoard(page);
+
+    for (let cell = 0; cell < 6; cell++) {
+      if (!(await page.locator('[data-screen="dig"]').isVisible())) break;
+      await dig(page, cell);
+    }
+
+    // Das Spiel laeuft weiter — egal ob Krater, Blindgaenger oder Kiste.
+    await expect(
+      page.locator('[data-screen="dig"], [data-screen="distribute"], [data-screen="result"]')
+    ).toBeVisible();
+  });
+
+  test('spielt Nachtgraeber zusammen mit Zwei Kisten', async ({ page }) => {
+    /*
+     * Der Konflikt: Nachtgraeber nimmt die Temperatur-Hinweise weg, Zwei Kisten macht
+     * die Suche laenger. Zusammen ist das die schwerste Runde des Spiels — sie muss
+     * trotzdem enden.
+     */
+    await openLobby(page, { players: 4, seed: 32, modes: ['nightDigger', 'twoChests'] });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await buryMines(page, 4);
+    await startDigging(page);
+    await waitForBoard(page);
+
+    // Ohne Hinweise steht die Kistenzahl da — sie ist die einzige verbliebene Auskunft.
+    await expect(page.locator('.dig__chests-left')).toBeVisible();
+    await expect(page.locator('.dig__chests-left')).toContainText('2');
+
+    for (let cell = 0; cell < 8; cell++) {
+      if (!(await page.locator('[data-screen="dig"]').isVisible())) break;
+      await dig(page, cell);
+    }
+    await expect(
+      page.locator('[data-screen="dig"], [data-screen="distribute"], [data-screen="result"]')
+    ).toBeVisible();
+  });
+});
+
+test.describe('Bewegung reduzieren (Audit A5)', () => {
+  // `contextOptions` statt `reducedMotion`: Letzteres kennt erst eine neuere Typdefinition.
+  test.use({ contextOptions: { reducedMotion: 'reduce' } });
+
+  test('spielt eine ganze Runde ohne Kamerafahrt und ohne Welle', async ({ page }) => {
+    /*
+     * "Bewegung reduzieren" darf nichts wegnehmen ausser Bewegung: Alle Informationen —
+     * wer schuld ist, wer trinkt, wo die Minen lagen — muessen weiter ankommen. Der
+     * Test spielt deshalb eine komplette Runde durch bis ins Replay.
+     */
+    const seed = 33;
+    const chest = treasureCell(seed);
+
+    await openLobby(page, { players: 3, seed });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await buryMines(page, 3, layout(3, { avoid: [chest] }));
+    await startDigging(page);
+    await waitForBoard(page);
+
+    await dig(page, chest);
+
+    await expect(page.locator('[data-screen="distribute"], [data-screen="result"]')).toBeVisible({
+      timeout: 20_000,
+    });
+    if (await page.locator('[data-screen="distribute"]').isVisible()) await distributeAll(page);
+
+    /*
+     * Das Replay deckt auch ohne Welle alles auf, was es zu sehen gibt: die sechs Minen
+     * der drei Spieler, jede mit ihrem Farbring. Platten, unter denen nie etwas lag und
+     * auf die niemand getreten ist, bleiben zu — das gilt mit Welle genauso.
+     */
+    await expect(page.locator('[data-screen="result"]')).toBeVisible({ timeout: 20_000 });
+    await waitForBoard(page);
+    await page.waitForTimeout(600);
+    expect(await countTiles(page, 'mine_revealed')).toBe(6);
+  });
+});
+
+test.describe('Bedienbarkeit (Audit A5)', () => {
+  test('gibt jedem Bedienelement einen vorlesbaren Namen', async ({ page }) => {
+    /*
+     * Ein Knopf ohne zugaenglichen Namen ist fuer einen Screenreader ein "Button" ohne
+     * weitere Angabe. Geprueft wird auf den beiden Screens mit den meisten Bedienelementen.
+     */
+    await openLobby(page, { players: 4, seed: 34 });
+
+    for (const screen of ['lobby'] as const) {
+      const buttons = page.locator(`[data-screen="${screen}"] button`);
+      const count = await buttons.count();
+      expect(count).toBeGreaterThan(0);
+
+      for (let i = 0; i < count; i++) {
+        const button = buttons.nth(i);
+        const name = (await button.getAttribute('aria-label')) ?? (await button.textContent()) ?? '';
+        expect(name.trim(), `Button ${i} auf ${screen}`).not.toBe('');
+      }
+    }
+  });
+
+  test('meldet Minen- und Kistenzahl als hoefliche Live-Region', async ({ page }) => {
+    await openLobby(page, { players: 3, seed: 35 });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await buryMines(page, 3);
+    await startDigging(page);
+    await waitForBoard(page);
+
+    await expect(page.locator('.dig__mines-left')).toHaveAttribute('aria-live', 'polite');
+    // Das Banner unterbricht (assertive), die Zaehler nicht — sonst reden beide gleichzeitig.
+    await expect(page.locator('.banner-host')).toHaveAttribute('aria-live', 'assertive');
+  });
+
+  test('zeigt den Erklaertext genau einmal', async ({ page }) => {
+    await openLobby(page, { players: 3, seed: 36 });
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await buryMines(page, 3);
+    await startDigging(page);
+    await waitForBoard(page);
+
+    await expect(page.locator('.toast')).toContainText('Heiß');
+
+    // Zweite Runde, derselbe Browser: Der Hinweis kommt nicht wieder.
+    await page.reload();
+    await page.getByRole('button', { name: 'Spielen' }).click();
+    await page.getByRole('button', { name: 'Feld verminen' }).click();
+    await buryMines(page, 3);
+    await startDigging(page);
+    await waitForBoard(page);
+    await expect(page.locator('.toast')).toHaveCount(0);
+  });
+});

@@ -29,6 +29,8 @@ import { showToast } from '@/ui/components/toast';
 import { openRulesSheet } from '@/ui/screens/RulesSheet';
 import { openSettingsSheet } from '@/ui/screens/SettingsSheet';
 import type { ScreenFactory } from '@/ui/router';
+import { prefersReducedMotion, safeAnimate } from '@/ui/animate';
+import { UI_TIMING } from '@/config/theme';
 
 export const createLobbyScreen: ScreenFactory = ({ fsm, session, router }) => {
   const el = document.createElement('section');
@@ -88,12 +90,37 @@ export const createLobbyScreen: ScreenFactory = ({ fsm, session, router }) => {
 
   /* ---------------------------------------------------------------- */
 
+  /** Nur der erste Aufbau laeuft animiert herein. */
+  let playersRendered = false;
+
   function renderPlayers(): void {
+    /*
+     * Beim ersten Aufbau laufen die Zeilen versetzt herein — danach nicht mehr. Ein
+     * Umbenennen oder ein neuer Spieler zeichnet die Liste neu, und wenn dabei jedes Mal
+     * alles wieder einfliegt, wirkt die Lobby unruhig statt lebendig.
+     */
+    const animate = !playersRendered && !prefersReducedMotion();
+    playersRendered = true;
     playerList.replaceChildren();
 
-    for (const player of session.state.players) {
+    session.state.players.forEach((player, index) => {
       const row = document.createElement('li');
       row.className = 'player-row';
+      if (animate) {
+        void safeAnimate(
+          row,
+          [
+            { opacity: 0, transform: 'translateY(10px)' },
+            { opacity: 1, transform: 'none' },
+          ],
+          {
+            duration: UI_TIMING.base,
+            delay: index * UI_TIMING.staggerMs,
+            easing: 'ease-out',
+            fill: 'backwards',
+          }
+        );
+      }
 
       row.append(createPlayerBadge({ colorId: player.colorId, size: 'md' }));
 
@@ -120,7 +147,7 @@ export const createLobbyScreen: ScreenFactory = ({ fsm, session, router }) => {
 
       row.append(input, remove);
       playerList.append(row);
-    }
+    });
 
     if (session.state.players.length < MAX_PLAYERS) {
       const add = document.createElement('li');

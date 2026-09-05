@@ -12,6 +12,7 @@
 
 import { hex, MOTION, UI_COLORS } from '@/config/theme';
 import type { Fsm } from '@/core/fsm';
+import { t } from '@/core/i18n';
 import type { SessionStore } from '@/core/session';
 import { prefersReducedMotion, safeAnimate } from '@/ui/animate';
 
@@ -87,6 +88,33 @@ function focusScreen(el: HTMLElement): void {
   }
 }
 
+/**
+ * Die Ersatzseite, wenn eine Screen-Fabrik wirft.
+ *
+ * Bewusst ohne Abhaengigkeiten: kein Button-Bauteil, kein Sheet, keine Animation. Wenn
+ * hier etwas kaputt ist, kann es genauso gut das Bauteil sein.
+ */
+function createErrorScreen(): ScreenInstance {
+  const el = document.createElement('section');
+  el.className = 'screen screen--error';
+  el.setAttribute('role', 'alert');
+
+  const title = document.createElement('h1');
+  title.textContent = t('error.title');
+
+  const body = document.createElement('p');
+  body.textContent = t('error.body');
+
+  const reload = document.createElement('button');
+  reload.type = 'button';
+  reload.className = 'btn btn--primary';
+  reload.textContent = t('error.reload');
+  reload.addEventListener('click', () => globalThis.location.reload());
+
+  el.append(title, body, reload);
+  return { el };
+}
+
 /** Leitet die Richtung aus der Position in `SCREEN_ORDER` ab. */
 function directionBetween(from: ScreenId | null, to: ScreenId): 'forward' | 'back' {
   if (from === null) return 'forward';
@@ -109,7 +137,23 @@ export function createRouter(options: RouterOptions): Router {
     instance?.destroy?.();
     host.replaceChildren();
 
-    instance = factory({ ...options.context, router });
+    /*
+     * **Ein kaputter Screen darf nicht die Runde mitnehmen** (Roadmap M5.5).
+     *
+     * Wirft eine Screen-Fabrik, stand hier vorher ein weisses Bild: Der alte Screen war
+     * schon abgeraeumt, der neue kam nie. Am Tisch heisst das, dass das Handy mitten in
+     * einer Runde nicht mehr reagiert und niemand weiss, ob die Runde verloren ist.
+     *
+     * Die Ersatzseite sagt beides: was passiert ist, und dass die Session gespeichert
+     * ist (`saveSession` laeuft bei jeder Aenderung). Ein Neuladen holt sie zurueck.
+     */
+    try {
+      instance = factory({ ...options.context, router });
+    } catch (error) {
+      console.error(`Screen "${id}" konnte nicht gebaut werden.`, error);
+      instance = createErrorScreen();
+    }
+
     instance.el.dataset['screen'] = id;
     host.append(instance.el);
     current = id;

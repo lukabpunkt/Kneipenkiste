@@ -184,5 +184,10 @@
     "plateCrater": "Platte {index}, Krater von {names}",
     "plateTreasure": "Platte {index}, Kiste",
     "plateMine": "Platte {index}, Mine von {name}"
+  },
+  "error": {
+    "title": "Da ist etwas hochgegangen",
+    "body": "Der Screen konnte nicht geladen werden. Die Runde ist gespeichert.",
+    "reload": "Neu laden"
   }
 }

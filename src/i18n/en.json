@@ -184,5 +184,10 @@
     "plateCrater": "Plate {index}, crater from {names}",
     "plateTreasure": "Plate {index}, crate",
     "plateMine": "Plate {index}, mine from {name}"
+  },
+  "error": {
+    "title": "Something blew up",
+    "body": "This screen failed to load. Your session is saved.",
+    "reload": "Reload"
   }
 }

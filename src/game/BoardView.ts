@@ -18,6 +18,7 @@ import type { BoardSize } from '@/config/rules';
 import { createSeededRng, type SeededRng } from '@/core/rng';
 import type { Cell, PlaceView, PlayerId, PublicView, ReplayView } from '@/core/types';
 import { chebyshev } from '@/core/board';
+import { play } from '@/audio/AudioManager';
 import { prefersReducedMotion } from '@/ui/animate';
 import { Field } from './Field';
 import { Tile } from './Tile';
@@ -291,6 +292,12 @@ export class BoardView {
     const timeline = gsap.timeline();
     const origin = view.cells.find((cell) => cell.treasure)?.cell ?? 0;
     const instant = prefersReducedMotion();
+    /**
+     * Die Zeitpunkte, an denen ein Ring aufklappt — **einer je Ring**, nicht je Platte.
+     * Ein `plate_flip` pro Zelle waeren bei 6 x 6 sechsunddreissig Toene in zwei
+     * Sekunden; ein Ton pro Ring klingt wie eine Welle, die ueber das Feld laeuft.
+     */
+    const rings = new Set<number>();
 
     for (const cell of view.cells) {
       const tile = this.tiles[cell.cell];
@@ -320,6 +327,7 @@ export class BoardView {
 
       const ring = chebyshev(cell.cell, origin, this.size);
       const at = Math.min((ring * REPLAY.ringStepMs) / 1000, REPLAY.maxTotalMs / 1000);
+      rings.add(at);
       timeline.add(paint, at);
       timeline.fromTo(
         tile.view.scale,
@@ -327,6 +335,17 @@ export class BoardView {
         { x: 1, y: 1, duration: REPLAY.plateFlipMs / 1000, ease: 'back.out(2)' },
         at
       );
+    }
+
+    /*
+     * Der Ton wird in **einem** Callback auf die Audio-Uhr vorgeplant (ADR-13), nicht
+     * Ring fuer Ring aus der Timeline getriggert. Bei Low-FPS bleibt die Welle dadurch
+     * im Takt, auch wenn das Bild ruckelt.
+     */
+    if (rings.size > 0) {
+      timeline.add(() => {
+        for (const at of rings) play('plate_flip', at, -6 + at * 8);
+      }, 0);
     }
 
     return timeline;
