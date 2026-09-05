@@ -1,13 +1,16 @@
 /**
  * Title (GDD §5, Screen 0).
  *
- * Logo, ein Satz Erklaerung, drei Knoepfe. Der grabende Digger, der regelmaessig aus
- * dem Bild fliegt, kommt in M5 — hier steht bis dahin die Bombe als Standbild.
+ * Logo, ein Satz Erklaerung, drei Knoepfe — und der grabende Digger, der regelmaessig
+ * aus dem Bild fliegt (`titleLoop.ts`). Die Schleife ist DOM, nicht PIXI: Der Titel ist
+ * der erste Screen, und ein Renderer im Einstiegs-Chunk kostet Startzeit fuer etwas,
+ * das nur nett aussieht (Architektur §1).
  */
 
 import { STORAGE_KEY_DISCLAIMER } from '@/config/rules';
 import { t } from '@/core/i18n';
 import { createButton } from '@/ui/components/button';
+import { createTitleLoop } from '@/ui/components/titleLoop';
 import { openRulesSheet } from '@/ui/screens/RulesSheet';
 import { openSettingsSheet } from '@/ui/screens/SettingsSheet';
 import type { ScreenFactory } from '@/ui/router';
@@ -24,10 +27,7 @@ export const createTitleScreen: ScreenFactory = ({ fsm, router, session }) => {
    */
   logo.textContent = t('app.title');
 
-  const bomb = document.createElement('div');
-  bomb.className = 'title__bomb';
-  bomb.setAttribute('aria-hidden', 'true');
-  bomb.textContent = '💣';
+  const loop = createTitleLoop();
 
   const tagline = document.createElement('p');
   tagline.className = 'title__tagline';
@@ -61,7 +61,7 @@ export const createTitleScreen: ScreenFactory = ({ fsm, router, session }) => {
   });
 
   actions.append(play, rules, settings);
-  el.append(bomb, logo, tagline, actions);
+  el.append(loop.el, logo, tagline, actions);
 
   // Einmaliger 18+-Hinweis (Roadmap M1.2). Er steht als Fussnote, nicht als Dialog —
   // ein Trinkspiel, das mit einem Modal beginnt, ist kein Zero-Friction-Spiel.
@@ -83,5 +83,17 @@ export const createTitleScreen: ScreenFactory = ({ fsm, router, session }) => {
     }
   }
 
-  return { el };
+  return {
+    el,
+    activate() {
+      loop.start();
+    },
+    /*
+     * Anhalten beim Verlassen: Sonst tickt der Timer weiter, solange die App laeuft —
+     * Audit A5 prueft zehn Minuten Titel ohne Leck.
+     */
+    destroy() {
+      loop.stop();
+    },
+  };
 };

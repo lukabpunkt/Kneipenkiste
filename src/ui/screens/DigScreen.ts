@@ -17,6 +17,7 @@ import { t } from '@/core/i18n';
 import { createDevPanel, devMode, type DevPanel } from '@/ui/components/devPanel';
 import { seedActive } from '@/ui/devSeed';
 import { createBannerHost, type KillLine } from '@/ui/components/drinkBanner';
+import { STORAGE_KEY_ONBOARDING } from '@/config/rules';
 import { tickTurn } from '@/audio/AudioManager';
 import { createStageHost } from '@/ui/components/stageHost';
 import { createTimerRing, type TimerRing } from '@/ui/components/timerRing';
@@ -52,8 +53,25 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
 
   const minesLeft = document.createElement('p');
   minesLeft.className = 'dig__mines-left';
+  /*
+   * Beide Zahlen sind hoefliche Live-Regionen: Sie aendern sich nach jeder Grabung, und
+   * ein Screenreader soll sie nachreichen, ohne das Banner zu unterbrechen (Audit A5).
+   */
+  minesLeft.setAttribute('aria-live', 'polite');
 
-  footer.append(minesLeft, tokenStack.el);
+  /**
+   * Zwei-Kisten-Anzeige (GDD §3.6, Roadmap M5.2).
+   *
+   * Nur im Modus "Zwei Kisten" — sonst ist die Zahl immer 1 und damit keine Information,
+   * sondern Rauschen. Sobald die erste gefunden ist, sagt sie das Entscheidende: Die
+   * Runde laeuft weiter, und die zweite liegt noch irgendwo.
+   */
+  const chestsLeft = document.createElement('p');
+  chestsLeft.className = 'dig__chests-left';
+  chestsLeft.setAttribute('aria-live', 'polite');
+  chestsLeft.hidden = !fsm.context.settings.modes.twoChests;
+
+  footer.append(minesLeft, chestsLeft, tokenStack.el);
   el.append(turnBanner.el, bannerHost.el, stage.el, footer);
 
   if (seedActive()) {
@@ -87,6 +105,7 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
     const view = fsm.view();
     stage.board?.renderPublic(view);
     minesLeft.textContent = t('dig.minesRemaining', { count: view.minesRemaining });
+    chestsLeft.textContent = t('dig.chestsRemaining', { count: view.chestsRemaining });
     tokenStack.render(tokens);
   }
 
@@ -108,6 +127,28 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
     });
     turnBanner.setTimer(ring.el);
     ring.start();
+  }
+
+  /**
+   * Der einzige Erklaertext des Spiels (Roadmap M5.4), und er erscheint genau einmal.
+   *
+   * "Heiss = Kiste ist direkt daneben" ist die eine Regel, die man nicht errät — alles
+   * andere zeigt das Feld von selbst. Ein Tutorial waere hier falsch: Das Spiel wird am
+   * Tisch von jemandem erklaert, der es kennt, und wer stattdessen fuenf Dialoge
+   * wegtippen muss, hat schon verloren (Design-Prioritaet 5).
+   *
+   * Im Nachtgraeber-Modus faellt der Hinweis weg — dort gibt es keine Hinweise, und ein
+   * Tipp zu etwas, das nicht existiert, ist schlimmer als keiner.
+   */
+  function showOnboardingOnce(): void {
+    if (fsm.context.settings.modes.nightDigger) return;
+    try {
+      if (globalThis.localStorage?.getItem(STORAGE_KEY_ONBOARDING) === '1') return;
+      globalThis.localStorage?.setItem(STORAGE_KEY_ONBOARDING, '1');
+    } catch {
+      // Private Mode: Dann erscheint der Hinweis jedes Mal. Harmlos.
+    }
+    showToast(t('dig.tooltip'), { variant: 'info', durationMs: 5000 });
   }
 
   /**
@@ -135,7 +176,9 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
     // Der Director sperrt das Feld selbst und gibt es danach wieder frei.
     await board.play(result, fsm.view());
 
-    minesLeft.textContent = t('dig.minesRemaining', { count: fsm.view().minesRemaining });
+    const after = fsm.view();
+    minesLeft.textContent = t('dig.minesRemaining', { count: after.minesRemaining });
+    chestsLeft.textContent = t('dig.chestsRemaining', { count: after.chestsRemaining });
 
     const roundOver = result.roundOver;
     fsm.send({ type: 'digShown' });
@@ -240,6 +283,7 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
     activate() {
       void acquireWakeLock();
       renderTurn();
+      showOnboardingOnce();
 
       if (devMode()) {
         dev = createDevPanel(fsm, () => stage.board);

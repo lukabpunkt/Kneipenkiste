@@ -101,6 +101,8 @@ export class BoardStage {
       ...(options.lowEffects === undefined ? {} : { lowEffects: options.lowEffects }),
     });
     this.board.field.boardLayer.addChild(this.fx.view);
+    // Nachtgraeber: dunkles Feld, zwei Laternen (GDD §3.6, Roadmap M5.2).
+    this.board.field.setNight(options.modes.nightDigger);
 
     this.camera = new Camera(this.cameraLayer);
     /*

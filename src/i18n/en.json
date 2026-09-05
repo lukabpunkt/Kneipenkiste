@@ -99,7 +99,8 @@
     "coward": "Coward…",
     "tooltip": "Hot = the crate is right next door.",
     "minesRemaining": "{count} still buried",
-    "timeUp": "Time's up — a random plate was dug."
+    "timeUp": "Time's up — a random plate was dug.",
+    "chestsRemaining": "{count} chests left"
   },
   "hint": {
     "hot": "Hot",
@@ -126,7 +127,13 @@
     "nextRound": "Next round",
     "changePlayers": "Change players",
     "changeModes": "Change modes",
-    "share": "{layer} blew {victim} up {count}× 💣"
+    "share": "{layer} blew {victim} up {count}× 💣",
+    "masterBonus": "DEMOLITION MASTER: {name}",
+    "coward": "Coward: {name}",
+    "deadliest": "Deadliest layer",
+    "shareButton": "Share",
+    "shareCopied": "Copied to clipboard",
+    "sips": "Sips"
   },
   "stats": {
     "sips": "Sips taken",

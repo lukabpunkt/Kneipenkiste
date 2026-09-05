@@ -99,7 +99,8 @@
     "coward": "Feigling…",
     "tooltip": "Heiß = Kiste ist direkt daneben.",
     "minesRemaining": "Noch {count} im Boden",
-    "timeUp": "Zeit um — es wurde zufällig gegraben."
+    "timeUp": "Zeit um — es wurde zufällig gegraben.",
+    "chestsRemaining": "Noch {count} Kisten"
   },
   "hint": {
     "hot": "Heiß",
@@ -126,7 +127,13 @@
     "nextRound": "Nächste Runde",
     "changePlayers": "Spieler ändern",
     "changeModes": "Modus ändern",
-    "share": "{layer} hat {victim} {count}× in die Luft gejagt 💣"
+    "share": "{layer} hat {victim} {count}× in die Luft gejagt 💣",
+    "masterBonus": "SPRENGMEISTER: {name}",
+    "coward": "Feigling: {name}",
+    "deadliest": "Gefährlichster Leger",
+    "shareButton": "Teilen",
+    "shareCopied": "In die Zwischenablage kopiert",
+    "sips": "Schlucke"
   },
   "stats": {
     "sips": "Getrunken",

@@ -40,6 +40,17 @@ export class Camera {
    */
   zoomTo(x: number, y: number, scale = STAGE.plateZoom): gsap.core.Timeline {
     /*
+     * Bei "Bewegung reduzieren" bleibt die Kamera stehen. Ein Zoom bewegt das **ganze
+     * Bild** und ist damit genau die Art Bewegung, die diese Einstellung meint — die
+     * Information ("welche Platte") liegt ohnehin in der Platte selbst, die sich
+     * gleichzeitig oeffnet. Die Timeline behaelt ihre Laenge, damit der Rest der
+     * Choreografie unveraendert bleibt (Audit A5).
+     */
+    if (prefersReducedMotion()) {
+      return gsap.timeline().to({}, { duration: CAMERA.zoomInMs / 1000 });
+    }
+
+    /*
      * Bei starkem Zoom wandert die Platte an den Rand des Sichtfelds. Deshalb nur zur
      * Haelfte auf sie zufahren: Das Feld drumherum bleibt sichtbar, und man sieht
      * weiterhin, wo die Platte im Feld liegt.
@@ -61,6 +72,7 @@ export class Camera {
   /** Zurueck in die Ruhelage. */
   reset(): gsap.core.Timeline {
     const duration = CAMERA.zoomOutMs / 1000;
+    if (prefersReducedMotion()) return gsap.timeline().to({}, { duration });
 
     return gsap
       .timeline()

@@ -35,6 +35,13 @@ export class Field {
   readonly view = new Container();
   /** Hier haengt die `BoardView` ihre Platten ein — zwischen Deko und Diggers. */
   readonly boardLayer = new Container();
+  /**
+   * Nachtgraeber (GDD §3.6): Ueber allem liegt eine dunkle Scheibe, und zwei Laternen
+   * schneiden warme Loecher hinein. Beide haengen von Anfang an im Feld und sind nur
+   * unsichtbar — im Spiel wird der Modus nie mitten in der Runde umgelegt, aber ein
+   * Layer, der erst beim Einschalten entsteht, kostet genau dann Zeit.
+   */
+  private readonly nightLayer = new Container();
   /** Weltposition der Baumkrone — Ziel von `hit_tree_landing`. */
   readonly treeTop: { x: number; y: number } = { x: 0, y: 0 };
   private tree: Sprite | undefined;
@@ -121,6 +128,41 @@ export class Field {
     }
 
     this.view.addChild(this.boardLayer);
+
+    /* --- Nacht: dunkle Scheibe plus zwei Laternen -------------------- */
+    const dusk = new Graphics().rect(0, 0, width, height).fill(UI_COLORS.bgDeep);
+    dusk.alpha = STAGE.nightDim;
+    this.nightLayer.addChild(dusk);
+
+    /*
+     * Die Laternen sind derselbe Glow wie unter der Kiste — gleiche Textur, gleicher
+     * Atlas, deshalb kein zusaetzlicher Draw-Batch fuer das Bild selbst. Additiv
+     * gemischt leuchten sie, statt die Wiese zu ueberkleben.
+     */
+    for (const x of [0.18, 0.82]) {
+      const lantern = new Sprite(sheet.textures['plates/treasure_glow']);
+      lantern.anchor.set(0.5);
+      lantern.tint = UI_COLORS.hazard;
+      lantern.alpha = 0.5;
+      lantern.blendMode = 'add';
+      lantern.scale.set((width * 0.5) / lantern.texture.width);
+      lantern.position.set(width * x, fieldBottom - boardExtent * 0.5);
+      this.nightLayer.addChild(lantern);
+    }
+
+    this.nightLayer.visible = false;
+    this.view.addChild(this.nightLayer);
+  }
+
+  /**
+   * Nachtgraeber an oder aus (GDD §3.6).
+   *
+   * Der Modus nimmt die Temperatur-Hinweise weg — das entscheidet `core/board.ts`. Hier
+   * passiert nur das, was man sieht: Ohne die Hinweise ist das Feld dunkler, und die
+   * beiden Laternen sind das Einzige, was noch Orientierung gibt.
+   */
+  setNight(on: boolean): void {
+    this.nightLayer.visible = on;
   }
 
   /**

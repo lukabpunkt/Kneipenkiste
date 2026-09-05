@@ -921,9 +921,101 @@
   text-align: center;
 }
 
-.title__bomb {
-  font-size: 72px;
+/* ==================================================================
+ * Title-Loop (Roadmap M5.1)
+ *
+ * Vier Phasen an einem `data-phase`-Attribut: graben, Knall, weg, zurueck. Die
+ * Uebergaenge macht CSS, den Takt gibt `titleLoop.ts` — so laeuft die Schleife ohne
+ * PixiJS und ohne einen einzigen Frame-Callback.
+ * ================================================================== */
+
+.title-loop {
+  position: relative;
+  width: 160px;
+  height: 96px;
+}
+
+.title-loop > span {
+  position: absolute;
+  bottom: 0;
+  font-size: 46px;
   line-height: 1;
+  transition:
+    transform 420ms cubic-bezier(0.3, 0.9, 0.4, 1.2),
+    opacity 220ms ease;
+}
+
+.title-loop__digger {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.title-loop__mine {
+  left: 50%;
+  font-size: 30px;
+  opacity: 0;
+  transform: translate(-50%, 6px) scale(0.7);
+}
+
+.title-loop__puff {
+  left: 50%;
+  font-size: 58px;
+  opacity: 0;
+  transform: translate(-50%, -6px) scale(0.4);
+}
+
+/* Graben: leichtes Wippen, die Mine schaut aus der Erde. */
+.title-loop[data-phase='dig'] .title-loop__digger {
+  animation: title-dig 700ms ease-in-out infinite;
+}
+
+.title-loop[data-phase='dig'] .title-loop__mine {
+  opacity: 0.9;
+  transform: translate(-50%, 4px) scale(0.9);
+}
+
+/* Knall: der Digger schnellt hoch, die Wolke bleibt stehen. */
+.title-loop[data-phase='boom'] .title-loop__digger {
+  transform: translate(-50%, -70px) rotate(35deg);
+}
+
+.title-loop[data-phase='boom'] .title-loop__puff,
+.title-loop[data-phase='gone'] .title-loop__puff {
+  opacity: 1;
+  transform: translate(-50%, -18px) scale(1);
+}
+
+/* Weg: nur noch Rauch — die Sekunde Stille, wie in `hit_classic_launch`. */
+.title-loop[data-phase='gone'] .title-loop__digger {
+  opacity: 0;
+  transform: translate(-50%, -190px) rotate(180deg);
+}
+
+/* Zurueck: er faellt herein und landet mit einem Ruck. */
+.title-loop[data-phase='back'] .title-loop__digger {
+  opacity: 1;
+  transform: translateX(-50%) rotate(-8deg);
+}
+
+@keyframes title-dig {
+  0%,
+  100% {
+    transform: translateX(-50%) rotate(-6deg);
+  }
+
+  50% {
+    transform: translate(-50%, 4px) rotate(6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title-loop > span {
+    transition: none;
+  }
+
+  .title-loop[data-phase='dig'] .title-loop__digger {
+    animation: none;
+  }
 }
 
 .title__logo {
@@ -1255,6 +1347,14 @@
   gap: 10px;
 }
 
+/* Zwei-Kisten-Anzeige: in Kistengold, damit sie sich von der Minenzahl abhebt. */
+.dig__chests-left {
+  margin: 0;
+  color: var(--treasure);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
 .dig__mines-left {
   margin: 0;
   color: rgb(255 248 231 / 55%);
@@ -1371,6 +1471,84 @@
   font-size: var(--fs-sm);
   font-weight: 700;
   gap: 8px;
+}
+
+.result__drinker-name {
+  min-width: 6ch;
+  flex: none;
+}
+
+/*
+ * Der Schluck-Balken. Die Breite steckt in `--score-fill` (gesetzt von `growBar`), die
+ * Farbe in `--bar-color` — so animiert der Balken ohne Layout-Rechnung, und die
+ * Spielerfarbe kommt aus dem Element statt aus acht CSS-Klassen.
+ */
+.result__bar {
+  overflow: hidden;
+  min-width: 0;
+  height: 10px;
+  flex: 1;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: rgb(255 248 231 / 12%);
+}
+
+.result__bar::after {
+  display: block;
+  width: var(--score-fill, 0%);
+  height: 100%;
+  background: var(--bar-color, var(--hazard));
+  content: '';
+  transition: width 520ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.result__drinker-sips {
+  min-width: 2ch;
+  flex: none;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Die Titel des Sprengmeister-Bonus. Sie stehen ueber den Zahlen, weil sie die einzige
+ * Zeile sind, die jemand vorliest — "SPRENGMEISTER: Rudi" ist eine Ansage, kein Wert.
+ */
+.result__titles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.result__title {
+  margin: 0;
+  padding: 4px 10px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  letter-spacing: 0.04em;
+}
+
+.result__title--master {
+  background: var(--hazard);
+  color: var(--ink);
+}
+
+.result__title--coward {
+  background: rgb(255 248 231 / 12%);
+  color: rgb(255 248 231 / 75%);
+}
+
+.result__title--deadliest {
+  background: var(--color-red);
+  color: var(--paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result__bar::after {
+    transition: none;
+  }
 }
 
 .result__actions {

@@ -253,6 +253,12 @@ export const STAGE = {
   blinkDurationMs: 120,
   /** Eine zufaellige verdeckte Platte wackelt in diesem Abstand — "da lebt was". */
   plateIdleWiggleMs: [6000, 10_000] as const,
+  /**
+   * Nachtgraeber (GDD §3.6): So dunkel wird die Wiese. Nicht dunkler — die Platten
+   * muessen tippbar bleiben, und ihre Kanten sind die einzige Orientierung, die der
+   * Modus noch laesst (Design-Prioritaet 4).
+   */
+  nightDim: 0.55,
 } as const;
 
 export const RENDER = {

@@ -9,12 +9,17 @@
  */
 
 import { t } from '@/core/i18n';
+import { colorById, hex, UI_TIMING } from '@/config/theme';
+import { cowards, masterBonuses } from '@/core/modes';
+import { countUp, growBar } from '@/ui/animate';
 import { totalSips } from '@/core/payout';
 import { deadliestLayer, mostBlasted, sessionStats } from '@/core/session';
 import { createPlayerBadge } from '@/ui/components/badge';
 import { createButton } from '@/ui/components/button';
 import { createStageHost } from '@/ui/components/stageHost';
 import { openSheet } from '@/ui/components/sheet';
+import { showToast } from '@/ui/components/toast';
+import { share, shareText } from '@/ui/share';
 import type { ScreenFactory } from '@/ui/router';
 import type { PlayerId } from '@/core/types';
 
@@ -23,6 +28,8 @@ export const createResultScreen: ScreenFactory = ({ fsm, session, router }) => {
   el.className = 'screen screen--result';
 
   const result = fsm.context.result;
+  /** Laufende Count-Ups — beim Verlassen abbrechen, sonst tickt ein toter Screen weiter. */
+  const stopCountUps: (() => void)[] = [];
   const playerById = (id: PlayerId) => fsm.context.players.find((p) => p.id === id);
   const nameOf = (id: PlayerId) => playerById(id)?.name;
 
@@ -57,21 +64,77 @@ export const createResultScreen: ScreenFactory = ({ fsm, session, router }) => {
     const list = document.createElement('ul');
     list.className = 'result__drinkers';
 
-    for (const [playerId, sips] of Object.entries(totalSips(result))) {
+    /*
+     * Die Zeilen sind nach Schlucken sortiert, und der laengste Balken ist der
+     * Spitzenreiter. Ein Balken sagt in einem Blick, was eine Zahlenkolonne erst nach
+     * dem Lesen sagt — und am Tisch schaut man hier hoechstens zwei Sekunden hin.
+     */
+    const sips = Object.entries(totalSips(result))
+      .filter(([, count]) => count > 0)
+      .sort(([, a], [, b]) => b - a);
+    const worst = sips[0]?.[1] ?? 0;
+
+    sips.forEach(([playerId, count], index) => {
       const player = playerById(playerId);
-      if (!player || sips === 0) continue;
+      if (!player) return;
 
       const row = document.createElement('li');
       row.className = 'result__drinker';
       row.append(createPlayerBadge({ colorId: player.colorId, size: 'sm' }));
 
-      const text = document.createElement('span');
-      text.textContent = `${player.name} — ${sips}`;
-      row.append(text);
+      const name = document.createElement('span');
+      name.className = 'result__drinker-name';
+      name.textContent = player.name;
+
+      const bar = document.createElement('span');
+      bar.className = 'result__bar';
+      bar.style.setProperty('--bar-color', hex(colorById(player.colorId).hex));
+
+      const value = document.createElement('span');
+      value.className = 'result__drinker-sips';
+
+      row.append(name, bar, value);
       list.append(row);
-    }
+
+      // Balken und Zahl laufen versetzt an — von oben nach unten, wie man liest.
+      const delay = index * UI_TIMING.staggerMs;
+      growBar(bar, worst === 0 ? 0 : Math.round((count / worst) * 100), delay);
+      stopCountUps.push(countUp(value, count, { delayMs: delay }));
+    });
 
     if (list.childElementCount > 0) drinkers.append(list);
+  }
+
+  /* --- Sprengmeister und Feigling (GDD §3.6) --------------------- */
+
+  /**
+   * Die beiden Titel des Sprengmeister-Bonus.
+   *
+   * Sie stehen **ueber** den Trinkern, nicht in der Statistik: Wer zwei Leute erwischt
+   * hat, soll das sofort sehen, und wer sich durch die eigene Runde geschlichen hat,
+   * auch. Ohne den Modus ist der Block leer und faellt weg.
+   */
+  const titles = document.createElement('div');
+  titles.className = 'result__titles';
+  if (result) {
+    const modes = fsm.context.settings.modes;
+    for (const [playerId] of Object.entries(masterBonuses(result.digs, modes))) {
+      const player = playerById(playerId);
+      if (!player) continue;
+      titles.append(titleChip(t('result.masterBonus', { name: player.name }), 'master'));
+    }
+    for (const playerId of cowards(result.digs, modes)) {
+      const player = playerById(playerId);
+      if (!player) continue;
+      titles.append(titleChip(t('result.coward', { name: player.name }), 'coward'));
+    }
+  }
+
+  /** Der gefaehrlichste Leger der ganzen Session — ein Abzeichen, keine Tabellenzeile. */
+  const deadliest = deadliestLayer(session.state);
+  if (deadliest) {
+    const player = playerById(deadliest);
+    if (player) titles.append(titleChip(`${t('result.deadliest')}: ${player.name}`, 'deadliest'));
   }
 
   const killFeed = document.createElement('section');
@@ -135,9 +198,37 @@ export const createResultScreen: ScreenFactory = ({ fsm, session, router }) => {
     })
   );
 
-  el.append(banner, stage.el, drinkers, killFeed, actions);
+  /*
+   * Der Teilen-Knopf erscheint nur, wenn es etwas zu erzaehlen gibt — hat niemand
+   * jemanden erwischt, waere der Satz leer und der Knopf eine Enttaeuschung.
+   */
+  const story = result ? shareText(result, (id) => nameOf(id)) : undefined;
+  if (story) {
+    actions.append(
+      createButton({
+        label: t('result.shareButton'),
+        variant: 'ghost',
+        onClick: () => {
+          void share(story).then((outcome) => {
+            if (outcome === 'copied') showToast(t('result.shareCopied'), { variant: 'info' });
+            else if (outcome === 'unavailable') showToast(story, { variant: 'info' });
+          });
+        },
+      })
+    );
+  }
+
+  el.append(banner, stage.el, titles, drinkers, killFeed, actions);
 
   /* ---------------------------------------------------------------- */
+
+  /** Ein Titel-Abzeichen. `kind` steuert nur die Farbe, nicht den Inhalt. */
+  function titleChip(text: string, kind: 'master' | 'coward' | 'deadliest'): HTMLElement {
+    const chip = document.createElement('p');
+    chip.className = `result__title result__title--${kind}`;
+    chip.textContent = text;
+    return chip;
+  }
 
   /** Session-Statistik (GDD §3.7) — aufklappbar, damit sie den Moment nicht zerredet. */
   function openStatsSheet(): void {
@@ -216,6 +307,7 @@ export const createResultScreen: ScreenFactory = ({ fsm, session, router }) => {
     },
 
     destroy() {
+      for (const stop of stopCountUps) stop();
       stage.unmount();
     },
   };

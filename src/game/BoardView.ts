@@ -15,7 +15,7 @@ import gsap from 'gsap';
 import { REPLAY } from '@/config/choreo';
 import { FIELD_LAYOUT, STAGE, type ColorId } from '@/config/theme';
 import type { BoardSize } from '@/config/rules';
-import { createSeededRng } from '@/core/rng';
+import { createSeededRng, type SeededRng } from '@/core/rng';
 import type { Cell, PlaceView, PlayerId, PublicView, ReplayView } from '@/core/types';
 import { chebyshev } from '@/core/board';
 import { prefersReducedMotion } from '@/ui/animate';
@@ -45,6 +45,9 @@ export class BoardView {
   private mode: BoardMode = 'idle';
   private isLocked = false;
   private pressedTile: Tile | undefined;
+  /** Der Timer, der ab und zu eine verdeckte Platte wackeln laesst. */
+  private wiggleTimer: ReturnType<typeof setTimeout> | undefined;
+  private readonly wiggleRng: SeededRng;
 
   /** Kantenlaenge des Plattenfeldes in Welteinheiten — die Kamera rechnet damit. */
   readonly extent: number;
@@ -59,6 +62,7 @@ export class BoardView {
 
     this.field = new Field({ sheet, playerCount, boardExtent: this.extent });
     this.view.addChild(this.field.view);
+    this.wiggleRng = createSeededRng(seed ^ 0x1d1e);
 
     // Horizontal zentriert, vertikal am oberen Rand — darunter stehen die Diggers (ADR-12).
     const originX = (STAGE.worldSize - this.extent) / 2 + layout.plate / 2;
@@ -148,6 +152,68 @@ export class BoardView {
   setMode(mode: BoardMode): void {
     this.mode = mode;
     this.releasePress();
+    /*
+     * Das Leben im Feld gehoert den Phasen, in denen jemand ueberlegt. Im Replay laufen
+     * ohnehin alle Platten auf, und eine wackelnde Platte mitten in der Aufloesung
+     * lenkt nur ab.
+     */
+    if (mode === 'place' || mode === 'dig') this.startIdleWiggle();
+    else this.stopIdleWiggle();
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Leben im Feld (Art Direction §4.1)                                */
+  /* ---------------------------------------------------------------- */
+
+  /**
+   * Alle paar Sekunden wackelt eine zufaellige verdeckte Platte — "da lebt was".
+   *
+   * Das ist kein Schmuck: Ein Feld aus 36 gleichen Platten sieht aus wie ein Bild.
+   * Sobald sich eine bewegt, sieht es aus wie Erde, unter der etwas liegt — und genau
+   * das soll man beim Tippen im Hinterkopf haben (Design-Prioritaet 1).
+   *
+   * Die Platte, die wackelt, wird **zufaellig** gewaehlt und verraet nichts: Der
+   * Generator haengt am Feld-Seed, nicht am Inhalt der Zelle (ADR-2).
+   */
+  private startIdleWiggle(): void {
+    this.stopIdleWiggle();
+    if (prefersReducedMotion()) return;
+
+    const [minMs, maxMs] = STAGE.plateIdleWiggleMs;
+    const next = (): void => {
+      this.wiggleTimer = globalThis.setTimeout(
+        () => {
+          this.wiggleOnce();
+          next();
+        },
+        this.wiggleRng.intBetween(minMs, maxMs)
+      );
+    };
+    next();
+  }
+
+  private stopIdleWiggle(): void {
+    if (this.wiggleTimer !== undefined) clearTimeout(this.wiggleTimer);
+    this.wiggleTimer = undefined;
+  }
+
+  private wiggleOnce(): void {
+    if (this.isLocked) return;
+    const covered = this.tiles.filter((tile) => tile.state === 'covered');
+    if (covered.length === 0) return;
+
+    const tile = this.wiggleRng.pick(covered);
+    // Winzig: 4 Grad in 160 ms. Wer hinsieht, merkt es; wer nicht, wird nicht gestoert.
+    gsap.to(tile.view, {
+      rotation: 0.07,
+      duration: 0.16,
+      yoyo: true,
+      repeat: 3,
+      ease: 'sine.inOut',
+      onComplete: () => {
+        tile.view.rotation = 0;
+      },
+    });
   }
 
   get currentMode(): BoardMode {
@@ -240,8 +306,15 @@ export class BoardView {
         if (owners.length > 0) tile.revealMine(owners, cell.neverTriggered);
       };
 
+      /*
+       * Bei "Bewegung reduzieren" wird aus der Welle ein Fade (Audit A5): Alle Platten
+       * decken gleichzeitig auf und blenden ein. Die Aufloesung bleibt damit ein
+       * eigener Moment — sie wandert nur nicht mehr ueber den Bildschirm.
+       */
       if (instant) {
         paint();
+        tile.view.alpha = 0;
+        timeline.to(tile.view, { alpha: 1, duration: REPLAY.plateFlipMs / 1000, ease: 'none' }, 0);
         continue;
       }
 
@@ -283,6 +356,7 @@ export class BoardView {
   }
 
   destroy(): void {
+    this.stopIdleWiggle();
     this.tapListeners.clear();
     for (const tile of this.tiles) tile.destroy();
     this.field.destroy();
