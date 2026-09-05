@@ -485,3 +485,35 @@ Die Einzeiler in der Lobby bleiben: Sie reichen zum Wählen. Wer es genau wissen
 **Was den Text ehrlich hält:** Ein Test prüft für **beide** Sprachen, dass jeder Modus aus `MODE_IDS` einen Titel, mindestens zwei Zeilen und eine Fußnote hat. Wer einen sechsten Modus ergänzt und die Anleitung vergisst, fällt hier auf — und nicht am Tisch.
 
 **Zahlen:** 758 Unit-Tests (2 neu für die Vollständigkeit) · 4 neue E2E-Fälle · 5 erklärte Modi in DE und EN.
+
+
+## Der Ruckler beim Aufdecken ist behoben — ADR-40 lag falsch — 2026-09-05
+
+ADR-40 hatte den Aussetzer gemessen, den Fix zurückgenommen und zwei Vermutungen hinterlassen, warum ein Vorlauf während der Verhandlung PixiJS zerlegt. **Beide waren falsch.** Der Fehler `Cannot read properties of undefined (reading 'updateRenderable')` liest sich wie ein Lebenszyklus-Problem und ist in Wahrheit eine Reihenfolge im Chunk-Splitting.
+
+**Was wirklich passiert.** PixiJS baut `renderer.renderPipes` in dem Moment, in dem der Renderer entsteht, aus den bis dahin registrierten Erweiterungen — und jede Zeichen-Klasse registriert ihre Pipe beim Auswerten ihres Moduls. Der alte Vorlauf lud nur `StageApp` und legte den Renderer an. Alles, was die Show darüber hinaus zeichnet (`VaultRoom`, `RevealDirector`, die zwanzig Inszenierungen), kam erst beim Betreten der Aufdeckung — und deren Pipes fehlten diesem Renderer für immer. Der erste Frame der Show greift dann in `renderPipes[renderPipeId]` und findet `undefined`.
+
+**Wie es gefunden wurde: durch Ausschluss, nicht durch Nachdenken.** Jede Vermutung einzeln gefahren, jede widerlegt — das Rendern der echten Bühne (ein Vorlauf ganz ohne Frame starb genauso), der mitlaufende Ticker (`autoStart: false` änderte nichts), die GSAP-Uhr (Übernahme erst beim Anhängen änderte nichts). Erst ein unminifizierter Build machte den Stack lesbar, und dort stand nicht die vermutete zerstörte Render-Gruppe, sondern eine fehlende Pipe. Die beiden ADR-40-Vorschläge hätten beide nicht funktioniert.
+
+**Was jetzt steht**
+
+- `src/game/stageModules.ts` — **eine** Liste der Bühnen-Module. Vorlauf, `RevealScreen` und die Outcome-Vorschau ziehen dieselbe; vorher führten alle drei ihre eigene.
+- Der Vorlauf arbeitet in drei Schritten, und die Reihenfolge ist bindend: erst alle Zeichen-Module, dann die Atlanten, dann der Renderer. Gewärmt wird an einem Wegwerf-Objekt außerhalb der Bühne — eine Fläche für die Graphics-Shader, je ein Sprite pro Atlas für die Batch-Shader. Nebenbei wandern damit auch die drei Atlas-Texturen in der Verhandlung auf die GPU.
+- `getStageApp()` sperrt auf der **Promise** statt auf dem fertigen Handle. Ohne das legen Vorlauf und Aufdeckung in den 280 ms von `init()` zwei WebGL-Kontexte an, deren Ticker beide GSAPs Wurzel-Zeitleiste mit eigener Zeit füttern.
+- `autoStart: false` und die Übernahme der GSAP-Uhr beim `attach()` stammen aus der Suche und bleiben. Sie haben den Absturz nicht behoben, bekommen aber mit einem früh angelegten Renderer erst Gewicht: Sonst zeichnet die App ab ihrer Entstehung jeden Frame eine leere Bühne, und GSAPs Uhr steht ab der Verhandlung still, während die Runde schon Tweens anlegt.
+
+**Was die Messung sagt.** Zeitmarken gegen denselben Ablauf mit abgeschaltetem Vorlauf, vierfach gedrosselte CPU, zwei Paare:
+
+| | ohne Vorlauf | mit Vorlauf |
+|---|---|---|
+| `Application.init()` | 11 219 ms — 123 ms nach Aufbaubeginn, mitten in der Aufdeckung | 1 413 ms — in der Verhandlung |
+| schlechtester Frame | 133 ms · 116 ms | 67 ms · 84 ms |
+| Frames über 33 ms | 4 · 4 | 1 · 1 |
+
+Der Rest ist die Shader-Übersetzung des ersten echten Bildes, direkt nach dem Anhängen. Dagegen hilft kein Vorlauf mehr, der die Bühne nicht anfassen darf — und anfassen darf er sie nicht, denn ihr erster gerenderter Frame soll der erste Frame der Show bleiben.
+
+**Eine Lehre zur Methode, die teurer war als der Fix:** Absolute Frame-Zahlen sind auf einer belasteten Maschine wertlos. Derselbe Code lieferte 67, 84 und 183 ms. Der erste Vergleich gegen die in M6 notierte Zahl legte deshalb sogar eine *Verschlechterung* nahe. Erst Zeitmarken im Ablauf und paarweise Läufe auf derselben Maschine machten den Unterschied belastbar.
+
+**Was das festhält:** `tests/unit/boundaries.test.ts` lässt nur noch `stageModules.ts` Bühnen-Module nachladen. Wer künftig eines nur in der Aufdeckung ergänzt, bekommt keinen Tippfehler, sondern einen toten Reveal — und fällt hier auf, nicht am Tisch. Die Grenzen in `perf.spec.ts` gehen von 400 ms / 6 Frames auf 300 ms / 4 Frames; bewusst weiter als die gemessenen Werte, weil der Test die Größenordnung sichern soll und nicht das Rauschen.
+
+**Zahlen:** 762 Unit-Tests (2 neu) · gedrosselt schlechtester Frame 65 ms · ungedrosselt 19 ms und kein Frame über Budget · `Application.init()` 9,8 s früher · Einstiegs-Bundle 37,9 KB (Budget 40).
