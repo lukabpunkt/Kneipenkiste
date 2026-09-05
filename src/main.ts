@@ -17,19 +17,38 @@ import { loadSession } from '@/core/session';
 declare const __APP_VERSION__: string;
 
 /**
- * Meldet den Service Worker an.
+ * Meldet den Service Worker an — aber erst, wenn der Titel steht.
  *
  * Ohne diesen Aufruf wird `sw.js` zwar ausgeliefert, aber nie installiert — die App
  * waere „installierbar" und trotzdem offline leer (ADR-25). Der Import ist dynamisch,
  * damit der Registrierungs-Code nicht im Einstiegs-Chunk landet, und ein Fehlschlag ist
  * folgenlos: Das Spiel laeuft online genauso.
+ *
+ * **Warum verzoegert:** Der Precache holt 51 Dateien, gut 1,7 MB. Direkt beim Start
+ * angemeldet, laedt er waehrend des ersten Bildaufbaus — auf einem schnellen Rechner
+ * unsichtbar, auf einem langsamen Geraet kostete es Lighthouse 13 Punkte (99 -> 86).
+ * Offline wird die App dadurch keine Sekunde spaeter tauglich, die zaehlt naemlich erst
+ * ab dem zweiten Besuch.
  */
 function registerServiceWorker(): void {
   if (!('serviceWorker' in navigator)) return;
 
-  void import('virtual:pwa-register')
-    .then(({ registerSW }) => registerSW({ immediate: true }))
-    .catch((error: unknown) => console.warn('[zoll] Service Worker nicht angemeldet', error));
+  const register = (): void => {
+    void import('virtual:pwa-register')
+      .then(({ registerSW }) => registerSW({ immediate: true }))
+      .catch((error: unknown) => console.warn('[zoll] Service Worker nicht angemeldet', error));
+  };
+
+  /* Leerlauf, sonst spaetestens nach zwei Sekunden — nicht jeder Browser kennt `idle`. */
+  const idle = (globalThis as { requestIdleCallback?: (cb: () => void) => void })
+    .requestIdleCallback;
+  const start = (): void => {
+    if (idle) idle(register);
+    else globalThis.setTimeout(register, 2_000);
+  };
+
+  if (document.readyState === 'complete') start();
+  else globalThis.addEventListener('load', start, { once: true });
 }
 
 /** Texte, die direkt im `index.html` stehen (Landscape-Overlay). */
