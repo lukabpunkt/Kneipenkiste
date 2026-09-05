@@ -4,7 +4,24 @@ Ein Mobile-First Pass-the-Phone-Bluffspiel für 4–8 Personen. Alle sind Reisen
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot), [Der Tresor](https://github.com/lukabpunkt/Tresor) und [Sprengmeister](https://github.com/lukabpunkt/Sprengmeister) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M5 fertig (`v0.5.0`) — Lighthouse 99/100/100, Kontrast geprüft, Tastatur-Bedienung, Title-Loop, Share. Als Nächstes M6 (Playtest & Release 1.0).
+**Status:** Spielbereit. Fehlt für 1.0 nur noch der Playtest mit echten Menschen
+(`docs/PLAYTEST-01.md`) und der Balancing-Pass danach.
+
+| | |
+|---|---|
+| Lighthouse Mobile | Performance **99** · Accessibility **100** · Best Practices **100** |
+| Bundle | 251 KB gzip gesamt, **30 KB** Einstieg (PIXI und GSAP laden erst mit der Halle) |
+| Rendering | p50 **16,7 ms**, 3 Draw-Calls bei 8 Spielern |
+| Tests | 269 Unit · 40 E2E auf iPhone 12 und Pixel 5 |
+
+## So sieht es aus
+
+| | |
+|---|---|
+| ![Titel](docs/screens/m5-title.png) | ![Zollhalle](docs/screens/m2-hall-8.png) |
+| Der Titel — ein Koffer rollt durchs Röntgen | Die Zollhalle mit acht Spielern |
+| ![Röntgen](docs/screens/m4-sweat-flood.png) | ![Result](docs/screens/m5-stats.png) |
+| Erwischt: die Pfütze, der Ausrutscher | Am Ende ist alles öffentlich |
 
 ## Planung
 
@@ -17,6 +34,9 @@ Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot), [Der 
 | [`docs/04-ROADMAP.md`](docs/04-ROADMAP.md) | Meilensteine M0–M6 |
 | [`docs/05-AUDITS.md`](docs/05-AUDITS.md) | Audits A0–A6 |
 | [`docs/PROGRESS.md`](docs/PROGRESS.md) · [`docs/DECISIONS.md`](docs/DECISIONS.md) | Fortschritt · ADR-Log |
+| [`docs/PLAYTEST-01.md`](docs/PLAYTEST-01.md) | Playtest-Protokoll mit dem Vorbefund aus der Simulation |
+| [`docs/DEVICES.md`](docs/DEVICES.md) | Gerätematrix — was getestet ist und was ein echtes Gerät braucht |
+| [`CHANGELOG.md`](CHANGELOG.md) | Was sich wann geändert hat |
 
 ## Stack
 
@@ -34,6 +54,7 @@ npm run test:sequences # Sequenzen, Hinweise und Polish (A3–A5)
 npm run check:contrast  # 22 Farbpaarungen gegen 4,5:1
 npm run check:lighthouse # Perf/A11y/Best Practices ≥ 90 (Preview muss laufen)
 npm run build:atlas  # SVG → Atlas (@1x/@2x)
+npm run balance      # 20 000 simulierte Runden gegen die Balancing-Ziele
 ```
 
 Läuft auf Port 4173 schon etwas anderes: `PREVIEW_PORT=4183 npm run test:e2e`.
@@ -47,3 +68,20 @@ cd /Users/lukabloemendal/Documents/Zoll
 claude
 > Lies CLAUDE.md und docs/. Setze Milestone M6 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A6 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
 ```
+
+## Balancing
+
+`npm run balance` simuliert 20 000 Runden je Parametersatz und misst gegen die Ziele aus
+Audit A6. Zwei Befunde stehen ausführlich in [`docs/PLAYTEST-01.md`](docs/PLAYTEST-01.md);
+der schärfste in einem Satz:
+
+> Ein Hinweis stimmt mit p_true = 0,6. Blindes Raten trifft mit der Wahrscheinlichkeit,
+> dass irgendein Koffer Ware enthält. **Sobald mehr als 60 % der Reisenden schmuggeln,
+> ist ein Hinweis schlechter als Raten.**
+
+Ob das ein Problem ist oder eine elegante Rückkopplung, entscheidet der Playtest — nicht
+die Simulation.
+
+## Lizenz
+
+[MIT](LICENSE) © Luka Bloemendal
