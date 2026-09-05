@@ -94,13 +94,26 @@ export async function runReveal(page: Page): Promise<void> {
   await atScreen(page, 'reveal');
 }
 
-/** Verteilt alle Schluecke auf den ersten Teiler und zahlt aus. */
+/**
+ * Verteilt alle Schluecke auf den ersten Teiler und zahlt aus.
+ *
+ * Gewartet wird auf den **Rest-Zaehler**, nicht auf den Knopf: Jeder Tap startet eine
+ * Muenzflug-Animation, und wer in dieser Zeit `isDisabled()` fragt, fragt mitten in der
+ * Bewegung. Der Zaehler traegt `is-done`, sobald nichts mehr uebrig ist — das ist ein
+ * Zustand, kein Zeitpunkt.
+ */
 export async function distributeAllToFirst(page: Page): Promise<void> {
   await atScreen(page, 'distribute');
   const payout = page.getByRole('button', { name: 'Auszahlen' });
   const target = page.locator('.distribute__target').first();
-  // Solange tippen, bis nichts mehr uebrig ist — "Auszahlen" bleibt bis dahin gesperrt.
-  for (let i = 0; i < 40 && (await payout.isDisabled()); i++) await target.click();
+  const remaining = page.locator('.distribute__remaining');
+
+  for (let i = 0; i < 40; i++) {
+    if (await remaining.evaluate((el) => el.classList.contains('is-done'))) break;
+    await target.click();
+  }
+
+  await expect(remaining).toHaveClass(/is-done/);
   await expect(payout).toBeEnabled();
   await payout.click();
 }
