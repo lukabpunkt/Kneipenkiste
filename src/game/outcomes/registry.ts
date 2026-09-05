@@ -11,21 +11,26 @@
  */
 
 import { basicOutcome } from './basic';
+import { bankPhoto } from './share/BankPhoto';
 import { groupHug } from './share/GroupHug';
 import { slowClap } from './share/SlowClap';
 import { toast } from './share/Toast';
 import { getaway } from './soloSteal/Getaway';
 import { helicopter } from './soloSteal/Helicopter';
+import { trapdoor } from './soloSteal/Trapdoor';
 import { magician } from './soloSteal/Magician';
 import { moonwalk } from './soloSteal/Moonwalk';
 import { anvil } from './multiSteal/Anvil';
 import { banana } from './multiSteal/Banana';
+import { handcuffs } from './multiSteal/Handcuffs';
 import { standoff } from './multiSteal/Standoff';
 import { tugOfWar } from './multiSteal/TugOfWar';
 import { allStealAlarm } from './allSteal/Alarm';
 import { brawl } from './allSteal/Brawl';
+import { dominoes } from './allSteal/Dominoes';
 import { pieFight } from './allSteal/PieFight';
 import { jackpotBurst } from './jackpot/Burst';
+import { jackpotDive } from './jackpot/Dive';
 import { moleReveal } from './overlays/MoleReveal';
 import { perjurySealBreak } from './overlays/PerjurySealBreak';
 import { outcomeById, registerOutcome, registerOverlay } from './OutcomeSequence';
@@ -56,6 +61,11 @@ export const ALL_OUTCOMES = [
   helicopter,
   banana,
   pieFight,
+  bankPhoto,
+  trapdoor,
+  handcuffs,
+  dominoes,
+  jackpotDive,
 ] as const;
 
 export const ALL_OVERLAYS = [perjurySealBreak, moleReveal] as const;

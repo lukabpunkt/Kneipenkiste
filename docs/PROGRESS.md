@@ -380,3 +380,24 @@ Der Kontrast ist der Punkt: Im Screenshot steht dieselbe Person heute Abend auf 
 **Was offen bleibt:** Der Name ist die einzige Identität ohne Konto. Wer sich umbenennt, fängt bei null an, und zwei Marcs an verschiedenen Abenden sind derselbe Marc. Für ein Trinkspiel unter Freunden ist das die richtige Näherung — ein Login wäre die falsche Antwort auf diese Frage.
 
 **Zahlen:** 711 Unit-Tests · E2E auf vier Geräteprofilen (12 neue Fälle für den Kronzeugen, 4 für die Historie) · 15 Inszenierungen (3,7–5,3 s) + 2 Overlays · 5 Modi · gesamt 270,9 KB gzip.
+
+
+## Backlog: die letzten fünf Inszenierungen — 2026-09-05
+
+Damit sind die im Backlog angestrebten **20** erreicht. Jeder Fall hat jetzt mindestens vier Varianten; nur der Jackpot bleibt bei zwei, weil ihn niemand zweimal an einem Abend sieht.
+
+| ID | Dauer | Die Lücke, die sie füllt |
+|---|---|---|
+| `share_bank_photo` | 4,1 s | Die einzige, die **Kassel führt**. Umarmung, Prosit und Applaus kommen von den Crooks; hier ist der Bankier der Regisseur, und das Bild, das er macht, ist ein Beweisfoto. Der Blitz ist der Hit-Stop — der Moment, den das Foto festhält, und der einzige, in dem niemand etwas ahnt. |
+| `steal_solo_trapdoor` | 3,4 s | Die einzige, die **nach unten** geht. Fluchtauto und Moonwalk gehen nach links, der Hubschrauber nach oben, der Magier bleibt stehen — damit sind alle vier Richtungen vergeben. |
+| `steal_multi_handcuffs` | 4,9 s | Das Bild für „ihr teilt euch die Rechnung", ganz ohne Text: Sie hängen aneinander, ziehen in verschiedene Richtungen, die Kette hält. Tauziehen streitet um einen Sack, der Amboss bestraft von außen, das Duell gegenseitig, die Bananenschale niemand. |
+| `steal_all_dominoes` | 4,4 s | Die einzige, die mit der Spielerzahl **besser** wird: bei drei Leuten ein Umfallen, bei acht eine Welle. Die Schlägerei versteckt alles in einer Wolke, der Alarm sperrt alle gleichzeitig weg — diese ist eine Linie, und Linien liest man schneller als alles andere. |
+| `jackpot_dive` | 5,7 s | Der zweite Jackpot. Der Ausbruch geht nach **außen** — ein Knall, alles fliegt weg. Dieser geht nach **innen**: Das Gold bleibt liegen, und die Crooks springen hinein. |
+
+**Befunde**
+
+- **Der Münzberg war zuerst eine einzelne, neunfach gezogene Münze** — und damit genau der Fehler aus ADR-24: ein oranger Fleck mit sichtbarem Frame-Rand. Jetzt sieben überlappende bei 1,4-facher Größe; die unregelmäßige Silhouette macht den Haufen.
+- **Die Handschellen hingen quer über einem fremden Kopf.** Die beiden Diebe trafen sich in der Mitte des Halbkreises — dort sitzen die Teiler. Treffpunkt jetzt vor dem Tisch.
+- **Der front-Atlas ist auf 2048 × 2048 gewachsen** (@1x, vorher 1024 × 2048). Draw-Calls und Bildrate bleiben unverändert bei 2 und p50 16,7 ms, auch der Speichertest ist grün. Wer weitere Requisiten hinzufügt, sollte den Wert im Auge behalten.
+
+**Zahlen:** 736 Unit-Tests · 20 Inszenierungen (3,4–5,7 s) + 2 Overlays · 44 Frames im front-Atlas · p50 16,7 ms · 2 Draw-Calls · gesamt 272,3 KB gzip.

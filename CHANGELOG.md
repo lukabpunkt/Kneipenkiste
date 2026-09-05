@@ -8,12 +8,21 @@ Alle nennenswerten Änderungen an **Der Tresor**. Format nach
 
 ### Hinzugefügt
 
-- Vier weitere Ergebnis-Inszenierungen aus dem Backlog (jetzt 15 von angestrebten 20):
+- **Neun weitere Ergebnis-Inszenierungen aus dem Backlog — damit sind die angestrebten 20
+  erreicht.** Zuerst vier:
   `share_slow_clap` (langsamer Applaus, der in Beifall kippt und an der Kasse abreißt),
   `steal_solo_helicopter` (Ausschleusung am Seil — die einzige Flucht nach oben),
   `steal_multi_banana` (beide rutschen aus, niemand hat sie bestraft außer sie selbst),
   `steal_all_pie_fight` (jeder trifft seinen Nachbarn, jeder Treffer einzeln lesbar).
-- Vier neue Requisiten: Hubschrauber, Rotor, Bananenschale, Sahnetorte.
+  Dann fünf, die jeden Fall auf mindestens vier Varianten bringen — nur der seltene
+  Jackpot bleibt bei zwei: `share_bank_photo` (Kassel führt Regie, der Blitz ist der
+  Hit-Stop), `steal_solo_trapdoor` (der Ausgang nach unten — damit sind alle vier
+  Richtungen vergeben), `steal_multi_handcuffs` (das Bild für „ihr teilt euch die
+  Rechnung", ganz ohne Text), `steal_all_dominoes` (eine Welle durch den Halbkreis, die
+  mit der Spielerzahl besser wird), `jackpot_dive` (Kopfsprung ins Gold — der Ausbruch
+  geht nach außen, dieser nach innen).
+- Sieben neue Requisiten: Hubschrauber, Rotor, Bananenschale, Sahnetorte, Balgenkamera,
+  Falltür-Loch, Handschellen.
 - `ctx.play()` nimmt jetzt eine Verstimmung entgegen — derselbe Klang sechsmal
   hintereinander klingt nach Maschinengewehr, minimal verstimmt nach sechs Händen.
 - `docs/screens/m4-outcomes.gif` — sechs Inszenierungen am Stück (offenes SOLL aus M4).
