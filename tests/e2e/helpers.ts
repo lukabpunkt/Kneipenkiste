@@ -45,10 +45,10 @@ export async function cellPoint(
   const worldY = top + layout.plate / 2 + Math.floor(cell / size) * (layout.plate + layout.gap);
 
   /*
-   * **Letterbox mitrechnen.** Seit ADR-28 ist die Canvas-Box nicht mehr im Verhaeltnis
-   * der Welt: Die Hoehe wird je Feldgroesse gedeckelt, damit der Vergraben-Knopf ueber
-   * die Falz passt. PIXI skaliert dann mit `min(w/1000, h/1500)` und zentriert den Rest —
-   * wer wie vorher pro Achse gegen die Box rechnet, trifft daneben.
+   * **Letterbox mitrechnen.** Seit ADR-28 steht die Canvas-Box nicht mehr zwingend im
+   * Verhaeltnis der Welt: `--stage-min-h` haelt eine Mindesthoehe frei, damit die Platten
+   * ueber 56 px bleiben. PIXI skaliert dann mit `min(w/1000, h/1500)` und zentriert den
+   * Rest — wer wie vorher pro Achse gegen die Box rechnet, trifft daneben.
    *
    * Bewusst noch einmal von Hand, nicht ueber `BoardApp.layout`: Ein Test, der dieselbe
    * Funktion benutzt wie der Code, prueft nur sich selbst.
@@ -60,9 +60,35 @@ export async function cellPoint(
   return { x: originX + worldX * scale, y: originY + worldY * scale };
 }
 
-/** Tippt eine Platte im PIXI-Feld an. */
+/**
+ * Tippt eine Platte im PIXI-Feld an — und scrollt sie vorher ins Bild, falls noetig.
+ *
+ * Seit ADR-28 haengt das Feld in einem scrollenden Rumpf, waehrend der Primaer-Knopf fest
+ * unten sitzt. In den engsten Faellen (5 x 5 **mit** Doppelagent auf 390 x 664) reicht die
+ * sichtbare Hoehe nicht fuer das ganze Feld: Die untersten Platten liegen unter der Kante
+ * des Rumpfes und sind dort vom `overflow` beschnitten. Ein Klick auf ihre Koordinaten
+ * traefe die Fusszeile — genau wie beim Menschen, der erst scrollt und dann tippt.
+ *
+ * Ein Klick auf ein DOM-Element haette das automatisch getan; ein Canvas hat keine
+ * Elemente, also steht es hier.
+ */
 export async function tapCell(page: Page, cell: number, size: 5 | 6 = 5, playerCount = 4): Promise<void> {
-  const point = await cellPoint(page, cell, size, playerCount);
+  let point = await cellPoint(page, cell, size, playerCount);
+
+  const visible = await page.evaluate((y) => {
+    const body = document.querySelector<HTMLElement>('.place__body, .dig__body, .lobby__body');
+    if (!body) return true;
+    const box = body.getBoundingClientRect();
+    if (y >= box.top + 8 && y <= box.bottom - 8) return true;
+    body.scrollBy({ top: y - (box.top + box.height / 2), behavior: 'instant' });
+    return false;
+  }, point.y);
+
+  if (!visible) {
+    await page.waitForTimeout(80);
+    point = await cellPoint(page, cell, size, playerCount);
+  }
+
   await page.mouse.click(point.x, point.y);
 }
 

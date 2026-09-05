@@ -87,7 +87,17 @@ export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
    * das ganze Feld nach unten. Jetzt faehrt es dort ein, wo gerade etwas passiert ist.
    */
   stage.el.append(bannerHost.el);
-  el.append(turnBanner.el, stage.el, footer);
+
+  /*
+   * Wie Lobby und Place-Screen: Der Rumpf scrollt, die Fusszeile nicht. Auf einem kurzen
+   * Geraet (390 x 664 im Browser) lief der Dig-Screen um 40 px ueber — und unten stand
+   * ausgerechnet der Schluck-Zaehler, also die Konsequenz, die man sehen soll (ADR-27/28).
+   */
+  const body = document.createElement('div');
+  body.className = 'dig__body';
+  body.append(turnBanner.el, stage.el);
+
+  el.append(body, footer);
 
   if (seedActive()) {
     const note = document.createElement('p');

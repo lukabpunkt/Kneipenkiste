@@ -524,12 +524,22 @@
    */
   margin: 0 -10px;
   /*
-   * Die Hoehe folgt der Feldgroesse (`--stage-ar`, gesetzt in `stageHost.ts`, ADR-28);
-   * ohne den Wert bleibt es beim vollen Weltverhaeltnis. PIXI letterboxt sauber, was
-   * nicht hineinpasst — die **Breite** bleibt in jedem Fall unangetastet, an ihr haengt
-   * die 56-px-Touch-Regel.
+   * Das Seitenverhaeltnis der Welt (ADR-12), damit beim Canvas-Umhaengen nichts springt.
+   *
+   * Ein **Deckel** auf die Hoehe stand hier kurz und ist wieder raus (ADR-28): Er sollte
+   * dem Place-Screen Platz verschaffen, hat aber die Touch-Regel gekostet. Der Grund ist
+   * eine Feinheit des Flex-Layouts — die Hoehe aus `aspect-ratio` wird aus der Breite
+   * **ohne** die negativen Margins gerechnet (366 statt 386 px), das Feld schrumpfte also
+   * 20 px staerker als gerechnet und die Platte fiel bei 6 x 6 auf 55,3 px. Die 56 px sind
+   * ein MUSS aus GDD §5, der Deckel war Komfort. Was den Place-Screen wirklich rettet, ist
+   * ohnehin der feste Fuss: Der Knopf scrollt nie mit.
    */
-  aspect-ratio: var(--stage-ar, calc(1000 / 1500));
+  aspect-ratio: 1000 / 1500;
+  /*
+   * ... und eine Untergrenze, damit ein enger Screen das Feld nicht unter die Touch-Regel
+   * druecken kann (`--stage-min-h`, gesetzt in `stageHost.ts`, ADR-28).
+   */
+  min-height: var(--stage-min-h, 0);
   overflow: hidden;
   border-radius: var(--radius-lg);
   background: var(--grass-dark);
@@ -1316,17 +1326,29 @@
  * nicht. Beide Screens sind laenger als ein Handy — der Knopf, der die Runde
  * weiterbringt, darf trotzdem nie unter der Falz liegen.
  */
+.screen--dig,
 .screen--lobby,
 .screen--place {
+  /*
+   * Das seitliche Polster wandert in Rumpf und Fuss. Grund: Der Rumpf scrollt, und ein
+   * Scroll-Container klemmt ab, was seitlich herausragt — das Feld holt sich seine
+   * vollen 386 px aber ueber negative Margins (`.stage-host`). Ohne diese Verschiebung
+   * bleibt es bei 366 px, und bei 6 x 6 faellt die Platte auf 55,998 px. Die 56 px sind
+   * ein MUSS aus GDD §5.
+   */
+  padding-right: 0;
+  padding-left: 0;
   overflow: hidden;
 }
 
+.dig__body,
 .lobby__body,
 .place__body {
   display: flex;
   min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
+  padding: 0 12px;
   overflow-y: auto;
   overscroll-behavior: contain;
   gap: 12px;
@@ -1336,7 +1358,11 @@
 .place__footer {
   flex: none;
   margin-top: auto;
-  padding-top: 4px;
+  padding: 4px 12px 0;
+}
+
+.dig__footer {
+  padding: 4px 12px 0;
 }
 
 /*

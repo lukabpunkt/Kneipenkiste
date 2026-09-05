@@ -23,8 +23,9 @@ Versionierung nach [SemVer](https://semver.org/lang/de/).
 - **Die Konsequenz bleibt stehen**: Das Trink-Banner fährt unten im Feld ein statt am
   oberen Bildrand, und ein Schluck-Zähler in der Fußzeile hält fest, wer wie viel trinkt
   (ADR-27).
-- **„Vergraben" liegt nie mehr unter der Falz** — scrollender Rumpf, fester Fuß, dazu die
-  gedeckelte Feldhöhe. Derselbe Fehler steckte in der Lobby (ADR-28).
+- **„Vergraben" liegt nie mehr unter der Falz** — scrollender Rumpf, fester Fuß, und ein
+  Mindestmaß für das Feld, damit die Platten nie unter 56 px rutschen. Derselbe Fehler
+  steckte in der Lobby und, gefunden vom neuen Layout-Test, im Dig-Screen (ADR-28).
 
 ### Offen
 

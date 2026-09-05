@@ -267,6 +267,27 @@ export const FIELD_LAYOUT = {
   6: { plate: 153, gap: 16 },
 } as const;
 
+/**
+ * Die kleinste Hoehe, die der Canvas-Platz im DOM haben darf — in **Welteinheiten**,
+ * umgerechnet aus der Touch-Regel (Playtest-Finding 01, ADR-28).
+ *
+ * PIXI skaliert mit `min(w/1000, h/1500)`. Wird die Hoehe der engere Faktor, schrumpfen
+ * die Platten mit — und genau das ist passiert, als der Place-Screen einen scrollenden
+ * Rumpf bekam: Das Feld wurde auf 549 px gestaucht, und die Platte landete bei 55,998 px.
+ * Zwei Pixel unter 56 sind kein Rundungsfehler, sondern ein gebrochenes MUSS aus GDD §5.
+ *
+ * Deshalb eine **Untergrenze** statt einer Obergrenze: Das Feld darf sich nicht unter die
+ * Hoehe druecken lassen, bei der eine Platte 58 px misst (56 plus zwei Pixel Reserve).
+ * Passt das nicht mehr auf den Schirm, scrollt der Rumpf — der Vergraben-Knopf nicht.
+ */
+export function minStageHeightPx(plateUnits: number, hostWidthPx: number): number {
+  const targetPx = 58;
+  const neededScale = targetPx / plateUnits;
+  const height = neededScale * 1500;
+  // Breiter als noetig bringt nichts: Ist die Breite ohnehin der engere Faktor, reicht sie.
+  return Math.min(height, (hostWidthPx / 1000) * 1500);
+}
+
 export const STAGE = {
   /**
    * Logische Weltgroesse, aufloesungsunabhaengig — **Hochformat** (ADR-12).
@@ -277,30 +298,6 @@ export const STAGE = {
    */
   worldSize: 1000,
   worldHeight: 1500,
-  /**
-   * Wie hoch der Canvas-Platz im DOM hoechstens sein darf — als Seitenverhaeltnis
-   * `Breite : Hoehe`, je Feldgroesse (Playtest-Finding 01, ADR-28).
-   *
-   * Die Welt bleibt 1000 x 1500; PIXI letterboxt, was nicht hineinpasst. Der Grund fuer
-   * die Deckelung ist der Place-Screen: Mit dem vollen Verhaeltnis belegt das Feld auf
-   * einem 390 x 844-Geraet 579 von 697 verfuegbaren Pixeln, und der Vergraben-Knopf
-   * landet unter der Falz.
-   *
-   * Die Zahlen sind **rueckwaerts aus der Touch-Regel** gerechnet, wie `FIELD_LAYOUT`
-   * selbst: Bei 386 px Hostbreite skaliert PIXI mit `min(386/1000, h/1500)`; damit eine
-   * Platte ueber 56 px bleibt, darf die Hoehe bis auf diese Werte sinken. Gerechnet ist
-   * mit **58 px** statt 56 — zwei Pixel Reserve, damit ein Geraet mit etwas anderer
-   * Breite nicht sofort unter die Grenze faellt. Die **Breite** bleibt unberuehrt; an ihr
-   * haengt die Touch-Groesse.
-   *
-   * Ehrlicherweise: Das bringt vor allem bei 5 x 5 etwas (rund 106 px, also drei bis
-   * fuenf Spieler). Bei 6 x 6 sind es nur acht Pixel — dort traegt allein die Trennung von
-   * scrollendem Rumpf und festem Fuss auf dem Place-Screen.
-   */
-  hostAspect: {
-    5: 1000 / 1225,
-    6: 1000 / 1480,
-  } as Record<5 | 6, number>,
   /**
    * Oberkante des Plattenfeldes. Der Streifen darueber traegt Zaun, Baum und Schild —
    * bei 6–8 Spielern zusaetzlich die hintere Digger-Bank.

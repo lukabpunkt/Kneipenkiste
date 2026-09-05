@@ -17,7 +17,7 @@
  */
 
 import { boardSizeFor, cellCount } from '@/config/rules';
-import { STAGE } from '@/config/theme';
+import { FIELD_LAYOUT, minStageHeightPx } from '@/config/theme';
 import type { Fsm } from '@/core/fsm';
 import type { BoardStage } from '@/game/BoardStage';
 import type { BoardMode } from '@/game/BoardView';
@@ -83,11 +83,13 @@ export function createStageHost(options: StageHostOptions = {}): StageHost {
       stage = next;
       placeholder.remove();
       /*
-       * Die Hoehe des Canvas-Platzes folgt der Feldgroesse (ADR-28): Bei 5 x 5 sind die
-       * Platten so gross, dass das Feld deutlich flacher stehen darf, ohne die
-       * Touch-Regel zu verletzen. Die Breite bleibt unberuehrt — an ihr haengen die 56 px.
+       * Untergrenze fuer die Feldhoehe (ADR-28): Sonst druecken enge Screens das Feld so
+       * flach, dass die Platten unter 56 px fallen. Passt es nicht, scrollt der Rumpf.
        */
-      el.style.setProperty('--stage-ar', String(STAGE.hostAspect[size]));
+      el.style.setProperty(
+        '--stage-min-h',
+        `${Math.ceil(minStageHeightPx(FIELD_LAYOUT[size].plate, el.clientWidth || 386))}px`
+      );
       next.attach(el);
       next.setMode(mode);
       /*
