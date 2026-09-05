@@ -8,9 +8,104 @@
 | M3 Sequenzen Teil 1 | ✅ fertig | `v0.3.0` | A3 bestanden |
 | M4 Hit-Sequenzen | ✅ fertig | `v0.4.0` | A4 bestanden |
 | M5 Polish, Modi, A11y | ✅ fertig | `v0.5.0` | A5 bestanden |
-| M6 Playtest & Release | ⬜ offen | – | – |
+| M6 Playtest & Release | 🟡 technisch fertig | `v1.0.0-rc.1` | A6 Teil 1 bestanden, Playtest offen |
 
 ## Audit-Reports
+
+## Audit A6 — 2026-09-05 (Teil 1: technischer Release-Stand)
+
+**Ergebnis:** Der technische Teil ist BESTANDEN. **Der Playtest steht aus** — und mit ihm
+alles, was Audit A6 eigentlich fragt. Deshalb `v1.0.0-rc.1` statt `v1.0.0` (→ **ADR-22**).
+
+### Was ohne Menschen am Tisch nicht geht
+
+Audit A6 besteht fast vollständig aus Beobachtungen: Zeit bis zur ersten Explosion,
+„DU warst das?!"-Momente, Lachen bei den Hit-Sequenzen, „nochmal spielen?". Kein Test
+ersetzt das. Ein 1.0-Tag würde behaupten, das Spiel sei am Tisch erprobt — und genau das
+ist die einzige Aussage, die dieses Projekt über sich selbst nicht belegen kann.
+
+| Check | Status | Notiz |
+|---|---|---|
+| Zeit bis erste Explosion ≤ 90 s | ⏳ Playtest | Protokollzeile in `docs/PLAYTEST-01.md`. |
+| „DU warst das?!" ≥ 6 von 8 Runden | ⏳ Playtest | Der Farbring kommt technisch 120 ms nach dem Knall (Test); ob er die Frage auslöst, sagt der Tisch. |
+| Lachen bei Hit-Sequenz ≥ 5 von 8 | ⏳ Playtest | 8 Hit-Sequenzen, No-Repeat-Fenster 3 — technisch abgesichert, nicht lustig-geprüft. |
+| Replay löst Gespräch aus ≥ 4 von 8 | ⏳ Playtest | Replay zeigt alle nie ausgelösten Minen (E2E). |
+| Trittstein bewusst genutzt **und** gelesen ≥ 1 | ⏳ Playtest | Die Datenseite ist gesichert (ADR-2, 1 000 simulierte Runden). |
+| „Nochmal spielen?" ≥ 80 % | ⏳ Playtest | — |
+| „Was war verwirrend?" → Top 5 | ⏳ Playtest | Fragebogen liegt im Protokoll. |
+| Abstürze 0 / Ruckler ≤ 1 / Sound-Aussetzer 0 / Fehl-Taps ≤ 1 | ⏳ Playtest | Emuliert: 0 Long-Tasks, 50/50 Taps, Heap flach. Auf echter Hardware offen. |
+| **Balancing: Grabungen 4–8, Explosionen 1–3, Gier 5–15 %** | 🟡 gemessen | `npm run balance` über je 2 000 Runden. Standard: Median **4** Grabungen, **0,53–1,29** Explosionen, **15–32 %** Gier. Zwei Abweichungen, eine davon strukturell — siehe (1) und (2). |
+| Gerätematrix | 🟡 | `docs/DEVICE-MATRIX.md`: Emulation vollständig grün, echte Geräte offen — und die Matrix sagt bei jeder Zeile, wer sie prüft. |
+| PWA | ✅ | Manifest mit `id`, `scope`, `display_override`, drei Icons inkl. maskable; Service Worker; E2E prüft Installierbarkeit. |
+| Live-URL | ⏳ manuell | Braucht `git push` und Pages auf „GitHub Actions" — Lukas Entscheidung, keine Automatik. |
+| README | ✅ | Status, Befehle (inkl. `npm run balance`), Aufbau, Testebenen, Planungsdokumente. Das GIF fehlt — es braucht ein Gerät. |
+| CHANGELOG | ✅ | Ein Abschnitt je Meilenstein, mit den Fehlern, die dabei gefunden wurden. |
+| Lizenz | 🟡 | „Alle Rechte vorbehalten", wie beim Schwesterprojekt *Der Tresor* — die zurücknehmbare Entscheidung. Siehe (4). |
+| Tag | ✅ | `v1.0.0-rc.1`. |
+
+**Zahlen:** 342 Unit-Tests · 50 E2E-Tests · 5 Perf-Tests · 16 Inszenierungen · 22 ADRs · 253 KB gzip (Budget 450) · Balancing über 64 000 simulierte Runden
+
+### Was dabei aufgefallen ist
+
+**(1) Die Simulation kennt nur die zwei Ränder, nicht die Mitte.** Sie spielt entweder
+perfekt hinweislesend (Median **4** Grabungen) oder komplett blind (Median **13** auf
+5 × 5, **19** auf 6 × 6). Ein echter Tisch liegt dazwischen — also mit hoher
+Wahrscheinlichkeit **innerhalb** der Zielspanne 4–8. Wer jetzt auf den optimistischen Rand
+hin tunt, verlängert die Runde für echte Spieler, statt sie zu verbessern. Dieselbe
+Beobachtung von der anderen Seite ist die niedrige Explosionsrate (0,53–1,29 statt 1–3):
+Wer in vier Zügen findet, tritt selten auf eine Mine.
+
+**(2) Der Gier-Zielwert ist mit zwei Minen pro Spieler arithmetisch unerreichbar.** Die
+Rate „Preis der Gier" hängt nicht an der Rundenlänge, sondern nur daran, wie oft die Kiste
+auf einer fremden Mine liegt — und das ist die Minendichte: rund 22 % bei vier Spielern,
+rund 30 % bei acht. Gemessen: 15–32 %. Der Zielwert 5–15 % wäre erst bei etwa **einer**
+Mine pro Spieler erreichbar, und das wäre ein anderes Spiel: GDD §7 nennt den Preis der
+Gier ausdrücklich „den besten Doppelmoment" und den Grund, „warum die letzte Grabung nie
+sicher ist". Entweder der Zielwert wandert auf 15–30 %, oder die Minenzahl sinkt — beides
+ist eine Design-Entscheidung für den Playtest, keine für die Simulation (→ **ADR-21**).
+
+**(3) Zwei Modi liegen absichtlich außerhalb der Zielspanne.** „Zwei Kisten" (Median 14–20
+Grabungen) und „Nachtgräber" (13–19) sind laut GDD §3.6 genau dafür gemacht: „Runde endet
+beim **zweiten** Fund → mehr Grabungen" und „längere Runden, reiner Zufall + Minenlesen".
+Die Zielwerte aus A6 gelten für den Standardmodus; die Balancing-Tabelle markiert die
+Abweichung trotzdem, damit niemand sie später für einen Fehler hält.
+
+**(4) Die Lizenz ist die einzige Entscheidung, die ich nicht treffen kann.** Die
+Schwesterprojekte widersprechen sich: *Der Tresor* liegt unter „alle Rechte vorbehalten",
+*Zoll* unter MIT. Ich habe die zurücknehmbare Variante gewählt (Tresor, das nähere
+Geschwister) und den Weg nach MIT in der Datei beschrieben. Der umgekehrte Weg ist
+versperrt — einmal erteilte Rechte bleiben.
+
+**(5) Ein Skript statt eines Panels.** Die Roadmap nennt ein „Simulations-Panel". Ein Panel
+zeigt eine Zahl, während man daneben steht; für einen Balancing-Pass braucht man alle
+Zahlen nebeneinander, reproduzierbar und in einer Form, die man in ein Dokument kleben
+kann. `npm run balance` gibt genau das aus — acht Szenarien × vier Spielerzahlen, mit `!`
+markiert, wo eine Zahl aus der Zielspanne fällt.
+
+### Abweichungen von der Planung
+
+- **`v1.0.0` ist nicht getaggt**, sondern `v1.0.0-rc.1` (ADR-22).
+- **Keine Regeländerung in `rules.ts`** — der Balancing-Pass endet mit einer begründeten
+  Nicht-Änderung (ADR-21). Die Messung dafür ist reproduzierbar und liegt bei.
+- **Das Simulations-Panel ist ein Konsolen-Skript** (siehe (5)).
+- **README ohne GIF** — es braucht eine Aufnahme vom Gerät.
+
+**Offene SOLL-Follow-ups:** README-GIF, Video `docs/screens/m4-hits.mp4`.
+
+**Manuelle Checks für Luka — die Liste vor 1.0:**
+
+- [ ] **Den Playtest durchführen.** 4–6 Personen, 8 Runden, Protokoll in
+      `docs/PLAYTEST-01.md`. Das ist der einzige verbliebene Schritt zu 1.0.
+- [ ] **Die zwei Balancing-Fragen entscheiden** (nach dem Playtest, mit ADR):
+      Wandert der Gier-Zielwert auf 15–30 %, oder sinkt `MINES_PER_PLAYER`?
+      Und: Liegt der gemessene Median näher an 4 oder an 13?
+- [ ] **Lighthouse Mobile** laufen lassen (offen aus A5).
+- [ ] **Referenzgeräte durchgehen** — die Prüfliste steht in `docs/DEVICE-MATRIX.md`.
+- [ ] **Lizenz bestätigen** oder auf MIT + CC BY-NC-SA wechseln.
+- [ ] **Repo pushen**, Pages auf „GitHub Actions" stellen, Live-URL prüfen.
+- [ ] **README-GIF** und `docs/screens/m4-hits.mp4` aufnehmen.
+- [ ] Nach dem Playtest: **Top-5-Findings beheben**, dann `v1.0.0` taggen.
+
 
 ## Audit A5 — 2026-09-05
 

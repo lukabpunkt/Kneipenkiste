@@ -1,7 +1,8 @@
 {
   "name": "sprengmeister",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.5.0",
+  "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "description": "Mobile-First Pass-the-Phone-Trinkspiel — Schatzsuche auf einem Minenfeld",
   "scripts": {
@@ -22,7 +23,8 @@
     "build:atlas": "node scripts/build-atlas.mjs",
     "build:audio": "node scripts/build-audio-sprite.mjs",
     "build:icons": "node scripts/build-icons.mjs",
-    "preview:sequences": "vite --host --open \"/?dev=1&panel=sequences\""
+    "preview:sequences": "vite --host --open \"/?dev=1&panel=sequences\"",
+    "balance": "node scripts/balance.mjs"
   },
   "dependencies": {
     "gsap": "^3.13.0",

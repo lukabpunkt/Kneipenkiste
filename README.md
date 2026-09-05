@@ -4,7 +4,9 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel für 3–8 Personen: Schatzsuche auf 
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot) und [Der Tresor](https://github.com/lukabpunkt/Tresor) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M2 abgeschlossen (`v0.2.0`) — das Feld ist jetzt eine PixiJS-Bühne: Erdplatten mit 3D-Kante, Diggers mit Bauhelm in Spielerfarbe auf der Bank, Wiese mit Zaun und Baum, Kamera-Zoom auf die aktive Platte und die Jenga-Sekunde vor jedem Ergebnis. Die acht Slapstick-Sequenzen kommen in M3–M4; bis dahin spielt der `DigDirector` Platzhalter.
+**Status:** M5 abgeschlossen (`v0.5.0`), Release-Kandidat für 1.0. Das Spiel ist vollständig: PixiJS-Bühne mit Erdplatten, Diggers und Kamera, **16 Inszenierungen** (8 Hit-Sequenzen, 4 Leer-Varianten, Blindgänger, 3 Treasure), Ton komplett zur Laufzeit synthetisiert, alle fünf Modi, Nachtgräber-Look, Result mit Replay und Share-Text, Reduced-Motion und Accessibility.
+
+Was zu 1.0 noch fehlt, ist nichts, was man programmieren kann: **der Playtest** (Audit A6, Protokoll in [`docs/PLAYTEST-01.md`](docs/PLAYTEST-01.md)). Erst danach wird `v1.0.0` getaggt — die Zahlen für Rundenlänge und Explosionsrate stellt der Tisch scharf, nicht die Simulation (→ ADR-22).
 
 ## Loslegen
 
@@ -25,7 +27,8 @@ npm run dev            # Vite --host, öffnet auf dem Handy im gleichen WLAN
 | `npm run test:e2e` · `test:perf`        | Playwright (iPhone 12 + Pixel 5) · Performance |
 | `npm run build:icons`                   | PWA-Icons aus `assets-src/svg/favicon.svg`     |
 | `npm run build:atlas` · `build:audio`   | Sprite-Atlas · Audio-Sprite (ab M2/M3)         |
-| `npm run preview:sequences`             | Sequenz-Preview (`?dev=1`), ab M3              |
+| `npm run preview:sequences`             | Sequenz-Preview: alle 16 einzeln abspielbar    |
+| `npm run balance`                       | Balancing-Tabelle über simulierte Runden       |
 
 ## Aufbau
 
@@ -35,6 +38,8 @@ src/
 ├─ core/       Reine Spiellogik: board · payout · modes · turn · fsm · session · simulate
 ├─ ui/         Router, Komponenten, Screens (ab M1)
 ├─ game/       PIXI-Feld: BoardApp · BoardView · Tile · Field · Digger · Camera · DigDirector
+│  ├─ fx/      Gepoolte Effekte: Rauch, Erde, Sternchen, Blätter, Konfetti
+│  └─ sequences/  Die 16 Inszenierungen + Registry (gewichtet, No-Repeat, Modus-Filter)
 ├─ i18n/       DE · EN
 └─ styles/     Tokens als CSS-Variablen, Basis-Layout
 ```
@@ -55,12 +60,24 @@ src/
 | [`docs/04-ROADMAP.md`](docs/04-ROADMAP.md)                                        | Meilensteine M0–M6                                                                    |
 | [`docs/05-AUDITS.md`](docs/05-AUDITS.md)                                          | Audits A0–A6                                                                          |
 | [`docs/PROGRESS.md`](docs/PROGRESS.md) · [`docs/DECISIONS.md`](docs/DECISIONS.md) | Fortschritt · ADR-Log                                                                 |
+| [`docs/PLAYTEST-01.md`](docs/PLAYTEST-01.md)                                      | Playtest-Protokoll (Audit A6)                                                         |
+| [`CHANGELOG.md`](CHANGELOG.md)                                                    | Was in welchem Meilenstein dazukam                                                    |
 
 ## Stack
 
-Vite 6 · TypeScript 5 strict · PixiJS v8 · GSAP 3 · howler.js · vite-plugin-pwa · Vitest · Playwright
+Vite 6 · TypeScript 5 strict · PixiJS v8 · GSAP 3 · Web Audio (Cues zur Laufzeit synthetisiert, ADR-13) · vite-plugin-pwa · Vitest · Playwright
 
-Kein Backend, keine Analytics, keine externen Requests.
+Kein Backend, keine Analytics, keine externen Requests. Der Ton kommt ohne eine einzige Audiodatei aus.
+
+## Tests
+
+| Ebene | Umfang |
+| --- | --- |
+| Unit (Vitest) | 342 Tests — Board-Matrix, `publicView`, Auszahlung, Modi, FSM, Sequenzen, Audio-Timing, Kontrast, Partikel-Pool |
+| E2E (Playwright) | 25 Tests × 2 Geräte (iPhone 12, Pixel 5) — kompletter Flow, Modus-Kombinationen, Reduced-Motion, Bedienbarkeit |
+| Perf | Frame-Zeiten im Leerlauf und während der Sequenzen, Draw-Batches, Heap, Partikel-Budget, Long-Tasks |
+
+Zwei Prüfungen laufen zusätzlich außerhalb der Testsuite, damit sie auch dann greifen, wenn jemand einen Test löscht: `Math.random` ist in `src/core/` verboten, und kein Screen darf das private Board erreichen (`.github/workflows/ci.yml`).
 
 ## Deploy
 

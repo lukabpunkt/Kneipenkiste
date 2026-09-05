@@ -116,6 +116,8 @@ In 2 Sessions (4a: ClassicLaunch, SootFace, HelmetRocket, ShovelPretzel · 4b: T
 2. Balancing-Pass: Minen pro Spieler, Trinkwert, Token-Wert, Hinweis-Schwellen (nur in `rules.ts`, mit ADR). Simulations-Panel als Grundlage (Rundenlänge-Verteilung).
 3. Geräte-Matrix, PWA-Feinschliff, README mit GIF, CHANGELOG, Lizenz, Deploy, Tag.
 
+**Stand 2026-09-05:** Punkt 2 und 3 sind erledigt (`v1.0.0-rc.1`) — das Balancing ist gemessen (`npm run balance`, Ergebnis in `docs/balance-2026-09-05.txt`) und endet mit einer begründeten Nicht-Änderung (ADR-21); Geräte-Matrix, README, CHANGELOG und Lizenz liegen vor. Offen ist Punkt 1: der Playtest selbst. `v1.0.0` folgt danach (ADR-22).
+
 → **Audit A6**
 
 ---
