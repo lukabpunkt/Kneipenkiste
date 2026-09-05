@@ -79,7 +79,7 @@ Eine **Session** = beliebig viele Runden; Scoreboard, Minen-Statistik und "Meist
 
 ### 3.5 Auszahlung
 
-- **Sofort während der Grabphase:** Trinken passiert direkt bei der Explosion ("Anna trinkt 2" als Banner, Handy bleibt liegen, weiter geht's).
+- **Sofort während der Grabphase:** Trinken passiert direkt bei der Explosion ("Anna trinkt 2" als Banner, Handy bleibt liegen, weiter geht's). Das Banner fährt **unten im Feld** ein, wo gerade etwas passiert ist, und danach bleibt der Schluck-Zähler in der Fußzeile stehen — ein Banner allein war im ersten Gerätetest niemandem aufgefallen (ADR-27).
 - **Verteil-Tokens** werden gesammelt und **am Rundenende** verteilt: Auf dem Distribute-Screen bekommt jeder Spieler mit Tokens nacheinander das Handy (Reihenfolge: Finder zuerst, dann Leger in Legereihenfolge) und tippt Badges an (+1 pro Tap, Long-Press −1), bis alle Tokens vergeben sind. Man darf **nicht** an sich selbst verteilen. Alles auf eine Person ist erlaubt.
 - Result-Screen fasst zusammen: wer wie viel getrunken hat, wer wen gesprengt hat, wer die Kiste fand.
 

@@ -44,10 +44,20 @@ export async function cellPoint(
     (WORLD.width - extent) / 2 + layout.plate / 2 + (cell % size) * (layout.plate + layout.gap);
   const worldY = top + layout.plate / 2 + Math.floor(cell / size) * (layout.plate + layout.gap);
 
-  return {
-    x: box.x + (worldX / WORLD.width) * box.width,
-    y: box.y + (worldY / WORLD.height) * box.height,
-  };
+  /*
+   * **Letterbox mitrechnen.** Seit ADR-28 ist die Canvas-Box nicht mehr im Verhaeltnis
+   * der Welt: Die Hoehe wird je Feldgroesse gedeckelt, damit der Vergraben-Knopf ueber
+   * die Falz passt. PIXI skaliert dann mit `min(w/1000, h/1500)` und zentriert den Rest —
+   * wer wie vorher pro Achse gegen die Box rechnet, trifft daneben.
+   *
+   * Bewusst noch einmal von Hand, nicht ueber `BoardApp.layout`: Ein Test, der dieselbe
+   * Funktion benutzt wie der Code, prueft nur sich selbst.
+   */
+  const scale = Math.min(box.width / WORLD.width, box.height / WORLD.height);
+  const originX = box.x + (box.width - WORLD.width * scale) / 2;
+  const originY = box.y + (box.height - WORLD.height * scale) / 2;
+
+  return { x: originX + worldX * scale, y: originY + worldY * scale };
 }
 
 /** Tippt eine Platte im PIXI-Feld an. */

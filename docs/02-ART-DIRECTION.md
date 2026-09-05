@@ -61,9 +61,12 @@ Wie Drinkshot (*Luckiest Guy* / *Nunito*). Turn-Banner ("RUDI GRÄBT") in Luckie
 
 ### 4.3 Trink-Banner (Explosion)
 - Schärpe fährt von rechts ein, "ANNA TRINKT 2", darunter kleiner Kill-Feed "Rudi → Anna" mit beiden Badges. Bleibt 2.2 s, dann raus. Haptik 60 ms. Bei Stapel: "ANNA TRINKT 4 · Rudi + Marc → Anna".
+- **Es liegt über der Bühne, nicht darüber im Layout** (ADR-27): Es fährt unten im Feld ein, wo gerade etwas passiert ist — am oberen Bildrand hat es im ersten Playtest niemand gesehen. Beim Blindgänger heißt die Überschrift "BLINDGÄNGER", und der Feed nennt nur den Leger: Ein Blindgänger hat kein Opfer (ADR-26).
+- **Danach bleibt eine Spur**: der Schluck-Zähler in der Fußzeile (§4.4). Das Banner ist nach 2,2 s weg; wer in dem Moment das Handy weiterreicht, hat die Zahl sonst nie gesehen.
 
-### 4.4 Token-Anzeige
+### 4.4 Token-Anzeige und Schluck-Zähler
 - Rechts unten kleine Stapel-Badges "🍺 ×2" pro Spieler mit Tokens, ploppen bei Vergabe mit Overshoot.
+- Links daneben der **Schluck-Zähler** der laufenden Runde: Name und Zahl in Spielerfarbe, der Härteste zuerst, in `--fs-sm` und ohne `aria-hidden`. Er zählt eine andere Größe als die Tokens — was jemand **jetzt** trinken muss (ADR-27).
 
 ### 4.5 Distribute-Screen
 - Wie Tresor (Münze → hier Flaschen-Icon fliegt vom Token-Stapel in den Badge).
@@ -115,7 +118,7 @@ Die 7 Regeln aus Drinkshot gelten für jede Hit-/Treasure-Sequenz. Zusätzlich:
 
 | Effekt | Max | Technik |
 |---|---|---|
-| Rauchpilz | 12 Sprites | Pool |
+| Rauchpilz | 12 Sprites (6 klein · 4 mittel · 2 groß) | Pool |
 | Erdklumpen | 20 | Pool, Gravity |
 | Sternchen | 8 | Pool |
 | Konfetti | 100 | ParticleContainer |
@@ -123,6 +126,8 @@ Die 7 Regeln aus Drinkshot gelten für jede Hit-/Treasure-Sequenz. Zusätzlich:
 | Legerfarben-Ring | 2 | Graphics cache / Sprite scale |
 
 Gesamt ≤ 200 aktive Sprites.
+
+**Größen stehen in Welteinheiten** (`FX_SIZE` in `config/theme.ts`), nicht in Atlas-Pixeln — sonst hängt die Größe eines Erdklumpens daran, wie groß jemand das SVG gezeichnet hat (ADR-25). Und **sichtbar wird ein Partikel erst, wenn seine Bewegung anfängt**, nie beim Bauen der Sequenz (ADR-23).
 
 ---
 

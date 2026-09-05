@@ -14,7 +14,12 @@
   height: 100%;
   flex-direction: column;
   gap: 12px;
-  padding: 16px 12px calc(16px + var(--safe-bottom));
+  /*
+   * Kein `var(--safe-bottom)` mehr: `#app` zahlt die Safe-Area bereits (`base.css`), und
+   * doppelt gerechnet gingen auf einem iPhone 68 statt 34 px verloren — genug, um den
+   * Vergraben-Knopf unter die Falz zu schieben (Playtest-Finding 01).
+   */
+  padding: 16px 12px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -518,7 +523,13 @@
    * Als Flex-Item streckt es sich von selbst und nimmt die Margins mit.
    */
   margin: 0 -10px;
-  aspect-ratio: 1000 / 1500;
+  /*
+   * Die Hoehe folgt der Feldgroesse (`--stage-ar`, gesetzt in `stageHost.ts`, ADR-28);
+   * ohne den Wert bleibt es beim vollen Weltverhaeltnis. PIXI letterboxt sauber, was
+   * nicht hineinpasst — die **Breite** bleibt in jedem Fall unangetastet, an ihr haengt
+   * die 56-px-Touch-Regel.
+   */
+  aspect-ratio: var(--stage-ar, calc(1000 / 1500));
   overflow: hidden;
   border-radius: var(--radius-lg);
   background: var(--grass-dark);
@@ -1301,17 +1312,16 @@
 /* ================================================================== */
 
 /*
- * Place-Screen: Der Rumpf scrollt, die primaere Aktion nicht (Playtest-Finding 01).
- *
- * Das Feld traegt ein festes Seitenverhaeltnis und laesst sich nicht schrumpfen; ohne
- * diese Trennung landet "Vergraben" auf einem 390 x 844-Geraet unter der Falz. Dasselbe
- * Idiom wie `.dig__footer` — nur muss hier zusaetzlich der Rumpf das Scrollen uebernehmen,
- * damit der Screen selbst es nicht tut.
+ * Lobby und Place-Screen teilen dasselbe Muster: Der Rumpf scrollt, die primaere Aktion
+ * nicht. Beide Screens sind laenger als ein Handy — der Knopf, der die Runde
+ * weiterbringt, darf trotzdem nie unter der Falz liegen.
  */
+.screen--lobby,
 .screen--place {
   overflow: hidden;
 }
 
+.lobby__body,
 .place__body {
   display: flex;
   min-height: 0;
@@ -1322,10 +1332,20 @@
   gap: 12px;
 }
 
+.lobby__footer,
 .place__footer {
   flex: none;
   margin-top: auto;
+  padding-top: 4px;
 }
+
+/*
+ * Place-Screen: Der Rumpf scrollt, die primaere Aktion nicht (Playtest-Finding 01).
+ *
+ * Das Feld traegt ein festes Seitenverhaeltnis und laesst sich nicht schrumpfen; ohne
+ * diese Trennung landet "Vergraben" auf einem 390 x 844-Geraet unter der Falz. Dasselbe
+ * Idiom wie `.dig__footer`.
+ */
 
 .place__header {
   text-align: center;
@@ -1349,6 +1369,11 @@
 }
 
 .place__tools:empty {
+  display: none;
+}
+
+/* Wie `.place__tools` und `.turn-banner__timer`: Ein leerer Slot kostet sonst seinen Gap. */
+.place__timer:empty {
   display: none;
 }
 

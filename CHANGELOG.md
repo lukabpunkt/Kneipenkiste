@@ -9,6 +9,25 @@ Versionierung nach [SemVer](https://semver.org/lang/de/).
 
 ## [Unveröffentlicht]
 
+### Behoben — vier Befunde aus dem ersten Gerätetest
+
+- **Die Explosion war unsichtbar, und daran waren zwei echte Fehler schuld.** Die Partikel
+  wurden beim _Bauen_ der Sequenz sichtbar, also fast eine Sekunde vor dem Knall: Neun
+  Rauchwolken saßen bewegungslos auf der geschlossenen Platte — das verriet die Mine, und
+  beim Aufdecken _erschien_ nichts mehr (ADR-23). Und der Kamera-Ruck wurde in
+  Welteinheiten angewendet: Aus 12 px wurden auf dem Handy 4,7 (ADR-24).
+- **Partikel in Welteinheiten** statt Atlas-Pixeln, dritte Rauchgröße aus dem Atlas,
+  Restrauch und Trümmer im Krater, eigene Effekte für Kettenreaktions-Nachbarn (ADR-25).
+- **Blindgänger sagen, dass sie welche sind**: entschärfte Bombe, das Schild aus GDD §4.1,
+  Überschrift „BLINDGÄNGER", ein Feed ohne Opfer, fünfte Regelkarte (ADR-26).
+- **Die Konsequenz bleibt stehen**: Das Trink-Banner fährt unten im Feld ein statt am
+  oberen Bildrand, und ein Schluck-Zähler in der Fußzeile hält fest, wer wie viel trinkt
+  (ADR-27).
+- **„Vergraben" liegt nie mehr unter der Falz** — scrollender Rumpf, fester Fuß, dazu die
+  gedeckelte Feldhöhe. Derselbe Fehler steckte in der Lobby (ADR-28).
+
+### Offen
+
 - Playtest (Audit A6) und die Top-5-Findings daraus. `v1.0.0` wird erst danach getaggt
   (ADR-22): Rundenlänge und Explosionsrate stellt der Tisch scharf, nicht die Simulation.
 

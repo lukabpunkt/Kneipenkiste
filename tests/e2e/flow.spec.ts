@@ -288,14 +288,43 @@ test.describe('Grabphase', () => {
     await buryMines(page, 3, layout(3, { forced: { 1: [15, dudCell] }, avoid: [chest] }));
     await startDigging(page);
 
+    /*
+     * Wer graebt, steht im Turn-Banner ("RUDI GRAEBT") — gleich braucht es der Vergleich.
+     * Die Namen sind dort in Grossbuchstaben, deshalb wird spaeter auch so verglichen.
+     */
+    const turnLabel = ((await page.locator('.turn-banner__label').textContent()) ?? '').trim();
+    // "SPIELER 2 GRÄBT" → "SPIELER 2": alles ausser dem letzten Wort ist der Name.
+    const digger = turnLabel.split(' ').slice(0, -1).join(' ');
+    expect(digger).toMatch(/\S/);
+
     await tapCell(page, dudCell, 5, 3);
 
     const banner = page.locator('.drink-banner');
     await expect(banner).toBeVisible({ timeout: 15_000 });
+    /*
+     * Das Wort steht da, nicht nur das Geraeusch. Bis zum ersten Playtest hiess die
+     * Ueberschrift schlicht "Pfff." — niemand am Tisch wusste, was gerade passiert war
+     * (ADR-26).
+     */
+    await expect(banner).toContainText('BLINDGÄNGER');
     await expect(banner).toContainText('Pfff');
-    // Der Leger wird gezeigt — das ist der Bluff (GDD §3.6).
-    await expect(banner.locator('.kill-feed__text')).toContainText('Spieler 2');
-    // ... aber niemand trinkt.
+    /*
+     * **Der Leger wird genannt, nicht der Graeber** — das ist der Bluff (GDD §3.6).
+     *
+     * Die frühere Fassung dieses Tests suchte einen festen Namen im Feed und war damit
+     * gruen, obwohl sie in Wahrheit den **Graeber** getroffen hat: Der alte Text lautete
+     * "{Leger} → {Opfer}", und beide standen drin. Jetzt wird geprueft, was gemeint war.
+     */
+    const feed = banner.locator('.kill-feed__text');
+    await expect(feed).toContainText('hat hier gelegt');
+    expect((await feed.textContent())?.toUpperCase()).not.toContain(digger);
+    /*
+     * Kein Pfeil, kein zweites Badge: "A → B" heisst im Krater-Fall "A hat B gesprengt"
+     * und waere hier eine Falschaussage. Ein Blindgaenger hat keinen Verlierer (ADR-26).
+     */
+    await expect(feed).not.toContainText('→');
+    await expect(banner.locator('.kill-feed .badge')).toHaveCount(1);
+    // Und niemand trinkt.
     await expect(banner).not.toContainText('TRINKT');
 
     expect(await tileState(page, dudCell)).toBe('dud');

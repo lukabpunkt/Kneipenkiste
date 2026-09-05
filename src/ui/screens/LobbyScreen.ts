@@ -86,7 +86,23 @@ export const createLobbyScreen: ScreenFactory = ({ fsm, session, router }) => {
     },
   });
 
-  el.append(header, playerList, fieldInfo, modesSection, timersSection, cta);
+  /*
+   * Wie beim Place-Screen: Der Rumpf scrollt, die primaere Aktion nicht.
+   *
+   * Die Lobby **muss** scrollen — acht Spielerzeilen und fuenf Modus-Schalter passen auf
+   * kein Handy. Aber "Feld verminen" als letztes Kind einer scrollenden Spalte lag bei
+   * vier Spielern rund 400 px unter der Falz. Gefunden hat das der Layout-Test, den der
+   * Playtest-Befund zum Vergraben-Knopf ausgeloest hat (ADR-28).
+   */
+  const body = document.createElement('div');
+  body.className = 'lobby__body';
+  body.append(header, playerList, fieldInfo, modesSection, timersSection);
+
+  const footer = document.createElement('div');
+  footer.className = 'lobby__footer';
+  footer.append(cta);
+
+  el.append(body, footer);
 
   /* ---------------------------------------------------------------- */
 

@@ -278,6 +278,30 @@ export const STAGE = {
   worldSize: 1000,
   worldHeight: 1500,
   /**
+   * Wie hoch der Canvas-Platz im DOM hoechstens sein darf — als Seitenverhaeltnis
+   * `Breite : Hoehe`, je Feldgroesse (Playtest-Finding 01, ADR-28).
+   *
+   * Die Welt bleibt 1000 x 1500; PIXI letterboxt, was nicht hineinpasst. Der Grund fuer
+   * die Deckelung ist der Place-Screen: Mit dem vollen Verhaeltnis belegt das Feld auf
+   * einem 390 x 844-Geraet 579 von 697 verfuegbaren Pixeln, und der Vergraben-Knopf
+   * landet unter der Falz.
+   *
+   * Die Zahlen sind **rueckwaerts aus der Touch-Regel** gerechnet, wie `FIELD_LAYOUT`
+   * selbst: Bei 386 px Hostbreite skaliert PIXI mit `min(386/1000, h/1500)`; damit eine
+   * Platte ueber 56 px bleibt, darf die Hoehe bis auf diese Werte sinken. Gerechnet ist
+   * mit **58 px** statt 56 — zwei Pixel Reserve, damit ein Geraet mit etwas anderer
+   * Breite nicht sofort unter die Grenze faellt. Die **Breite** bleibt unberuehrt; an ihr
+   * haengt die Touch-Groesse.
+   *
+   * Ehrlicherweise: Das bringt vor allem bei 5 x 5 etwas (rund 106 px, also drei bis
+   * fuenf Spieler). Bei 6 x 6 sind es nur acht Pixel — dort traegt allein die Trennung von
+   * scrollendem Rumpf und festem Fuss auf dem Place-Screen.
+   */
+  hostAspect: {
+    5: 1000 / 1225,
+    6: 1000 / 1480,
+  } as Record<5 | 6, number>,
+  /**
    * Oberkante des Plattenfeldes. Der Streifen darueber traegt Zaun, Baum und Schild —
    * bei 6–8 Spielern zusaetzlich die hintere Digger-Bank.
    */

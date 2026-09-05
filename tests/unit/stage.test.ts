@@ -24,6 +24,45 @@ const CANVAS_WIDTH_PX = DEVICE_WIDTH_PX - 2 * 2;
 /** Wieviele Bildschirm-Pixel eine Welteinheit auf dem Referenzgeraet bekommt. */
 const PX_PER_UNIT = CANVAS_WIDTH_PX / STAGE.worldSize;
 
+describe('Gedeckelte Host-Hoehe (ADR-28)', () => {
+  /*
+   * Der Canvas-Platz im DOM darf flacher stehen als die Welt, damit auf dem Place-Screen
+   * der Vergraben-Knopf ueber die Falz passt. Was dabei **nicht** passieren darf: dass
+   * die Platten unter die Touch-Grenze rutschen. PIXI skaliert mit `min(w/1000, h/1500)` —
+   * sobald die Hoehe der engere Faktor wird, schrumpfen die Platten mit.
+   */
+  it('haelt die Platten auch bei gedeckelter Hoehe ueber 56 px', () => {
+    for (const size of [5, 6] as const) {
+      const hostHeightPx = CANVAS_WIDTH_PX / STAGE.hostAspect[size];
+      const scale = Math.min(CANVAS_WIDTH_PX / STAGE.worldSize, hostHeightPx / STAGE.worldHeight);
+      const platePx = FIELD_LAYOUT[size].plate * scale;
+
+      expect(platePx, `${size} × ${size}`).toBeGreaterThanOrEqual(TOUCH.minTargetPx);
+      /*
+       * Zwei Pixel Reserve. Der erste Anlauf lag bei 55,9 px — rechnerisch knapp daneben,
+       * und auf einem Geraet mit leicht anderer Breite waere es echter Verlust gewesen.
+       */
+      expect(platePx, `${size} × ${size} ohne Reserve`).toBeGreaterThanOrEqual(TOUCH.minTargetPx + 2);
+    }
+  });
+
+  it('deckelt ueberhaupt — sonst waere das Token wirkungslos', () => {
+    for (const size of [5, 6] as const) {
+      const capped = CANVAS_WIDTH_PX / STAGE.hostAspect[size];
+      const full = CANVAS_WIDTH_PX * (STAGE.worldHeight / STAGE.worldSize);
+      expect(capped, `${size} × ${size}`).toBeLessThan(full);
+    }
+  });
+
+  it('gibt dem kleineren Feld mehr Spielraum', () => {
+    /*
+     * Bei 5 x 5 sind die Platten 185 Einheiten breit statt 153 — dort darf das Feld
+     * deutlich flacher stehen, ohne die Touch-Regel zu verletzen.
+     */
+    expect(STAGE.hostAspect[5]).toBeGreaterThan(STAGE.hostAspect[6]);
+  });
+});
+
 describe('Feld-Geometrie (ADR-12)', () => {
   it('haelt die Platten auf beiden Feldgroessen ueber 56 px (GDD §5, Audit A1/A2)', () => {
     /*
