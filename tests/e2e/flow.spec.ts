@@ -262,7 +262,17 @@ test.describe('Aufdeckung', () => {
      * das ist die Regel, die den Moment schuetzt, fuer den es das Spiel gibt.
      */
     const before = (await revealedCards(page)).length;
-    for (let i = 0; i < 20; i++) await page.locator('#app > section').click({ force: true });
+    /*
+     * Getippt wird auf die **Buehne**, nicht auf den jeweils aktuellen Screen — und nur
+     * solange sie steht. Laeuft die Show waehrend der zwanzig Taps durch (auf einem
+     * langsamen Rechner dauern sie laenger als der Rest der Show), landeten die
+     * restlichen Taps sonst auf dem Ergebnis, wo einer davon "Naechste Runde" trifft.
+     */
+    const stage = page.locator('.screen--reveal');
+    for (let i = 0; i < 20; i++) {
+      if (!(await stage.isVisible().catch(() => false))) break;
+      await stage.click({ force: true, timeout: 2000 }).catch(() => undefined);
+    }
     await page.waitForTimeout(400);
     expect((await revealedCards(page)).length).toBeLessThanOrEqual(before + 1);
 

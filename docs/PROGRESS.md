@@ -547,6 +547,8 @@ Der Ticker treibt GSAP. Wo ein Frame laenger als 100 ms braucht, bekommt die Sho
 
 Wartebedingungen, die ein Stueck Show ueberspannen, haben jetzt ihr eigenes Fenster (`AFTER_SHOW_MS`, 90 s) mit der Begruendung im Code. Gewartet wird weiter auf einen **Zustand** — nur laenger, wenn die Maschine langsam zeichnet. Dieselbe Rechnung trifft das Test-Timeout: Drei Runden mit je einer um die Haelfte gedehnten Show passen nicht in zwei Minuten, also stehen dort jetzt fuenf.
 
+Zwei Stellen waren dabei leicht zu uebersehen. `distributeAllToFirst()` wartet auf den Verteil-Screen — im Helfer, nicht an der Aufrufstelle —, und dieser Screen kommt immer direkt hinter einer Show. Und die zwanzig Taps auf die letzte Karte zielten auf den jeweils **aktuellen** Screen: Laeuft die Show waehrend der Taps durch, landen die restlichen auf dem Ergebnis, wo einer davon "Naechste Runde" trifft. Sie zielen jetzt auf die Buehne und hoeren auf, sobald sie nicht mehr steht.
+
 **Das ist nicht nur eine Test-Eigenschaft.** Faellt ein echtes Geraet unter 10 fps, zieht sich die Show dort genauso. Die Gegenmassnahme dafuer steht seit M5: Low-Effects greift ab einem Frame-Median von 22 ms und nimmt Laser, Schatten und Vignette heraus, bevor es so weit kommt.
 
 **Zahlen:** 3 rote CI-Befunde (ein Rennen, eine fehlende Weiche, ein zu enges Zeitfenster) · 13 Wartestellen umgestellt · 6 Actions auf Node-24-Majors · 31 E2E-Fälle lokal grün · 0 Produktionscode geändert.

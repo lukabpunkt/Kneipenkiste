@@ -173,7 +173,8 @@ export async function waitForRevealed(page: Page, count: number, timeout = AFTER
  * Zustand, kein Zeitpunkt.
  */
 export async function distributeAllToFirst(page: Page): Promise<void> {
-  await atScreen(page, 'distribute');
+  // Verteilt wird immer direkt nach der Show — also mit deren Fenster (AFTER_SHOW_MS).
+  await atScreen(page, 'distribute', AFTER_SHOW_MS);
   const payout = page.getByRole('button', { name: 'Auszahlen' });
   const target = page.locator('.distribute__target').first();
   const remaining = page.locator('.distribute__remaining');
