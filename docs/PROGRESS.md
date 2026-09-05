@@ -37,7 +37,8 @@ ist die einzige Aussage, die dieses Projekt über sich selbst nicht belegen kann
 | **Balancing: Grabungen 4–8, Explosionen 1–3, Gier 5–15 %** | 🟡 gemessen | `npm run balance` über je 2 000 Runden. Standard: Median **4** Grabungen, **0,53–1,29** Explosionen, **15–32 %** Gier. Zwei Abweichungen, eine davon strukturell — siehe (1) und (2). |
 | Gerätematrix | 🟡 | `docs/DEVICE-MATRIX.md`: Emulation vollständig grün, echte Geräte offen — und die Matrix sagt bei jeder Zeile, wer sie prüft. |
 | PWA | ✅ | Manifest mit `id`, `scope`, `display_override`, drei Icons inkl. maskable; Service Worker; E2E prüft Installierbarkeit. |
-| Live-URL | ⏳ manuell | Braucht `git push` und Pages auf „GitHub Actions" — Lukas Entscheidung, keine Automatik. |
+| Live-URL | ✅ | **https://lukabpunkt.github.io/Sprengmeister/** — Repo gepusht (7 Tags), Pages auf „GitHub Actions" gestellt, Deploy grün, Seite antwortet mit 200. |
+| CI grün | ✅ | Alle drei Jobs: Lint/Typecheck/Unit, Informationssicherheit, **E2E 50/50 in einem Prozess** (16 min). Zum ersten Mal am Stück — hier lokal räumt der Sandbox den Preview-Server vorher ab. Ein Fund dabei: siehe (5). |
 | README | ✅ | Status, Befehle (inkl. `npm run balance`), Aufbau, Testebenen, Planungsdokumente. Das GIF fehlt — es braucht ein Gerät. |
 | CHANGELOG | ✅ | Ein Abschnitt je Meilenstein, mit den Fehlern, die dabei gefunden wurden. |
 | Lizenz | 🟡 | „Alle Rechte vorbehalten", wie beim Schwesterprojekt *Der Tresor* — die zurücknehmbare Entscheidung. Siehe (4). |
@@ -76,7 +77,16 @@ Schwesterprojekte widersprechen sich: *Der Tresor* liegt unter „alle Rechte vo
 Geschwister) und den Weg nach MIT in der Datei beschrieben. Der umgekehrte Weg ist
 versperrt — einmal erteilte Rechte bleiben.
 
-**(5) Ein Skript statt eines Panels.** Die Roadmap nennt ein „Simulations-Panel". Ein Panel
+**(5) Die CI hatte nie einen Browser für das iPhone-Profil.** Der erste Lauf nach dem Push
+meldete 25 Fehlschläge — alle iPhone-12-Tests, schon der erste. Die Ursache stand erst in
+der dritten Fehlerzeile: `Executable doesn't exist … webkit-2336`. Der Workflow
+installierte nur Chromium, das iPhone-12-Profil läuft aber unter WebKit. Das ist die
+unangenehme Sorte Fehler: In der Zusammenfassung sieht „25 failed" aus wie eine
+Regression, und lokal fällt es nie auf, weil dort beide Engines liegen. Jetzt installiert
+CI `chromium webkit` — und die Suite läuft zum ersten Mal vollständig am Stück durch,
+50 von 50 in 16 Minuten.
+
+**(6) Ein Skript statt eines Panels.** Die Roadmap nennt ein „Simulations-Panel". Ein Panel
 zeigt eine Zahl, während man daneben steht; für einen Balancing-Pass braucht man alle
 Zahlen nebeneinander, reproduzierbar und in einer Form, die man in ein Dokument kleben
 kann. `npm run balance` gibt genau das aus — acht Szenarien × vier Spielerzahlen, mit `!`
@@ -101,8 +111,8 @@ markiert, wo eine Zahl aus der Zielspanne fällt.
       Und: Liegt der gemessene Median näher an 4 oder an 13?
 - [ ] **Lighthouse Mobile** laufen lassen (offen aus A5).
 - [ ] **Referenzgeräte durchgehen** — die Prüfliste steht in `docs/DEVICE-MATRIX.md`.
-- [ ] **Lizenz bestätigen** oder auf MIT + CC BY-NC-SA wechseln.
-- [ ] **Repo pushen**, Pages auf „GitHub Actions" stellen, Live-URL prüfen.
+- [ ] **Lizenz bestätigen** oder auf MIT + CC BY-NC-SA wechseln. (Das Repo ist **öffentlich**, wie Drinkshot und Der Tresor.)
+- [ ] **Die Live-URL auf dem Handy öffnen**: https://lukabpunkt.github.io/Sprengmeister/ — und von dort aus die PWA installieren.
 - [ ] **README-GIF** und `docs/screens/m4-hits.mp4` aufnehmen.
 - [ ] Nach dem Playtest: **Top-5-Findings beheben**, dann `v1.0.0` taggen.
 

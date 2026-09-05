@@ -81,4 +81,6 @@ Zwei Prüfungen laufen zusätzlich außerhalb der Testsuite, damit sie auch dann
 
 ## Deploy
 
-GitHub Pages unter `/Sprengmeister/` (`.github/workflows/deploy.yml`). Ein Host, der aus dem Root serviert, baut mit `SPRENGMEISTER_BASE=/`.
+**Live:** https://lukabpunkt.github.io/Sprengmeister/
+
+GitHub Pages unter `/Sprengmeister/` (`.github/workflows/deploy.yml`), gebaut aus `main`. Ein Host, der aus dem Root serviert, baut mit `SPRENGMEISTER_BASE=/`.
