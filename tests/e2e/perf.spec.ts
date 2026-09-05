@@ -282,6 +282,8 @@ test.describe('Gedrosselt', () => {
     if (await confirm.isVisible().catch(() => false)) await confirm.click();
     await atScreen(page, 'lobby');
 
+    const software = await isSoftwareRenderer(page);
+
     await setPlayerCount(page, 4);
     await openVault(page);
     await skipNegotiation(page);
@@ -323,6 +325,15 @@ test.describe('Gedrosselt', () => {
         `${overBudget.length} ueber ${FRAME_LIMITS.overBudget} ms`
     );
 
+    /*
+     * Wie in den beiden Faellen darueber: Gemessen und gemeldet wird immer, geprueft nur
+     * auf echter Grafik. Der CI-Runner zeichnet in Software mit 10 fps — dort liegt
+     * **jeder** Frame ueber dem Budget, egal was das Spiel tut (gemessen: 314 von 352).
+     * Eine Zusicherung darauf misst den Mietrechner, nicht die Aufdeckung. Dass dieser
+     * Fall das als einziger vergass, fiel nie auf: Die Perf-Stufe lief auf CI nie, weil
+     * der E2E-Flow davor abbrach.
+     */
+    test.skip(software, 'Software-Renderer: Frame-Zeiten sagen nichts ueber das Spiel aus.');
     expect(worst, `schlechtester Frame ${worst.toFixed(0)} ms`).toBeLessThanOrEqual(FRAME_LIMITS.maxMs);
     expect(overBudget.length).toBeLessThanOrEqual(FRAME_LIMITS.maxOverBudget);
   });
