@@ -106,7 +106,13 @@ export function createRevealScreen(ctx: ScreenContext): ScreenInstance {
     globalThis.setTimeout(() => {
       if (destroyed) return;
       if (!ctx.fsm.send({ type: 'showFinished' })) return;
-      void ctx.router.go(ctx.fsm.state === 'DISTRIBUTE' ? 'distribute' : 'result');
+      /*
+       * Wohin es nach der Show geht, weiss die FSM (Alleingang → Verteilen, ab zwei
+       * Dieben im Kronzeugen-Modus → Auspacken, sonst Ergebnis). Der Screen liest das
+       * nur ab, statt die Regel ein zweites Mal zu kennen.
+       */
+      const next = ctx.fsm.state.toLowerCase();
+      void ctx.router.go(next === 'distribute' || next === 'witness' ? next : 'result');
     }, OUTRO_MS);
   };
 

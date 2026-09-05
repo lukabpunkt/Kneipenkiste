@@ -26,6 +26,7 @@ import {
   HIGHROLLER,
   MAX_PLAYERS,
   MIN_PLAYERS,
+  DEFAULT_MODES,
   MODE_IDS,
   MOLE_PENALTY_DIVISOR,
   NEGOTIATION_SECONDS,
@@ -89,8 +90,11 @@ describe('rules.ts gegen GDD §3', () => {
     expect(THINK_TIMER_OPTIONS).toEqual([0, 5]);
   });
 
-  it('kennt genau die vier Modi aus GDD §3.7', () => {
-    expect([...MODE_IDS]).toEqual(['oath', 'mole', 'nightShift', 'highroller']);
+  it('kennt die vier Modi aus GDD §3.7, dazu den Kronzeugen aus dem Backlog', () => {
+    // Reihenfolge ist die der Lobby — die vier aus dem GDD zuerst, Nachzuegler hinten.
+    expect([...MODE_IDS]).toEqual(['oath', 'mole', 'nightShift', 'highroller', 'witness']);
+    // Jeder Modus ist aus: Klassik ist der Default (GDD §3.7).
+    for (const id of MODE_IDS) expect(DEFAULT_MODES[id]).toBe(false);
   });
 
   it('Default: Klassik, normal, 30 s, normale Show, keine Bedenkzeit', () => {

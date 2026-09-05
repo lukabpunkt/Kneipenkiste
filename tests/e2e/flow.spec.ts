@@ -442,3 +442,77 @@ test.describe('Zurueck-Knopf', () => {
     await atScreen(page, 'lobby');
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* Kronzeuge (Backlog nach 1.0)                                        */
+/* ------------------------------------------------------------------ */
+
+test.describe('Kronzeuge', () => {
+  test('halbiert die Strafe des Verpfeifers und legt sie dem Verpfiffenen auf', async ({ page }) => {
+    await startGame(page);
+    await setPlayerCount(page, 3);
+    await enableMode(page, 'Kronzeuge');
+    await openVault(page);
+    await skipNegotiation(page);
+
+    // Zwei Diebe bei V = 4 → je 2 Schlücke.
+    await playChoices(page, ['steal', 'steal', 'share']);
+    await runReveal(page);
+
+    /*
+     * Der Screen liegt offen in der Mitte — kein Rumgeben, kein Timer. Erst tippt der
+     * Kronzeuge sein eigenes Zeichen, dann das des anderen. Beides sieht der ganze Tisch.
+     */
+    await atScreen(page, 'witness');
+    await expect(page.locator('.witness__thief')).toHaveCount(2);
+
+    await page.locator('.witness__thief').first().click();
+    // Nach dem ersten Tap ist er markiert und selbst nicht mehr wählbar.
+    await expect(page.locator('.witness__thief.is-witness')).toHaveCount(1);
+    await expect(page.locator('.witness__thief').first()).toBeDisabled();
+
+    await page.locator('.witness__thief').nth(1).click();
+    await atScreen(page, 'result');
+
+    // 1 + 3 = 4: Der Deal verschiebt Schlücke, er erlässt keine.
+    const rows = page.locator('.result__drinker');
+    await expect(rows).toHaveCount(2);
+    await expect(rows.first()).toContainText('trinkt 1');
+    await expect(rows.nth(1)).toContainText('trinkt 3');
+    await expect(page.locator('.result__sub')).toContainText('verpfiffen');
+  });
+
+  test('lässt die Runde auch schweigend enden', async ({ page }) => {
+    await startGame(page);
+    await setPlayerCount(page, 3);
+    await enableMode(page, 'Kronzeuge');
+    await openVault(page);
+    await skipNegotiation(page);
+    await playChoices(page, ['steal', 'steal', 'share']);
+    await runReveal(page);
+
+    await atScreen(page, 'witness');
+    await page.getByRole('button', { name: 'Keiner packt aus' }).click();
+    await atScreen(page, 'result');
+
+    // Unverändert: je 2 Schlücke, keine Verpfiffen-Zeile.
+    const rows = page.locator('.result__drinker');
+    await expect(rows).toHaveCount(2);
+    await expect(rows.first()).toContainText('trinkt 2');
+    await expect(rows.nth(1)).toContainText('trinkt 2');
+    await expect(page.locator('.result__sub')).not.toContainText('verpfiffen');
+  });
+
+  test('überspringt den Screen beim Alleingang', async ({ page }) => {
+    await startGame(page);
+    await setPlayerCount(page, 3);
+    await enableMode(page, 'Kronzeuge');
+    await openVault(page);
+    await skipNegotiation(page);
+
+    // Ein Dieb: Es gibt niemanden zu verpfeifen — es geht direkt zum Verteilen.
+    await playChoices(page, ['steal', 'share', 'share']);
+    await runReveal(page);
+    await atScreen(page, 'distribute');
+  });
+});

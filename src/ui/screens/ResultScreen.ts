@@ -375,6 +375,16 @@ function subLine(ctx: ScreenContext, result: RoundResult): string {
     parts.push(`${t('result.mole')}: ${ctx.session.playerById(result.moleId)?.name ?? ''}`);
   }
 
+  // Der Kronzeuge gehoert in die Zeile unter dem Banner — er ist der zweite Verrat.
+  if (result.witnessId && result.accusedId) {
+    parts.push(
+      t('witness.line', {
+        witness: ctx.session.playerById(result.witnessId)?.name ?? '',
+        accused: ctx.session.playerById(result.accusedId)?.name ?? '',
+      })
+    );
+  }
+
   return parts.join(' · ');
 }
 

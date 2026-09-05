@@ -16,6 +16,7 @@ import {
   MOLE_PENALTY_DIVISOR,
   PERJURY_MULTI_FACTOR,
   PERJURY_SOLO_SIPS,
+  WITNESS_DIVISOR,
   type Settings,
 } from '@/config/rules';
 import { buildRevealOrder } from './choreographer';
@@ -161,6 +162,107 @@ export function applyDistribution(
     .map((id) => ({ playerId: id, sips: distribution[id]!, reason: 'distributed' as const }));
 
   return { ...result, drinkers: [...result.drinkers, ...distributed] };
+}
+
+/* ------------------------------------------------------------------ */
+/* Kronzeuge (Backlog nach 1.0)                                        */
+/* ------------------------------------------------------------------ */
+
+/** Wer packen darf und wen er nennen kann. */
+export interface WitnessDeal {
+  /** Der Dieb, der auspackt. */
+  witnessId: PlayerId;
+  /** Der Dieb, den er verpfeift. */
+  accusedId: PlayerId;
+}
+
+/**
+ * Darf in dieser Runde ueberhaupt jemand auspacken?
+ *
+ * Nur ab **zwei** Dieben: Beim Alleingang gibt es niemanden zu nennen, und ohne Dieb
+ * gibt es nichts zu halbieren. Der Modus muss an sein — er ist ein Zusatz, keine Regel.
+ */
+export function canTestify(result: RoundResult, settings: Settings): boolean {
+  return settings.modes.witness && result.thieves.length >= 2;
+}
+
+/**
+ * Traegt den Kronzeugen-Deal nach (Backlog nach 1.0).
+ *
+ * Ein Dieb packt aus und halbiert damit **seinen** Anteil an der Beute. Was er spart,
+ * trinkt der Verpfiffene zusaetzlich: Der Tresor verliert nichts, und der Verrat hat
+ * einen Preis, den man am Tisch sitzen sieht. Ein gratis Ausstieg waere keine
+ * Entscheidung, sondern ein Knopf.
+ *
+ * **Der Meineid bleibt unberuehrt.** Der Deal handelt von der Beute, nicht vom
+ * gebrochenen Eid — wer schwoert und stiehlt, zahlt das voll, auch wenn er auspackt.
+ * Genau daran haengt der Satz "Ein Eid ist ein Eid" (GDD §3.7).
+ *
+ * Reine Funktion wie `applyDistribution`: Sie bekommt das fertige Ergebnis und gibt ein
+ * neues zurueck. Wer den Deal nicht will, ruft sie gar nicht auf.
+ */
+export function applyCrownWitness(result: RoundResult, deal: WitnessDeal): RoundResult {
+  const { witnessId, accusedId } = deal;
+
+  if (result.thieves.length < 2) {
+    throw new Error('Ausgepackt wird nur, wenn es mehr als einen Dieb gibt.');
+  }
+  if (!result.thieves.includes(witnessId)) {
+    throw new Error(`${witnessId} hat nicht gestohlen und kann nicht auspacken.`);
+  }
+  if (!result.thieves.includes(accusedId)) {
+    throw new Error(`${accusedId} hat nicht gestohlen und kann nicht verpfiffen werden.`);
+  }
+  if (witnessId === accusedId) {
+    throw new Error('Niemand verpfeift sich selbst.');
+  }
+  if (result.witnessId !== undefined) {
+    throw new Error('In dieser Runde hat schon jemand ausgepackt.');
+  }
+  /*
+   * **Wer den Eid gebrochen hat, hat nichts zu verhandeln.** Der ganze Schluck eines
+   * Meineidigen laeuft unter `perjury`, nicht unter `split` — er hat keinen Beuteanteil,
+   * den er halbieren koennte. Das ist keine technische Ausrede, sondern die Regel: Der
+   * Deal gilt der Beute, und wer geschworen und gestohlen hat, zahlt seinen Eid voll.
+   */
+  if (result.perjurers.includes(witnessId)) {
+    throw new Error(`${witnessId} hat einen Eid gebrochen und kann nicht auspacken.`);
+  }
+
+  /*
+   * Gehandelt wird nur ueber `split` — den Anteil an der Beute. Gebuehr, Jackpot,
+   * Verteilung und Meineid bleiben, wie sie sind.
+   */
+  const witnessShare = result.drinkers.find(
+    (drinker) => drinker.playerId === witnessId && drinker.reason === 'split'
+  );
+  if (!witnessShare || witnessShare.sips <= 0) return { ...result, witnessId, accusedId };
+
+  const reduced = Math.ceil(witnessShare.sips / WITNESS_DIVISOR);
+  const moved = witnessShare.sips - reduced;
+
+  const drinkers: Drinker[] = result.drinkers.map((drinker) => {
+    if (drinker.reason !== 'split') return drinker;
+    if (drinker.playerId === witnessId) return { ...drinker, sips: reduced };
+    if (drinker.playerId === accusedId) return { ...drinker, sips: drinker.sips + moved };
+    return drinker;
+  });
+
+  /*
+   * Der Verpfiffene kann selbst Meineidiger sein — dann hat er keinen `split`-Eintrag,
+   * und die verschobenen Schluecke haetten nirgends hingekonnt. Sie bekommen einen
+   * eigenen: Er zahlt seinen Eid **und** uebernimmt den Anteil des Kronzeugen. Ohne
+   * diese Zeile verschwinden Schluecke aus dem Tresor — genau das hat der Property-Test
+   * ueber 2 000 Deals gefunden.
+   */
+  const accusedHasShare = drinkers.some(
+    (drinker) => drinker.playerId === accusedId && drinker.reason === 'split'
+  );
+  if (!accusedHasShare && moved > 0) {
+    drinkers.push({ playerId: accusedId, sips: moved, reason: 'split' });
+  }
+
+  return { ...result, drinkers, witnessId, accusedId };
 }
 
 /* ------------------------------------------------------------------ */

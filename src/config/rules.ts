@@ -66,7 +66,7 @@ export const HIGHROLLER = {
 /* Modi (GDD §3.7)                                                     */
 /* ------------------------------------------------------------------ */
 
-export const MODE_IDS = ['oath', 'mole', 'nightShift', 'highroller'] as const;
+export const MODE_IDS = ['oath', 'mole', 'nightShift', 'highroller', 'witness'] as const;
 export type ModeId = (typeof MODE_IDS)[number];
 
 /** Modi sind kombinierbar — deshalb Flags statt eines Enums (GDD §3.7). */
@@ -77,6 +77,7 @@ export const DEFAULT_MODES: Modes = {
   mole: false,
   nightShift: false,
   highroller: false,
+  witness: false,
 };
 
 /** Eid: Wer schwoert und als Alleindieb stiehlt, trinkt so viel selbst (GDD §3.7). */
@@ -87,6 +88,14 @@ export const PERJURY_MULTI_FACTOR = 2;
 
 /** Maulwurf: trinkt bei k >= 2 nur die Haelfte (aufgerundet). */
 export const MOLE_PENALTY_DIVISOR = 2;
+
+/**
+ * Kronzeuge (Backlog nach 1.0): Um welchen Faktor der Verpfeifer seine Strafe senkt.
+ *
+ * Was er spart, trinkt der Verpfiffene zusaetzlich — der Tresor verliert nichts. Ohne
+ * diese Umlage waere Auspacken gratis, und ein Verrat ohne Preis ist keine Entscheidung.
+ */
+export const WITNESS_DIVISOR = 2;
 
 /** Nachtschicht: Stille statt Verhandlung (GDD §3.7). */
 export const NIGHT_SHIFT_SILENCE_SEC = 10;

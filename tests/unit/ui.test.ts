@@ -54,6 +54,7 @@ describe('Router', () => {
       'choice',
       'sealed',
       'reveal',
+      'witness',
       'distribute',
       'result',
     ]);
@@ -194,6 +195,17 @@ describe('i18n-Abdeckung der Screens', () => {
     'result.traitor',
     'onboarding.negotiation',
     'onboarding.choice',
+    'witness.headline',
+    'witness.pickSelf',
+    'witness.pickOther',
+    'witness.skip',
+    'witness.backOut',
+    'witness.line',
+    'rules.witnessTitle',
+    'rules.witnessBody',
+    'witness.perjurerBlocked',
+    'modes.witness',
+    'modes.witnessHint',
     'install.cta',
     'install.hint',
     'update.headline',
@@ -246,6 +258,7 @@ describe('i18n-Abdeckung der Screens', () => {
       'silence',
       'title',
       'update',
+      'witness',
     ]);
   });
 });

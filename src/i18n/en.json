@@ -65,7 +65,9 @@
     "highrollerHint": "Bigger vault, faster growth, no ceiling.",
     "comboOathMole": "Chaos mode: the mole may swear and still has to steal — no perjury penalty for them.",
     "comboNightHighroller": "Late shift: big vaults, no negotiation. Short and expensive.",
-    "comboAllOn": "Everything on. Good luck."
+    "comboAllOn": "Everything on. Good luck.",
+    "witness": "Crown witness",
+    "witnessHint": "One thief may talk and halve their penalty. The one they name drinks it."
   },
   "negotiation": {
     "headline": "Negotiate.",
@@ -203,7 +205,9 @@
     "chooseTitle": "Choose in secret",
     "chooseBody": "The phone goes around. Everyone decides alone: SPLIT or STEAL. No going back.",
     "payoutTitle": "Payout",
-    "payoutBody": "One thief hands out the whole vault. Several thieves drink it between them. Splitters walk away dry."
+    "payoutBody": "One thief hands out the whole vault. Several thieves drink it between them. Splitters walk away dry.",
+    "witnessTitle": "Crown witness",
+    "witnessBody": "With two or more thieves one may talk: they halve their share, the one they name drinks it. Whoever broke an oath cannot deal."
   },
   "settings": {
     "headline": "Settings",
@@ -242,5 +246,14 @@
   "update": {
     "headline": "New version available.",
     "cta": "Reload"
+  },
+  "witness": {
+    "headline": "Anyone want to talk?",
+    "pickSelf": "Tap your symbol — you halve your penalty.",
+    "pickOther": "And who else was in on it?",
+    "skip": "Nobody talks",
+    "line": "{witness} gave up {accused}.",
+    "perjurerBlocked": "cannot talk, broke the oath",
+    "backOut": "Never mind"
   }
 }

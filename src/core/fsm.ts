@@ -10,7 +10,7 @@
 
 import { MIN_PLAYERS, type Settings } from '@/config/rules';
 import { assignMole, forcedChoice } from './modes';
-import { resolveRound, type ResolveOptions } from './payout';
+import { canTestify, resolveRound, type ResolveOptions } from './payout';
 import { createSeed } from './rng';
 import type { Choice, Player, PlayerId, RoundResult, RoundSetup } from './types';
 import { vaultSpec } from './vault';
@@ -24,6 +24,7 @@ export const GAME_STATES = [
   'CHOICE',
   'SEALED',
   'REVEAL',
+  'WITNESS',
   'DISTRIBUTE',
   'RESULT',
 ] as const;
@@ -42,9 +43,9 @@ export type GameEvent =
   | { type: 'choose'; choice: Choice }
   /** SEALED → REVEAL — hier faellt die Entscheidung, genau einmal */
   | { type: 'reveal' }
-  /** REVEAL → DISTRIBUTE (Alleingang) oder REVEAL → RESULT */
+  /** REVEAL → WITNESS (Kronzeuge, ab 2 Dieben) / DISTRIBUTE (Alleingang) / RESULT */
   | { type: 'showFinished' }
-  /** DISTRIBUTE → RESULT */
+  /** DISTRIBUTE/WITNESS → RESULT */
   | { type: 'payout'; result: RoundResult }
   /** RESULT → NEGOTIATION/SILENCE */
   | { type: 'nextRound' }
@@ -124,6 +125,7 @@ const ALLOWED: Record<GameState, readonly GameEventType[]> = {
   SEALED: ['reveal', 'cancel'],
   REVEAL: ['showFinished', 'cancel'],
   // Kein `cancel`: Die Runde ist gelaufen, die Schluecke sind faellig.
+  WITNESS: ['payout'],
   DISTRIBUTE: ['payout'],
   RESULT: ['nextRound', 'changePlayers'],
 };
@@ -207,8 +209,18 @@ export function createFsm(options: FsmOptions): Fsm {
       case 'reveal':
         return 'REVEAL';
 
-      case 'showFinished':
-        return context.result?.outcome === 'soloSteal' ? 'DISTRIBUTE' : 'RESULT';
+      /*
+       * Nach der Show gibt es drei Wege: Der Alleindieb verteilt, ab zwei Dieben darf
+       * im Kronzeugen-Modus einer auspacken, sonst geht es direkt zum Ergebnis. Die
+       * beiden Zwischenstationen schliessen sich gegenseitig aus — beim Alleingang gibt
+       * es niemanden zu verpfeifen.
+       */
+      case 'showFinished': {
+        const result = context.result;
+        if (result?.outcome === 'soloSteal') return 'DISTRIBUTE';
+        if (result && canTestify(result, context.settings)) return 'WITNESS';
+        return 'RESULT';
+      }
 
       case 'payout':
         return 'RESULT';

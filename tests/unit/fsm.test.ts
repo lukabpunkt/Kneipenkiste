@@ -384,6 +384,7 @@ describe('Unzulaessige Events', () => {
     CHOICE: ['choose', 'cancel'],
     SEALED: ['reveal', 'cancel'],
     REVEAL: ['showFinished', 'cancel'],
+    WITNESS: ['payout'],
     DISTRIBUTE: ['payout'],
     RESULT: ['nextRound', 'changePlayers'],
   };
@@ -554,11 +555,19 @@ function driveTo(fsm: Fsm, state: GameState): void {
   fsm.send({ type: 'tap' });
   if (state === 'CHOICE') return;
 
-  const solo = state === 'DISTRIBUTE';
-  fsm.send({ type: 'choose', choice: solo ? 'steal' : 'share' });
+  /*
+   * Wieviele stehlen, entscheidet der Zielzustand: einer fuer die Verteil-UI, zwei fuer
+   * den Kronzeugen, sonst keiner. Der Kronzeuge braucht ausserdem den Modus.
+   */
+  const thieves = state === 'DISTRIBUTE' ? 1 : state === 'WITNESS' ? 2 : 0;
+  if (state === 'WITNESS') {
+    fsm.setSettings({ ...fsm.context.settings, modes: { ...fsm.context.settings.modes, witness: true } });
+  }
+
+  fsm.send({ type: 'choose', choice: thieves > 0 ? 'steal' : 'share' });
   for (let i = 1; i < fsm.context.players.length; i++) {
     fsm.send({ type: 'tap' });
-    fsm.send({ type: 'choose', choice: 'share' });
+    fsm.send({ type: 'choose', choice: i < thieves ? 'steal' : 'share' });
   }
   if (state === 'SEALED') return;
   fsm.send({ type: 'reveal' });

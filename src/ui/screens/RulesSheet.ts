@@ -1,8 +1,13 @@
 /**
- * Regeln als vier Karten (GDD §5, Screen 9): Tresor, Verhandeln, Geheim wählen, Auszahlung.
+ * Regeln als Karten (GDD §5, Screen 9): Tresor, Verhandeln, Geheim wählen, Auszahlung.
  *
- * Vier Karten, nicht vier Absätze: Wer in der Kneipe die Regeln nachschlägt, wischt —
- * er liest nicht (GDD Pfeiler 4, Zero Friction).
+ * Karten, nicht Absätze: Wer in der Kneipe die Regeln nachschlägt, wischt — er liest
+ * nicht (GDD Pfeiler 4, Zero Friction).
+ *
+ * Die fünfte Karte gibt es nur im Kronzeugen-Modus. Modus-Regeln stehen sonst als ein
+ * Satz in der Lobby; der Kronzeuge braucht mehr, weil er als einziger Modus **nach** der
+ * Aufdeckung eingreift und weil seine Ausnahme (Meineidige dürfen nicht handeln) sonst
+ * nirgends steht.
  */
 
 import type { Settings } from '@/config/rules';
@@ -10,6 +15,7 @@ import { t } from '@/core/i18n';
 import { openSheet, type SheetHandle } from '@/ui/components/sheet';
 
 const CARDS = ['vault', 'negotiate', 'choose', 'payout'] as const;
+const WITNESS_CARD = 'witness' as const;
 
 export function createRulesSheet(settings: Settings): SheetHandle {
   const content = document.createElement('div');
@@ -20,7 +26,9 @@ export function createRulesSheet(settings: Settings): SheetHandle {
   const dots = document.createElement('div');
   dots.className = 'rules__dots';
 
-  CARDS.forEach((id, index) => {
+  const cards: readonly string[] = settings.modes.witness ? [...CARDS, WITNESS_CARD] : CARDS;
+
+  cards.forEach((id, index) => {
     const card = document.createElement('article');
     card.className = 'rules__card';
 

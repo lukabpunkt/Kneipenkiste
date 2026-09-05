@@ -65,7 +65,9 @@
     "highrollerHint": "Größerer Tresor, schnelleres Wachstum, kein Deckel.",
     "comboOathMole": "Chaos-Modus: Der Maulwurf darf schwören und muss trotzdem stehlen — ohne Meineid-Strafe.",
     "comboNightHighroller": "Späte Schicht: Große Tresore, keine Verhandlung. Kurz und teuer.",
-    "comboAllOn": "Alles an. Viel Glück."
+    "comboAllOn": "Alles an. Viel Glück.",
+    "witness": "Kronzeuge",
+    "witnessHint": "Ein Dieb darf auspacken und halbiert seine Strafe. Der Verpfiffene trinkt sie."
   },
   "negotiation": {
     "headline": "Verhandelt.",
@@ -203,7 +205,9 @@
     "chooseTitle": "Geheim wählen",
     "chooseBody": "Das Handy geht rum. Jeder wählt allein: TEILEN oder STEHLEN. Kein Zurück.",
     "payoutTitle": "Auszahlung",
-    "payoutBody": "Ein Dieb verteilt den ganzen Tresor. Mehrere Diebe saufen ihn unter sich aus. Teiler kommen dann trocken davon."
+    "payoutBody": "Ein Dieb verteilt den ganzen Tresor. Mehrere Diebe saufen ihn unter sich aus. Teiler kommen dann trocken davon.",
+    "witnessTitle": "Kronzeuge",
+    "witnessBody": "Ab zwei Dieben darf einer auspacken: Er halbiert seinen Anteil, der Verpfiffene trinkt ihn. Wer den Eid gebrochen hat, darf nicht handeln."
   },
   "settings": {
     "headline": "Einstellungen",
@@ -242,5 +246,14 @@
   "update": {
     "headline": "Neue Version da.",
     "cta": "Neu laden"
+  },
+  "witness": {
+    "headline": "Will jemand auspacken?",
+    "pickSelf": "Tippe dein Zeichen — du halbierst deine Strafe.",
+    "pickOther": "Und wer war noch dabei?",
+    "skip": "Keiner packt aus",
+    "line": "{witness} hat {accused} verpfiffen.",
+    "perjurerBlocked": "kann nicht auspacken, hat den Eid gebrochen",
+    "backOut": "Doch nicht"
   }
 }

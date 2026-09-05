@@ -28,6 +28,7 @@ import { createRevealScreen } from '@/ui/screens/RevealScreen';
 import { createSealedScreen } from '@/ui/screens/SealedScreen';
 import { createSilenceScreen } from '@/ui/screens/SilenceScreen';
 import { createTitleScreen } from '@/ui/screens/TitleScreen';
+import { createWitnessScreen } from '@/ui/screens/WitnessScreen';
 
 /** Aus diesen Screens fuehrt der Zurueck-Knopf nur ueber einen Dialog (Architektur §3). */
 const ABORTABLE: readonly ScreenId[] = ['negotiation', 'silence', 'pass', 'choice', 'sealed', 'reveal'];
@@ -114,6 +115,7 @@ function boot(): void {
   router.register('choice', createChoiceScreen);
   router.register('sealed', createSealedScreen);
   router.register('reveal', createRevealScreen);
+  router.register('witness', createWitnessScreen);
   router.register('distribute', createDistributeScreen);
   router.register('result', createResultScreen);
 

@@ -17,6 +17,7 @@ export type ScreenId =
   | 'choice'
   | 'sealed'
   | 'reveal'
+  | 'witness'
   | 'distribute'
   | 'result';
 

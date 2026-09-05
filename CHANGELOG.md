@@ -17,6 +17,11 @@ Alle nennenswerten Änderungen an **Der Tresor**. Format nach
 - `ctx.play()` nimmt jetzt eine Verstimmung entgegen — derselbe Klang sechsmal
   hintereinander klingt nach Maschinengewehr, minimal verstimmt nach sechs Händen.
 - `docs/screens/m4-outcomes.gif` — sechs Inszenierungen am Stück (offenes SOLL aus M4).
+- **Kronzeugen-Modus** (fünfter Modus): Ab zwei Dieben darf nach der Aufdeckung einer
+  auspacken. Er halbiert seinen Beuteanteil, der Verpfiffene trinkt ihn — die Summe der
+  Runde bleibt gleich (ADR-33). Wer den Eid gebrochen hat, darf nicht handeln. Der Screen
+  ist bewusst öffentlich: Das Handy bleibt in der Mitte, beide Taps sieht der Tisch
+  (ADR-34). Neuer FSM-Zustand `WITNESS` zwischen Aufdeckung und Ergebnis.
 
 ## [1.0.0-rc.1] — 2026-09-05
 

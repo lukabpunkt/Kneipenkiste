@@ -358,4 +358,17 @@ Alle vier durchlaufen dieselben Prüfungen wie die elf aus M4: Dauer 2–8 s, Tr
 - **`ctx.play()` konnte nicht verstimmen.** Sechs identische Klatscher hintereinander klingen nach Maschinengewehr. Die Kontext-Schnittstelle reicht jetzt `detune` durch — der `AudioManager` konnte es die ganze Zeit.
 - **Zwei Registry-Tests zählten den Stand von gestern.** Sie prüften „genau elf" statt einer Untergrenze und fielen um, sobald etwas dazukam. Jetzt prüfen sie die Untergrenze je Fall aus GDD §4.4 und dass die Summe zur Liste passt.
 
-**Zahlen:** 682 Unit-Tests · 15 Inszenierungen (3,7–5,3 s) + 2 Overlays · 45 Atlas-Frames im front-Atlas · gesamt 268,6 KB gzip.
+**Kronzeugen-Modus** — der fünfte Modus und der erste, der **nach** der Aufdeckung eingreift.
+
+Ab zwei Dieben liegt das Handy offen in der Mitte: Einer darf auspacken, halbiert seinen Beuteanteil, und der Verpfiffene trinkt ihn. Die Summe der Runde bleibt gleich — was der Kronzeuge spart, zahlt ein anderer. Ein Rabatt für alle wäre kein Verrat, sondern ein Knopf (ADR-33).
+
+Zwei Regeln fallen aus der Umlage:
+
+- **Wer den Eid gebrochen hat, kann nicht auspacken.** Sein ganzer Schluck ist die Meineid-Strafe; einen Beuteanteil zum Halbieren hat er nicht. Der Screen sperrt ihn sichtbar statt ihn auszublenden.
+- **Verpfiffen werden kann er sehr wohl** — dann bekommt er einen eigenen Beuteanteil zusätzlich zu seinem Eid.
+
+Der Screen ist der einzige öffentliche Entscheidungs-Screen im Spiel (ADR-34): kein Rumgeben, kein Timer, beide Taps sieht der Tisch. „Keiner packt aus" steht gleichberechtigt daneben.
+
+**Befund:** Der Property-Test über 2 000 Deals hat ein echtes Loch gefunden — bei einem verpfiffenen Meineidigen verschwanden Schlücke, weil er gar keinen `split`-Eintrag hatte und die verschobenen Schlücke nirgends hinkonnten. Ohne die Zusicherung „die Summe bleibt" wäre das erst am Tisch aufgefallen, als Rechenfehler.
+
+**Zahlen:** 698 Unit-Tests · E2E auf vier Geräteprofilen (12 neue Fälle für den Kronzeugen) · 15 Inszenierungen (3,7–5,3 s) + 2 Overlays · 5 Modi · gesamt 269,8 KB gzip.

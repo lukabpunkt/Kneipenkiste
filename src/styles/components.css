@@ -2686,3 +2686,66 @@
   font-size: var(--fs-xs);
   color: rgb(255 248 231 / 58%);
 }
+
+/* ------------------------------------------------------------------ */
+/* Kronzeuge (Backlog nach 1.0)                                        */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Oeffentlicher Screen: Das Handy liegt in der Mitte, alle sehen zu. Deshalb grosse
+ * Ziele, viel Luft und keine Privatsphaere-Vorkehrungen wie beim Wahl-Screen.
+ */
+.screen--witness {
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  text-align: center;
+}
+
+.witness__headline {
+  margin: 0;
+  font-size: var(--fs-xl);
+  color: var(--c-steal);
+}
+
+.witness__sub {
+  margin: 0;
+  font-size: var(--fs-md);
+  color: rgb(255 248 231 / 72%);
+}
+
+.witness__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.witness__thief {
+  display: grid;
+  place-items: center;
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+  padding: var(--space-3);
+  border: 3px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--c-bg-panel);
+  cursor: pointer;
+}
+
+/* Wer ausgepackt hat, bleibt sichtbar stehen — man soll sehen, wer geredet hat. */
+.witness__thief.is-witness {
+  border-color: var(--c-steal);
+  background: rgb(255 45 85 / 12%);
+}
+
+.witness__thief:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+
+/* Wer den Eid gebrochen hat, darf nicht handeln — sichtbar, nicht versteckt. */
+.witness__thief.is-blocked {
+  opacity: 0.4;
+  filter: grayscale(1);
+}

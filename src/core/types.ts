@@ -73,6 +73,10 @@ export interface RoundResult extends RoundSetup {
   distributorId?: PlayerId;
   /** Bei `soloSteal`: wieviele Schluecke er zu verteilen hat (V, bei Meineid V−2). */
   distributableSips?: number;
+  /** Kronzeugen-Modus: Wer ausgepackt hat (Backlog nach 1.0). */
+  witnessId?: PlayerId;
+  /** Kronzeugen-Modus: Wen er verpfiffen hat. */
+  accusedId?: PlayerId;
   /** Vollstaendige Karten-Reihenfolge: Teiler zuerst, Diebe zuletzt (ADR-3). */
   revealOrder: PlayerId[];
   outcomeSequenceId: string;

@@ -22,6 +22,7 @@ export const SCREEN_ORDER = [
   'choice',
   'sealed',
   'reveal',
+  'witness',
   'distribute',
   'result',
 ] as const;
@@ -104,6 +105,7 @@ const MUSIC_FOR: Record<ScreenId, MusicTrack | undefined> = {
   choice: undefined,
   sealed: undefined,
   reveal: 'reveal',
+  witness: 'reveal',
   distribute: 'lobby',
   result: 'lobby',
 };
