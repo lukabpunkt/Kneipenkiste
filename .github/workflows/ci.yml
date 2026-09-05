@@ -129,8 +129,11 @@ jobs:
       - name: Dependencies installieren
         run: npm ci
 
+      # Beide Engines: Das iPhone-12-Profil laeuft unter WebKit, Pixel 5 unter Chromium.
+      # Mit `chromium` allein scheitern die 25 iPhone-Tests am fehlenden Browser, nicht
+      # an einer Regression — und das sieht in der Log-Ausgabe fast gleich aus.
       - name: Playwright-Browser installieren
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium webkit
 
       - name: E2E (iPhone 12 + Pixel 5)
         run: npm run test:e2e
