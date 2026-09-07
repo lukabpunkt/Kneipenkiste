@@ -551,8 +551,10 @@
 
 /* --- Toasts -------------------------------------------------------------- */
 
+/* Absolute, not fixed: #app is the positioned ancestor, so on a desktop the toasts stay inside
+   the phone frame instead of floating off across the page. */
 .toasts {
-  position: fixed;
+  position: absolute;
   left: 50%;
   /* Clears the sticky footer, so a toast never sits on top of the primary action. */
   bottom: calc(var(--space-5) + var(--btn-primary-height) + env(safe-area-inset-bottom));

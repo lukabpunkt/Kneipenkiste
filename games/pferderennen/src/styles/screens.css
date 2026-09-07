@@ -961,44 +961,12 @@
 
 /* --- Desktop ------------------------------------------------------------- */
 
-@media (min-width: 900px) {
-  .horse-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  /*
-   * On a wide screen the payouts stop being a long column nobody can take in at once. Two per
-   * row means a table of six sees its whole settlement without scrolling.
-   */
-  .payouts {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    align-items: start;
-  }
-
-  /* A button spanning the whole desktop width looks accidental rather than inviting. Not a
-     child selector: the start screen wraps its primary action so a second line can sit under it. */
-  .screen__footer .btn--wide {
-    display: flex;
-    max-width: 420px;
-    margin-inline: auto;
-  }
-
-  .start__title {
-    font-size: 72px;
-  }
-
-  .results__actions {
-    flex-direction: row-reverse;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .results__actions .btn--primary {
-    width: auto;
-    min-width: 260px;
-  }
-}
+/*
+ * There is no wide menu layout any more. Every screen except the race lives in a 480px phone
+ * frame on a desktop (see base.css), so the three-up horse grid, the two-column payouts, the
+ * 72px title and the centred action row that used to live here were all sized for a width the
+ * menus never see now. The race keeps its own wide handling in race.css.
+ */
 
 .betting__footer {
   display: flex;

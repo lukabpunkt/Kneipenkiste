@@ -89,20 +89,28 @@ body {
   font-size: var(--text-sm);
   line-height: var(--leading-body);
   color: var(--text);
-  /*
-   * The sky, with a whisper of grain over it. Long gradients band into visible stripes on 8-bit
-   * displays; a little noise dithers the steps away — the same trick film and games have always
-   * used. It is baked into a data URI rather than run as a live SVG filter, because a canvas is
-   * already asking for the GPU on the race screen.
-   */
-  background: var(--grain), linear-gradient(170deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
-  background-attachment: fixed;
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
   /* No double-tap zoom and no selection lasso while the phone is passed around. */
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+/*
+ * The room the game sits in: two coloured lamps a long way off, with a whisper of grain over
+ * them. Long low gradients band into visible stripes on 8-bit displays; a little noise dithers
+ * the steps away — the same trick film and games have always used. Baked into a data URI rather
+ * than run as a live SVG filter, because a canvas is already asking for the GPU on the race
+ * screen. Fixed, so it does not scroll, and behind #app so the desktop frame can sit on it.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--grain), var(--room-light), var(--bg);
 }
 
 /* While a modal is open the page behind it must not scroll away underneath. */
@@ -182,6 +190,39 @@ select {
   z-index: 1;
   display: grid;
   height: 100dvh;
+  background: var(--bg);
+}
+
+/*
+ * Desktop. The menus move into the same 9:16 phone frame the sister games use — this is a game
+ * you play by passing one phone around, and a full-width menu says otherwise.
+ *
+ * The race does not. It has a landscape track and a ten-foot mode that no sister game has, and
+ * both would be thrown away by a 480px column. The router flips :root[data-frame] between the
+ * two, which is also what gates the television font size in tokens.css.
+ */
+@media (min-width: 768px) {
+  body {
+    display: grid;
+    place-items: center;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  :root[data-frame='phone'] #app {
+    width: min(var(--frame-max-width), calc(100dvh * 9 / 16));
+    height: min(854px, 100dvh - 48px);
+    aspect-ratio: var(--frame-aspect);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--elev-3);
+    overflow: hidden;
+  }
+
+  :root[data-frame='full'] #app {
+    width: 100vw;
+    height: 100dvh;
+  }
 }
 
 /* All screens share one grid cell so a leaving and an entering screen can overlap. */
@@ -192,8 +233,9 @@ select {
   display: flex;
   flex-direction: column;
   /* A fixed height rather than a minimum: only then does __body scroll internally and the
-     footer with the primary action stay put at the bottom edge. */
-  height: 100dvh;
+     footer with the primary action stay put at the bottom edge. 100 % of #app, not of the
+     viewport, so a framed screen stays inside the frame. */
+  height: 100%;
   min-height: 0;
   transition:
     opacity var(--dur-base) var(--ease-out),
@@ -269,7 +311,7 @@ select {
   margin-top: calc(var(--space-6) * -1);
   padding-top: var(--space-6);
   padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, transparent, var(--sky-bottom) 62%);
+  background: linear-gradient(180deg, transparent, var(--bg) 62%);
 }
 
 /* Visible to screen readers only (aria-live region, canvas description). */
@@ -310,46 +352,16 @@ select {
 
 /* --- Desktop and TV ------------------------------------------------------ */
 
-@media (min-width: 900px) {
-  .screen__header,
-  .screen__body,
-  .screen__footer {
-    max-width: 900px;
-  }
-
-  .screen__title {
-    font-size: var(--text-2xl);
-  }
-
-  .screen__subtitle {
-    font-size: var(--text-sm);
-  }
-}
-
 /*
- * Ten feet away. The type scale is already lifted by `:root { font-size: 21px }` in tokens.css,
- * which carries every ratio with it; what is left here is room and margin.
+ * Ten feet away — the race, and only the race. Everything else is inside a 480px phone frame at
+ * this width, where a lifted root font size would be a magnifying glass held to a phone. The
+ * scale itself is raised by `:root[data-frame='full']` in tokens.css; what is left here is room.
  *
  * The safe frame matters: real televisions overscan by up to ~5 %, so anything that must be
  * readable stays inside it. A browser at this width loses nothing by it.
  */
 @media (min-width: 1400px) {
-  .screen__header,
-  .screen__body,
-  .screen__footer {
-    max-width: 1100px;
-    padding-inline: var(--space-6);
-  }
-
-  .screen__header {
-    padding-top: max(var(--space-6), env(safe-area-inset-top));
-  }
-
-  .screen__footer {
-    padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
-  }
-
-  body {
+  :root[data-frame='full'] body {
     font-size: var(--text-md);
   }
 }
