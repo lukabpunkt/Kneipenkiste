@@ -637,6 +637,8 @@
 }
 
 .modal__handle {
+  /* The sheet is a flex column, so without this the handle is squashed to half its height. */
+  flex: 0 0 auto;
   width: 44px;
   height: 5px;
   margin: var(--space-2) auto var(--space-1);
