@@ -1,0 +1,97 @@
+/*
+ * Design-Tokens (Art Direction §2/§3/§7).
+ * TS-Pendant: `src/config/theme.ts`. Beide muessen synchron bleiben —
+ * `tests/unit/config.test.ts` vergleicht sie Wert fuer Wert.
+ */
+
+:root {
+  /* Menue-Flaechen */
+  --bg-deep: #0f0e1a;
+  --bg-panel: #1c1b2e;
+  --bg-panel-raised: #27263d;
+  --ink: #1a1024;
+  --paper: #fff8e7;
+
+  /* Canyon-Akzent */
+  --canyon: #ffb800;
+  --canyon-shade: #d18e00;
+
+  /* Die Schlucht */
+  --sky-top: #2b4c8c;
+  --sky-horizon: #f5a25d;
+  --rock: #c4693e;
+  --rock-dark: #8c4426;
+  --mist: #dce3f0;
+  --river: #3fa7d6;
+
+  /* Die Bruecke */
+  --wood: #9c8a72;
+  --wood-dark: #6b5b48;
+  --wood-rotten: #5a6b3f;
+  --rope: #d9b77a;
+
+  /* Ergebnisse */
+  --safe: #2ed573;
+  --danger: #ff2d55;
+  --flag: #ffffff;
+
+  /* Spielerfarben — identisch zu Drinkshot */
+  --player-red: #ff4757;
+  --player-blue: #3b82f6;
+  --player-green: #2ed573;
+  --player-yellow: #ffd32a;
+  --player-purple: #af73ee;
+  --player-orange: #ff7f50;
+  --player-pink: #ff6b9d;
+  --player-cyan: #18dcff;
+
+  /* Typografie */
+  --font-display: 'Luckiest Guy', 'Comic Sans MS', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-md: 16px;
+  --fs-lg: 20px;
+  --fs-xl: 28px;
+  --fs-2xl: 40px;
+  --fs-hero: 64px;
+  --fs-mega: 96px;
+
+  /* Layout */
+  --design-width: 390px;
+  --design-height: 844px;
+  --plank-min-height: 56px;
+  --plank-min-height-tight: 48px;
+  --plank-gap: 8px;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Motion */
+  --wipe-ms: 260ms;
+  --press-ms: 90ms;
+  --seal-ms: 420ms;
+  --banner-ms: 520ms;
+  --rope-idle-ms: 4000ms;
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Safe-Areas */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Reduced-Motion: Der Blickkontakt bleibt (er ist Information), das Wackeln geht (A5). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --wipe-ms: 1ms;
+    --press-ms: 1ms;
+    --rope-idle-ms: 0ms;
+  }
+}

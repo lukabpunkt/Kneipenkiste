@@ -1,0 +1,184 @@
+{
+  "app": {
+    "title": "The Rope Bridge",
+    "tagline": "Alone is safe. Together you get wet."
+  },
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Yes",
+    "continue": "Continue",
+    "settings": "Settings",
+    "rules": "Rules",
+    "sips_one": "sip",
+    "sips_other": "sips",
+    "planks_one": "plank",
+    "planks_other": "planks",
+    "players_one": "player",
+    "players_other": "players",
+    "plank": "Plank {n}",
+    "and": "and"
+  },
+  "title": {
+    "play": "Play",
+    "rules": "Rules",
+    "settings": "Settings"
+  },
+  "lobby": {
+    "headline": "Who's crossing?",
+    "addPlayer": "Add player",
+    "removePlayer": "Remove {name}",
+    "rename": "Rename",
+    "cycleColor": "Change colour",
+    "bridgeInfo": "{count} planks for {players} people",
+    "tooFew": "With two of you there are planks to spare. Go find someone else.",
+    "modes": "Modes",
+    "duration": "Talk time",
+    "pace": "Pace",
+    "cta": "Onto the bridge"
+  },
+  "modes": {
+    "flags": "Flag",
+    "flagsHint": "Planting a flag is public. Breaking your word is expensive.",
+    "rotten": "Rotten plank",
+    "rottenHint": "One plank breaks under a single person. Nobody knows which.",
+    "weights": "Heavyweight",
+    "weightsHint": "Backpack 1–3: hand out more, drink more.",
+    "fog": "Fog",
+    "fogHint": "No talking. Just wind and ten seconds of silence.",
+    "rope": "Rope",
+    "ropeHint": "Once per session: swing across safely for one sip."
+  },
+  "pace": {
+    "short": "Short",
+    "normal": "Normal",
+    "long": "Long"
+  },
+  "negotiation": {
+    "headline": "Talk it over. Or pretend to.",
+    "notBinding": "Promises are not binding.",
+    "ready": "Everyone ready",
+    "ruleLine": "Standing alone hands out {giving}. Two on one plank: both drink 2.",
+    "deathZoneRule": "Death zone: fewer planks than people. Standing alone hands out {giving}.",
+    "flagPrompt": "Flag on …",
+    "flagOf": "{name}: flag on {plank}",
+    "tooltip": "Talk. Promise. Break it."
+  },
+  "silence": {
+    "headline": "Fog",
+    "body": "No talking. Just wind.",
+    "countdown": "{seconds}"
+  },
+  "pass": {
+    "headline": "Phone to {name}",
+    "body": "Nobody else looks.",
+    "cta": "That's me"
+  },
+  "choose": {
+    "headline": "Your plank. Nobody sees it.",
+    "plankLabel": "Choose plank {n}",
+    "rope": "Take the rope (once)",
+    "ropeSpent": "Your rope is used up.",
+    "weight": "Backpack",
+    "weightRisk": "Safe: hand out {giving} · Fall: drink {weight} × people",
+    "sealed": "Sealed",
+    "thinkTimer": "{seconds} s left",
+    "autoPicked": "Time's up — plank {plank} picked for you.",
+    "tooltip": "Alone on the plank = safe. Two of you = wet."
+  },
+  "sealed": {
+    "headline": "Everyone has chosen.",
+    "body": "Phone in the middle.",
+    "cta": "The step"
+  },
+  "step": {
+    "skip": "Continue",
+    "oh": "Oh.",
+    "whyMe": "Why me?!",
+    "seriously": "Seriously?",
+    "youSaidThree": "You said plank {plank}!",
+    "phew": "Phew.",
+    "help": "HELP",
+    "deathZoneSign": "ONLY {count} PLANKS",
+    "rotSign": "Plank {plank} rotted away",
+    "repairedSign": "Repaired"
+  },
+  "distribute": {
+    "headline": "{name} hands out",
+    "quickHeadline": "The safe ones hand out 1 each",
+    "prompt": "To whom?",
+    "remaining_one": "{count} sip left",
+    "remaining_other": "{count} sips left",
+    "notYourself": "Not to yourself."
+  },
+  "banner": {
+    "allSafe": "All across",
+    "crash": "Crack",
+    "massCollision": "Mass fall",
+    "deathZone": "Death zone",
+    "desertion": "Desertion!",
+    "badLuck": "Bad luck"
+  },
+  "result": {
+    "drinkers": "Drinks",
+    "givers": "Hands out",
+    "sipsFor": "{name}: {sips}",
+    "collisionOn": "Plank {plank}: {names}",
+    "rottenWas": "The rotten one was plank {plank}.",
+    "removed": "Plank {plank} rotted away.",
+    "repaired": "Repaired: {count} planks.",
+    "nextRound": "Next round: {count} planks",
+    "nextRoundTight": "Only {count} planks for {players} people",
+    "flagVsChoice": "{name}: flag on {flag}, stood on {plank}",
+    "thief": "{thief} stole {victim}'s plank.",
+    "ropeUser": "{name} swung across.",
+    "stats": "Stats",
+    "statSips": "Drunk",
+    "statFalls": "Falls",
+    "statPartner": "{a} and {b} fell together {count}×",
+    "mountainGoat": "Mountain goat: {name}",
+    "frequentFaller": "Frequent faller: {name}",
+    "again": "Next round",
+    "changePlayers": "Change players",
+    "changeModes": "Change modes",
+    "vulture": [
+      "I'd have bet on plank 5.",
+      "Trust is so 2019.",
+      "Nobody again? I'm hungry.",
+      "You talked. You lied. Excellent.",
+      "The plank was not the problem."
+    ]
+  },
+  "rules": {
+    "headline": "In three sentences",
+    "card1Title": "Pick a plank",
+    "card1Body": "Everyone secretly picks a plank. You may talk first.",
+    "card2Title": "Alone = safe, two = fall",
+    "card2Body": "Stand alone and you hand out. Share a plank and you drink and fall.",
+    "card3Title": "The bridge shrinks",
+    "card3Body": "Every peaceful round costs a plank. Eventually there aren't enough for anyone."
+  },
+  "settings": {
+    "sound": "Sound",
+    "music": "Music",
+    "haptics": "Haptics",
+    "lowEffects": "Fewer effects",
+    "language": "Language",
+    "negotiationSec": "Talk time: {seconds} s",
+    "thinkTimer": "Think timer",
+    "thinkTimerOff": "Off",
+    "reset": "Reset session"
+  },
+  "dialog": {
+    "abortRound": "Abort the round?",
+    "abortBody": "This round's choices will be lost."
+  },
+  "orientation": {
+    "headline": "Turn your phone upright",
+    "body": "The canyon is deep, not wide."
+  },
+  "share": {
+    "pair": "{a} and {b} fell together for the {count}. time 🌉"
+  }
+}

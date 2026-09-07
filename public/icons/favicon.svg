@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Die Hängebrücke">
+  <!-- Goldene Stunde ueber der Schlucht (Art Direction §1) -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B4C8C" />
+      <stop offset="1" stop-color="#F5A25D" />
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#sky)" />
+
+  <!-- Felsplateaus links und rechts -->
+  <path d="M0 300h96l24 32v180H0z" fill="#C4693E" />
+  <path d="M512 300h-96l-24 32v180h120z" fill="#C4693E" />
+  <path d="M0 380h96v132H0z" fill="#8C4426" />
+  <path d="M512 380h-96v132h96z" fill="#8C4426" />
+
+  <!-- Seile mit Durchhang -->
+  <path d="M96 300C176 372 336 372 416 300" fill="none" stroke="#1A1024" stroke-width="26" stroke-linecap="round" />
+  <path d="M96 300C176 372 336 372 416 300" fill="none" stroke="#D9B77A" stroke-width="14" stroke-linecap="round" />
+
+  <!-- Balken; die Luecke ist der abgefaulte Balken (Design-Pfeiler 3) -->
+  <g fill="#9C8A72" stroke="#1A1024" stroke-width="10" stroke-linejoin="round">
+    <rect x="132" y="330" width="52" height="20" rx="6" transform="rotate(9 158 340)" />
+    <rect x="204" y="352" width="52" height="20" rx="6" transform="rotate(3 230 362)" />
+    <rect x="328" y="330" width="52" height="20" rx="6" transform="rotate(-9 354 340)" />
+  </g>
+
+  <!-- Zwei Hüte auf einem Balken: das Bild, das das Spiel verkauft -->
+  <circle cx="268" cy="336" r="22" fill="#FF4757" stroke="#1A1024" stroke-width="10" />
+  <circle cx="300" cy="336" r="22" fill="#3B82F6" stroke="#1A1024" stroke-width="10" />
+</svg>

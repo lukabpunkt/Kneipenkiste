@@ -1,0 +1,184 @@
+{
+  "app": {
+    "title": "Die Hängebrücke",
+    "tagline": "Allein ist sicher. Zu zweit wird es nass."
+  },
+  "common": {
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "confirm": "Ja",
+    "continue": "Weiter",
+    "settings": "Einstellungen",
+    "rules": "Regeln",
+    "sips_one": "Schluck",
+    "sips_other": "Schlücke",
+    "planks_one": "Balken",
+    "planks_other": "Balken",
+    "players_one": "Spieler",
+    "players_other": "Spieler",
+    "plank": "Balken {n}",
+    "and": "und"
+  },
+  "title": {
+    "play": "Spielen",
+    "rules": "Regeln",
+    "settings": "Einstellungen"
+  },
+  "lobby": {
+    "headline": "Wer geht rüber?",
+    "addPlayer": "Spieler dazu",
+    "removePlayer": "{name} entfernen",
+    "rename": "Name ändern",
+    "cycleColor": "Farbe wechseln",
+    "bridgeInfo": "{count} Balken für {players} Leute",
+    "tooFew": "Zu zweit gibt es genug Balken für alle. Holt noch jemanden.",
+    "modes": "Modi",
+    "duration": "Absprache",
+    "pace": "Tempo",
+    "cta": "Auf die Brücke"
+  },
+  "modes": {
+    "flags": "Fahne",
+    "flagsHint": "Fahne setzen ist öffentlich. Wortbruch wird teuer.",
+    "rotten": "Morscher Balken",
+    "rottenHint": "Ein Balken bricht auch unter einer Person. Niemand weiß welcher.",
+    "weights": "Schwergewicht",
+    "weightsHint": "Rucksack 1–3: mehr verteilen, mehr trinken.",
+    "fog": "Nebel",
+    "fogHint": "Keine Absprache. Nur Wind und zehn Sekunden Stille.",
+    "rope": "Seil",
+    "ropeHint": "Einmal pro Session: sicher durchhangeln für einen Schluck."
+  },
+  "pace": {
+    "short": "Kurz",
+    "normal": "Normal",
+    "long": "Lang"
+  },
+  "negotiation": {
+    "headline": "Sprecht euch ab. Oder tut so.",
+    "notBinding": "Versprechen sind nicht bindend.",
+    "ready": "Alle bereit",
+    "ruleLine": "Sicher stehen verteilt {giving}. Zu zweit auf einem Balken: beide trinken 2.",
+    "deathZoneRule": "Todeszone: Es gibt weniger Balken als Leute. Sicher stehen verteilt {giving}.",
+    "flagPrompt": "Fahne auf …",
+    "flagOf": "{name}: Fahne auf {plank}",
+    "tooltip": "Redet. Versprecht. Brecht es."
+  },
+  "silence": {
+    "headline": "Nebel",
+    "body": "Keine Absprache. Nur Wind.",
+    "countdown": "{seconds}"
+  },
+  "pass": {
+    "headline": "Handy an {name}",
+    "body": "Niemand sonst schaut hin.",
+    "cta": "Ich bin's"
+  },
+  "choose": {
+    "headline": "Dein Balken. Niemand sieht ihn.",
+    "plankLabel": "Balken {n} wählen",
+    "rope": "Seil nehmen (einmalig)",
+    "ropeSpent": "Dein Seil ist verbraucht.",
+    "weight": "Rucksack",
+    "weightRisk": "Sicher: verteilst {giving} · Sturz: trinkst {weight} × Personen",
+    "sealed": "Versiegelt",
+    "thinkTimer": "Noch {seconds} s",
+    "autoPicked": "Zeit um — Balken {plank} für dich gewählt.",
+    "tooltip": "Allein auf dem Balken = sicher. Zu zweit = nass."
+  },
+  "sealed": {
+    "headline": "Alle haben gewählt.",
+    "body": "Handy in die Mitte.",
+    "cta": "Der Schritt"
+  },
+  "step": {
+    "skip": "Weiter",
+    "oh": "Oh.",
+    "whyMe": "Warum ich?!",
+    "seriously": "Ernsthaft?",
+    "youSaidThree": "Du hattest die {plank} gesagt!",
+    "phew": "Puh.",
+    "help": "HILFE",
+    "deathZoneSign": "NUR {count} BALKEN",
+    "rotSign": "Balken {plank} ist abgefault",
+    "repairedSign": "Repariert"
+  },
+  "distribute": {
+    "headline": "{name} verteilt",
+    "quickHeadline": "Die Sicheren verteilen je 1",
+    "prompt": "An wen?",
+    "remaining_one": "Noch {count} Schluck",
+    "remaining_other": "Noch {count} Schlücke",
+    "notYourself": "An dich selbst geht nicht."
+  },
+  "banner": {
+    "allSafe": "Alle drüben",
+    "crash": "Es kracht",
+    "massCollision": "Massensturz",
+    "deathZone": "Todeszone",
+    "desertion": "Fahnenflucht!",
+    "badLuck": "Pech"
+  },
+  "result": {
+    "drinkers": "Trinkt",
+    "givers": "Verteilt",
+    "sipsFor": "{name}: {sips}",
+    "collisionOn": "Balken {plank}: {names}",
+    "rottenWas": "Morsch war Balken {plank}.",
+    "removed": "Balken {plank} ist abgefault.",
+    "repaired": "Repariert: {count} Balken.",
+    "nextRound": "Nächste Runde: {count} Balken",
+    "nextRoundTight": "Nur noch {count} Balken für {players} Leute",
+    "flagVsChoice": "{name}: Fahne auf {flag}, stand auf {plank}",
+    "thief": "{thief} hat {victim} den Balken geklaut.",
+    "ropeUser": "{name} hat sich durchgehangelt.",
+    "stats": "Statistik",
+    "statSips": "Getrunken",
+    "statFalls": "Stürze",
+    "statPartner": "{a} und {b} sind {count}× zusammen gefallen",
+    "mountainGoat": "Bergziege: {name}",
+    "frequentFaller": "Sturzflieger: {name}",
+    "again": "Nächste Runde",
+    "changePlayers": "Spieler ändern",
+    "changeModes": "Modus ändern",
+    "vulture": [
+      "Ich hätte auf die 5 gewettet.",
+      "Vertrauen ist so 2019.",
+      "Wieder niemand? Ich hab Hunger.",
+      "Ihr habt geredet. Ihr habt gelogen. Sehr gut.",
+      "Der Balken war nicht das Problem."
+    ]
+  },
+  "rules": {
+    "headline": "In drei Sätzen",
+    "card1Title": "Balken wählen",
+    "card1Body": "Jeder wählt geheim einen Balken. Vorher dürft ihr reden.",
+    "card2Title": "Allein = sicher, zu zweit = Sturz",
+    "card2Body": "Wer allein steht, verteilt. Wer sich einen Balken teilt, trinkt und fällt.",
+    "card3Title": "Die Brücke schrumpft",
+    "card3Body": "Jede friedliche Runde kostet einen Balken. Irgendwann reicht es für niemanden mehr."
+  },
+  "settings": {
+    "sound": "Ton",
+    "music": "Musik",
+    "haptics": "Vibration",
+    "lowEffects": "Weniger Effekte",
+    "language": "Sprache",
+    "negotiationSec": "Absprache: {seconds} s",
+    "thinkTimer": "Bedenkzeit",
+    "thinkTimerOff": "Aus",
+    "reset": "Session zurücksetzen"
+  },
+  "dialog": {
+    "abortRound": "Runde abbrechen?",
+    "abortBody": "Die Wahlen dieser Runde gehen verloren."
+  },
+  "orientation": {
+    "headline": "Dreh das Handy hochkant",
+    "body": "Die Schlucht ist tief, nicht breit."
+  },
+  "share": {
+    "pair": "{a} und {b} sind zum {count}. Mal zusammen abgestürzt 🌉"
+  }
+}
