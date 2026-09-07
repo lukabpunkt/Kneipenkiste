@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gustav, Fluegel. Ankerpunkt oben links am Schulteransatz, damit er schlagen kann. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100" width="150" height="100">
+  <path d="M12 16 Q70 6 132 34 Q104 58 68 56 Q34 54 12 16 Z" fill="#6B5B48" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+  <!-- Handschwingen: drei Federn, die der Schlag auffaechert. -->
+  <g fill="#4A3E30" stroke="#1A1024" stroke-width="8" stroke-linejoin="round">
+    <path d="M62 52 L54 92 L78 62 Z"/>
+    <path d="M84 56 L86 94 L102 60 Z"/>
+    <path d="M104 54 L118 88 L124 54 Z"/>
+  </g>
+</svg>

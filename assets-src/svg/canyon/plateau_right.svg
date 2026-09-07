@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Rechtes Plateau: Lauffläche ebenfalls oben, aber andere Kante — eine Schlucht ist
+     nicht symmetrisch. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 520" width="260" height="520">
+  <path d="M260 4 H50 L24 28 l18 24 l-22 36 L48 516 H260 Z" fill="#C4693E" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M260 4 H50 L24 28 H260 Z" fill="#E09A67"/>
+  <g stroke="#8C4426" stroke-width="7" stroke-linecap="round" opacity="0.7">
+    <path d="M260 128 H56"/><path d="M260 226 H44"/><path d="M260 322 H52"/><path d="M260 420 H48"/>
+  </g>
+  <path d="M150 30 v486" stroke="#8C4426" stroke-width="5" opacity="0.35"/>
+</svg>

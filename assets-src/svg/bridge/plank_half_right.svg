@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gebrochener Balken, rechte Haelfte — Gegenstueck mit passender Zacke. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 44" width="108" height="44">
+  <path d="M102 15 a7 7 0 0 0 -7 -7 H24 l-6 8 l8 6 l-10 7 l8 7 h71 a7 7 0 0 0 7 -7 Z"
+        fill="#9C8A72" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M34 18 H86" stroke="#6B5B48" stroke-width="4" stroke-linecap="round"/>
+</svg>

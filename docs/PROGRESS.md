@@ -4,7 +4,7 @@
 |---|---|---|---|
 | M0 Setup & Regelkern | ✅ fertig | `v0.0.1` | A0 bestanden |
 | M1 UI-Flow (Platzhalter-Schritt) | ✅ fertig | `v0.1.0` | A1 bestanden |
-| M2 Schlucht, Brücke, Hikers | ⬜ offen | – | – |
+| M2 Schlucht, Brücke, Hikers | ✅ fertig | `v0.2.0` | A2 bestanden |
 | M3 Show: Knarren, Blickkontakt, Audio | ⬜ offen | – | – |
 | M4 Fall-Sequenzen | ⬜ offen | – | – |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
@@ -83,3 +83,42 @@
 - Der Step-Screen ist der einzige Screen, der in M2 ersetzt wird. Sein Vertrag steht: Er bekommt `stepScript()` und `reveal()`, sonst nichts — der `StepDirector` kann exakt dort andocken.
 - Das Nachspiel des Platzhalters folgt dem letzten Bruch direkt (ADR-12). Ab M4 gehört dieses Fenster den Fall-Sequenzen; der Deckel von 20 s ist dafür schon eingerechnet.
 - Die Modus-Kombinationen sind rechnerisch geprüft (M0) und einzeln gespielt (M1). Fahne + Schwergewicht + Todeszone gleichzeitig hat noch niemand gespielt — das gehört in den A5-Check.
+
+## Audit A2 — 2026-09-08
+
+**Ergebnis:** BESTANDEN
+
+| Check | Status | Notiz |
+|---|---|---|
+| 8 Hikers + Schlucht 60 s: p50 ≤ 16.7 ms, p95 ≤ 33 ms | ✅ / ⏳ | Gemessen wird die **JS-Zeit des Bühnen-Loops**: **0,10 ms p95** bei acht Hikers, zehn Balken, Nebel und Glitzer — Budget 4 ms. Die Frame-Zeit taugt in CI nicht: Vier Varianten (voll, Low-Effects, halbe Auflösung, beides) lieferten auf die Nachkommastelle dieselben 33,3 ms, das ist die Kadenz des Compositors (ADR-16). Die Aussage über das Referenzgerät ist ein manueller Check. |
+| Draw-Batches ≤ 3; Heap flach 30 s; Seile gecached | ✅ | **1 Draw-Call** statt drei erlaubten — zwei Atlanten entlang der Zeichenreihenfolge, und PIXI packt beide in dieselbe Batch (ADR-13). Seile sind Sprites mit eingebautem Durchhang, kein `Graphics` mit eigener Textur. |
+| Gleichzeitige Ankunft: alle `runTo` enden im selben Frame (Test) | ✅ | `Hiker.runTo()` nimmt eine **Dauer**, keine Geschwindigkeit; der Choreographer-Test aus M0 prüft die gemeinsame `arriveAt` über jede Spielerzahl und jedes Tempo-Preset. |
+| Look-Check gegen Art Direction §1/§5/§6 (`docs/screens/m2-*`) | ⏳ manuell | 24 Screenshots für n = 3, 5, 8 entlang der Zeitachse (Aufstellung, Anlauf, Schritt, Knarren, Blickkontakt, Bruch, Nachspiel) — reproduzierbar über `npm run capture:screens`. |
+| Alle 8 Farben unterscheidbar (Deuteranopie, Symbole) | ✅ / ⏳ | `npm run check:colorblind` simuliert auf dem echten Bühnenbild. Farbe allein trägt nicht — unter Deuteranopie bleiben etwa vier Gruppen, wie zu erwarten. Die Symbole übernehmen: acht verschiedene, im Bild klar erkennbar. Der Blick darauf ist manuell (`m2-deuteranopia-8.png`). |
+| Layout B = n−1 … n+2 für n = 3 und 8 ohne Überlappung; zwei Hikers nebeneinander auf einem Balken | ✅ | `stage.test.ts` (22 Tests): Mindestbreite 60 Einheiten bei jeder Balkenzahl, Aufstellung ohne doppelte Plätze und ohne jemanden neben der Kante, `fitsSideBySide` für jede Spielerzahl. |
+| Preload während NEGOTIATION; Low-Effects bei Throttle | ✅ | Der Bühnen-Chunk lädt beim Eintritt in Absprache oder Stille; die Atlanten teilen sich eine Promise. Low-Effects schaltet Nebel, Glitzer und Schatten ab, automatisch erkannt oder in den Einstellungen. |
+| `typecheck` · `lint` · `test:unit` · `build` · E2E | ✅ | 296 Unit-Tests, 36 E2E auf iPhone 12 und Pixel 5, 0 Lint-Warnungen. JS 228 KB gzip (Budget 450), Bühnen-Chunk lazy. |
+
+**Zahlen:** 296 Unit-Tests · 36 E2E · JS-Loop 0,10 ms p95 · 1 Draw-Call · JS 228 KB gzip · Atlas 713 KB (davon lädt ein Gerät die Hälfte).
+
+**Fünf Fehler, die erst das laufende Bild gezeigt hat:**
+1. **Der `world@2x`-Atlas lief über 2048 px und wurde still in zwei Seiten geteilt.** Der Loader kennt nur eine, bekam die 404-Seite als JSON und die Bühne startete auf keinem Retina-Gerät. Das Build-Skript rastert gestreckte Kulissen jetzt mit halber Dichte — und **bricht ab**, wenn ein Atlas mehr als eine Seite braucht.
+2. **Die Nummernschilder blieben leer.** `fontFamily` als CSS-Stack-String ergibt in PIXI eine ungültige Deklaration, lautlos. Jetzt sind die Schilder in den Atlas gebacken (ADR-14) — das spart nebenbei zehn Draw-Batches.
+3. **Der Skip-Knopf erschien vor dem Bruch.** Er hing an `setTimeout`, die Timeline läuft im Blickkontakt aber auf halber Geschwindigkeit. Jetzt meldet der Director seine Beats (ADR-17).
+4. **Der fünfte Hiker stand neben dem Plateau in der Luft.** Fester Abstand statt gerechnetem; in einer Seitenansicht sieht man einem Männchen nicht an, dass es eigentlich schon fällt.
+5. **Zwei Hikers auf einem Balken verdeckten sich fast vollständig.** Genau das Bild, das das Spiel verkauft (GDD §1). Der Abstand hängt jetzt an der Hikerbreite, mit Tiefenstaffelung ab drei.
+
+**Offene SOLL-Follow-ups:**
+1. Die Symbole auf dem Torso sind auf der Bühne klein (rund 11 px). Für die Zuordnung reicht der Hut; wer sich auf das Symbol verlassen muss, liest es besser im Result. Gehört in den A11y-Durchgang in M5.
+2. WebGPU- und Canvas-Renderer liegen im Bühnen-Chunk, obwohl `preference: 'webgl'` gesetzt ist (~21 KB gzip). Beim Bundle-Durchgang in M5 prüfen.
+
+**Manuelle Checks für Luka vor M3:**
+- [ ] **Look-Check** auf dem Handy: `docs/screens/m2-*` gegen Art Direction §1/§5/§6 — goldene Stunde, Durchhang, Wind, Nebel, Gustav, Hüte in Spielerfarbe.
+- [ ] **Frame-Rate auf dem Referenzgerät** (iPhone 11 / Pixel 4a): `?dev=1` zeigt unten rechts Frame-Kadenz, JS-Zeit und Draw-Calls. Ziel 60 fps, Minimum 30.
+- [ ] `docs/screens/m2-deuteranopia-8.png` ansehen: Sind die acht Wanderer noch acht?
+- [ ] Fühlt sich die Kamerafahrt im Intro richtig an — zeigt sie die Tiefe, bevor die Brücke kommt?
+
+**Anmerkungen für M3:**
+- Der `StepDirector` spielt das Skript vollständig, aber der Bruch ist noch eine direkte Animation ohne Sequenz. M3 hängt Registry und Sicher-/Misc-/Overlay-Sequenzen an dieselben Stellen; `breaks[].sequenceId` steht bereits im Skript.
+- Knarren, Blickkontakt, Slow-Mo, Bruch-Reihenfolge und Hit-Stop laufen schon — M3 ergänzt Audio und die Sequenz-Auswahl, nicht die Choreographie.
+- Gustav kann sechs Dinge (kreisen, kreischen, lachen, Uhr, tragen, landen); im Einsatz sind bisher drei. Die anderen warten auf ihre Sequenzen.

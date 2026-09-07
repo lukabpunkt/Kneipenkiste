@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sprechblase ("Oh.", "Warum ich?!"). Der Text kommt als PIXI-Text hinein, damit er
+     uebersetzbar bleibt. Neun-Scheiben-faehig: Ecken 26 px. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140" width="220" height="140">
+  <path d="M28 8 H192 a24 24 0 0 1 24 24 V88 a24 24 0 0 1 -24 24 H120 l-26 24 l4 -24 H28 a24 24 0 0 1 -24 -24 V32 a24 24 0 0 1 24 -24 Z"
+        fill="#FFF8E7" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+</svg>

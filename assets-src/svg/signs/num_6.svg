@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Nummernschild 6: eingebranntes Holz an einer Schnur (Art Direction §3).
+     Erzeugt von scripts/build-signs.mjs — nicht von Hand ändern. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 96" width="84" height="96">
+  <path d="M42 4 v18" stroke="#1A1024" stroke-width="6" stroke-linecap="round"/>
+  <rect x="8" y="22" width="68" height="66" rx="9" fill="#D9B77A" stroke="#1A1024" stroke-width="8"/>
+  <rect x="17" y="31" width="50" height="48" rx="5" fill="none" stroke="#8C6B3A" stroke-width="4"/>
+  <text x="42" y="72" font-family="Helvetica, Arial, sans-serif" font-size="50"
+        font-weight="bold" text-anchor="middle" fill="#1A1024">6</text>
+</svg>

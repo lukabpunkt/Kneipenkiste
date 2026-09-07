@@ -29,7 +29,15 @@ export default defineConfig({
       name: 'Pixel 5',
       use: {
         ...devices['Pixel 5'],
-        launchOptions: { args: ['--use-angle=default', '--enable-gpu', '--ignore-gpu-blocklist'] },
+        /*
+         * SwiftShader statt echter GPU: Headless-Chromium hat in CI keine, und ohne
+         * WebGL startet die PIXI-Schlucht gar nicht erst. Die Frame-Zeiten sind damit
+         * eine Aussage über **unseren** Code, nicht über die Grafikkarte — die Aussage
+         * über das Referenzgerät macht der manuelle Check in A2.
+         */
+        launchOptions: {
+          args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+        },
       },
     },
   ],

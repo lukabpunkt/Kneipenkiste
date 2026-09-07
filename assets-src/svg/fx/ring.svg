@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Wasserring nach dem Platsch: waechst und verblasst (max. 3). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="160" height="60">
+  <ellipse cx="80" cy="30" rx="72" ry="22" fill="none" stroke="#FFF8E7" stroke-width="8"/>
+</svg>

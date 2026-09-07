@@ -21,23 +21,42 @@ const SRC_ROOT = 'assets-src/svg';
 const OUT_DIR = 'public/atlas';
 const MAX_SIZE = 2048;
 
+/**
+ * Kulissen-Frames werden mit halber Dichte gerastert.
+ *
+ * Himmel, Wand, Fluss, Nebel, Plateaus und die Seile werden auf der Bühne um ein
+ * Vielfaches gestreckt — der Fluss auf über tausend Welteinheiten, der Himmel auf drei-
+ * tausend. Sie in voller Dichte zu rastern kostet den halben Atlas für Farbverläufe, in
+ * denen kein Pixel eine eigene Information trägt.
+ *
+ * Was eine Outline hat und aus der Nähe gesehen wird — Balken, Figuren, Schilder, Fx —
+ * steht hier bewusst **nicht** drin.
+ */
+const STRETCHED = new Set([
+  'canyon/sky',
+  'canyon/wall',
+  'canyon/river',
+  'canyon/mist',
+  'canyon/plateau_left',
+  'canyon/plateau_right',
+  'bridge/rope',
+]);
+
 /** Welche Ordner werden zu welchem Atlas? */
 /*
- * Getrennte Atlanten nach Layer, nicht nach Motiv: Canyon und Bridge liegen in jedem
- * Frame auf der Bühne, Gustav und Balthasar nur in ihren Auftritten, Fx nur beim Bruch.
- * So bleibt der Preload klein und trotzdem kein Layer über zwei Texturen verteilt.
+ * **Zwei** Atlanten, nicht sieben — und die Aufteilung folgt der Zeichenreihenfolge,
+ * nicht dem Motiv (ADR-13).
  *
- * Die Ordner werden in M2 gefüllt (Roadmap M2.1); fehlende Kategorien überspringt das
- * Skript still, damit `npm run build:atlas` schon jetzt durchläuft.
+ * Jeder Texturwechsel innerhalb eines Frames kostet einen Draw-Batch, und Audit A2 lässt
+ * höchstens drei zu. Die Bühne zeichnet: Schlucht → Brücke → Figuren → Schilder/Fx. Mit
+ * `world` für alles Unbelebte und `chars` für alles, was sich bewegt, sind das genau drei
+ * Wechsel — world, chars, world.
+ *
+ * Fehlende Ordner überspringt das Skript still.
  */
 const CATEGORIES = [
-  { name: 'hikers', dir: 'hikers' },
-  { name: 'canyon', dir: 'canyon' },
-  { name: 'bridge', dir: 'bridge' },
-  { name: 'vulture', dir: 'vulture' },
-  { name: 'carpenter', dir: 'carpenter' },
-  { name: 'signs', dir: 'signs' },
-  { name: 'fx', dir: 'fx' },
+  { name: 'world', dirs: ['canyon', 'bridge', 'signs', 'fx'] },
+  { name: 'chars', dirs: ['hikers', 'vulture', 'carpenter'] },
 ];
 
 const SCALES = [
@@ -78,16 +97,25 @@ async function rasterize(file, factor) {
 }
 
 async function buildCategory(category, scale) {
-  const srcDir = path.join(SRC_ROOT, category.dir);
-  if (!existsSync(srcDir)) return null;
-
-  const svgs = await collectSvgs(srcDir);
+  /*
+   * Mehrere Quellordner in einen Atlas: Der Frame-Name behält seinen Ordner als Präfix
+   * (`bridge/plank`, `hikers/faces/oh`), damit zwei Kategorien nie kollidieren.
+   */
+  const svgs = [];
+  for (const dir of category.dirs) {
+    const srcDir = path.join(SRC_ROOT, dir);
+    if (!existsSync(srcDir)) continue;
+    for (const entry of await collectSvgs(srcDir)) {
+      svgs.push({ file: entry.file, name: `${dir}/${entry.name}` });
+    }
+  }
   if (svgs.length === 0) return null;
+  svgs.sort((a, b) => a.name.localeCompare(b.name));
 
   const images = await Promise.all(
     svgs.map(async ({ file, name }) => ({
       path: `${name}.png`,
-      contents: await rasterize(file, scale.factor),
+      contents: await rasterize(file, STRETCHED.has(name) ? scale.factor / 2 : scale.factor),
     }))
   );
 
@@ -104,10 +132,29 @@ async function buildCategory(category, scale) {
     allowTrim: true,
     detectIdentical: true,
     removeFileExtension: true,
+    /*
+     * Muss `true` bleiben: Sonst nimmt der Packer nur den Dateinamen, und Gustavs `head`
+     * überschreibt still den Kopf der Hikers — 41 Quellen, 40 Frames, kein Fehler.
+     */
     prependFolderName: true,
     exporter: 'Pixi',
     scale: 1,
   });
+
+  /*
+   * Mehr als eine Seite heisst: Der Atlas ist ueber `MAX_SIZE` gelaufen und der Packer hat
+   * ihn geteilt — still, mit Namen wie `world@2x-0.json`. Der Loader kennt nur
+   * `world@2x.json`, bekommt die 404-Seite als JSON und die Buehne startet nicht.
+   *
+   * Genau so ist es einmal passiert. Deshalb ist es hier ein Fehler und keine Warnung.
+   */
+  const pages = files.filter((f) => f.name.endsWith('.json')).length;
+  if (pages > 1) {
+    throw new Error(
+      `Atlas "${category.name}${scale.suffix}" braucht ${pages} Seiten (max. ${MAX_SIZE} px). ` +
+        'Quellen verkleinern oder in STRETCHED aufnehmen.'
+    );
+  }
 
   await mkdir(OUT_DIR, { recursive: true });
   const written = [];

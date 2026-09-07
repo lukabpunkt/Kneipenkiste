@@ -363,12 +363,38 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Step (M1-Platzhalter, M2 ersetzt ihn durch die PIXI-Schlucht)       */
+/* Step — die PIXI-Schlucht (M2)                                       */
 /* ------------------------------------------------------------------ */
 
 .screen--step {
-  justify-content: center;
+  position: relative;
+  justify-content: flex-end;
+  padding: 0;
+  /* Die Farbfläche steht, bevor der Atlas da ist — kein Weissblitz beim Betreten. */
   background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-horizon) 62%, var(--rock-dark) 100%);
+}
+
+/* Das Canvas füllt den Screen; die Kamera schneidet links und rechts Fels ab. */
+.step__stage {
+  position: absolute;
+  inset: 0;
+}
+
+.step__stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.step__loading {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline: 0;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  color: var(--paper);
+  text-shadow: 0 2px 0 var(--ink);
 }
 
 .step__sign {
@@ -428,7 +454,14 @@
 }
 
 .step__skip {
-  margin-top: auto;
+  position: relative;
+  margin: var(--space-4);
+}
+
+/* Solange nicht getippt werden darf, ist der Knopf auch nicht zu sehen. */
+.step__skip:disabled {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ------------------------------------------------------------------ */

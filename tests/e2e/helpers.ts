@@ -129,15 +129,25 @@ export async function chooseAll(page: Page, picks: (number | 'rope')[]): Promise
   }
 }
 
-/** Die Show ansehen und danach weiter. */
+/**
+ * Die Show ansehen und danach weiter.
+ *
+ * Der Skip-Knopf wird erst nach dem letzten Bruch frei (GDD §4.2) — in einer friedlichen
+ * Runde also erst kurz vor dem Nachspiel. Danach bleiben ein paar Sekunden, in denen die
+ * Show auch von allein enden kann. Der Klick ist deshalb ein Angebot, kein Zwang: Was
+ * zählt, ist der nächste Screen.
+ */
 export async function watchStep(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Der Schritt' }).click();
   await expect(page.locator('[data-screen="step"]')).toBeVisible();
 
-  /* Tap-to-Skip ist bis zum letzten Bruch gesperrt (GDD §4.2). */
   const skip = page.locator('.step__skip');
-  await expect(skip).toBeEnabled({ timeout: 30_000 });
-  await skip.click();
+  await expect(skip).toBeEnabled({ timeout: 40_000 });
+  await skip.click({ timeout: 3000 }).catch(() => undefined);
+
+  await expect(page.locator('[data-screen="distribute"], [data-screen="result"]')).toBeVisible({
+    timeout: 30_000,
+  });
 }
 
 /**

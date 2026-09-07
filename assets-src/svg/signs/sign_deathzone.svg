@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Todeszone-Schild: rot-weiss gestreift, schwingt an zwei Ketten ins Bild (GDD §4.2).
+     Der Text kommt als PIXI-Text darauf, damit "NUR {B} BALKEN" uebersetzbar bleibt. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150" width="420" height="150">
+  <defs>
+    <pattern id="stripes" width="48" height="48" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="24" height="48" fill="#FF2D55"/>
+      <rect x="24" width="24" height="48" fill="#FFF8E7"/>
+    </pattern>
+  </defs>
+  <path d="M64 6 V26 M356 6 V26" stroke="#1A1024" stroke-width="8" stroke-linecap="round"/>
+  <rect x="10" y="26" width="400" height="112" rx="14" fill="url(#stripes)" stroke="#1A1024" stroke-width="10"/>
+  <rect x="34" y="48" width="352" height="68" rx="8" fill="#FFF8E7" stroke="#1A1024" stroke-width="8"/>
+</svg>

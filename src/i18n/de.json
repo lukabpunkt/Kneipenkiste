@@ -102,7 +102,9 @@
     "help": "HILFE",
     "deathZoneSign": "NUR {count} BALKEN",
     "rotSign": "Balken {plank} ist abgefault",
-    "repairedSign": "Repariert"
+    "repairedSign": "Repariert",
+    "loading": "Die Schlucht wacht auf …",
+    "stageFailed": "Die Schlucht bleibt heute zu. Weiter zum Ergebnis."
   },
   "distribute": {
     "headline": "{name} verteilt",

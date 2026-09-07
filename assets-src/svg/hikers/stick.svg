@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Wanderstock: krummer Ast mit Schlaufe. Ungetintet. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 160" width="40" height="160">
+  <path d="M22 6 Q14 42 20 80 Q26 118 16 154" stroke="#1A1024" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <path d="M22 6 Q14 42 20 80 Q26 118 16 154" stroke="#9C8A72" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M20 34 q10 -4 12 4" stroke="#1A1024" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>

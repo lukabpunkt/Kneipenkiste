@@ -102,7 +102,9 @@
     "help": "HELP",
     "deathZoneSign": "ONLY {count} PLANKS",
     "rotSign": "Plank {plank} rotted away",
-    "repairedSign": "Repaired"
+    "repairedSign": "Repaired",
+    "loading": "The canyon wakes up …",
+    "stageFailed": "The canyon stays shut today. On to the result."
   },
   "distribute": {
     "headline": "{name} hands out",

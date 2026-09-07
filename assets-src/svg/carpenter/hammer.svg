@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hammer. Ankerpunkt unten am Stielende — er schwingt um die Hand. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 140" width="84" height="140">
+  <rect x="34" y="34" width="16" height="102" rx="7" fill="#9C8A72" stroke="#1A1024" stroke-width="8"/>
+  <path d="M10 12 h64 a8 8 0 0 1 8 8 v18 a8 8 0 0 1 -8 8 H10 a8 8 0 0 1 -8 -8 V20 a8 8 0 0 1 8 -8 Z" fill="#8C93A8" stroke="#1A1024" stroke-width="8"/>
+  <path d="M2 22 q-6 8 0 16" fill="#8C93A8" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+</svg>

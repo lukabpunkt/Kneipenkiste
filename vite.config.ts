@@ -39,9 +39,26 @@ export default defineConfig({
       manifest: false, // public/manifest.webmanifest liefern wir selbst aus
       workbox: {
         globPatterns: ['**/*.{js,css,html,woff2,png,svg,json,webmanifest,ogg,mp3}'],
+        /*
+         * Der @2x-Atlas wird **nicht** vorgeladen: Ein Gerät benutzt immer nur eine der
+         * beiden Auflösungen, und beide zu precachen verdoppelt den ersten Download für
+         * nichts. @1x liegt im Precache (damit die Schlucht auch offline steht), @2x holt
+         * sich die Runtime-Regel unten beim ersten Schritt und behält sie danach.
+         */
+        globIgnores: ['**/atlas/*@2x.*'],
         cleanupOutdatedCaches: true,
         navigateFallback: 'index.html',
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.includes('/atlas/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'atlas',
+              expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 90 },
+            },
+          },
+        ],
       },
       devOptions: { enabled: false },
     }),

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- "HILFE"-Schild fuer `fall_coyote_delay` — ein Pappschild mit Stiel. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" width="200" height="150">
+  <path d="M100 96 V146" stroke="#1A1024" stroke-width="12" stroke-linecap="round"/>
+  <path d="M100 96 V146" stroke="#9C8A72" stroke-width="6" stroke-linecap="round"/>
+  <rect x="10" y="10" width="180" height="88" rx="10" fill="#FFF8E7" stroke="#1A1024" stroke-width="10"/>
+</svg>

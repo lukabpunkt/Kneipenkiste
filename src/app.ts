@@ -21,7 +21,7 @@ import {
   loadSession,
   type SessionController,
 } from '@/core/session';
-import { createDevPanel, devSeed, isDevMode } from '@/dev/devPanel';
+import { createDevPanel, devSeed, isDevMode, readStageStats } from '@/dev/devPanel';
 import { confirmDialog } from '@/ui/components/sheet';
 import { setHapticsEnabled } from '@/ui/haptics';
 import { SCREEN_FOR_STATE, createRouter, type ScreenId } from '@/ui/router';
@@ -41,6 +41,9 @@ import { createTitleScreen } from '@/ui/screens/TitleScreen';
  * Screens, bei denen das Handy in der Mitte liegt oder herumgeht und nicht dunkel werden
  * darf. Die Absprache gehört dazu: 40 Sekunden reden reichen jedem Handy zum Einschlafen.
  */
+/** In diesen States steht die PIXI-Buehne; ausserhalb wird sie abgeräumt. */
+const STAGE_STATES: readonly GameState[] = ['STEP'];
+
 const AWAKE_STATES: readonly GameState[] = [
   'NEGOTIATION',
   'SILENCE',
@@ -158,6 +161,24 @@ export function createApp(host: HTMLElement): App {
     else void releaseWakeLock();
 
     /*
+     * Zwanzig Sekunden Absprache sind genug Zeit für 250 KB Atlas. Wer erst beim Schritt
+     * lädt, sieht einen Spinner an genau der Stelle, an der die Show anfangen sollte
+     * (Roadmap M2.5).
+     */
+    if (transition.to === 'NEGOTIATION' || transition.to === 'SILENCE') {
+      void import('@/game').then((game) => game.preloadStageAssets());
+    }
+
+    /*
+     * Die Bühne lebt nur während des Schritts. Sie danach abzuräumen ist kein Aufräumen
+     * aus Ordnungsliebe: Ein PIXI-Ticker, der im Result weiterläuft, kostet auf einem
+     * Handy spürbar Akku.
+     */
+    if (!STAGE_STATES.includes(transition.to)) {
+      void import('@/game').then((game) => game.disposeStage());
+    }
+
+    /*
      * DISTRIBUTE → DISTRIBUTE ist der einzige Selbstübergang: Der nächste Verteiler ist
      * dran, der Screen aber derselbe. `go()` würde ihn für unverändert halten und den
      * alten stehen lassen — also neu aufbauen.
@@ -192,7 +213,9 @@ export function createApp(host: HTMLElement): App {
    * Das Panel hängt **neben** dem Router-Host: `mount()` leert den Host bei jedem
    * Screenwechsel, und darin hätte das Panel genau einen Screen lang überlebt.
    */
-  const devPanel = dev ? createDevPanel(fsm, { refresh: () => void router.refresh() }) : null;
+  const devPanel = dev
+    ? createDevPanel(fsm, { refresh: () => void router.refresh(), stats: readStageStats })
+    : null;
   if (devPanel) (host.parentElement ?? document.body).append(devPanel);
 
   return {

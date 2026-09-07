@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Stempel-Rahmen fuer "FAHNENFLUCHT" (GDD §4.3). Text als PIXI-Text. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 110" width="340" height="110">
+  <rect x="8" y="8" width="324" height="94" rx="12" fill="none" stroke="#FF2D55" stroke-width="10"/>
+  <rect x="22" y="22" width="296" height="66" rx="6" fill="none" stroke="#FF2D55" stroke-width="5"/>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Balthasars Leiter — er kommt damit von unten aus der Schlucht (GDD §4.4). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 260" width="110" height="260">
+  <g stroke="#1A1024" stroke-width="9" stroke-linecap="round">
+    <path d="M24 6 V254" /><path d="M86 6 V254" />
+    <path d="M24 46 H86" /><path d="M24 98 H86" /><path d="M24 150 H86" /><path d="M24 202 H86" />
+  </g>
+  <g stroke="#9C8A72" stroke-width="5" stroke-linecap="round">
+    <path d="M24 6 V254" /><path d="M86 6 V254" />
+    <path d="M24 46 H86" /><path d="M24 98 H86" /><path d="M24 150 H86" /><path d="M24 202 H86" />
+  </g>
+</svg>

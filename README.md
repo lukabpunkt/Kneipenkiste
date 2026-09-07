@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel für 3–8 Personen über Anti-Koordi
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot), [Der Tresor](https://github.com/lukabpunkt/Tresor), [Sprengmeister](https://github.com/lukabpunkt/Sprengmeister) und [Der Zoll](https://github.com/lukabpunkt/Zoll) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M1 abgeschlossen (`v0.1.0`) — **ab hier auf einer Party spielbar.** Kompletter Flow von der Lobby bis zum Result, alle fünf Modi, Schritt als DOM-Platzhalter mit echtem Timing. Als Nächstes M2: die Schlucht in PixiJS.
+**Status:** M2 abgeschlossen (`v0.2.0`) — die Schlucht lebt: Brücke mit Durchhang, Wind, Nebel, Fluss, acht Hikers, Gustav und Balthasar in PixiJS. Als Nächstes M3: Knarren, Blickkontakt und Audio als vollständige Show.
 
 ## Planung
 
@@ -32,6 +32,10 @@ npm run test:coverage    # core/ >= 95 % (A0)
 npm run test:e2e         # iPhone 12 (WebKit) + Pixel 5 (Chromium)
 npm run build            # tsc --noEmit + vite build + PWA
 npm run balance -- 20000 # Kollisionsraten je n/B (M6)
+npm run build:atlas      # SVG → Atlas (world + chars)
+npm run capture:screens  # Bühnen-Screenshots für den Look-Check
+npm run check:colorblind # Deuteranopie-Simulation auf dem Bühnenbild
+npm run test:perf        # JS-Budget und Draw-Batches (Audit A2)
 ```
 
 `?dev=1` blendet das Dev-Panel ein (aktueller State, Balkenzahl, Todeszone erzwingen),
@@ -42,5 +46,5 @@ npm run balance -- 20000 # Kollisionsraten je n/B (M6)
 ```
 cd /Users/lukabloemendal/Documents/Hängebrücke
 claude
-> Lies CLAUDE.md und docs/. Setze Milestone M2 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A2 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
+> Lies CLAUDE.md und docs/. Setze Milestone M3 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A3 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
 ```
