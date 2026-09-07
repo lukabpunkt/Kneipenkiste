@@ -4,40 +4,68 @@
  */
 
 /*
- * The display face, self-hosted. No CDN — the CSP allows `font-src 'self'` only, and the game
- * has to work offline after the first load. One variable file (weight 300-700, latin subset,
- * 29 KB) replaces five static weights.
+ * The two Kneipenkiste faces, self-hosted. No CDN — the CSP allows `font-src 'self'` only, and
+ * the game has to work offline after the first load. Both files are byte-identical to the ones
+ * in hub/fonts and in every sister game, so a player who has opened one game has them cached.
  *
- * Note the axis default is 300, so anything using this family must state its weight.
+ * Luckiest Guy carries the headlines, Nunito everything else. Nunito is a variable font, so one
+ * file covers 600 (body) and 800 (emphasis).
  */
 @font-face {
-  font-family: 'Fredoka';
-  src: url('../../assets/fonts/fredoka-latin-var.woff2') format('woff2-variations');
-  font-weight: 300 700;
+  font-family: 'Luckiest Guy';
+  src: url('../../assets/fonts/luckiest-guy-400.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
   unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('../../assets/fonts/nunito-var.woff2') format('woff2-variations');
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 /*
- * What shows during the swap, with Fredoka's metrics forced onto it, so the headline occupies
- * exactly the same box before and after the font arrives. Without this the swap shifts every
- * heading on the page and CLS stops being zero (audit A5).
+ * What shows during the swap, with the real metrics forced onto it, so text occupies exactly the
+ * same box before and after the font arrives. Without this the swap shifts the page and CLS stops
+ * being zero (audit A5). No sister game ships this — it is ours to keep.
  *
- * Fredoka: 1000 upm, ascent 974, descent 236, line gap 0, x-height 500. The fallbacks sit around
- * a 0.519 x-height, so 0.500 / 0.519 = 96.3 %; the ascent and descent are then divided by that
- * same factor to keep the line box where it was.
+ * Metrics read out of the shipped woff2 with fontTools, not copied from a table:
+ *   Nunito       1000 upm, ascent 1011, descent 353, line gap 0, x-height 484
+ *   Luckiest Guy 2048 upm, ascent 1440, descent 608, line gap 0, x-height 1400
+ * The fallbacks sit around a 0.519 x-height, so size-adjust is the x-height ratio and the ascent
+ * and descent are then divided by that same factor to keep the line box where it was.
+ *
+ * Honest limit: this fixes the layout jump, which is what CLS measures. It cannot fix the visual
+ * jump for Luckiest Guy — no system font looks remotely like a comic brush face.
  */
 @font-face {
-  font-family: 'Fredoka Fallback';
+  font-family: 'Nunito Fallback';
   src:
     local('Helvetica Neue'), local('Arial'), local('Roboto'), local('Segoe UI Variable Display'),
     local('Segoe UI');
-  size-adjust: 96.3%;
-  ascent-override: 101.1%;
-  descent-override: 24.5%;
+  size-adjust: 93.3%; /* 0.484 / 0.519 */
+  ascent-override: 108.4%; /* 1.011 / 0.933 */
+  descent-override: 37.9%; /* 0.353 / 0.933 */
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Luckiest Guy Fallback';
+  src:
+    local('Arial Black'), local('Impact'), local('Helvetica Neue'), local('Arial'),
+    local('Segoe UI');
+  size-adjust: 131.7%; /* 0.684 / 0.519 */
+  ascent-override: 53.4%; /* 0.703 / 1.317 */
+  descent-override: 22.5%; /* 0.297 / 1.317 */
   line-gap-override: 0%;
 }
 
