@@ -24,7 +24,8 @@
     "check:contrast": "node scripts/check-contrast.mjs",
     "test:sequences": "playwright test tests/e2e/hints.spec.ts tests/e2e/xray.spec.ts tests/e2e/polish.spec.ts --project=\"Pixel 5\"",
     "check:lighthouse": "node scripts/check-lighthouse.mjs",
-    "balance": "vite-node scripts/balance.mjs"
+    "balance": "vite-node scripts/balance.mjs",
+    "build:icons": "node scripts/build-icons.mjs"
   },
   "dependencies": {
     "gsap": "^3.13.0",
