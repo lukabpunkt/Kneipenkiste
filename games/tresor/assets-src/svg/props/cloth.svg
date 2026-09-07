@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Zaubertuch (GDD §4.4, steal_solo_magician). Weiß, wird in Samtfarbe getintet. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" width="120" height="100">
+  <path d="M6 18q28-14 54 0t54 0v58q-28 16-54 0T6 76z"
+        fill="#FFFFFF" stroke="#1A1024" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M6 46q28-14 54 0t54 0" stroke="#1A1024" stroke-width="4" fill="none" opacity="0.35"/>
+</svg>

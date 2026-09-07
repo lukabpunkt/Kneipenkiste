@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Wasserspritzer (GDD §4.4, steal_multi_standoff). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <g fill="#18DCFF" stroke="#1A1024" stroke-width="4" stroke-linejoin="round">
+    <path d="M24 4c6 10 10 15 10 21a10 10 0 0 1-20 0c0-6 4-11 10-21z"/>
+  </g>
+  <circle cx="10" cy="38" r="5" fill="#18DCFF" stroke="#1A1024" stroke-width="3"/>
+  <circle cx="38" cy="40" r="4" fill="#18DCFF" stroke="#1A1024" stroke-width="3"/>
+</svg>

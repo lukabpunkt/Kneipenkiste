@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Wachssiegel auf der Karte eines Schwörenden (Art Direction §4.4).
+     Bricht bei Meineid in drei Scherben — die liegen als eigene Sprites bereit. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <circle cx="40" cy="40" r="32" fill="#B8163A"/>
+  <circle cx="40" cy="36" r="32" fill="#FF2D55" stroke="#1A1024" stroke-width="6"/>
+  <circle cx="40" cy="36" r="21" fill="none" stroke="#B8163A" stroke-width="5"/>
+</svg>

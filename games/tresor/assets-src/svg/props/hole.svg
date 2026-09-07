@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Falltuer-Loch (Backlog, steal_solo_trapdoor). Eine Ellipse mit dickem Rand, damit
+     sie auf dem roten Tisch als Loch liest und nicht als Schatten. Der Innenraum ist
+     bewusst fast schwarz: Man soll nicht sehen, wohin es geht. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 96" width="200" height="96">
+  <ellipse cx="100" cy="48" rx="94" ry="42" fill="#0b0a14" stroke="#1A1024" stroke-width="8"/>
+  <ellipse cx="100" cy="42" rx="80" ry="32" fill="#000000" opacity="0.55"/>
+  <!-- Aufgeklappter Deckel, angeschnitten am rechten Rand -->
+  <path d="M150 22 196 4l6 12-44 20z" fill="#7a2a50" stroke="#1A1024" stroke-width="7" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Domino-Maske (Art Direction §5). Weiss = wird in Spielerfarbe getintet.
+     Die Augenlöcher sind echte Löcher (evenodd), damit die Augen darunter sichtbar
+     bleiben — der Crook ist maskiert, nicht blind. Sitzt über dem Gesichts-Slot. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <path fill-rule="evenodd" fill="#FFFFFF" stroke="#1A1024" stroke-width="5" stroke-linejoin="round"
+        d="M10 22 Q10 7 27 7 H69 Q86 7 86 22 Q86 41 69 45 Q58 47 48 39 Q38 47 27 45 Q10 41 10 22 Z
+           M41 26 a13 13 0 1 0 -26 0 a13 13 0 1 0 26 0 Z
+           M81 26 a13 13 0 1 0 -26 0 a13 13 0 1 0 26 0 Z"/>
+  <!-- Zweite Cel-Stufe an der Unterkante, kein Verlauf. -->
+  <path fill="#000000" opacity="0.18" d="M14 36 Q30 48 48 39 Q66 48 82 36 Q86 42 69 45 Q58 47 48 39 Q38 47 27 45 Q10 42 14 36 Z"/>
+</svg>

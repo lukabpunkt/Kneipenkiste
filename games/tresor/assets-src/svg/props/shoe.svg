@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Der Schuh, der aus der Prügelwolke fliegt (GDD §4.4, steal_all_brawl). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 32" width="56" height="32">
+  <path d="M6 24c0-12 7-18 16-18 8 0 9 6 16 8 6 2 12 3 12 8v2H6z"
+        fill="#1A1024" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M10 20c4-8 9-11 14-11" stroke="#4A506A" stroke-width="4" fill="none" stroke-linecap="round"/>
+</svg>

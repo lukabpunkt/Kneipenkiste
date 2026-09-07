@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kassels Aktenkamera (Backlog, share_bank_photo). Balgenkamera mit Blitzschale —
+     altmodisch genug, dass sie zum Bankier passt, und gross genug, dass man sie auf
+     Armlaenge erkennt. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 110" width="140" height="110">
+  <!-- Blitzschale -->
+  <path d="M96 30 128 6l6 8-26 24z" fill="#8c93a8" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="122" cy="14" r="16" fill="#fff8e7" stroke="#1A1024" stroke-width="6"/>
+  <!-- Balgen -->
+  <path d="M28 44h34l14-10v42l-14-10H28z" fill="#4a506a" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+  <!-- Gehaeuse -->
+  <rect x="6" y="34" width="30" height="56" rx="8" fill="#2a1b3d" stroke="#1A1024" stroke-width="7"/>
+  <!-- Objektiv -->
+  <circle cx="76" cy="66" r="18" fill="#1A1024" stroke="#1A1024" stroke-width="6"/>
+  <circle cx="76" cy="66" r="8" fill="#18dcff"/>
+  <!-- Stativfuss -->
+  <path d="M20 90v14M8 110l12-16 12 16" fill="none" stroke="#1A1024" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Vignette: dunkle Ränder, damit der Blick in der Mitte bleibt (Art Direction §6). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="256" height="256">
+  <defs>
+    <radialGradient id="vig">
+      <stop offset="52%" stop-color="#0B0A14" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0B0A14" stop-opacity="0.92"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#vig)"/>
+</svg>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Der Zipfel der Sprechblase. Eigener Sprite, damit ihn das 9-Slice nicht verzerrt. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 40" width="48" height="40">
+  <path d="M4 4 H44 L18 36 Z" fill="#FFF8E7" stroke="#1A1024" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M8 2 H40" stroke="#FFF8E7" stroke-width="12"/>
+</svg>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Amboss (GDD §4.4, steal_multi_anvil). Fällt auf den feiernden Dieb.
+     Das Symbol des Gegenspielers wird im Spiel als eigener Sprite daraufgelegt. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 100" width="140" height="100">
+  <path d="M10 18 H118 L104 40 H120 L96 62 H44 L20 40 H36 L22 18 Z" fill="#4A506A" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <rect x="46" y="62" width="48" height="14" fill="#4A506A" stroke="#1A1024" stroke-width="8"/>
+  <rect x="30" y="76" width="80" height="16" rx="4" fill="#8C93A8" stroke="#1A1024" stroke-width="8"/>
+  <path d="M10 18 H118 L112 28 H16 Z" fill="#8C93A8"/>
+</svg>

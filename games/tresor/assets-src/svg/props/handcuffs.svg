@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Handschellen (Backlog, steal_multi_handcuffs). Zwei Ringe an einer kurzen Kette;
+     die Kette ist absichtlich kurz, damit die beiden nicht auseinanderkoennen. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 72" width="160" height="72">
+  <path d="M62 36h36" fill="none" stroke="#1A1024" stroke-width="10" stroke-linecap="round"/>
+  <path d="M62 36h36" fill="none" stroke="#8c93a8" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="38" cy="36" r="28" fill="none" stroke="#1A1024" stroke-width="12"/>
+  <circle cx="38" cy="36" r="28" fill="none" stroke="#8c93a8" stroke-width="6"/>
+  <circle cx="122" cy="36" r="28" fill="none" stroke="#1A1024" stroke-width="12"/>
+  <circle cx="122" cy="36" r="28" fill="none" stroke="#8c93a8" stroke-width="6"/>
+</svg>

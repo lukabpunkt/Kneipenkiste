@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gesicht "guilty" — Blick zur Seite, Schweißtropfen, schmaler Mund.
+     Das Gesicht, das man aufsetzt, wenn man gerade STEHLEN getippt hat. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <ellipse cx="27" cy="26" rx="13" ry="15" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <ellipse cx="69" cy="26" rx="13" ry="15" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <!-- Pupillen weit links: schaut betont weg -->
+  <circle cx="20" cy="28" r="6" fill="#1A1024"/>
+  <circle cx="62" cy="28" r="6" fill="#1A1024"/>
+  <path d="M38 52 Q48 48 58 52" stroke="#1A1024" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <!-- Schweißtropfen an der Schläfe -->
+  <path d="M87 14 C92 22 90 28 85 28 C80 28 78 22 87 14 Z" fill="#8FD3FF" stroke="#1A1024" stroke-width="4" stroke-linejoin="round"/>
+</svg>

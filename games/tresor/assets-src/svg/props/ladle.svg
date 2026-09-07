@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Schöpfkelle (GDD §4.4, steal_all_brawl). Kassel teilt damit gleichmäßig aus. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 140" width="80" height="140">
+  <rect x="32" y="6" width="14" height="76" rx="7" fill="#8C93A8" stroke="#1A1024" stroke-width="7"/>
+  <path d="M12 80 H68 C68 108 56 124 40 124 C24 124 12 108 12 80 Z" fill="#8C93A8" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M40 80 H68 C68 108 56 124 40 124 Z" fill="#4A506A"/>
+</svg>

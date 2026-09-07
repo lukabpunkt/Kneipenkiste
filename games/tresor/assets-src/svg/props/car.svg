@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fluchtauto (GDD §4.4, steal_solo_getaway). Fährt von rechts ins Bild. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 120" width="240" height="120">
+  <path d="M18 84 L28 52 C32 40 42 34 56 34 H150 C166 34 178 40 190 52 L214 76 C222 84 220 92 208 92 H28 C20 92 16 90 18 84 Z"
+        fill="#1A1830" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M60 42 H96 V68 H44 Z" fill="#8FD3FF" stroke="#1A1024" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M108 42 H146 L168 68 H108 Z" fill="#8FD3FF" stroke="#1A1024" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="66" cy="94" r="20" fill="#1A1024"/>
+  <circle cx="66" cy="94" r="9" fill="#8C93A8"/>
+  <circle cx="176" cy="94" r="20" fill="#1A1024"/>
+  <circle cx="176" cy="94" r="9" fill="#8C93A8"/>
+</svg>

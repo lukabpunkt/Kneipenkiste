@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kassels Träne (GDD §4.4, share_group_hug). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 40" width="28" height="40">
+  <path d="M14 3c8 12 11 17 11 22a11 11 0 0 1-22 0c0-5 3-10 11-22z"
+        fill="#8FD3FF" stroke="#1A1024" stroke-width="4" stroke-linejoin="round"/>
+</svg>

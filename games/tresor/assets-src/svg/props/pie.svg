@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sahnetorte (Backlog, steal_all_pie_fight). Getintet fliegt sie, ungetintet klebt
+     sie im Gesicht. Bewusst simpel: Bei Wurfgeschwindigkeit sieht man einen weissen
+     Klecks mit Rand, mehr nicht. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 84" width="100" height="84">
+  <ellipse cx="50" cy="62" rx="44" ry="18" fill="#c9961a" stroke="#1A1024" stroke-width="7"/>
+  <path d="M8 62c0-20 18-34 42-34s42 14 42 34c-10 8-28 12-42 12s-32-4-42-12z"
+        fill="#fff8e7" stroke="#1A1024" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="50" cy="26" r="10" fill="#ff2d55" stroke="#1A1024" stroke-width="6"/>
+</svg>

@@ -1,0 +1,115 @@
+/*
+ * Design-Tokens — CSS-Pendant zu `src/config/theme.ts`.
+ * Quelle: docs/02-ART-DIRECTION.md §2, §3, §7.
+ * Keine Magic-Numbers in Komponenten: alles laeuft ueber diese Variablen.
+ * `tests/unit/config.test.ts` prueft, dass beide Dateien dieselben Farben nennen.
+ */
+
+:root {
+  color-scheme: dark; /* Der Tresorraum ist nachts. Immer. */
+
+  /* --- UI-Farben (§2) --- */
+  --c-bg-deep: #0b0a14;
+  --c-bg-panel: #1a1830;
+  --c-bg-panel-raised: #262345;
+  --c-paper: #fff8e7;
+  --c-ink: #1a1024;
+  --c-gold: #ffc93c;
+  --c-gold-shade: #c9961a;
+  --c-steel: #8c93a8;
+  --c-steel-dark: #4a506a;
+  --c-velvet: #5b1e3a;
+  --c-velvet-light: #7a2a50;
+  --c-share: #2ed573;
+  --c-share-shade: #1e9e52;
+  --c-steal: #ff2d55;
+  --c-steal-shade: #b8163a;
+  --c-laser: #18dcff;
+  --c-spot: #fff1c4;
+  --spot-alpha: 0.18;
+
+  /* --- Spielerfarben (§2, identisch zu Drinkshot) --- */
+  --c-player-red: #ff4757;
+  --c-player-red-shade: #c0392b;
+  --c-player-blue: #3b82f6;
+  --c-player-blue-shade: #1e5bb8;
+  --c-player-green: #2ed573;
+  --c-player-green-shade: #1e9e52;
+  --c-player-yellow: #ffd32a;
+  --c-player-yellow-shade: #d4a800;
+  --c-player-purple: #af73ee;
+  --c-player-purple-shade: #7b3fbf;
+  --c-player-orange: #ff7f50;
+  --c-player-orange-shade: #cc5a2e;
+  --c-player-pink: #ff6b9d;
+  --c-player-pink-shade: #c94a78;
+  --c-player-cyan: #18dcff;
+  --c-player-cyan-shade: #0fa6c2;
+
+  /* --- Typografie (§3) --- */
+  --font-display: 'Luckiest Guy', 'Comic Sans MS', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-xs: 0.75rem; /* 12 */
+  --fs-sm: 0.875rem; /* 14 */
+  --fs-md: 1rem; /* 16 */
+  --fs-lg: 1.25rem; /* 20 */
+  --fs-xl: 1.75rem; /* 28 */
+  --fs-2xl: 2.5rem; /* 40 */
+  --fs-hero: 4rem; /* 64 */
+  --fs-mega: 6rem; /* 96 */
+
+  --sticker-stroke: 4px;
+  --sticker-shadow: 0 4px 0 var(--c-ink);
+
+  /* --- Spacing / Radien --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-card: 24px;
+  --radius-frame: 32px;
+
+  /* --- Touch-Ziele (Audit A1) --- */
+  --touch-min: 48px;
+  --touch-primary: 64px;
+
+  /* --- Motion (Art Direction §7) --- */
+  --t-fast: 120ms;
+  --t-base: 260ms;
+  --t-slow: 420ms;
+  --t-wipe: 320ms;
+  --t-sheet: 260ms;
+  --t-flap: 120ms;
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-snappy: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-sheet: cubic-bezier(0.2, 0.9, 0.3, 1.2);
+
+  /* --- Layout (Architektur §9) --- */
+  --frame-max-width: 480px;
+  --frame-aspect: 9 / 16;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  --z-screen: 1;
+  --z-wipe: 40;
+  --z-sheet: 50;
+  --z-toast: 60;
+  --z-orientation: 80;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    /* Wipes werden zu Fades, Shake aus. Slow-Mo bleibt — das ist Gameplay. */
+    --t-wipe: 160ms;
+  }
+}

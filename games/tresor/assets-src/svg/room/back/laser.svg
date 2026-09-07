@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ein Lasersegment. Im Spiel wird der Sprite in die Länge gezogen und rotiert;
+     deshalb ist er hier nur ein kurzer Strich mit weichem Kern. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 12" width="64" height="12">
+  <rect x="0" y="4" width="64" height="4" fill="#18DCFF" opacity="0.55"/>
+  <rect x="0" y="5" width="64" height="2" fill="#FFFFFF" opacity="0.9"/>
+</svg>

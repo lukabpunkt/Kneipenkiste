@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Rahmen der Sprechblase, als 9-Slice gedacht: Die Ecken bleiben, die Mitte wird gezogen.
+  Liegt im front-Atlas und damit in derselben Textur wie die Karten — eine Blase aus
+  `Graphics` hätte einen eigenen Draw-Call gekostet (Audit A2, ADR-16).
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <rect x="5" y="5" width="86" height="86" rx="26" fill="#FFF8E7" stroke="#1A1024" stroke-width="10"/>
+</svg>

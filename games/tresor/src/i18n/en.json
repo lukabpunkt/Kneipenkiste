@@ -1,0 +1,318 @@
+{
+  "app": {
+    "title": "The Vault",
+    "tagline": "Split or Steal."
+  },
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Go",
+    "continue": "Continue",
+    "sips_one": "sip",
+    "sips_other": "sips",
+    "sipsCount_one": "{count} sip",
+    "sipsCount_other": "{count} sips",
+    "players_one": "{count} player",
+    "players_other": "{count} players",
+    "round": "Round {index}",
+    "vault": "Vault",
+    "share": "SPLIT",
+    "steal": "STEAL",
+    "on": "On",
+    "off": "Off"
+  },
+  "orientation": {
+    "headline": "Turn your phone upright.",
+    "body": "The vault stands tall."
+  },
+  "title": {
+    "play": "Play",
+    "rules": "Rules",
+    "settings": "Settings",
+    "sound": "Sound",
+    "disclaimer": "18+. Drink responsibly — or not at all."
+  },
+  "lobby": {
+    "headline": "Who's in?",
+    "addPlayer": "Add player",
+    "namePlaceholder": "Name",
+    "cta": "Open the vault",
+    "tooFewPlayers": "With two people this isn't a dilemma, it's a relationship. Get someone else.",
+    "tooManyPlayers": "More than eight won't fit around the table.",
+    "hardness": "Stakes",
+    "hardnessSoft": "Gentle",
+    "hardnessNormal": "Normal",
+    "hardnessHard": "Harsh",
+    "negotiationTime": "Negotiation",
+    "revealPace": "Reveal",
+    "paceShort": "Short",
+    "paceNormal": "Normal",
+    "paceLong": "Long",
+    "thinkTimer": "Think time",
+    "seconds": "{count} s"
+  },
+  "modes": {
+    "headline": "Modes",
+    "hint": "Combine them freely.",
+    "oath": "Oath",
+    "oathHint": "Swear and steal anyway, and you'll pay for the perjury.",
+    "mole": "Mole",
+    "moleHint": "Someone has to steal. Nobody knows who.",
+    "nightShift": "Night Shift",
+    "nightShiftHint": "No negotiation. Ten seconds of silence.",
+    "highroller": "Highroller",
+    "highrollerHint": "Bigger vault, faster growth, no ceiling.",
+    "comboOathMole": "Chaos mode: the mole may swear and still has to steal — no perjury penalty for them.",
+    "comboNightHighroller": "Late shift: big vaults, no negotiation. Short and expensive.",
+    "comboAllOn": "Everything on. Good luck.",
+    "witness": "Crown witness",
+    "witnessHint": "One thief may talk and halve their penalty. The one they name drinks it.",
+    "comboOathNight": "Careful: the night shift has no negotiation — nobody can swear there, so the oath does nothing."
+  },
+  "negotiation": {
+    "headline": "Negotiate.",
+    "sub": "{count} seconds.",
+    "allReady": "Everyone's ready",
+    "vaultLabel": "In the vault",
+    "vaultLine": "In the vault: {count}",
+    "tableHeadline": "This round",
+    "tableNoThief": "Everyone splits",
+    "tableSoloThief": "One thief",
+    "tableMultiThief": "Two or more",
+    "tableAllThieves": "Everyone steals",
+    "tableThiefDistributes": "hands out everything",
+    "tableEachDrinks": "{count} each",
+    "tableNextVault": "Vault after: {vault}",
+    "swear": "I swear to split",
+    "sworn": "Sworn"
+  },
+  "silence": {
+    "headline": "Night shift.",
+    "body": "Nobody says a word.",
+    "sub": "{count} seconds."
+  },
+  "pass": {
+    "headline": "Pass to {name}.",
+    "body": "Tap when nobody else can see the screen."
+  },
+  "choice": {
+    "headline": "Your call.",
+    "sub": "Nobody sees it.",
+    "sealed": "Sealed",
+    "moleHeadline": "You're the mole.",
+    "moleSub": "Act innocent.",
+    "moleLocked": "Not for you.",
+    "thinkTimer": "{count} s left",
+    "autoShared": "Time's up. You split."
+  },
+  "sealed": {
+    "headline": "All cards sealed.",
+    "body": "Put the phone in the middle.",
+    "cta": "Open the vault"
+  },
+  "reveal": {
+    "skipHint": "Tap to flip"
+  },
+  "distribute": {
+    "headline": "You hand out {count}.",
+    "sub": "Tap: +1. Hold: −1.",
+    "remaining_one": "{count} left to hand out",
+    "remaining_other": "{count} left to hand out",
+    "cta": "Pay out",
+    "handover": "Pass to {name}."
+  },
+  "result": {
+    "allShare": "Honour Among Thieves",
+    "soloSteal": "The Solo Job",
+    "multiSteal": "Too Many Cooks",
+    "allSteal": "Brawl",
+    "jackpot": "JACKPOT",
+    "perjury": "PERJURY!",
+    "mole": "The Mole",
+    "drinks": "{name} drinks {count}",
+    "distributionLine": "{name} hands out: {detail}",
+    "fee": "Fee",
+    "vaultGrows": "The vault grows to {vault}",
+    "vaultReset": "The vault was emptied",
+    "vaultBurst": "The vault burst",
+    "nextRound": "Next round",
+    "changePlayers": "Change players",
+    "changeModes": "Change modes",
+    "stats": "Stats",
+    "scoreboard": "Sips taken",
+    "trustIndex": "Trust",
+    "betrayalStreak": "Betrayal streak",
+    "mostBetrayed": "Most betrayed",
+    "noStatsYet": "No round played yet.",
+    "traitor": "Traitor of the evening",
+    "history": "Across all evenings",
+    "historyEvenings": "{count} evenings",
+    "historyEvening": "1 evening"
+  },
+  "kassel": {
+    "negotiation": [
+      "Cards, please.",
+      "I have a feeling about this…",
+      "Trust is lovely. I'm a banker.",
+      "The vault has never looked better.",
+      "Who stole last round?",
+      "Someone here looks awfully honest today."
+    ],
+    "fee": "Fee! Thank you.",
+    "perjury": [
+      "Noted.",
+      "An oath is an oath.",
+      "That'll cost extra."
+    ],
+    "cardsPlease": "Cards, please.",
+    "allShare": [
+      "Touching. Truly.",
+      "I was hoping for more drama.",
+      "Fee! Thank you."
+    ],
+    "soloSteal": [
+      "Clean work.",
+      "And off he goes.",
+      "I saw nothing."
+    ],
+    "multiSteal": [
+      "Two geniuses, one idea.",
+      "That was never going to work.",
+      "Do share it nicely."
+    ],
+    "allSteal": [
+      "I'll get the broom.",
+      "Everyone. Truly everyone.",
+      "Now that's unity."
+    ],
+    "jackpot": [
+      "My rivets!",
+      "So that was the vault.",
+      "I'll need a new one."
+    ],
+    "negotiationLate": [
+      "Ten seconds left.",
+      "Make up your minds.",
+      "The clock is running, ladies and gentlemen.",
+      "Settling up shortly."
+    ]
+  },
+  "rules": {
+    "headline": "Rules",
+    "vaultTitle": "The vault",
+    "vaultBody": "Sips sit in the middle. If everyone splits, the vault grows — and everyone pays a 1-sip fee.",
+    "negotiateTitle": "Negotiate",
+    "negotiateBody": "You get {count} seconds. Talk, swear, lie. The phone only keeps time.",
+    "chooseTitle": "Choose in secret",
+    "chooseBody": "The phone goes around. Everyone decides alone: SPLIT or STEAL. No going back.",
+    "payoutTitle": "Payout",
+    "payoutBody": "One thief hands out the whole vault. Several thieves drink it between them. Splitters walk away dry.",
+    "witnessTitle": "Crown witness",
+    "witnessBody": "With two or more thieves one may talk: they halve their share, the one they name drinks it. Whoever broke an oath cannot deal."
+  },
+  "settings": {
+    "headline": "Settings",
+    "sound": "Sound",
+    "music": "Music",
+    "haptics": "Vibration",
+    "lowEffects": "Fewer effects",
+    "language": "Language",
+    "reset": "Reset session",
+    "forgetHistory": "Delete trust history",
+    "historyGone": "History deleted."
+  },
+  "dialog": {
+    "abortRound": "Abandon round?",
+    "abortRoundBody": "This round's choices will be lost.",
+    "abortConfirm": "Abandon",
+    "abortKeep": "Keep playing"
+  },
+  "share": {
+    "title": "The Vault",
+    "allShare": "With {vault} sips in the vault, everyone shared. Honour among thieves. 🤝",
+    "soloSteal": "{name} stole with {vault} sips in the vault. Alone. 🔓",
+    "multiSteal": "{count} of us stole at the same time, with {vault} sips in the vault. 💥",
+    "allSteal": "With {vault} sips in the vault, everyone stole. There was a brawl. 🥊",
+    "jackpot": "The vault burst at {vault} sips. 🎉",
+    "perjury": "{name} swore to share and stole with {vault} sips at stake. Perjury. ⚖️",
+    "cta": "Share",
+    "copied": "Copied to clipboard."
+  },
+  "onboarding": {
+    "negotiation": "Talk. Swear. Lie.",
+    "choice": "Nobody sees this. Really."
+  },
+  "install": {
+    "cta": "Add to home screen",
+    "hint": "Plays offline, starts instantly."
+  },
+  "update": {
+    "headline": "New version available.",
+    "cta": "Reload"
+  },
+  "witness": {
+    "headline": "Anyone want to talk?",
+    "pickSelf": "Tap your symbol — you halve your penalty.",
+    "pickOther": "And who else was in on it?",
+    "skip": "Nobody talks",
+    "line": "{witness} gave up {accused}.",
+    "perjurerBlocked": "cannot talk, broke the oath",
+    "backOut": "Never mind"
+  },
+  "modeGuide": {
+    "headline": "What the modes change",
+    "intro": "Freely combinable. Everything here applies on top of the normal rules.",
+    "oath": {
+      "title": "Oath",
+      "lines": [
+        "During the negotiation, anyone who wants to swear taps their own symbol. The whole table sees the seal — and it can be taken back until the negotiation ends.",
+        "Swear and share: nothing happens.",
+        "Swear and steal is perjury. As the lone thief you drink 2 sips yourself and have 2 fewer to hand out.",
+        "As one of several thieves you drink double your share.",
+        "Whoever doesn't swear never pays extra. They're just suspicious."
+      ],
+      "note": "The mole can't commit perjury — they have to steal."
+    },
+    "mole": {
+      "title": "Mole",
+      "lines": [
+        "At the start of the round the game secretly picks one player.",
+        "Only they see “You are the mole” on their choice screen. SHARE is locked for them.",
+        "So every round has at least one thief.",
+        "If two or more steal, they only drink half their share, rounded up.",
+        "At the end of the reveal a helmet drops on their head. Only then does everyone know."
+      ],
+      "note": "Anyone can claim they were the mole. Once a round it's true."
+    },
+    "nightShift": {
+      "title": "Night shift",
+      "lines": [
+        "No negotiation. Ten seconds of silence with a ticking clock instead.",
+        "Payout, vault and reveal are unchanged."
+      ],
+      "note": "Useless together with the Oath: without a negotiation nobody can swear."
+    },
+    "highroller": {
+      "title": "Highroller",
+      "lines": [
+        "Overrides the hardness setting completely.",
+        "The vault starts at 6 and grows by 4 per peaceful round.",
+        "The jackpot sits at 24.",
+        "No cap: the vault grows past the jackpot threshold instead of waiting there."
+      ],
+      "note": "The fee stays 1 sip. Peace costs the same — and is worth far more."
+    },
+    "witness": {
+      "title": "Crown witness",
+      "lines": [
+        "Kicks in after the reveal, and only if at least two stole.",
+        "The phone stays in the middle. Whoever wants to talk taps their own symbol first, then another thief's — in front of everyone.",
+        "Their share halves, rounded up. The difference is drunk by the one they named.",
+        "The round's total stays the same: betrayal moves sips, it doesn't forgive them.",
+        "“Nobody talks” is an equal option."
+      ],
+      "note": "Whoever broke an oath can't talk. They can be named, though."
+    }
+  }
+}
