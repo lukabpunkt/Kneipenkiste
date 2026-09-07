@@ -38,21 +38,21 @@ const KINDS = [
   { colour: null, gravity: -10, drag: 3, shape: 'bar', alpha: 0.8 },
   { colour: '110, 170, 70', gravity: 320, drag: 0.4, shape: 'blob', alpha: 0.9 },
   { colour: '255, 255, 255', gravity: -34, drag: 1.6, shape: 'glyph', alpha: 0.95, glyph: 'z' },
-  { colour: '236, 72, 153', gravity: -40, drag: 2, shape: 'glyph', alpha: 0.95, glyph: '♥' },
-  { colour: '43, 29, 46', gravity: -32, drag: 2, shape: 'glyph', alpha: 0.9, glyph: '?' },
+  { colour: '255, 107, 157', gravity: -40, drag: 2, shape: 'glyph', alpha: 0.95, glyph: '♥' },
+  { colour: '255, 248, 231', gravity: -32, drag: 2, shape: 'glyph', alpha: 0.9, glyph: '?' },
   { colour: '255, 255, 255', gravity: 0, drag: 1.2, shape: 'bar', alpha: 0.55 },
   // Kicked-up turf: heavier than dust, so it arcs and comes back down.
-  { colour: '150, 108, 62', gravity: 520, drag: 0.5, shape: 'blob', alpha: 0.95 },
+  { colour: '92, 66, 38', gravity: 520, drag: 0.5, shape: 'blob', alpha: 0.95 },
 ];
 
 /** Rainbow stripe colours, cycled by the trail. */
 const RAINBOW_COLOURS = [
-  '239,68,68',
-  '245,158,11',
-  '250,204,21',
-  '34,197,94',
-  '6,182,212',
-  '139,92,246',
+  '255,71,87',
+  '255,127,80',
+  '255,211,42',
+  '46,213,115',
+  '24,220,255',
+  '175,115,238',
 ];
 
 /**

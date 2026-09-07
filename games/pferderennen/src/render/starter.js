@@ -12,8 +12,8 @@ import { TRACK_COLOURS } from './trackTheme.js';
 
 /** Skin and clothing, matching the figures in eventProps.js. */
 const SKIN = '#F2C9A0';
-const COAT = '#1F2937';
-const STEEL = '#4B5563';
+const COAT = '#3E4A5C';
+const STEEL = '#8892A3';
 
 /**
  * @param {CanvasRenderingContext2D} ctx

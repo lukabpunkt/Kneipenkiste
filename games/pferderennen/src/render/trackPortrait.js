@@ -213,7 +213,8 @@ export function createPortraitTrack({ camera, horses }) {
         ctx.lineTo(left + surface, y);
         ctx.stroke();
         ctx.globalAlpha = 1;
-        ctx.fillStyle = COLOURS.ink;
+        // Paper, not ink: these sit straight on the track, and the track is now the dark thing.
+        ctx.fillStyle = COLOURS.paper;
         ctx.globalAlpha = 0.45;
         ctx.fillText(String(unit), left + 4, y - 8);
         ctx.globalAlpha = 1;

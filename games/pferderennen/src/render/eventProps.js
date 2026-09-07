@@ -65,7 +65,7 @@ export function drawCarrot(ctx, x, y, r) {
 
 export function drawCup(ctx, x, y, r) {
   ctx.fillStyle = '#FFF8EE';
-  ctx.strokeStyle = '#6B5B73';
+  ctx.strokeStyle = '#9A8AA5';
   ctx.lineWidth = r * 0.16;
   ctx.beginPath();
   ctx.roundRect(x - r, y - r, r * 1.7, r * 2, r * 0.25);
@@ -90,8 +90,9 @@ export function drawHorseshoe(ctx, r) {
 }
 
 export function drawFan(ctx, x, y, r, since) {
-  // A spectator at the rail, phone held up, flashing.
-  ctx.fillStyle = '#2B1D2E';
+  // A spectator at the rail, phone held up, flashing. Lit from the track, so the head is warm
+  // rather than dark — a near-black silhouette on a night rail is not a person, it is a hole.
+  ctx.fillStyle = '#EFD8BC';
   ctx.beginPath();
   ctx.arc(x, y, r * 0.36, 0, Math.PI * 2);
   ctx.fill();
@@ -99,7 +100,7 @@ export function drawFan(ctx, x, y, r, since) {
   ctx.beginPath();
   ctx.roundRect(x - r * 0.4, y + r * 0.3, r * 0.8, r * 0.9, r * 0.2);
   ctx.fill();
-  ctx.fillStyle = '#111827';
+  ctx.fillStyle = '#3A3550';
   ctx.beginPath();
   ctx.roundRect(x + r * 0.35, y - r * 0.5, r * 0.32, r * 0.5, r * 0.08);
   ctx.fill();
@@ -153,14 +154,14 @@ export function drawStreaker(ctx, frame, since, seed) {
   };
 
   person(x, '#F2C9A0', false);
-  person(x - 46, '#1F2937', true);
+  person(x - 46, '#4E5A6B', true);
 }
 
 export function drawTumbleweed(ctx, x, y, r, since) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(since * 3);
-  ctx.strokeStyle = 'rgba(150, 120, 70, 0.85)';
+  ctx.strokeStyle = 'rgba(214, 186, 128, 0.9)';
   ctx.lineWidth = 2.5;
   for (let i = 0; i < 7; i += 1) {
     const a = (i / 7) * Math.PI * 2;
@@ -226,7 +227,7 @@ export function drawPuddle(ctx, x, y, r, colour) {
 }
 
 export function drawSittingJockey(ctx, x, y, r) {
-  ctx.fillStyle = '#6B5B73';
+  ctx.fillStyle = '#9A8AA5';
   ctx.beginPath();
   ctx.roundRect(x - r * 0.4, y - r * 0.75, r * 0.8, r * 0.6, r * 0.2);
   ctx.fill();
@@ -235,7 +236,7 @@ export function drawSittingJockey(ctx, x, y, r) {
   ctx.arc(x, y - r * 0.95, r * 0.27, 0, Math.PI * 2);
   ctx.fill();
   // Waving.
-  ctx.strokeStyle = '#6B5B73';
+  ctx.strokeStyle = '#9A8AA5';
   ctx.lineWidth = r * 0.16;
   ctx.lineCap = 'round';
   ctx.beginPath();
