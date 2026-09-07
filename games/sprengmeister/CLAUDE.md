@@ -44,3 +44,7 @@ iPhone 11/12 (Safari), Pixel 4a/5 (Chrome): 60 fps Ziel, 30 fps Minimum (Low-Eff
 
 - Repo: https://github.com/lukabpunkt/Sprengmeister · Deploy: GitHub Pages (`base: '/Sprengmeister/'`)
 - Docs: Deutsch. Code, Bezeichner, Commits: Englisch.
+
+## Kneipenkiste
+
+Dieses Spiel lebt seit September 2026 im Monorepo [Kneipenkiste](https://github.com/lukabpunkt/Kneipenkiste) unter `games/sprengmeister/`. `npm install` läuft im Root; Befehle von hier aus mit `npm run <script> -w games/sprengmeister`. Deploy und CI kommen aus dem Root (`scripts/build-site.mjs`, `.github/workflows/`), der Base-Pfad wird beim Plattform-Build per Umgebungsvariable gesetzt — die Defaults in diesem Ordner bleiben für lokale Tests bestehen.

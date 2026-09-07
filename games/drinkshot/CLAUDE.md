@@ -52,3 +52,7 @@ npm run preview:deaths # App in der Death-Preview öffnen (?dev=1)
 - Repo: https://github.com/lukabpunkt/Drinkshot.git
 - Deploy: GitHub Pages (Vite `base: '/Drinkshot/'`), Workflow `.github/workflows/deploy.yml`
 - Sprache der Docs: Deutsch. Code, Bezeichner, Commits: Englisch.
+
+## Kneipenkiste
+
+Dieses Spiel lebt seit September 2026 im Monorepo [Kneipenkiste](https://github.com/lukabpunkt/Kneipenkiste) unter `games/drinkshot/`. `npm install` läuft im Root; Befehle von hier aus mit `npm run <script> -w games/drinkshot`. Deploy und CI kommen aus dem Root (`scripts/build-site.mjs`, `.github/workflows/`), der Base-Pfad wird beim Plattform-Build per Umgebungsvariable gesetzt — die Defaults in diesem Ordner bleiben für lokale Tests bestehen.

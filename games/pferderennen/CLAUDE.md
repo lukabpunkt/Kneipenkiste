@@ -96,3 +96,7 @@ npm run e2e          # Playwright Smoke-Tests (ab M9)
 ## Wenn etwas unklar ist
 
 Entscheide im Zweifel so, wie es dem Ziel „macht am Küchentisch mit sechs angetrunkenen Freunden am meisten Spaß und ist absolut fair“ am besten dient, und notiere die Entscheidung kurz in `PROGRESS.md` unter „Entscheidungen“.
+
+## Kneipenkiste
+
+Dieses Spiel lebt seit September 2026 im Monorepo [Kneipenkiste](https://github.com/lukabpunkt/Kneipenkiste) unter `games/pferderennen/`. `npm install` läuft im Root; Befehle von hier aus mit `npm run <script> -w games/pferderennen`. Deploy und CI kommen aus dem Root (`scripts/build-site.mjs`, `.github/workflows/`), der Base-Pfad wird beim Plattform-Build per Umgebungsvariable gesetzt — die Defaults in diesem Ordner bleiben für lokale Tests bestehen.
