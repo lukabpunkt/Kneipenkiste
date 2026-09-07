@@ -35,7 +35,7 @@
 .start__tagline {
   max-width: none;
   margin: var(--space-2) 0 0;
-  color: var(--text-on-sky);
+  color: var(--text-subtle);
   font-size: var(--text-md);
 }
 
@@ -1005,7 +1005,7 @@
 }
 
 .betting__footer-hint {
-  color: var(--text-on-sky);
+  color: var(--text-subtle);
   text-align: center;
 }
 

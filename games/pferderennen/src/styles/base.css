@@ -233,10 +233,10 @@ select {
   font-size: var(--text-xl);
 }
 
-/* This one sits on the sky, not on a card — see --text-on-sky. */
+/* This one sits on the page, not on a card — see --text-subtle. */
 .screen__subtitle {
   margin: var(--space-1) 0 0;
-  color: var(--text-on-sky);
+  color: var(--text-subtle);
   font-size: var(--text-xs);
 }
 
@@ -281,13 +281,14 @@ select {
 }
 
 /*
- * Small print. It defaults to the darker on-sky tone because that is where it is least safe:
- * --text-muted only reaches 3.0-3.7:1 against the gradient. Inside a card there is no such
- * problem, so it goes back to the lighter tone there and the two tiers stay distinguishable.
+ * Small print. It defaults to the on-page tone because that is where most of it lives:
+ * the page is a shade darker than a panel, so secondary text out there can afford to be quieter
+ * and still outrank --text-muted in its own context. Inside a card it goes back to the other
+ * tone, and the two tiers stay distinguishable.
  */
 .hint,
 .field__label {
-  color: var(--text-on-sky);
+  color: var(--text-subtle);
 }
 
 .card .hint,
