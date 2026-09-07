@@ -14,6 +14,7 @@
 import { TRACK_LENGTH, RUNNER_COUNT, STARTER } from '../config.js';
 import { TRACK_COLOURS as COLOURS, MARKER_SPACING, drawGrandstandStrip } from './trackTheme.js';
 import { createCrowdFlashes } from './crowdFlashes.js';
+import { textOn } from './palette.js';
 
 /** Vertical layout, as shares of the canvas height. */
 const TRACK_TOP = 0.44;
@@ -39,6 +40,7 @@ export function createLandscapeTrack({ camera, horses }) {
   let height = 0;
   let hills = null;
   let stand = null;
+  let lights = null;
   /** How excited the crowd is right now; decays back to zero. */
   let cheer = 0;
   let energy = 0;
@@ -79,6 +81,23 @@ export function createLandscapeTrack({ camera, horses }) {
     const standDepth = bandHeight * 0.4;
     standCtx.translate(0, bandHeight - standDepth);
     drawGrandstandStrip(standCtx, tile, standDepth);
+
+    // The pools the floodlights throw onto the track. Cached like everything else in the
+    // backdrop, so the race pays two drawImage calls a frame for them and no path operations.
+    // They ride the stand's parallax, which is also physically right: the lamps are bolted to
+    // the stadium, not standing out in the world.
+    const poolBand = Math.ceil(height * (TRACK_BOTTOM - TRACK_TOP)) + 2;
+    lights = new OffscreenCanvas(tile, poolBand);
+    const lightCtx = lights.getContext('2d');
+    const pools = 4;
+    for (let i = 0; i < pools; i += 1) {
+      const cx = (tile / pools) * (i + 0.5);
+      const glow = lightCtx.createRadialGradient(cx, 0, 0, cx, 0, poolBand * 1.6);
+      glow.addColorStop(0, COLOURS.floodPool);
+      glow.addColorStop(1, 'rgba(255, 184, 0, 0)');
+      lightCtx.fillStyle = glow;
+      lightCtx.fillRect(cx - poolBand * 1.6, 0, poolBand * 3.2, poolBand);
+    }
   }
 
   /**
@@ -203,6 +222,8 @@ export function createLandscapeTrack({ camera, horses }) {
       ctx.fillStyle = sand;
       ctx.fillRect(0, top, width, bottom - top);
 
+      blit(ctx, lights, STAND_PARALLAX, top);
+
       ctx.strokeStyle = COLOURS.line;
       ctx.globalAlpha = 0.55;
       for (let i = 1; i < RUNNER_COUNT; i += 1) {
@@ -270,7 +291,7 @@ export function createLandscapeTrack({ camera, horses }) {
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = textOn(horse.color);
         ctx.font = `${Math.max(11, laneHeight * 0.42)}px system-ui, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -308,7 +329,7 @@ export function createLandscapeTrack({ camera, horses }) {
       const size = (bottom - top) / squares;
       for (let i = 0; i < squares; i += 1) {
         for (let column = 0; column < 2; column += 1) {
-          ctx.fillStyle = (i + column) % 2 === 0 ? COLOURS.ink : COLOURS.white;
+          ctx.fillStyle = (i + column) % 2 === 0 ? COLOURS.ink : COLOURS.paper;
           ctx.fillRect(x - 11 + column * 11, top + i * size, 11, size);
         }
       }
@@ -328,7 +349,7 @@ export function createLandscapeTrack({ camera, horses }) {
       ctx.beginPath();
       ctx.roundRect(x - 66, bannerY - 6, 132, height * 0.055, 6);
       ctx.fill();
-      ctx.fillStyle = COLOURS.white;
+      ctx.fillStyle = textOn(COLOURS.banner);
       ctx.font = `700 ${Math.max(12, height * 0.032)}px system-ui, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';

@@ -1,32 +1,47 @@
 /**
  * Colours and shared furniture of the race track, used by both orientations.
  *
- * These are the same values as the CSS design tokens, repeated here because canvas cannot read
- * custom properties. Whenever a token in tokens.css changes, this file changes with it.
+ * An evening meeting under floodlight. The rule that keeps it readable: everything that covers a
+ * large area is dark and sits close in value to its neighbours, and the few bright things — the
+ * rail, the lane lines, the lamps, the finish banner — are what the eye lands on. The horses are
+ * the brightest objects on the screen, which is the whole point.
+ *
+ * skyTop and skyBottom are the same values as the --sky-* design tokens, repeated here because
+ * canvas cannot read custom properties. Change one, change the other.
  */
 
 export const TRACK_COLOURS = {
-  skyTop: '#FFB88C',
-  skyBottom: '#C9A7EB',
-  hillFar: '#B79AD6',
-  hillNear: '#8FBF6B',
-  standRoof: '#8B5A2B',
-  standWall: '#C98F5A',
-  standShade: '#A6713F',
-  fence: '#FFF7E6',
-  sand: '#E8C88A',
-  sandDark: '#D9B370',
-  line: '#FFF7E6',
-  grassLight: '#7ED957',
-  grassDark: '#4CAF50',
-  ink: '#2B1D2E',
-  wood: '#8B5A2B',
-  banner: '#FF6B35',
-  white: '#FFFFFF',
+  skyTop: '#0F0E1A',
+  skyBottom: '#2E2448',
+  hillFar: '#2A2145',
+  hillNear: '#1D1834',
+  standRoof: '#4A3A22',
+  standWall: '#2A2340',
+  standShade: '#171326',
+  fence: '#E6DCC4',
+  sand: '#4E4132',
+  /** The pool of light down the middle of the track. */
+  sandLit: '#5E4C39',
+  sandDark: '#382E24',
+  line: '#D8CDB4',
+  grassLight: '#2C4A2A',
+  grassDark: '#1B2F1B',
+  ink: '#12101E',
+  wood: '#4A3A24',
+  banner: '#FFB800',
+  /** Not white — the Kneipenkiste paper. Everything bright on the track is this. */
+  paper: '#FFF8E7',
+  floodPole: '#3A3550',
+  floodHead: '#FFE9A8',
+  floodPool: 'rgba(255, 184, 0, 0.11)',
 };
 
-/** Crowd colours, cycled so the stand looks populated rather than patterned. */
-export const CROWD = ['#EF4444', '#F59E0B', '#22C55E', '#06B6D4', '#8B5CF6', '#EC4899', '#FFF8EE'];
+/**
+ * Crowd colours, cycled so the stand looks populated rather than patterned. Same hues as before
+ * at a fraction of the brightness: at night a crowd is a texture, and the flashbulbs going off
+ * in it are the only thing that should read as light.
+ */
+export const CROWD = ['#8A3B44', '#8A6A2E', '#2F6B45', '#2A5F73', '#54407E', '#7A3D5C', '#5B5468'];
 
 /** A distance marker every this many track units. */
 export const MARKER_SPACING = 100;
@@ -78,7 +93,51 @@ export function drawGrandstandStrip(ctx, length, depth) {
   }
   ctx.globalAlpha = 1;
 
+  drawFloodlights(ctx, length, depth, roofY);
+
   ctx.fillStyle = TRACK_COLOURS.fence;
   ctx.fillRect(0, baseY - 7, length, 4);
   for (let x = 5; x < length; x += 30) ctx.fillRect(x, baseY - 9, 3, 10);
+}
+
+/**
+ * Masts along the back of the stand. They live in the same cached strip as the stand itself, so
+ * both orientations get them for nothing and they scroll on the stand's parallax — which is also
+ * physically right, since the lamps are bolted to the stadium rather than standing in the world.
+ *
+ * @param {CanvasRenderingContext2D|OffscreenCanvasRenderingContext2D} ctx
+ * @param {number} roofY top of the stand roof; the masts rise above it
+ */
+function drawFloodlights(ctx, length, depth, roofY) {
+  const masts = 4;
+  const step = length / masts;
+  const poleWidth = Math.max(2, depth * 0.018);
+  const headWidth = poleWidth * 5;
+  const headHeight = Math.max(3, depth * 0.05);
+  const top = roofY - depth * 0.42;
+
+  for (let i = 0; i < masts; i += 1) {
+    const x = step * (i + 0.5);
+
+    ctx.fillStyle = TRACK_COLOURS.floodPole;
+    ctx.fillRect(x - poleWidth / 2, top, poleWidth, roofY - top);
+
+    ctx.fillStyle = TRACK_COLOURS.floodHead;
+    ctx.fillRect(x - headWidth / 2, top, headWidth, headHeight);
+
+    // The bloom around the lamp. A radial gradient rather than a shadow blur: blurs are the one
+    // canvas operation that reliably costs a frame, and this is baked once into a cache anyway.
+    const glow = ctx.createRadialGradient(
+      x,
+      top + headHeight / 2,
+      0,
+      x,
+      top + headHeight / 2,
+      headWidth * 2.2,
+    );
+    glow.addColorStop(0, TRACK_COLOURS.floodPool);
+    glow.addColorStop(1, 'rgba(255, 184, 0, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(x - headWidth * 2.2, top - headWidth * 2.2, headWidth * 4.4, headWidth * 4.4);
+  }
 }

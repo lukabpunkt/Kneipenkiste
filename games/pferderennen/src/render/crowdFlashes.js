@@ -63,7 +63,7 @@ export function createCrowdFlashes() {
     draw(ctx, band) {
       if (count === 0) return;
       ctx.save();
-      ctx.fillStyle = TRACK_COLOURS.white;
+      ctx.fillStyle = TRACK_COLOURS.paper;
       const radius = Math.max(2, band.height * 0.11);
       for (let i = 0; i < count; i += 1) {
         // Brightest in the middle of its life, so a flash blooms rather than blinking on.
