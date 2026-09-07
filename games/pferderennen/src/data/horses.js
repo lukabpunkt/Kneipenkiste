@@ -6,10 +6,13 @@
  * it works with runner indices 0..5, and only rendering maps index -> horse.
  * See docs/01_GAME_DESIGN.md §2 and docs/03_RACE_ENGINE.md §2.
  *
- * This file is the SINGLE SOURCE of the six signature colours. They used to exist a third time as
- * --horse-* tokens in tokens.css, which nothing ever read; those are gone. The one copy that must
- * stay is render/trackTheme.js, because canvas cannot read custom properties — change a colour
- * here and change it there too.
+ * This file is the SINGLE SOURCE of the six signature colours, and they are the Kneipenkiste
+ * player colours — the same six hexes Drinkshot, Sprengmeister, Tresor and Zoll hand out, so a
+ * purple horse is exactly the purple a purple player is. Do not drift them.
+ *
+ * Nothing else holds a copy. render/trackTheme.js keeps its own palette because canvas cannot
+ * read custom properties, but that palette is the scene, not the horses; the horses reach the
+ * canvas through render/palette.js.
  */
 
 /**
@@ -34,9 +37,9 @@ export const HORSES = [
     id: 'trabsalot',
     number: 1,
     name: 'Sir Trabsalot',
-    color: '#8B5CF6',
-    colorLight: '#C4B5FD',
-    colorDark: '#5B21B6',
+    color: '#AF73EE',
+    colorLight: '#D3AFEB',
+    colorDark: '#7B3FBF',
     coat: '#3A3340',
     coatDark: '#221D26',
     mane: '#15121A',
@@ -55,9 +58,9 @@ export const HORSES = [
     id: 'prosecco',
     number: 2,
     name: 'Prosecco Rakete',
-    color: '#EC4899',
-    colorLight: '#F9A8D4',
-    colorDark: '#9D174D',
+    color: '#FF6B9D',
+    colorLight: '#FFAABE',
+    colorDark: '#C94A78',
     coat: '#FFF1F6',
     coatDark: '#E8C3D4',
     mane: '#F9A8D4',
@@ -76,9 +79,9 @@ export const HORSES = [
     id: 'morgana',
     number: 3,
     name: 'Kater Morgana',
-    color: '#EF4444',
-    colorLight: '#FCA5A5',
-    colorDark: '#991B1B',
+    color: '#FF4757',
+    colorLight: '#FF9798',
+    colorDark: '#C0392B',
     coat: '#A9603A',
     coatDark: '#6E3A21',
     mane: '#4A2717',
@@ -97,9 +100,9 @@ export const HORSES = [
     id: 'schnapsidee',
     number: 4,
     name: 'Schnapsidee',
-    color: '#22C55E',
-    colorLight: '#86EFAC',
-    colorDark: '#15803D',
+    color: '#2ED573',
+    colorLight: '#8CE5A7',
+    colorDark: '#1E9E52',
     coat: '#EAF7E5',
     coatDark: '#B8D9AE',
     mane: '#3F7A2E',
@@ -118,9 +121,9 @@ export const HORSES = [
     id: 'hopfen',
     number: 5,
     name: 'Hopfen Hengst',
-    color: '#F59E0B',
-    colorLight: '#FCD34D',
-    colorDark: '#B45309',
+    color: '#FFD32A',
+    colorLight: '#FFE47F',
+    colorDark: '#D4A800',
     coat: '#C97B34',
     coatDark: '#8A4E1C',
     mane: '#F3D9A4',
@@ -139,9 +142,9 @@ export const HORSES = [
     id: 'wodka',
     number: 6,
     name: 'Wodka Wirbel',
-    color: '#06B6D4',
-    colorLight: '#67E8F9',
-    colorDark: '#0E7490',
+    color: '#18DCFF',
+    colorLight: '#80E9F4',
+    colorDark: '#0FA6C2',
     coat: '#DCE6EC',
     coatDark: '#9FB3C0',
     mane: '#8FA9B8',
