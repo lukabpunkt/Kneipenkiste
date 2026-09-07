@@ -1,0 +1,38 @@
+{
+  "name": "pferderennen",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pferderennen – ein faires Trinkspiel-Pferderennen für den Browser",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lukabpunkt/Pferderennen.git"
+  },
+  "scripts": {
+    "dev": "vite --host --port 5173",
+    "icons": "node scripts/make-icons.mjs",
+    "sw": "node scripts/make-sw-manifest.mjs",
+    "serve": "node scripts/serve.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "audit:fairness": "node tests/fairness/audit.js",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "@vitest/coverage-v8": "^4.1.11",
+    "eslint": "^10.9.1",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.6",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,306 @@
+/*
+ * Design tokens, in three layers.
+ *
+ *   Primitive  what a value IS      --sand-300, --accent-500
+ *   Semantic   what it is FOR       --surface, --text-muted, --accent-press
+ *   Component  the few exceptions   --btn-primary-edge
+ *
+ * Only the semantic layer is allowed outside this file. That indirection is what makes a second
+ * theme a block of overrides rather than a second design pass — and it is the difference between
+ * a palette and a list of colours.
+ *
+ * The ramps are built in OKLCH because its lightness is perceptually even across hues: in HSL
+ * "+10 % lightness" means something different for orange than for plum, which is exactly why
+ * hand-mixed scales look lumpy. Method: fix one lightness ladder for every ramp, then lay chroma
+ * and hue on top, compressing chroma at both ends so nothing clips out of sRGB.
+ *
+ * The hex comment after each value is the sRGB rendering, and the @supports block at the bottom
+ * of this file feeds those same hexes to anything that cannot do oklch().
+ *
+ * Outside this file the CSS contains not a single hex value (audit A1).
+ */
+
+:root {
+  /* ---------------------------------------------------------------- primitives */
+
+  /*
+   * Neutral. Warm paper at the top, plum shadow at the bottom — the hue rotates 77° → 320° down
+   * the ramp on purpose. That is not decoration: the background gradient runs peach to lilac, so
+   * a neutral that warms in the highlights and cools in the shadows belongs to the picture. A
+   * flat-hue grey would sit on top of it like a sticker.
+   *
+   * Steps 50, 600 and 900 are bit-identical to the cream, ink-soft and ink this game shipped
+   * with. The identity did not change; it grew neighbours.
+   */
+  --sand-50: oklch(0.982 0.015 77); /* #fff8ee */
+  --sand-100: oklch(0.955 0.018 70); /* #f8eee4 */
+  --sand-200: oklch(0.905 0.022 58); /* #ebdcd2 */
+  --sand-300: oklch(0.84 0.028 40); /* #dcc5bd */
+  --sand-400: oklch(0.72 0.038 10); /* #bb9b9f */
+  --sand-500: oklch(0.61 0.044 345); /* #977989 */
+  --sand-600: oklch(0.496 0.042 314); /* #6b5b73 */
+  --sand-700: oklch(0.4 0.041 318); /* #514156 */
+  --sand-800: oklch(0.325 0.039 319); /* #3d2e41 */
+  --sand-900: oklch(0.256 0.037 320); /* #2b1d2e */
+
+  /* Accent. Step 500 is the #ff6b35 this game has always used; 700 is the old --accent-dark. */
+  --accent-50: oklch(0.975 0.013 39); /* #fff4f0 */
+  --accent-100: oklch(0.945 0.029 39); /* #ffe7df */
+  --accent-200: oklch(0.89 0.06 39); /* #ffcebe */
+  --accent-300: oklch(0.82 0.105 39); /* #ffad91 */
+  --accent-400: oklch(0.765 0.144 39); /* #ff906b */
+  --accent-500: oklch(0.705 0.192 39); /* #ff6b36 */
+  --accent-600: oklch(0.615 0.176 39); /* #d85524 */
+  --accent-700: oklch(0.526 0.159 39); /* #b33f11 */
+  --accent-800: oklch(0.43 0.13 39); /* #882e0a */
+  --accent-900: oklch(0.33 0.098 39); /* #5d1e06 */
+
+  /* Danger and success need fewer steps: they only ever tint, fill or carry text. */
+  --danger-100: oklch(0.945 0.028 29.5); /* #ffe6e2 */
+  --danger-200: oklch(0.88 0.064 29.5); /* #ffc8bf */
+  --danger-500: oklch(0.576 0.209 29.5); /* #d92d20 */
+  --danger-700: oklch(0.44 0.16 29.5); /* #971c12 */
+
+  --success-100: oklch(0.955 0.035 149.6); /* #e1f7e4 */
+  --success-200: oklch(0.9 0.075 149.6); /* #bcedc4 */
+  --success-500: oklch(0.723 0.192 149.6); /* #22c55e */
+  --success-700: oklch(0.52 0.145 149.6); /* #007f37 */
+
+  /* The sky the whole game sits under. Also the canvas track's own two colours. */
+  --sky-top: oklch(0.839 0.101 52.7); /* #ffb88c */
+  --sky-bottom: oklch(0.782 0.101 307); /* #c9a7eb */
+  --paper: oklch(1 0 0); /* #ffffff */
+
+  /* ----------------------------------------------------------------- semantic */
+
+  /* Surfaces. On a light interface a raised surface should differ from its ground by no more
+     than ~7 % lightness — beyond that the card stops reading as paper and starts reading as a
+     hole. */
+  --surface: var(--sand-50);
+  --surface-sunken: var(--sand-100);
+  --surface-inverse: var(--sand-900);
+  --surface-tint: var(--accent-100);
+
+  /* Two text colours, not five. Hierarchy below this comes from weight and size — a ladder of
+     ever-paler greys is the classic tell. */
+  --text: var(--sand-900);
+  --text-muted: var(--sand-600); /* 5.91:1 on --surface */
+  /*
+   * Muted text that sits on the sky rather than on a card. The gradient is far darker than the
+   * cream, so --text-muted only reaches 3.0-3.7:1 out there; this step holds 6.1-7.5:1 across
+   * the whole peach-to-lilac run and still reads as secondary next to a heading.
+   */
+  --text-on-sky: var(--sand-800);
+  --text-on-inverse: var(--sand-50);
+  --text-disabled: var(--sand-500);
+
+  /* Two border weights: a hairline that only divides, and one you are meant to see (3:1). */
+  --border: var(--sand-200);
+  --border-strong: var(--sand-500);
+
+  --accent: var(--accent-500);
+  --accent-hover: var(--accent-400);
+  --accent-press: var(--accent-600);
+  --accent-edge: var(--accent-700);
+  --accent-tint: var(--accent-100);
+  --on-accent: var(--sand-900); /* 5.62:1 — white would be 2.84:1 (audit A4) */
+
+  --danger: var(--danger-500);
+  --danger-edge: var(--danger-700);
+  --danger-tint: var(--danger-100);
+  --on-danger: var(--sand-50);
+
+  --success: var(--success-500);
+  --success-edge: var(--success-700);
+  --success-tint: var(--success-100);
+  --on-success: var(--sand-900);
+
+  /* Translucent ink, for surfaces whose backdrop is not known at author time: hover fills, press
+     fills, dividers, the edge under a light button. These were nine unnamed color-mix() values
+     between 6 % and 35 %; the eye cannot tell 6 from 8 or 18 from 22, so there are three. */
+  --tint-subtle: oklch(0.256 0.037 320 / 0.06);
+  --tint: oklch(0.256 0.037 320 / 0.11);
+  --tint-strong: oklch(0.256 0.037 320 / 0.2);
+  /* Paper you can see through — ghost buttons and pills that sit on the sky. */
+  --surface-glass: oklch(0.982 0.015 77 / 0.62);
+
+  --overlay: oklch(0.256 0.037 320 / 0.55);
+
+  /* Film grain for the sky. See the note on `body` in base.css. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.32'/%3E%3C/svg%3E");
+
+  /* ------------------------------------------------------------------- depth */
+
+  /*
+   * One light source for the whole page: straight above, so every shadow is vertical. As a
+   * surface rises its offset and blur grow while its opacity DROPS — that is what makes height
+   * read as height instead of as weight.
+   *
+   * Three stacked shadows per level, never one. A single hard shadow is the most recognisable
+   * amateur marker there is, and stacking costs nothing.
+   *
+   * The tone is a warm brown (#502d24), not black. Black shadows on a peach page go grey and
+   * dirty; a shadow tinted toward its background stays in the picture. This is the single
+   * biggest visual return in this whole file.
+   */
+  --shadow-hue: 0.34 0.055 35;
+  --elev-1:
+    0 1px 1px oklch(var(--shadow-hue) / 0.1), 0 2px 2px oklch(var(--shadow-hue) / 0.08),
+    0 4px 4px oklch(var(--shadow-hue) / 0.05);
+  --elev-2:
+    0 1px 2px oklch(var(--shadow-hue) / 0.09), 0 3px 6px oklch(var(--shadow-hue) / 0.07),
+    0 8px 12px oklch(var(--shadow-hue) / 0.06);
+  --elev-3:
+    0 2px 4px oklch(var(--shadow-hue) / 0.08), 0 8px 14px oklch(var(--shadow-hue) / 0.07),
+    0 18px 28px oklch(var(--shadow-hue) / 0.07);
+
+  /*
+   * The bottom edge. This is the game's best existing idea — the same mechanic that makes
+   * Duolingo's buttons feel like objects — and it only works if EVERYTHING pressable has one,
+   * lit from the same direction. The colour always comes from the element's own ramp.
+   */
+  --edge: 4px;
+  --edge-press: 1px;
+
+  /* ------------------------------------------------------------------ shape */
+
+  /*
+   * Nested corners: an inner radius is the outer radius minus the gap between them. A 22px card
+   * with 16px of padding wants 6px inside it, not another 22. Wrong nesting is invisible until
+   * you know to look and impossible to unsee afterwards.
+   */
+  --radius-xs: 6px; /* inside a --lg card at 16px padding */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* --------------------------------------------------------------- spacing */
+
+  /* No two neighbours closer than ~25 %, so which one to reach for is never a judgement call. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* ---------------------------------------------------------------- motion */
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+
+  /* ------------------------------------------------------------ typography */
+
+  /*
+   * Fluid between a 360px and a 1440px viewport, so there is no breakpoint where type jumps.
+   * The small pole keeps the values this game shipped with (and passed audit A4 on); the large
+   * pole grows faster than a proportional scale would, because a bigger screen wants more
+   * hierarchy, not just more of everything.
+   *
+   * Every clamp keeps a rem term in the middle so browser zoom still works — a scale driven by
+   * vw alone silently breaks it.
+   */
+  --font-display: 'Fredoka', 'Fredoka Fallback', system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+
+  --text-xs: clamp(0.875rem, 0.8542rem + 0.0926vw, 0.9375rem); /* 14 → 15 */
+  --text-sm: clamp(1rem, 0.9583rem + 0.1852vw, 1.125rem); /* 16 → 18 */
+  --text-md: clamp(1.125rem, 1.0625rem + 0.2778vw, 1.3125rem); /* 18 → 21 */
+  --text-lg: clamp(1.375rem, 1.2708rem + 0.463vw, 1.6875rem); /* 22 → 27 */
+  --text-xl: clamp(1.75rem, 1.5833rem + 0.7407vw, 2.25rem); /* 28 → 36 */
+  --text-2xl: clamp(2.25rem, 2rem + 1.1111vw, 3rem); /* 36 → 48 */
+  --text-3xl: clamp(3.5rem, 3.0833rem + 1.8519vw, 4.75rem); /* 56 → 76 */
+  --text-countdown: clamp(7.5rem, 5rem + 11.111vw, 12.5rem);
+
+  /* Big type wants tighter tracking, small type wants looser. An untracked 56px headline is a
+     tell all by itself. */
+  --track-display: -0.02em;
+  --track-body: 0;
+  --track-caps: 0.06em;
+
+  /* Multiples of 4 at the sizes they apply to, so text blocks land on the grid. */
+  --leading-display: 1.1;
+  --leading-heading: 1.2;
+  --leading-body: 1.5;
+
+  /* --------------------------------------------------------- ergonomics */
+
+  --tap-min: 48px;
+  --btn-primary-height: 56px;
+  /* Roughly 70 characters, which is where reading speed peaks. */
+  --measure: 62ch;
+}
+
+/*
+ * From three metres away, everything under ~24px is unreadable — the ten-foot guidance puts the
+ * floor at 24-28px on 1080p. Raising the root instead of restating the scale keeps every ratio
+ * intact and lifts the whole type system at once. Spacing stays in px on purpose: a television
+ * needs bigger letters, not bigger gaps.
+ */
+@media (min-width: 1400px) {
+  :root {
+    font-size: 21px;
+  }
+}
+
+/*
+ * sRGB fallback. Every browser this game targets does oklch(), but a colour system that silently
+ * renders nothing is not a system — and these are the same values, so nothing shifts.
+ */
+@supports not (color: oklch(0 0 0)) {
+  :root {
+    --sand-50: #fff8ee;
+    --sand-100: #f8eee4;
+    --sand-200: #ebdcd2;
+    --sand-300: #dcc5bd;
+    --sand-400: #bb9b9f;
+    --sand-500: #977989;
+    --sand-600: #6b5b73;
+    --sand-700: #514156;
+    --sand-800: #3d2e41;
+    --sand-900: #2b1d2e;
+    --accent-50: #fff4f0;
+    --accent-100: #ffe7df;
+    --accent-200: #ffcebe;
+    --accent-300: #ffad91;
+    --accent-400: #ff906b;
+    --accent-500: #ff6b36;
+    --accent-600: #d85524;
+    --accent-700: #b33f11;
+    --accent-800: #882e0a;
+    --accent-900: #5d1e06;
+    --danger-100: #ffe6e2;
+    --danger-200: #ffc8bf;
+    --danger-500: #d92d20;
+    --danger-700: #971c12;
+    --success-100: #e1f7e4;
+    --success-200: #bcedc4;
+    --success-500: #22c55e;
+    --success-700: #007f37;
+    --sky-top: #ffb88c;
+    --sky-bottom: #c9a7eb;
+    --paper: #ffffff;
+    --tint-subtle: rgba(43, 29, 46, 0.06);
+    --tint: rgba(43, 29, 46, 0.11);
+    --tint-strong: rgba(43, 29, 46, 0.2);
+    --surface-glass: rgba(255, 248, 238, 0.62);
+    --overlay: rgba(43, 29, 46, 0.55);
+    --elev-1:
+      0 1px 1px rgba(80, 45, 36, 0.1), 0 2px 2px rgba(80, 45, 36, 0.08),
+      0 4px 4px rgba(80, 45, 36, 0.05);
+    --elev-2:
+      0 1px 2px rgba(80, 45, 36, 0.09), 0 3px 6px rgba(80, 45, 36, 0.07),
+      0 8px 12px rgba(80, 45, 36, 0.06);
+    --elev-3:
+      0 2px 4px rgba(80, 45, 36, 0.08), 0 8px 14px rgba(80, 45, 36, 0.07),
+      0 18px 28px rgba(80, 45, 36, 0.07);
+  }
+}

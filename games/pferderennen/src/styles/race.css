@@ -1,0 +1,508 @@
+/*
+ * The race stage: a full-screen canvas with the HUD floating over it.
+ *
+ * Split out of screens.css in M3. The other screens are documents — a header, a scrolling body,
+ * a footer; the race is a viewport onto a canvas and shares none of that, so keeping it here
+ * stops screens.css from growing into a file nobody can navigate.
+ */
+
+/* The race takes the whole screen: no header, no footer, nothing but the track. */
+.screen[data-screen='race'] {
+  padding: 0;
+}
+
+.race-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.race-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hud {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-4)
+    calc(var(--space-4) + env(safe-area-inset-bottom));
+  /* The HUD is information, not a control surface — clicks go to the canvas underneath. */
+  pointer-events: none;
+}
+
+.hud__top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-end;
+}
+
+/* --- Progress line with a pip per horse --- */
+
+.progress {
+  width: 100%;
+}
+
+.progress__line {
+  position: relative;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--tint-strong);
+}
+
+.progress__pip {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-pill);
+  background: var(--horse-color);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 4px rgba(43, 29, 46, 0.25);
+}
+
+/* --- Leaderboard --- */
+
+/*
+ * The one place in this game where frosted glass is the right answer: what is behind it is our
+ * own canvas, so the backdrop is known and legible contrast can be guaranteed. Everywhere else
+ * the backdrop is a page gradient and the effect would only look cheap.
+ *
+ * Done properly means all three parts: a real semi-opaque fill (never transparency alone, which
+ * is what makes glass illegible over busy content), the blur, and a hairline along the top edge
+ * so the panel has an edge where the light hits it.
+ */
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.55),
+    var(--elev-2);
+}
+
+/*
+ * Anyone who has asked for less transparency gets a solid panel. The setting exists because
+ * translucency over moving content is a real legibility problem, not a taste question.
+ */
+@media (prefers-reduced-transparency: reduce) {
+  .board,
+  .commentary {
+    background: var(--surface);
+    backdrop-filter: none;
+  }
+}
+
+.board__row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 8rem) 1.4rem;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+}
+
+/*
+ * The lane number, in the deep tone with the signature colour as a ring — the same construction
+ * as .horse-badge, and for the same reason: white on the six signature colours only reaches
+ * 2.2-4.2:1 (audit A4). The badges were fixed in M6; this one was missed because the leaderboard
+ * sits on a canvas and the contrast sweeps of the day only walked the DOM screens.
+ */
+.board__dot {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: var(--horse-dark, var(--horse-color));
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-weight: 600;
+  box-shadow:
+    0 0 0 2px var(--horse-color),
+    0 2px 0 var(--horse-dark);
+}
+
+.board__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board__place {
+  text-align: right;
+  font-family: var(--font-display);
+  color: var(--text-muted);
+}
+
+.board__row:first-child .board__place,
+.board__row:first-child .board__name {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* --- Commentary --- */
+
+.hud__bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/*
+ * When the skip button is on screen the commentary moves up out of its way. The button is
+ * positioned over the canvas rather than laid out in the HUD, so nothing else keeps them apart —
+ * and in portrait the commentary runs the full width, which put the two straight on top of each
+ * other.
+ */
+.race-stage.is-skippable .hud__bottom {
+  padding-bottom: calc(var(--tap-min) + var(--space-2));
+}
+
+.commentary {
+  margin: 0;
+  max-width: 40rem;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.55),
+    var(--elev-2);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--text-md);
+  text-align: center;
+}
+
+.commentary:empty {
+  display: none;
+}
+
+/* --- Countdown --- */
+
+.countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: var(--text-countdown);
+  color: var(--paper);
+  text-shadow: 0 6px 0 var(--accent-edge);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.countdown--visible {
+  animation: countdown-pop 700ms var(--ease-out) forwards;
+}
+
+@keyframes countdown-pop {
+  0% {
+    opacity: 0;
+    transform: scale(3);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+.race-debug {
+  position: absolute;
+  left: var(--space-4);
+  top: var(--space-4);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--text) 85%, transparent);
+  color: var(--surface);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.race-skip {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* --- Portrait: the phone layout ------------------------------------------ */
+
+/*
+ * In portrait the track runs up the screen, so the HUD moves out of the way rather than sitting
+ * beside it: the standings become a row of dots along the top, and the commentary sits at the
+ * bottom above the home indicator.
+ */
+
+.race-stage[data-orientation='portrait'] .hud__top {
+  align-items: stretch;
+}
+
+.race-stage[data-orientation='portrait'] .board {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
+}
+
+.race-stage[data-orientation='portrait'] .board__row {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 2px;
+}
+
+/* The name would not fit six times across a phone; the number on the dot carries it. */
+.race-stage[data-orientation='portrait'] .board__name {
+  display: none;
+}
+
+.race-stage[data-orientation='portrait'] .board__place {
+  text-align: center;
+  font-size: var(--text-xs);
+}
+
+/* The progress line is redundant next to a track you can already see end to end. */
+.race-stage[data-orientation='portrait'] .progress {
+  display: none;
+}
+
+.race-stage[data-orientation='portrait'] .commentary {
+  width: 100%;
+  font-size: var(--text-sm);
+  padding: var(--space-3) var(--space-4);
+}
+
+.race-stage[data-orientation='portrait'] .race-debug {
+  right: var(--space-4);
+  max-width: 100%;
+  white-space: pre-wrap;
+}
+
+/* --- Large screens and TV ------------------------------------------------- */
+
+@media (min-width: 1400px) {
+  .board__row {
+    grid-template-columns: 26px minmax(0, 11rem) 1.8rem;
+    font-size: var(--text-sm);
+  }
+
+  .board__dot {
+    width: 26px;
+    height: 26px;
+  }
+
+  .commentary {
+    max-width: 52rem;
+    font-size: var(--text-lg);
+  }
+
+  .countdown {
+    font-size: 160px;
+  }
+}
+
+/* --- Event toasts (drinking rules) ---------------------------------------- */
+
+.event-toasts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+/* 18px, not 16: the design system sets that floor for toasts and this one had drifted under it
+   (docs/04_DESIGN_SYSTEM.md §9). It is read at a glance, from across a table, mid-race. */
+.event-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  border-left: 5px solid var(--horse-color, var(--accent));
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+  font-size: var(--text-md);
+  box-shadow: var(--elev-2);
+  animation: toast-rise var(--dur-base) var(--ease-bounce);
+}
+
+.event-toast__icon {
+  font-size: var(--text-md);
+}
+
+.event-toast--leaving {
+  animation: toast-fade var(--dur-base) var(--ease-out) forwards;
+}
+
+@keyframes toast-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.94);
+  }
+}
+
+@keyframes toast-fade {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* --- Photo finish and the starting flash ---------------------------------- */
+
+/*
+ * The last few metres, when the leaders are close enough that the line decides it. Time slows,
+ * the camera pushes in, and the picture darkens at the edges so the eye goes where it should.
+ */
+
+.photo-finish {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: start center;
+  /* Clear of the finish banner, which hangs over the track a little further down. */
+  padding-top: 2.5%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-slow) var(--ease-out);
+  /* A vignette, drawn with a radial gradient rather than a fourth canvas layer. */
+  background: radial-gradient(ellipse at center, transparent 38%, rgba(43, 29, 46, 0.55) 100%);
+}
+
+.race-stage.is-photo-finish .photo-finish {
+  opacity: 1;
+}
+
+.photo-finish__banner {
+  padding: var(--space-2) var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  letter-spacing: 0.08em;
+  box-shadow: var(--elev-2);
+  transform: scale(0.7);
+  opacity: 0;
+}
+
+.race-stage.is-photo-finish .photo-finish__banner {
+  animation: photo-banner var(--dur-slow) var(--ease-bounce) forwards;
+}
+
+@keyframes photo-banner {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Press bulbs going off around the line. */
+.race-stage.is-photo-finish .photo-finish::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  animation: press-flash 0.9s steps(1, end) infinite;
+}
+
+@keyframes press-flash {
+  0%,
+  12%,
+  30%,
+  100% {
+    opacity: 0;
+  }
+  6%,
+  22% {
+    opacity: 0.35;
+  }
+}
+
+/* One bright frame as the gates open. */
+.race-stage.is-flashing::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--paper);
+  pointer-events: none;
+  animation: start-flash 260ms var(--ease-out) forwards;
+}
+
+@keyframes start-flash {
+  from {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .race-stage.is-photo-finish .photo-finish::after,
+  .race-stage.is-flashing::after {
+    display: none;
+  }
+}
+
+/* --- Paused while the tab is in the background ---------------------------- */
+
+.race-paused {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--overlay);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.race-stage.is-paused .race-paused {
+  opacity: 1;
+}
+
+.race-paused__text {
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  box-shadow: var(--elev-2);
+}

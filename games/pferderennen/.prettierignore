@@ -1,0 +1,13 @@
+node_modules/
+coverage/
+test-results/
+playwright-report/
+tests/fairness/last-report.json
+
+# The project plan is hand-maintained prose. Prettier would rewrite its markdown tables and
+# line breaks, creating diff noise in documents that otherwise never change.
+CLAUDE.md
+PROGRESS.md
+README.md
+CHANGELOG.md
+docs/

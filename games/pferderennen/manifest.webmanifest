@@ -1,0 +1,35 @@
+{
+  "id": "/Pferderennen/",
+  "name": "Pferderennen",
+  "short_name": "Pferderennen",
+  "description": "Ein faires Trinkspiel-Pferderennen für den Browser. Sechs Pferde, ein Gerät, viel Blödsinn.",
+  "lang": "de",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#FFB88C",
+  "background_color": "#FFB88C",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "./assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

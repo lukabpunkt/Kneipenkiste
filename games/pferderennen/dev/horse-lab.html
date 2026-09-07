@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Horse Lab</title>
+    <link rel="stylesheet" href="../src/styles/tokens.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: var(--font-body);
+        color: var(--ink);
+        background: linear-gradient(170deg, var(--bg-sky-top), var(--bg-sky-bottom));
+        min-height: 100vh;
+      }
+      header {
+        padding: var(--space-4);
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+        align-items: center;
+        background: var(--cream);
+        box-shadow: var(--shadow-soft);
+      }
+      h1 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: var(--text-lg);
+      }
+      label {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--text-xs);
+      }
+      canvas {
+        display: block;
+        width: 100%;
+      }
+      .readout {
+        margin-left: auto;
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        color: var(--ink-soft);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Horse Lab</h1>
+      <label>Tempo <input id="speed" type="range" min="0" max="2.2" step="0.05" value="1" /></label>
+      <label>Größe <input id="size" type="range" min="40" max="220" step="5" value="120" /></label>
+      <label>
+        Zustand
+        <select id="anim"></select>
+      </label>
+      <label>
+        Event
+        <select id="event"></select>
+      </label>
+      <label>
+        Ansicht
+        <select id="view">
+          <option value="side">Seite (Landscape)</option>
+          <option value="rear">Hinten (Portrait)</option>
+        </select>
+      </label>
+      <label><input id="skeleton" type="checkbox" /> Gelenke zeigen</label>
+      <label><input id="single" type="checkbox" /> nur ein Pferd</label>
+      <span class="readout" id="readout"></span>
+    </header>
+    <canvas id="lab"></canvas>
+    <script type="module" src="./horse-lab.js"></script>
+  </body>
+</html>
