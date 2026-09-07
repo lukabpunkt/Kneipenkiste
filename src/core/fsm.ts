@@ -9,7 +9,7 @@
  */
 
 import { MAX_PLAYERS, MIN_PLAYERS, type ModeFlags } from '@/config/rules';
-import { createBridge } from './bridge';
+import { createBridge, pickRottenPlank } from './bridge';
 import { consumeRopes, ropeAvailable, type RopeUsage } from './modes';
 import { createSequencePicker, type SequencePicker } from './choreographer';
 import { allChosen, choose, clearFlag, createRound, resolveRound, setFlag, setWeight } from './round';
@@ -116,6 +116,19 @@ export interface Fsm {
   send(event: GameEvent): boolean;
   setPlayers(players: Player[]): void;
   setModes(modes: ModeFlags): void;
+  /**
+   * Eine gespeicherte Session zurueckholen: Die Bruecke ist mitten in einer Partie
+   * geschrumpft, Seile sind verbraucht, Runden gezaehlt. Nur ausserhalb einer laufenden
+   * Runde erlaubt — mitten im Handy-Rumgeben waere es ein Regelbruch.
+   */
+  hydrate(snapshot: { bridge: Bridge; ropeUsage: RopeUsage; roundIndex: number }): boolean;
+  /**
+   * Die Bruecke direkt setzen. Dafuer gibt es genau zwei legitime Aufrufer: das Dev-Panel
+   * (Todeszone erzwingen, Balkenzahl-Slider) und Tests. Steht eine Runde, wandert die
+   * neue Bruecke mit hinein — inklusive frisch gezogenem morschen Balken, falls der alte
+   * nicht mehr existiert.
+   */
+  setBridge(bridge: Bridge): boolean;
   /** Fahne setzen — nur waehrend der Absprache, und fuer alle sichtbar. */
   raiseFlag(playerId: PlayerId, plank: PlankId): boolean;
   lowerFlag(playerId: PlayerId): boolean;
@@ -277,10 +290,15 @@ export function createFsm(options: FsmOptions = {}): Fsm {
   /** Seiteneffekte auf den Kontext — laufen vor dem eigentlichen Wechsel. */
   const applyEffects = (event: GameEvent, target: GameState): void => {
     switch (event.type) {
+      /*
+       * "Auf die Bruecke" setzt **nichts** zurueck. Eine wiederhergestellte Session
+       * bringt ihre halb geschrumpfte Bruecke, ihre verbrauchten Seile und ihren
+       * Rundenzaehler mit — und der Weg in die naechste Runde fuehrt nun einmal ueber die
+       * Lobby. Neu anfangen ist eine eigene, ausdrueckliche Geste (`resetProgress` in den
+       * Einstellungen); die Bruecke folgt ausserdem jeder Aenderung der Besetzung
+       * (`setPlayers`).
+       */
       case 'go':
-        context.roundIndex = 0;
-        context.bridge = createBridge(context.players.length);
-        context.ropeUsage = {};
         beginRound();
         return;
 
@@ -320,9 +338,9 @@ export function createFsm(options: FsmOptions = {}): Fsm {
         resetRound();
         return;
 
+      /* Der Titel ist ein Menue, kein Neustart: Die Session ueberlebt ihn. */
       case 'quit':
         resetRound();
-        context.roundIndex = 0;
         return;
 
       /*
@@ -394,13 +412,50 @@ export function createFsm(options: FsmOptions = {}): Fsm {
     },
 
     setPlayers(players) {
+      /*
+       * Die Bruecke haengt an der Besetzung (`B = n + 2`) — aber nur an der Besetzung.
+       * Wuerde sie bei jedem `setPlayers` neu entstehen, verloere eine wiederhergestellte
+       * Session ihre halb geschrumpfte Bruecke, sobald der Weg einmal ueber die Lobby
+       * fuehrt. Deshalb: gleiche Spieler, gleiche Bruecke.
+       */
+      const unchanged =
+        players.length === context.players.length &&
+        players.every((player, i) => player.id === context.players[i]?.id);
+
       context.players = [...players];
-      context.bridge = createBridge(Math.max(MIN_PLAYERS, players.length));
+      if (!unchanged) context.bridge = createBridge(Math.max(MIN_PLAYERS, players.length));
       if (context.playerIndex >= context.players.length) context.playerIndex = 0;
     },
 
     setModes(modes) {
       context.modes = { ...modes };
+    },
+
+    hydrate(snapshot) {
+      if (state !== 'TITLE' && state !== 'LOBBY') return false;
+      context.bridge = { ...snapshot.bridge, planks: [...snapshot.bridge.planks], removed: [...snapshot.bridge.removed] };
+      context.ropeUsage = { ...snapshot.ropeUsage };
+      context.roundIndex = snapshot.roundIndex;
+      return true;
+    },
+
+    setBridge(bridge) {
+      if (bridge.planks.length === 0) return false;
+      context.bridge = { count: bridge.planks.length, planks: [...bridge.planks], removed: [...bridge.removed] };
+
+      const round = context.round;
+      if (round) {
+        /*
+         * Der morsche Balken haengt an der alten Bruecke. Ist er weggefallen, muss ein
+         * neuer her — sonst laeuft der Modus ins Leere und niemand merkt es.
+         */
+        const next =
+          context.modes.rotten && !context.bridge.planks.includes(round.bridge.rottenPlank ?? -1)
+            ? pickRottenPlank(context.bridge, rng)
+            : { ...context.bridge, ...(round.bridge.rottenPlank !== undefined ? { rottenPlank: round.bridge.rottenPlank } : {}) };
+        context.round = { ...round, bridge: next };
+      }
+      return true;
     },
 
     raiseFlag(playerId, plank) {

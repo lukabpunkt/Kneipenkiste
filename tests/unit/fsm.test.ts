@@ -84,13 +84,26 @@ describe('Lobby-Guard (GDD §3.1)', () => {
     expect(fsm.send({ type: 'go' })).toBe(false);
   });
 
-  it('baut beim Start eine frische Bruecke n + 2', () => {
+  it('startet eine frische Session mit n + 2 Balken', () => {
     const fsm = fsmWith(5);
     fsm.send({ type: 'start' });
     fsm.send({ type: 'go' });
     expect(fsm.state).toBe('NEGOTIATION');
     expect(fsm.context.bridge.count).toBe(7);
     expect(fsm.context.round?.choices).toEqual({});
+  });
+
+  it('setzt eine laufende Session nicht zurueck, nur weil der Weg ueber die Lobby fuehrt', () => {
+    const fsm = fsmWith(3);
+    fsm.hydrate({ bridge: { count: 4, planks: [1, 2, 3, 4], removed: [5] }, ropeUsage: { p1: 1 }, roundIndex: 3 });
+
+    fsm.send({ type: 'start' });
+    fsm.send({ type: 'go' });
+
+    expect(fsm.context.bridge.count).toBe(4);
+    expect(fsm.context.roundIndex).toBe(3);
+    expect(fsm.context.ropeUsage).toEqual({ p1: 1 });
+    expect(fsm.context.round?.index).toBe(3);
   });
 });
 
@@ -335,9 +348,9 @@ describe('Abbrechen und Beenden', () => {
     }
   });
 
-  it('beendet in den Titel und setzt den Rundenzaehler zurueck', () => {
+  it('beendet in den Titel, ohne die Session wegzuwerfen', () => {
     const fsm = toChoose(fsmWith(3));
-    sealAll(fsm, [{ plank: 1 }, { plank: 2 }, { plank: 3 }]);
+    sealPeacefully(fsm);
     fsm.send({ type: 'tap' });
     fsm.send({ type: 'showFinished' });
     fsm.send({ type: 'nextRound' });
@@ -345,7 +358,10 @@ describe('Abbrechen und Beenden', () => {
 
     fsm.send({ type: 'quit' });
     expect(fsm.state).toBe('TITLE');
-    expect(fsm.context.roundIndex).toBe(0);
+    /* Der Titel ist ein Menue: Bruecke und Rundenzaehler stehen noch. */
+    expect(fsm.context.round).toBeNull();
+    expect(fsm.context.roundIndex).toBe(1);
+    expect(fsm.context.bridge.count).toBe(4);
   });
 
   it('laesst sich im Verteilen nicht abbrechen — die Schlucke sind schon verteilt', () => {
@@ -479,5 +495,121 @@ describe('Spielerreihenfolge', () => {
       if (fsm.state === 'PASS') fsm.send({ type: 'tap' });
     }
     expect(order).toEqual(['p1', 'p2', 'p3', 'p4', 'p5']);
+  });
+});
+
+describe('Wiederherstellen und Bruecke setzen', () => {
+  it('holt eine gespeicherte Session zurueck — aber nur ausserhalb einer Runde', () => {
+    const fsm = fsmWith(4);
+    const bridge = { count: 3, planks: [1, 3, 5], removed: [2, 4] };
+
+    expect(fsm.hydrate({ bridge, ropeUsage: { p1: 1 }, roundIndex: 7 })).toBe(true);
+    expect(fsm.context.bridge).toEqual(bridge);
+    expect(fsm.context.bridge).not.toBe(bridge);
+    expect(fsm.canTakeRope('p1')).toBe(false);
+    expect(fsm.context.roundIndex).toBe(7);
+
+    /* Mitten im Handy-Rumgeben waere es ein Regelbruch. */
+    toChoose(fsm);
+    expect(fsm.hydrate({ bridge, ropeUsage: {}, roundIndex: 0 })).toBe(false);
+  });
+
+  it('setzt die Bruecke und traegt sie in die laufende Runde', () => {
+    const fsm = fsmWith(5);
+    fsm.send({ type: 'start' });
+    fsm.send({ type: 'go' });
+    expect(fsm.context.bridge.count).toBe(7);
+
+    expect(fsm.setBridge({ count: 4, planks: [1, 2, 3, 4], removed: [5, 6, 7] })).toBe(true);
+    expect(fsm.context.bridge.count).toBe(4);
+
+    /* Die Runde waehlt jetzt auf der kleineren Bruecke — und ist in der Todeszone. */
+    fsm.send({ type: 'ready' });
+    fsm.send({ type: 'tap' });
+    expect(fsm.send({ type: 'seal', choice: { plank: 6 } })).toBe(false);
+    expect(fsm.send({ type: 'seal', choice: { plank: 4 } })).toBe(true);
+  });
+
+  it('zieht einen neuen morschen Balken, wenn der alte weggefallen ist', () => {
+    const fsm = fsmWith(5, { ...noModes(), rotten: true });
+    fsm.send({ type: 'start' });
+    fsm.send({ type: 'go' });
+
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      fsm.setBridge({ count: 7, planks: [1, 2, 3, 4, 5, 6, 7], removed: [] });
+      const before = fsm.context.round!.bridge.rottenPlank!;
+      /* Nur die Balken behalten, auf denen der morsche gerade NICHT liegt. */
+      const planks = [1, 2, 3, 4, 5, 6, 7].filter((p) => p !== before).slice(0, 4);
+
+      fsm.setBridge({ count: planks.length, planks, removed: [before] });
+      const after = fsm.context.round!.bridge.rottenPlank!;
+      expect(planks).toContain(after);
+      expect(after).not.toBe(before);
+    }
+  });
+
+  it('behaelt den morschen Balken, wenn es ihn noch gibt', () => {
+    const fsm = fsmWith(5, { ...noModes(), rotten: true });
+    fsm.send({ type: 'start' });
+    fsm.send({ type: 'go' });
+
+    const before = fsm.context.round!.bridge.rottenPlank!;
+    fsm.setBridge({ count: 7, planks: [1, 2, 3, 4, 5, 6, 7], removed: [] });
+    expect(fsm.context.round!.bridge.rottenPlank).toBe(before);
+  });
+
+  it('laesst die Bruecke in Ruhe, wenn keine Runde laeuft', () => {
+    const fsm = fsmWith(4);
+    expect(fsm.setBridge({ count: 2, planks: [1, 2], removed: [] })).toBe(true);
+    expect(fsm.context.round).toBeNull();
+    expect(fsm.context.bridge.count).toBe(2);
+  });
+
+  it('weist eine Bruecke ohne Balken ab', () => {
+    const fsm = fsmWith(4);
+    expect(fsm.setBridge({ count: 0, planks: [], removed: [1, 2, 3] })).toBe(false);
+    expect(fsm.context.bridge.count).toBe(6);
+  });
+});
+
+describe('setPlayers und die Bruecke', () => {
+  it('baut die Bruecke nur neu, wenn sich die Besetzung wirklich aendert', () => {
+    const fsm = fsmWith(4);
+    fsm.hydrate({ bridge: { count: 3, planks: [1, 3, 5], removed: [2, 4] }, ropeUsage: {}, roundIndex: 2 });
+
+    /* Dieselben Spieler noch einmal setzen: Die halb geschrumpfte Bruecke bleibt stehen. */
+    fsm.setPlayers(defaultPlayers(4));
+    expect(fsm.context.bridge.count).toBe(3);
+    expect(fsm.context.bridge.removed).toEqual([2, 4]);
+
+    /* Ein Spieler mehr: neue Besetzung, neue Bruecke. */
+    fsm.setPlayers(defaultPlayers(5));
+    expect(fsm.context.bridge.count).toBe(7);
+    expect(fsm.context.bridge.removed).toEqual([]);
+  });
+
+  it('erkennt auch einen Tausch bei gleicher Anzahl', () => {
+    const fsm = fsmWith(4);
+    fsm.hydrate({ bridge: { count: 4, planks: [1, 2, 3, 4], removed: [5, 6] }, ropeUsage: {}, roundIndex: 1 });
+
+    const swapped = defaultPlayers(4).map((p, i) => (i === 0 ? { ...p, id: 'p9' } : p));
+    fsm.setPlayers(swapped);
+    expect(fsm.context.bridge.count).toBe(6);
+  });
+});
+
+describe('Modus mitten in der Runde eingeschaltet', () => {
+  it('zieht einen morschen Balken nach, wenn der Modus nachtraeglich dazukommt', () => {
+    const fsm = fsmWith(5);
+    fsm.send({ type: 'start' });
+    fsm.send({ type: 'go' });
+    expect(fsm.context.round!.bridge.rottenPlank).toBeUndefined();
+
+    fsm.setModes({ ...noModes(), rotten: true });
+    fsm.setBridge({ count: 5, planks: [1, 2, 3, 4, 5], removed: [6, 7] });
+
+    /* Sonst liefe der Modus ins Leere und niemand merkte es. */
+    expect(fsm.context.round!.bridge.rottenPlank).toBeDefined();
+    expect([1, 2, 3, 4, 5]).toContain(fsm.context.round!.bridge.rottenPlank);
   });
 });

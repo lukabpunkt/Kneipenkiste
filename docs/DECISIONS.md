@@ -28,3 +28,12 @@ Kontext: Architektur §3 sagt "Schrumpf-Balken bei RESULT-Eintritt", GDD §4.2 z
 
 ## ADR-9 · 2026-09-07 · Verteilt wird nur, wenn jemand gefallen ist
 Kontext: Architektur §5 formuliert das Verteil-Guthaben unbedingt ("sicher → 1"), GDD §3.5 sagt für "alle sicher" ausdrücklich "Niemand trinkt, **niemand verteilt**" — und die Invariante `allSafe ⇒ giving leer` steht in derselben Architektur. Entscheidung: Das GDD gewinnt; Guthaben gibt es nur in Runden mit mindestens einer Kollision. Konsequenz: Design-Pfeiler 3 bleibt scharf — eine friedliche Runde bringt niemandem etwas ein und kostet trotzdem einen Balken. Ein reiner Morsch-Bruch löst kein Verteilen aus.
+
+## ADR-10 · 2026-09-08 · "Auf die Brücke" setzt die Session nicht zurück
+Kontext: `go` baute Brücke, Seil-Verbrauch und Rundenzähler neu — damit verlor jede wiederhergestellte Session ihren Fortschritt, sobald der Weg einmal über die Lobby führte (E2E-Befund). Entscheidung: `go` startet nur die Runde; die Brücke folgt ausschließlich einer Änderung der Besetzung (`setPlayers` vergleicht die IDs), `quit` räumt nur die laufende Runde ab. Konsequenz: Neu anfangen ist eine ausdrückliche Geste — "Session zurücksetzen" in den Einstellungen; Reload-Persistenz (Audit A1) funktioniert damit überhaupt erst.
+
+## ADR-11 · 2026-09-08 · Die Brücke ist nur dort ein Touch-Ziel, wo man sie antippt
+Kontext: Die 56-px-Regel aus CLAUDE.md auf jede Brücken-Darstellung anzuwenden, schob in der Absprache genau den Satz unter die Falz, an dem das Spiel hängt ("Versprechen sind nicht bindend"). Entscheidung: `BridgeTop` bekommt einen `display`-Modus mit `plankDisplayHeightPx` (34 px) für Negotiation, Result und Step; im Choose-Screen gelten unverändert ≥ 56 px (≥ 48 bei 10 Balken). Konsequenz: Die Touch-Ziel-Regel schützt weiter Buttons, nicht Bilder; der A1-Check misst nur den Choose-Screen.
+
+## ADR-12 · 2026-09-08 · Der Step-Platzhalter spielt das echte StepScript
+Kontext: M1 braucht einen DOM-Platzhalter für den Schritt. Ein frei erfundenes Timing hätte die Spannungs-Dramaturgie erst in M3 zum ersten Mal wirklich laufen lassen. Entscheidung: Der Platzhalter spielt `buildStepScript()` mit seinen tatsächlichen Zeiten ab — gleichzeitige Ankunft, Knarren mit Amplituden, Slow-Mo-Blickkontakt vor jedem Bruch, Tap-to-Skip erst danach. Nur das Nachspiel folgt dem letzten Bruch direkt, statt die 5 Sekunden abzuwarten, die ab M4 den Fall-Sequenzen gehören. Konsequenz: M2/M3 tauschen das Rendering, nicht die Choreographie; das Skript ist ab jetzt jede Runde im Einsatz.

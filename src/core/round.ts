@@ -102,7 +102,16 @@ export function allChosen(round: Round): boolean {
  * das Ergebnis genauso entscheidet wie eine getippte.
  */
 export function randomPlank(round: Round, rng: RandomSource = SECURE_RNG): Choice {
-  return { plank: rng.pick(round.bridge.planks) };
+  return pickRandomPlank(round.bridge.planks, rng);
+}
+
+/**
+ * Dieselbe Wahl, nur ohne Runde — der Choose-Screen kennt nur seine `ChooseView` und
+ * darf die Runde nicht anfassen (Architektur §4). Die eine Stelle, an der das Spiel
+ * fuer jemanden waehlt, bleibt trotzdem diese hier.
+ */
+export function pickRandomPlank(planks: readonly PlankId[], rng: RandomSource = SECURE_RNG): Choice {
+  return { plank: rng.pick(planks) };
 }
 
 /* ------------------------------------------------------------------ */

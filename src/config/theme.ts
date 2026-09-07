@@ -125,6 +125,13 @@ export const LAYOUT = {
   plankMinHeightTightPx: 48,
   /** Ab wie vielen Balken die enge Variante greift. */
   plankTightThreshold: 9,
+  /**
+   * Nicht bedienbare Bruecken (Negotiation, Result, Step) duerfen flacher sein: Die
+   * 56-px-Regel schuetzt Touch-Ziele, nicht Bilder. Bliebe die Bruecke ueberall so hoch,
+   * schoebe sie in der Absprache genau den Satz unter die Falz, an dem das Spiel haengt
+   * ("Versprechen sind nicht bindend").
+   */
+  plankDisplayHeightPx: 34,
   /** Vertikaler Abstand zwischen zwei Balken im SVG. */
   plankGapPx: 8,
 } as const;
@@ -143,22 +150,46 @@ export function plankHeightFor(plankCount: number): number {
 /* Motion (Art Direction §7)                                           */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Timings der **DOM-Schicht** in Millisekunden (`Element.animate`, CSS).
+ * Die Buehnen-Timings der PIXI-Sequenzen stehen in `config/choreo.ts`.
+ */
 export const MOTION = {
-  /** Screen-Wipes. */
-  wipeMs: 260,
   /** Tap-Feedback auf Buttons. */
-  pressMs: 90,
+  fast: 120,
+  /** Screen-Elemente. */
+  base: 260,
+  /** Grosse Panels. */
+  slow: 420,
+  /** Screen-Wipe zwischen zwei Screens. */
+  wipeMs: 320,
+  /** Bottom-Sheet faehrt hoch. */
+  sheetMs: 260,
+  sheetEase: 'cubic-bezier(.2,.9,.3,1.2)',
+  /** Result: Zahlen zaehlen hoch, Balken bauen sich auf. */
+  countUpMs: 620,
+  /** Versatz zwischen zwei Listenzeilen. */
+  staggerMs: 70,
   /** Versiegeln der Wahl im Choose-Screen. */
   sealMs: 420,
   /** Banner-Schaerpe faehrt ein. */
   bannerMs: 520,
   /** Seile schwingen im Leerlauf (CSS). */
   ropeIdleMs: 4000,
+  /* GSAP-Easings fuer die Buehne (M2+). */
   easeOut: 'power2.out',
   easeIn: 'power2.in',
   easeBack: 'back.out(1.7)',
   easeElastic: 'elastic.out(1, 0.5)',
 } as const;
+
+/** Alias fuer die DOM-Helfer in `ui/animate.ts` — dieselben Werte, sprechender Name. */
+export const UI_TIMING = MOTION;
+
+/** Hex-Zahl → CSS-Farbstring. */
+export function hex(value: number): string {
+  return `#${value.toString(16).padStart(6, '0')}`;
+}
 
 /* ------------------------------------------------------------------ */
 /* Buehne (Art Direction §6) — logische Welt 1000 x 1000               */

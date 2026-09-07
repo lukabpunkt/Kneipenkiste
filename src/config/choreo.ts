@@ -113,3 +113,19 @@ export const SAFE_SEQUENCE_MS = 3000;
 
 /** Eine Sequenz darf sich erst nach so vielen anderen wiederholen. */
 export const SEQUENCE_NO_REPEAT = 3;
+
+/* ------------------------------------------------------------------ */
+/* HUD (Art Direction §4.2)                                            */
+/* ------------------------------------------------------------------ */
+
+export const HUD = {
+  /**
+   * Ab hier wird der Countdown dringlich: Ring pulst, Gustav schaut auf die Uhr.
+   * Frueher waere es keine Dringlichkeit mehr, sondern Grundrauschen.
+   */
+  tickFromSec: 5,
+  /** Wie lange die Versiegelt-Bestaetigung im Choose-Screen steht. */
+  sealConfirmMs: 700,
+  /** Wie lange der DOM-Platzhalter des Schritts pro Phase braucht (M1; M2 ersetzt ihn). */
+  placeholderStepMs: 2600,
+} as const;
