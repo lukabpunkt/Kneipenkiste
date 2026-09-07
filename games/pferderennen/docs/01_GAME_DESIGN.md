@@ -13,16 +13,16 @@ Design-Leitsätze:
 
 ## 2. Die sechs Pferde
 
-Alle Pferde sind **spielmechanisch identisch**. Unterschiede sind ausschließlich visuell und im „Charakter“ (Kommentator-Sprüche, Idle-Animationen). Jedes Pferd hat eine Signaturfarbe, die auf **Stall (Startbox), Sattel, Jockey-Trikot, Zaumzeug, Lane-Marker, Wett-Chips und Konfetti** angewendet wird. Fellfarbe und Silhouette unterscheiden sich zusätzlich, damit die Pferde auch ohne Farbe erkennbar sind (Barrierefreiheit).
+Alle Pferde sind **spielmechanisch identisch**. Unterschiede sind ausschließlich visuell und im „Charakter“ (Kommentator-Sprüche, Idle-Animationen). Jedes Pferd hat eine Signaturfarbe, die auf **Stall (Startbox), Sattel, Jockey-Trikot, Zaumzeug, Lane-Marker, Wett-Chips und Konfetti** angewendet wird. Es sind die sechs Kneipenkiste-Spielerfarben — dieselben Hexwerte wie in Drinkshot, Sprengmeister, Tresor und Zoll. Fellfarbe und Silhouette unterscheiden sich zusätzlich, damit die Pferde auch ohne Farbe erkennbar sind (Barrierefreiheit).
 
 | #   | Name                | Signaturfarbe        | Fell / Look                                                    | Charakter (nur Flavor)                        | Beispiel-Kommentar                                                                    |
 | --- | ------------------- | -------------------- | -------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------- |
-| 1   | **Sir Trabsalot**   | Royal-Lila `#8B5CF6` | Schwarz glänzend, weiße Blesse, kleiner Ritterhelm am Jockey   | Edel, hochnäsig, hält sich für Adel           | „Sir Trabsalot galoppiert, als hätte er einen Stock verschluckt – einen sehr teuren.“ |
-| 2   | **Prosecco Rakete** | Pink `#EC4899`       | Weiß-rosa, Glitzer-Mähne, Sonnenbrille                         | Party-Pferd, laut, immer gut drauf            | „Prosecco Rakete zündet die zweite Stufe – oder war das nur ein Rülpser?“             |
-| 3   | **Kater Morgana**   | Rot `#EF4444`        | Rotbraun, zerzaust, Augenringe, Kaffeebecher am Sattel         | Verkatert, unberechenbar, mal Turbo, mal Koma | „Kater Morgana hat gestern definitiv das Falsche gemischt.“                           |
-| 4   | **Schnapsidee**     | Grün `#22C55E`       | Schecke grün-weiß, Kleeblatt am Zaumzeug                       | Chaotisch, macht Dinge, die niemand versteht  | „Schnapsidee nimmt eine Abkürzung, die es nicht gibt.“                                |
-| 5   | **Hopfen Hengst**   | Bernstein `#F59E0B`  | Fuchs mit blonder Mähne, Bierbauch, Brezel am Sattel           | Gemütlich, bayrisch, kraftvoll aber träge     | „Hopfen Hengst rollt an – wie ein Fass, das den Berg runter will.“                    |
-| 6   | **Wodka Wirbel**    | Eisblau `#06B6D4`    | Apfelschimmel weiß-grau, Frost-Effekt, Ushanka-Mütze am Jockey | Kalt, effizient, nervös zuckend               | „Wodka Wirbel läuft, als hätte jemand die Zeitlupe vergessen.“                        |
+| 1   | **Sir Trabsalot**   | Royal-Lila `#AF73EE` | Schwarz glänzend, weiße Blesse, kleiner Ritterhelm am Jockey   | Edel, hochnäsig, hält sich für Adel           | „Sir Trabsalot galoppiert, als hätte er einen Stock verschluckt – einen sehr teuren.“ |
+| 2   | **Prosecco Rakete** | Pink `#FF6B9D`       | Weiß-rosa, Glitzer-Mähne, Sonnenbrille                         | Party-Pferd, laut, immer gut drauf            | „Prosecco Rakete zündet die zweite Stufe – oder war das nur ein Rülpser?“             |
+| 3   | **Kater Morgana**   | Rot `#FF4757`        | Rotbraun, zerzaust, Augenringe, Kaffeebecher am Sattel         | Verkatert, unberechenbar, mal Turbo, mal Koma | „Kater Morgana hat gestern definitiv das Falsche gemischt.“                           |
+| 4   | **Schnapsidee**     | Grün `#2ED573`       | Schecke grün-weiß, Kleeblatt am Zaumzeug                       | Chaotisch, macht Dinge, die niemand versteht  | „Schnapsidee nimmt eine Abkürzung, die es nicht gibt.“                                |
+| 5   | **Hopfen Hengst**   | Gelb `#FFD32A`       | Fuchs mit blonder Mähne, Bierbauch, Brezel am Sattel           | Gemütlich, bayrisch, kraftvoll aber träge     | „Hopfen Hengst rollt an – wie ein Fass, das den Berg runter will.“                    |
+| 6   | **Wodka Wirbel**    | Türkis `#18DCFF`     | Apfelschimmel weiß-grau, Frost-Effekt, Ushanka-Mütze am Jockey | Kalt, effizient, nervös zuckend               | „Wodka Wirbel läuft, als hätte jemand die Zeitlupe vergessen.“                        |
 
 > Namen und Charaktere sind final. Bei Bedarf können in `src/data/horses.js` weitere Kommentator-Zeilen ergänzt werden.
 
