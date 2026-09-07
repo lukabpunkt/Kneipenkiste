@@ -57,8 +57,8 @@ Release-Nachweis: [`docs/audits/release-v1.0.md`](./docs/audits/release-v1.0.md)
 | 2   | Prosecco Rakete | Pink      | Party-Pferd, laut, immer gut drauf      |
 | 3   | Kater Morgana   | Rot       | Verkatert, mal Turbo, mal Koma          |
 | 4   | Schnapsidee     | Grün      | Chaotisch, macht unverständliche Dinge  |
-| 5   | Hopfen Hengst   | Bernstein | Gemütlich, bayrisch, kraftvoll          |
-| 6   | Wodka Wirbel    | Eisblau   | Kalt, effizient, nervös zuckend         |
+| 5   | Hopfen Hengst   | Gelb      | Gemütlich, bayrisch, kraftvoll          |
+| 6   | Wodka Wirbel    | Türkis    | Kalt, effizient, nervös zuckend         |
 
 ## Einstellungen
 

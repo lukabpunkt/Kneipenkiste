@@ -14,7 +14,7 @@
  * The released version. A new value means a new cache and a fresh copy of every file; the page
  * notices the new worker and offers a reload rather than swapping anything mid-race.
  */
-const VERSION = 'v1.1.0';
+const VERSION = 'v1.2.0';
 const CACHE = `pferderennen-${VERSION}`;
 
 /* --- precache:start --- */
@@ -103,7 +103,8 @@ const PRECACHE = [
   './src/ui/screens/start.js',
   './src/ui/screens/stats.js',
   './src/ui/strings.js',
-  './assets/fonts/fredoka-latin-var.woff2',
+  './assets/fonts/luckiest-guy-400.woff2',
+  './assets/fonts/nunito-var.woff2',
   './assets/icons/apple-touch-icon.png',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',

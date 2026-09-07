@@ -5,7 +5,8 @@ Ziel: Das Spiel soll aussehen wie ein liebevoll gemachtes Indie-Cartoon-Game –
 ## 1. Stilrichtung
 
 - **Cartoon / Flat mit Tiefe:** Klare Formen, dicke weiche Outlines (2–3 px, dunkle Fellfarbe, nicht schwarz), sanfte Verläufe für Volumen, lange weiche Schatten.
-- **Stimmung:** Sommerabend auf der Rennbahn. Warmer Himmel (Pfirsich → Flieder), sattes Grün, Holz- und Cremetöne bei der UI.
+- **Stimmung:** Abendrennen unter Flutlicht. Nachthimmel (fast schwarzes Pflaume → Horizontglühen), gedämpfte Bahn im warmen Lichtkegel, Papier und Amber bei der UI.
+- **Teil der Kneipenkiste:** Seit September 2026 teilt das Spiel Grund, Papier, Amber, Schrift und Knopfform mit Drinkshot, Sprengmeister, Tresor und Zoll. Was hier steht, beschreibt die eigene Handschrift *innerhalb* dieses Rahmens — die gemeinsamen Werte sind in §2.6 aufgeführt und dürfen nicht driften.
 - **Referenzen (nur als Gefühl, nicht kopieren):** _Alto's Odyssey_ (Farbverläufe & Stimmung), _Fall Guys_ (Rundlichkeit, Slapstick), _Kingdom Rush_ (Cartoon-Outlines), Duolingo (UI-Buttons mit „Kante unten“).
 
 ## 2. Farb-Tokens (`src/styles/tokens.css`)
@@ -14,12 +15,16 @@ Ziel: Das Spiel soll aussehen wie ein liebevoll gemachtes Indie-Cartoon-Game –
 
 | Pferd           | Base      | Light (Highlights, Glow) | Dark (Outline, Schatten) |
 | --------------- | --------- | ------------------------ | ------------------------ |
-| Sir Trabsalot   | `#8B5CF6` | `#C4B5FD`                | `#5B21B6`                |
-| Prosecco Rakete | `#EC4899` | `#F9A8D4`                | `#9D174D`                |
-| Kater Morgana   | `#EF4444` | `#FCA5A5`                | `#991B1B`                |
-| Schnapsidee     | `#22C55E` | `#86EFAC`                | `#15803D`                |
-| Hopfen Hengst   | `#F59E0B` | `#FCD34D`                | `#B45309`                |
-| Wodka Wirbel    | `#06B6D4` | `#67E8F9`                | `#0E7490`                |
+| Sir Trabsalot   | `#AF73EE` | `#D3AFEB`                | `#7B3FBF`                |
+| Prosecco Rakete | `#FF6B9D` | `#FFAABE`                | `#C94A78`                |
+| Kater Morgana   | `#FF4757` | `#FF9798`                | `#C0392B`                |
+| Schnapsidee     | `#2ED573` | `#8CE5A7`                | `#1E9E52`                |
+| Hopfen Hengst   | `#FFD32A` | `#FFE47F`                | `#D4A800`                |
+| Wodka Wirbel    | `#18DCFF` | `#80E9F4`                | `#0FA6C2`                |
+
+Die Base-Werte sind die **Kneipenkiste-Spielerfarben** — dieselben sechs Hexwerte, die die vier Schwesterspiele vergeben. Ein lila Pferd ist exakt das Lila eines lila Spielers. `Light` ist ein 45-%-Mix zu Papier (daraus wird der Streifen auf den Silks), `Dark` der kanonische Shade.
+
+**Beschriftung auf einer Signaturfarbe ist immer Tinte, nie Papier.** Papier erreicht auf den sechs Farben 2,1–6,0:1 und scheitert am Gelb; Tinte liegt bei 5,6–13,1:1. Auf den *Shades* ist es geteilt — dort entscheidet `textOn()` in `render/palette.js` bzw. dieselbe Regel in `components.css` pro Farbe.
 
 Alle sechs Farben sind gegeneinander auch bei Rot-Grün-Schwäche unterscheidbar, wenn Form/Fell hinzukommt (siehe Barrierefreiheit §9). Jedes Pferd nutzt seine Farbe für: Startbox, Sattel, Jockey-Trikot, Zaumzeug, Lane-Marker-Streifen, Wettkarte-Rahmen, Chips, Konfetti, Podium-Sockel, Leaderboard-Punkt.
 
@@ -28,7 +33,7 @@ Alle sechs Farben sind gegeneinander auch bei Rot-Grün-Schwäche unterscheidbar
 Seit M13 ist `tokens.css` dreistufig aufgebaut. Nur die **semantische** Ebene darf außerhalb der Datei benutzt werden — diese Indirektion ist es, die ein zweites Theme zu einem Block Überschreibungen macht statt zu einer zweiten Designrunde.
 
 ```
-Primitiv    was es IST         --sand-300, --accent-500
+Primitiv    was es IST         --night-300, --accent-500
 Semantisch  wofür es DA IST    --surface, --text-muted, --accent-press
 Komponente  die Ausnahmen      --btn-edge (nur wo eine Komponente wirklich eine braucht)
 ```
@@ -37,49 +42,78 @@ Komponente  die Ausnahmen      --btn-edge (nur wo eine Komponente wirklich eine 
 
 Gebaut in OKLCH, weil dessen Helligkeit über alle Farbtöne hinweg gleich wahrgenommen wird: In HSL bedeutet „+10 % Helligkeit" bei Orange etwas anderes als bei Pflaume, weshalb handgemischte Skalen ungleichmäßig aussehen. Methode: **eine Helligkeitsleiter für alle Skalen festlegen**, dann Chroma und Hue darüberlegen, Chroma an beiden Enden zusammendrücken.
 
-- **`--sand-50 … --sand-900`** – das Neutral. Warmes Papier oben (H 77), pflaumiger Schatten unten (H 320); der Farbton dreht über die Leiter, weil der Hintergrundverlauf von Pfirsich nach Flieder läuft und ein Neutral, das in den Lichtern wärmer und in den Schatten kühler wird, zum Bild gehört. Die Stufen **50, 600 und 900 sind bitgleich** mit dem alten `--cream`, `--ink-soft` und `--ink`.
-- **`--accent-50 … --accent-900`** – Stufe **500 ist `#FF6B35`**, Stufe 700 das alte `--accent-dark`. Die Identität hat sich nicht geändert, sie hat Nachbarn bekommen.
-- **`--danger-*` / `--success-*`** – je vier Stufen, mehr braucht keine von beiden.
-- **`--tint-subtle` / `--tint` / `--tint-strong`** – durchscheinendes Ink für Flächen, deren Untergrund beim Schreiben nicht bekannt ist. Vorher waren das neun unbenannte `color-mix()`-Werte zwischen 6 % und 35 %; das Auge unterscheidet 6 von 8 nicht, also sind es drei.
+- **`--night-50 … --night-950`** – das Neutral. Warmes Papier oben (H 88), pflaumiger Schatten unten (H 285); der Farbton dreht über die Leiter, weil ein Neutral, das in den Lichtern wärmer wird, zur Seite gehört. Ein Grau mit festem Farbton säße darauf wie ein Aufkleber. Die Stufen **50, 800, 900 und 950 sind die Kneipenkiste-Anker** und liegen fest.
+- **`--accent-100 … --accent-900`** – Stufe **500 ist `#FFB800`**, Stufe 700 `#D18E00`: das Amber, auf dem alle vier Schwesterspiele laufen. Orange bleibt die Farbe der Hub-Karte, so wie Sprengmeister außen grün und innen amber ist.
+- **`--danger-*` / `--success-*`** – je zwei Stufen: die Fläche und ihre Kante. Die blassen Tints, die eine helle Oberfläche brauchte, sind weg — auf dunklem Grund macht ein durchscheinender Hauch der Fläche selbst diese Arbeit und kann nicht aus dem Gamut laufen.
+- **`--tint-subtle` / `--tint` / `--tint-strong`** – durchscheinendes **Papier** für Flächen, deren Untergrund beim Schreiben nicht bekannt ist. (Auf der hellen Seite war es Tinte; auf dunklem Grund liest Helles als „angehoben“.) Vorher waren das neun unbenannte `color-mix()`-Werte zwischen 6 % und 35 %; das Auge unterscheidet 6 von 8 nicht, also sind es drei.
 
-**Genau zwei Textfarben:** `--text` und `--text-muted`. Alles darunter kommt aus Gewicht und Größe — eine Leiter immer blasserer Grautöne ist der klassische Bastel-Marker. Dazu `--text-on-sky` für die Stellen, an denen Text direkt auf dem Verlauf steht: `--text-muted` erreicht dort nur 3,0–3,7:1, die dunklere Stufe hält 6,1–7,5:1 über den ganzen Verlauf.
+**Genau zwei Textfarben:** `--text` und `--text-muted`. Alles darunter kommt aus Gewicht und Größe — eine Leiter immer blasserer Grautöne ist der klassische Bastel-Marker. Dazu `--text-subtle` für Text, der direkt auf der Seite statt in einer Karte steht. (Hieß bis zum Kneipenkiste-Umbau `--text-on-sky` und zog in die andere Richtung: auf hellem Grund verlor Text auf dem Verlauf Kontrast, auf dunklem Grund gewinnt er welchen.)
 
-Dark Mode ist weiterhin **nicht** vorgesehen. Die semantische Ebene ist aber die gesamte Vorarbeit dafür, falls er kommen soll.
+Ein Light Mode ist **nicht** vorgesehen. Die semantische Ebene ist aber genau die Vorarbeit, die den Wechsel von Tag auf Nacht zu einer Datei gemacht hat — sie würde ihn auch wieder zurück tragen.
 
 ### 2.4 Tiefe
 
 Eine Lichtquelle für die ganze Seite, senkrecht von oben. Mit steigender Höhe wachsen Versatz und Weichzeichnung, während die **Deckkraft sinkt** — das ist es, was Höhe als Höhe lesbar macht statt als Gewicht.
 
 ```
---elev-1 / --elev-2 / --elev-3   je DREI gestapelte Schatten, nie einer
---shadow-hue: 0.34 0.055 35      warmes Braun, nie Schwarz
---edge: 4px                      die Unterkante, auf der alles Drückbare steht
---edge-press: 1px                worauf sie beim Drücken zusammenfällt
+--elev-1 / --elev-2 / --elev-3   gestapelte weiche Schatten, nie ein einzelner
+--hairline                       1 px Papier-Lichtkante oben — DAS liest als „erhaben"
+--shadow-hue: 0.12 0.028 287     noch von vier Stellen als nacktes L C H konsumiert
+--edge: 6px                      die Unterkante, auf der alles Drückbare steht
+--edge-press: 2px                worauf sie beim Drücken zusammenfällt (4 px Weg)
 ```
 
-Ein einzelner harter Schatten ist der auffälligste Bastel-Marker, und Stapeln kostet nichts. Schwarze Schatten auf einer Pfirsich-Seite werden grau und schmutzig; ein zum Untergrund hin eingefärbter Schatten bleibt im Bild.
+Auf fast schwarzem Grund kann ein weicher Schatten nur noch schwarz sein, und Schwarz auf Schwarz ist nichts. Tiefe tragen hier deshalb zwei andere Dinge: die harte Unterkante und die Lichtkante oben. Die weichen Schatten trennen weiterhin ein Sheet von der Seite dahinter — das ist die eine Aufgabe, die ihnen bleibt.
 
-**Die Unterkante gilt überall**: Knöpfe, Chips, Stepper, Pferdekarten. Sie ist dieselbe Mechanik, die Duolingos Knöpfe wie Gegenstände wirken lässt, und sie funktioniert nur, wenn sie *ausnahmslos* gilt und von derselben Seite beleuchtet wird. Die Kantenfarbe kommt immer aus der eigenen Skala des Elements (`--btn-edge`).
+**Die Unterkante gilt überall**: Knöpfe, Chips, Stepper, Abzeichen. 6 px hoch mit 4 px Weg — exakt der Wert der Schwesterspiele. Dazu die Sticker-Kontur: **3 px Tinte um farbige Flächen**, aber *nicht* um Karten; drei Pixel Tinte auf einem Panel, das selbst fast Tinte ist, sind 1,1:1 und damit nichts. Sie ist dieselbe Mechanik, die Duolingos Knöpfe wie Gegenstände wirken lässt, und sie funktioniert nur, wenn sie *ausnahmslos* gilt und von derselben Seite beleuchtet wird. Die Kantenfarbe kommt immer aus der eigenen Skala des Elements (`--btn-edge`).
 
 ### 2.5 Form und Abstand
 
-**Verschachtelte Ecken: Innenradius = Außenradius − Abstand.** Ein Knopf 16 px innerhalb einer 22-px-Karte will 6 px, nicht noch einmal 22. Falsch verschachtelte Ecken sieht man nicht, bis man einmal darauf achtet, und danach nie wieder nicht.
+**Verschachtelte Ecken: Innenradius = Außenradius − Abstand.** Ein Knopf 16 px innerhalb einer 28-px-Karte will 12 px, nicht noch einmal 28. Falsch verschachtelte Ecken sieht man nicht, bis man einmal darauf achtet, und danach nie wieder nicht.
 
 ```
---radius-xs: 6px  --radius-sm: 10px  --radius-md: 14px
---radius-lg: 22px --radius-xl: 28px  --radius-pill: 999px
+--radius-xs: 6px  --radius-sm: 12px  --radius-md: 20px   (der Sticker-Knopf)
+--radius-lg: 28px --radius-xl: 32px  (der Handyrahmen)   --radius-pill: 999px
 --space-1..8: 4 8 12 16 24 32 48 64
 ```
 
 Bei den Abständen liegen keine zwei Nachbarn näher als ~25 % beieinander, damit nie abgewogen werden muss, welcher gemeint ist.
 
+### 2.6 Was der Kneipenkiste gehört
+
+Diese Werte sind **kneipenkiste-weit identisch** und dürfen hier nicht driften. Sie stehen in `tokens.css` bewusst als Hex-Literale und nicht als OKLCH: ein Hin-und-Zurück durch OKLCH verschiebt sie um einen Zählwert, und dann ist das Amber hier ein anderes als in Drinkshot.
+
+```
+#0F0E1A  Grund          #1C1B2E  Panel        #27263D  Panel erhoben
+#FFF8E7  Papier         #1A1024  Tinte
+#FFB800  Amber          #D18E00  Amber-Kante
+#FF2D55  Danger         #2ED573  Success
+Luckiest Guy 400 (Display)  ·  Nunito 200–1000 (Body)
+Sticker-Knopf: 64 px hoch, 20 px Radius, 3 px Tinte, 6 px Kante, 4 px Weg
+```
+
+Dazu die sechs Pferdefarben aus §2.1 und der Rahmen unten. Alles andere in dieser Datei — die Rampe dazwischen, die Rennszene, die Kamera, die Partikel — ist die eigene Handschrift dieses Spiels.
+
+### 2.7 Der Rahmen auf dem Desktop
+
+Ab 768 px sitzen die Menü-Screens in einem zentrierten 9:16-Handyrahmen (`min(480px, 100dvh·9/16)`, 32 px Radius), genau wie bei den vier Schwesterspielen. Das ist ein Spiel, bei dem ein Handy herumgereicht wird, und ein bildschirmbreites Menü behauptet etwas anderes.
+
+**Das Rennen nicht.** Es hat eine Querformat-Bahn und einen Zehn-Fuß-Modus, die kein Schwesterspiel hat, und eine 480-px-Spalte würde beide wegwerfen. Der Router setzt dafür `data-frame` auf `<html>`:
+
+- `phone` – Menüs, im Rahmen
+- `full` – das Rennen, vollflächig; dieses Flag schaltet auch die Fernseher-Schriftgröße
+
+Gesetzt wird `full` **vor** dem Einhängen des Screens, damit das Renn-Canvas gleich im ersten Frame die volle Box misst; zurück auf `phone` erst, wenn der abgehende Screen entfernt ist, sonst wird das Rennen mitten im Übergang zusammengequetscht.
+
 ## 3. Typografie
 
-- **Display (Titel, Pferdenamen, Knöpfe, Countdown):** **Fredoka**, Variable-Achse 300–700, self-hosted als woff2 in `assets/fonts/` (OFL, Lizenz liegt daneben), auf Latin subsettet, **29 KB**. Kein Google-Fonts-Request zur Laufzeit — die CSP erlaubt ohnehin nur `font-src 'self'`. Die Achse hat den Default 300, also **muss jede Nutzung ihr Gewicht angeben**.
-- **Fallback mit Metrik-Überschreibung:** Eine zweite `@font-face`-Regel zwingt Fredokas Metriken auf die Systemschrift (`size-adjust: 96.3 %`, `ascent-override: 101.1 %`, `descent-override: 24.5 %`), damit eine Überschrift vor und nach dem Font-Swap dieselbe Box belegt. Ohne das springt beim Swap jede Zeile und CLS ist nicht mehr 0 (A5).
-- **Body:** der System-Stack. Zwei Familien sind das Maximum, und eine Systemschrift für Fließtext ist bei GitHub oder Notion genauso — der Amateur-Marker ist `system-ui` in *Überschriften*.
-- **Fluide Skala** zwischen 360 px und 1440 px Viewport, per `clamp()`, ohne Breakpoint-Sprung. Der kleine Pol behält die Werte, mit denen das Spiel ausgeliefert wurde (14/16/18/22/28/36/56); der große wächst schneller als proportional, weil ein größerer Bildschirm mehr Hierarchie will, nicht bloß mehr von allem. Jedes `clamp()` behält einen `rem`-Anteil in der Mitte, sonst bricht der Browser-Zoom.
-- **Fernseher:** Ab 1400 px hebt `:root { font-size: 21px }` die ganze Skala an — aus drei Metern ist alles unter ~24 px unlesbar. Abstände bleiben in px: ein Fernseher braucht größere Buchstaben, nicht größere Lücken.
+- **Display (Titel, Pferdenamen, Countdown, Kommentar):** **Luckiest Guy** 400, self-hosted als woff2 in `assets/fonts/` (17 KB, Latin-Subset). Genau ein Schnitt — wer mehr anfordert, bekommt in manchen Engines synthetisches Fetten. Bitgleich mit der Datei in `hub/fonts` und in jedem Schwesterspiel, wer also ein anderes Spiel offen hatte, hat sie schon im Cache.
+- **Body (Fließtext, Knöpfe, Chips, Rangliste, Zahlen):** **Nunito**, Variable-Achse 200–1000, 39 KB. Default 600, Betonung 800. Knöpfe laufen bewusst *nicht* auf der Display-Schrift: Luckiest Guy ist bei 16–20 px unlesbar.
+- Kein Google-Fonts-Request zur Laufzeit — die CSP erlaubt ohnehin nur `font-src 'self'`.
+- **Fallback mit Metrik-Überschreibung:** Je eine zweite `@font-face`-Regel zwingt die echten Metriken auf die Systemschrift, damit Text vor und nach dem Font-Swap dieselbe Box belegt. Ohne das springt beim Swap jede Zeile und CLS ist nicht mehr 0 (A5). Kein Schwesterspiel liefert das mit; es ist unsere Zugabe. Die Werte sind mit fontTools **aus den ausgelieferten woff2 gelesen**, nicht aus einer Tabelle abgeschrieben (Nunito 1000 upm, asc 1011, desc 353, x-height 484; Luckiest Guy 2048 upm, asc 1440, desc 608, x-height 1400).
+- Ehrliche Grenze: das repariert den **Layout**-Sprung, und den misst CLS. Den optischen Sprung repariert es nicht — für eine Comic-Pinselschrift gibt es keine Systementsprechung.
+- **Fluide Skala** zwischen 360 px und 1440 px Viewport, per `clamp()`, ohne Breakpoint-Sprung. Der kleine Pol behält die Werte, mit denen das Spiel ausgeliefert wurde (14/16/18/22/28/36); der große wächst schneller als proportional, weil ein größerer Bildschirm mehr Hierarchie will, nicht bloß mehr von allem. **Ausnahme `--text-3xl`:** Luckiest Guy ist deutlich breiter als Fredoka war — „Pferderennen“ misst 7,14 em statt 6,0 —, deshalb ist der Titel auf 40→56 px gedeckelt. 56 px brauchen 400 px Zeile, und genau so viel gibt der 480-px-Rahmen her. Jedes `clamp()` behält einen `rem`-Anteil in der Mitte, sonst bricht der Browser-Zoom.
+- **Fernseher:** Ab 1400 px hebt `:root[data-frame='full'] { font-size: 21px }` die ganze Skala an — aus drei Metern ist alles unter ~24 px unlesbar. Nur während des Rennens: alles andere steckt bei dieser Breite im 480-px-Rahmen, wo ein angehobener Root eine Lupe auf einem Handy wäre. Abstände bleiben in px: ein Fernseher braucht größere Buchstaben, nicht größere Lücken.
 - Große Schrift enger (Tracking, Leading), kleine Schrift luftiger — `--track-display`, `--leading-display/-heading/-body`.
 - Zahlen (Schlücke) immer **tabular-nums**.
 

@@ -30,8 +30,12 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-4)
-    calc(var(--space-4) + env(safe-area-inset-bottom));
+  /* All four insets: in landscape — which this game plays in — the notch is on the SIDE, and
+     the leaderboard lives at exactly that edge. */
+  padding: max(var(--space-4), env(safe-area-inset-top))
+    calc(var(--space-4) + env(safe-area-inset-right))
+    calc(var(--space-4) + env(safe-area-inset-bottom))
+    calc(var(--space-4) + env(safe-area-inset-left));
   /* The HUD is information, not a control surface — clicks go to the canvas underneath. */
   pointer-events: none;
 }
@@ -65,11 +69,12 @@
   height: 20px;
   border-radius: var(--radius-pill);
   background: var(--horse-color);
-  color: var(--paper);
-  font-family: var(--font-display);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-xs);
   transform: translate(-50%, -50%);
-  box-shadow: 0 2px 4px rgba(43, 29, 46, 0.25);
+  box-shadow: 0 2px 0 var(--horse-dark, transparent);
 }
 
 /* --- Leaderboard --- */
@@ -91,9 +96,7 @@
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--surface) 82%, transparent);
   backdrop-filter: blur(14px) saturate(140%);
-  box-shadow:
-    inset 0 1px 0 oklch(1 0 0 / 0.55),
-    var(--elev-2);
+  box-shadow: var(--hairline), var(--elev-2);
 }
 
 /*
@@ -128,13 +131,11 @@
   width: 22px;
   height: 22px;
   border-radius: var(--radius-pill);
-  background: var(--horse-dark, var(--horse-color));
-  color: var(--paper);
-  font-family: var(--font-display);
-  font-weight: 600;
-  box-shadow:
-    0 0 0 2px var(--horse-color),
-    0 2px 0 var(--horse-dark);
+  background: var(--horse-color);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 800;
+  box-shadow: 0 2px 0 var(--horse-dark);
 }
 
 .board__name {
@@ -145,7 +146,8 @@
 
 .board__place {
   text-align: right;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
+  font-weight: 800;
   color: var(--text-muted);
 }
 
@@ -180,11 +182,8 @@
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: blur(14px) saturate(140%);
-  box-shadow:
-    inset 0 1px 0 oklch(1 0 0 / 0.55),
-    var(--elev-2);
+  box-shadow: var(--hairline), var(--elev-2);
   font-family: var(--font-display);
-  font-weight: 500;
   font-size: var(--text-md);
   text-align: center;
 }
@@ -400,7 +399,7 @@
   pointer-events: none;
   transition: opacity var(--dur-slow) var(--ease-out);
   /* A vignette, drawn with a radial gradient rather than a fourth canvas layer. */
-  background: radial-gradient(ellipse at center, transparent 38%, rgba(43, 29, 46, 0.55) 100%);
+  background: radial-gradient(ellipse at center, transparent 38%, var(--overlay) 100%);
 }
 
 .race-stage.is-photo-finish .photo-finish {
@@ -411,7 +410,7 @@
   padding: var(--space-2) var(--space-6);
   border-radius: var(--radius-pill);
   background: var(--accent);
-  color: var(--paper);
+  color: var(--on-accent);
   font-family: var(--font-display);
   font-size: var(--text-xl);
   letter-spacing: 0.08em;
@@ -436,7 +435,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--paper);
   opacity: 0;
   animation: press-flash 0.9s steps(1, end) infinite;
 }

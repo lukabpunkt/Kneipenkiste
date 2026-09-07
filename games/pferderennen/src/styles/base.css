@@ -4,40 +4,68 @@
  */
 
 /*
- * The display face, self-hosted. No CDN — the CSP allows `font-src 'self'` only, and the game
- * has to work offline after the first load. One variable file (weight 300-700, latin subset,
- * 29 KB) replaces five static weights.
+ * The two Kneipenkiste faces, self-hosted. No CDN — the CSP allows `font-src 'self'` only, and
+ * the game has to work offline after the first load. Both files are byte-identical to the ones
+ * in hub/fonts and in every sister game, so a player who has opened one game has them cached.
  *
- * Note the axis default is 300, so anything using this family must state its weight.
+ * Luckiest Guy carries the headlines, Nunito everything else. Nunito is a variable font, so one
+ * file covers 600 (body) and 800 (emphasis).
  */
 @font-face {
-  font-family: 'Fredoka';
-  src: url('../../assets/fonts/fredoka-latin-var.woff2') format('woff2-variations');
-  font-weight: 300 700;
+  font-family: 'Luckiest Guy';
+  src: url('../../assets/fonts/luckiest-guy-400.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
   unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('../../assets/fonts/nunito-var.woff2') format('woff2-variations');
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 /*
- * What shows during the swap, with Fredoka's metrics forced onto it, so the headline occupies
- * exactly the same box before and after the font arrives. Without this the swap shifts every
- * heading on the page and CLS stops being zero (audit A5).
+ * What shows during the swap, with the real metrics forced onto it, so text occupies exactly the
+ * same box before and after the font arrives. Without this the swap shifts the page and CLS stops
+ * being zero (audit A5). No sister game ships this — it is ours to keep.
  *
- * Fredoka: 1000 upm, ascent 974, descent 236, line gap 0, x-height 500. The fallbacks sit around
- * a 0.519 x-height, so 0.500 / 0.519 = 96.3 %; the ascent and descent are then divided by that
- * same factor to keep the line box where it was.
+ * Metrics read out of the shipped woff2 with fontTools, not copied from a table:
+ *   Nunito       1000 upm, ascent 1011, descent 353, line gap 0, x-height 484
+ *   Luckiest Guy 2048 upm, ascent 1440, descent 608, line gap 0, x-height 1400
+ * The fallbacks sit around a 0.519 x-height, so size-adjust is the x-height ratio and the ascent
+ * and descent are then divided by that same factor to keep the line box where it was.
+ *
+ * Honest limit: this fixes the layout jump, which is what CLS measures. It cannot fix the visual
+ * jump for Luckiest Guy — no system font looks remotely like a comic brush face.
  */
 @font-face {
-  font-family: 'Fredoka Fallback';
+  font-family: 'Nunito Fallback';
   src:
     local('Helvetica Neue'), local('Arial'), local('Roboto'), local('Segoe UI Variable Display'),
     local('Segoe UI');
-  size-adjust: 96.3%;
-  ascent-override: 101.1%;
-  descent-override: 24.5%;
+  size-adjust: 93.3%; /* 0.484 / 0.519 */
+  ascent-override: 108.4%; /* 1.011 / 0.933 */
+  descent-override: 37.9%; /* 0.353 / 0.933 */
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Luckiest Guy Fallback';
+  src:
+    local('Arial Black'), local('Impact'), local('Helvetica Neue'), local('Arial'),
+    local('Segoe UI');
+  size-adjust: 131.7%; /* 0.684 / 0.519 */
+  ascent-override: 53.4%; /* 0.703 / 1.317 */
+  descent-override: 22.5%; /* 0.297 / 1.317 */
   line-gap-override: 0%;
 }
 
@@ -55,23 +83,34 @@ body {
 body {
   margin: 0;
   font-family: var(--font-body);
+  /* Nunito is a variable font and its 400 is thin for a game read at arm's length across a
+     table. 600 is the body tone in every sister game; 800 is the emphasis. */
+  font-weight: 600;
   font-size: var(--text-sm);
   line-height: var(--leading-body);
   color: var(--text);
-  /*
-   * The sky, with a whisper of grain over it. Long gradients band into visible stripes on 8-bit
-   * displays; a little noise dithers the steps away — the same trick film and games have always
-   * used. It is baked into a data URI rather than run as a live SVG filter, because a canvas is
-   * already asking for the GPU on the race screen.
-   */
-  background: var(--grain), linear-gradient(170deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
-  background-attachment: fixed;
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
   /* No double-tap zoom and no selection lasso while the phone is passed around. */
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+/*
+ * The room the game sits in: two coloured lamps a long way off, with a whisper of grain over
+ * them. Long low gradients band into visible stripes on 8-bit displays; a little noise dithers
+ * the steps away — the same trick film and games have always used. Baked into a data URI rather
+ * than run as a live SVG filter, because a canvas is already asking for the GPU on the race
+ * screen. Fixed, so it does not scroll, and behind #app so the desktop frame can sit on it.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--grain), var(--room-light), var(--bg);
 }
 
 /* While a modal is open the page behind it must not scroll away underneath. */
@@ -88,7 +127,8 @@ h2,
 h3 {
   font-family: var(--font-display);
   margin: 0 0 var(--space-3);
-  font-weight: 600;
+  /* Luckiest Guy has exactly one weight. Asking for more makes some engines fake it. */
+  font-weight: 400;
   line-height: var(--leading-heading);
   letter-spacing: var(--track-display);
 }
@@ -136,10 +176,11 @@ select {
  * on the ink toast and the ink house banner, where a dark ring alone would disappear.
  */
 :focus-visible {
-  outline: 3px solid var(--text);
+  /* Amber ringed in ink, so the same ring works on the dark page and on the one paper card. */
+  outline: 3px solid var(--accent);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
-  box-shadow: 0 0 0 3px var(--surface);
+  box-shadow: 0 0 0 3px var(--ink);
 }
 
 /* --- Screen skeleton ---------------------------------------------------- */
@@ -149,6 +190,44 @@ select {
   z-index: 1;
   display: grid;
   height: 100dvh;
+  background: var(--bg);
+}
+
+/*
+ * Desktop. The menus move into the same 9:16 phone frame the sister games use — this is a game
+ * you play by passing one phone around, and a full-width menu says otherwise.
+ *
+ * The race does not. It has a landscape track and a ten-foot mode that no sister game has, and
+ * both would be thrown away by a 480px column. The router flips :root[data-frame] between the
+ * two, which is also what gates the television font size in tokens.css.
+ *
+ * The height condition is not decoration. A phone held sideways is wider than 768px, and the
+ * frame's width is derived from the viewport HEIGHT — so without it an iPhone 13 in landscape
+ * got a 215px column. The sister games escape this by locking orientation on a phone; we cannot,
+ * because the landscape track is a feature here. Sprengmeister gates the same way.
+ */
+@media (min-width: 768px) and (min-height: 700px) {
+  body {
+    display: grid;
+    place-items: center;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  :root[data-frame='phone'] #app {
+    width: min(var(--frame-max-width), calc(100dvh * 9 / 16));
+    height: min(854px, 100dvh - 48px);
+    aspect-ratio: var(--frame-aspect);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--elev-3);
+    overflow: hidden;
+  }
+
+  :root[data-frame='full'] #app {
+    width: 100vw;
+    height: 100dvh;
+  }
 }
 
 /* All screens share one grid cell so a leaving and an entering screen can overlap. */
@@ -159,9 +238,18 @@ select {
   display: flex;
   flex-direction: column;
   /* A fixed height rather than a minimum: only then does __body scroll internally and the
-     footer with the primary action stay put at the bottom edge. */
-  height: 100dvh;
+     footer with the primary action stay put at the bottom edge. 100 % of #app, not of the
+     viewport, so a framed screen stays inside the frame. */
+  height: 100%;
   min-height: 0;
+  /*
+   * And a grid item may not refuse to be narrower than its content. Without this the screen
+   * inherits the min-content width of the longest unbreakable thing inside it — on the betting
+   * summary a player name plus a horse name plus "ändern" on one line, which pushed a 320px
+   * phone 23px past its own edge. The text that has to give already knows how (ellipsis); this
+   * is what lets the layout ask it to.
+   */
+  min-width: 0;
   transition:
     opacity var(--dur-base) var(--ease-out),
     transform var(--dur-base) var(--ease-out);
@@ -178,13 +266,19 @@ select {
   pointer-events: none;
 }
 
+/*
+ * The side insets matter here because this game does not lock orientation: a notched phone held
+ * sideways puts its cutout and its rounded corner squarely in the left or right margin, and
+ * `viewport-fit=cover` means we asked for that space and have to pay for it.
+ */
 .screen__header,
 .screen__body,
 .screen__footer {
   width: 100%;
   max-width: 720px;
   margin-inline: auto;
-  padding-inline: var(--space-4);
+  padding-left: calc(var(--space-4) + env(safe-area-inset-left));
+  padding-right: calc(var(--space-4) + env(safe-area-inset-right));
 }
 
 .screen__header {
@@ -205,10 +299,10 @@ select {
   font-size: var(--text-xl);
 }
 
-/* This one sits on the sky, not on a card — see --text-on-sky. */
+/* This one sits on the page, not on a card — see --text-subtle. */
 .screen__subtitle {
   margin: var(--space-1) 0 0;
-  color: var(--text-on-sky);
+  color: var(--text-subtle);
   font-size: var(--text-xs);
 }
 
@@ -236,7 +330,7 @@ select {
   margin-top: calc(var(--space-6) * -1);
   padding-top: var(--space-6);
   padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, transparent, var(--sky-bottom) 62%);
+  background: linear-gradient(180deg, transparent, var(--bg) 62%);
 }
 
 /* Visible to screen readers only (aria-live region, canvas description). */
@@ -253,13 +347,14 @@ select {
 }
 
 /*
- * Small print. It defaults to the darker on-sky tone because that is where it is least safe:
- * --text-muted only reaches 3.0-3.7:1 against the gradient. Inside a card there is no such
- * problem, so it goes back to the lighter tone there and the two tiers stay distinguishable.
+ * Small print. It defaults to the on-page tone because that is where most of it lives:
+ * the page is a shade darker than a panel, so secondary text out there can afford to be quieter
+ * and still outrank --text-muted in its own context. Inside a card it goes back to the other
+ * tone, and the two tiers stay distinguishable.
  */
 .hint,
 .field__label {
-  color: var(--text-on-sky);
+  color: var(--text-subtle);
 }
 
 .card .hint,
@@ -276,46 +371,16 @@ select {
 
 /* --- Desktop and TV ------------------------------------------------------ */
 
-@media (min-width: 900px) {
-  .screen__header,
-  .screen__body,
-  .screen__footer {
-    max-width: 900px;
-  }
-
-  .screen__title {
-    font-size: var(--text-2xl);
-  }
-
-  .screen__subtitle {
-    font-size: var(--text-sm);
-  }
-}
-
 /*
- * Ten feet away. The type scale is already lifted by `:root { font-size: 21px }` in tokens.css,
- * which carries every ratio with it; what is left here is room and margin.
+ * Ten feet away — the race, and only the race. Everything else is inside a 480px phone frame at
+ * this width, where a lifted root font size would be a magnifying glass held to a phone. The
+ * scale itself is raised by `:root[data-frame='full']` in tokens.css; what is left here is room.
  *
  * The safe frame matters: real televisions overscan by up to ~5 %, so anything that must be
  * readable stays inside it. A browser at this width loses nothing by it.
  */
 @media (min-width: 1400px) {
-  .screen__header,
-  .screen__body,
-  .screen__footer {
-    max-width: 1100px;
-    padding-inline: var(--space-6);
-  }
-
-  .screen__header {
-    padding-top: max(var(--space-6), env(safe-area-inset-top));
-  }
-
-  .screen__footer {
-    padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
-  }
-
-  body {
+  :root[data-frame='full'] body {
     font-size: var(--text-md);
   }
 }

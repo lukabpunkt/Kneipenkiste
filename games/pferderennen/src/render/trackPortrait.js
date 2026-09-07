@@ -13,6 +13,7 @@
 import { TRACK_LENGTH, RUNNER_COUNT, STARTER } from '../config.js';
 import { TRACK_COLOURS as COLOURS, MARKER_SPACING, drawGrandstandStrip } from './trackTheme.js';
 import { createCrowdFlashes } from './crowdFlashes.js';
+import { textOn } from './palette.js';
 
 /** Share of the width taken by the grandstand down each side. */
 const SIDE_WIDTH = 0.085;
@@ -177,6 +178,9 @@ export function createPortraitTrack({ camera, horses }) {
       const sand = ctx.createLinearGradient(left, 0, left + surface, 0);
       sand.addColorStop(0, COLOURS.sandDark);
       sand.addColorStop(0.25, COLOURS.sand);
+      // The floodlights pool down the middle of the track. A stop in the gradient that is
+      // already being built, rather than a second pass over the same pixels.
+      sand.addColorStop(0.5, COLOURS.sandLit);
       sand.addColorStop(0.75, COLOURS.sand);
       sand.addColorStop(1, COLOURS.sandDark);
       ctx.fillStyle = sand;
@@ -209,7 +213,8 @@ export function createPortraitTrack({ camera, horses }) {
         ctx.lineTo(left + surface, y);
         ctx.stroke();
         ctx.globalAlpha = 1;
-        ctx.fillStyle = COLOURS.ink;
+        // Paper, not ink: these sit straight on the track, and the track is now the dark thing.
+        ctx.fillStyle = COLOURS.paper;
         ctx.globalAlpha = 0.45;
         ctx.fillText(String(unit), left + 4, y - 8);
         ctx.globalAlpha = 1;
@@ -246,7 +251,7 @@ export function createPortraitTrack({ camera, horses }) {
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = COLOURS.white;
+        ctx.fillStyle = textOn(horse.color);
         ctx.font = `${Math.max(12, lane * 0.4)}px system-ui, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -278,7 +283,7 @@ export function createPortraitTrack({ camera, horses }) {
       const size = surface / squares;
       for (let i = 0; i < squares; i += 1) {
         for (let row = 0; row < 2; row += 1) {
-          ctx.fillStyle = (i + row) % 2 === 0 ? COLOURS.ink : COLOURS.white;
+          ctx.fillStyle = (i + row) % 2 === 0 ? COLOURS.ink : COLOURS.paper;
           ctx.fillRect(left + i * size, y - 11 + row * 11, size, 11);
         }
       }
@@ -304,7 +309,7 @@ export function createPortraitTrack({ camera, horses }) {
       ctx.beginPath();
       ctx.roundRect(left - 9, bannerY, surface + 18, bannerHeight, 6);
       ctx.fill();
-      ctx.fillStyle = COLOURS.white;
+      ctx.fillStyle = textOn(COLOURS.banner);
       ctx.font = `700 ${Math.max(13, bannerHeight * 0.55)}px system-ui, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';

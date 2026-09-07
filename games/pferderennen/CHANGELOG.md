@@ -4,13 +4,40 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionierung nach
 [Semantic Versioning](https://semver.org/lang/de/).
 
-## [Unreleased] – wird 1.1.0
+## [Unreleased] – wird 1.2.0
+
+### Kneipenkiste-Look
+
+Pferderennen zieht in die Kneipenkiste ein. Gleicher dunkler Grund, gleiches Papier, gleiches
+Amber, gleiche Schrift und gleiche Knöpfe wie Drinkshot, Sprengmeister, Tresor und Der Zoll —
+und ein Rennen, das jetzt am Abend unter Flutlicht läuft. Die Simulation ist nicht angefasst:
+Der Fairness-Audit liefert danach **Ziffer für Ziffer dieselben Zahlen** wie vorher.
+
+#### Neu
+
+- **Abendrennen.** Nachthimmel, Flutlichtmasten über der Tribüne und warme Lichtkegel auf der
+  Bahn. Die Pferde sind damit die hellsten Dinge auf dem Schirm, was sie immer sein sollten.
+- **Handyrahmen auf dem Desktop.** Die Menüs sitzen ab 768 px in demselben 9:16-Rahmen wie die
+  Schwesterspiele. Das Rennen nicht — die Querformat-Bahn und der Fernseher-Modus bleiben.
+- **Luckiest Guy und Nunito** statt Fredoka, dieselben Dateien wie im Rest der Kneipenkiste.
+- **Die sechs Pferde tragen die Kneipenkiste-Spielerfarben.** Ein lila Pferd ist exakt das Lila
+  eines lila Spielers in Drinkshot.
+
+#### Behoben
+
+- Unter dem Einsatz-Feld stand bei jeder Wette das Wort **„null"**. `replaceChildren` macht aus
+  allem, was kein Node ist, einen Textknoten.
+- **Startnummern waren stellenweise unlesbar** — weiß auf Gelb sind 1,4:1. Sie laufen jetzt über
+  dieselbe Tinte-oder-Papier-Regel wie die Abzeichen im DOM.
+- Acht weitere Kontrastpaarungen, die auf hellem Grund funktionierten und auf dunklem nicht.
+
+### Rennen mit Anfang und Schluss
 
 Das Rennen bekommt Anfang, Höhepunkt und Schluss, und ein Wiederholungsrennen kostet drei Taps
 statt zwei pro Spieler. Nichts davon berührt die Simulation: Der Fairness-Audit liefert danach
 **Ziffer für Ziffer dieselben Zahlen** wie vorher.
 
-### Neu
+#### Neu
 
 - **Vollbild fürs Rennen.** Auf dem Handy nimmt sich das Spiel mit „Rennen starten“ den ganzen
   Bildschirm und gibt ihn danach zurück. (Nicht auf dem iPhone — Safari kennt die Fullscreen-API
@@ -47,7 +74,7 @@ statt zwei pro Spieler. Nichts davon berührt die Simulation: Der Fairness-Audit
 - **Mehr Leben im Rennen:** Dreckfetzen unter den Hufen, Speedlines bei Sprints, Blitzlichtgewitter
   in der Tribüne, das zum Ziel hin zunimmt, und ein sanfter Kamera-Push im Schlussdrittel.
 
-### Behoben
+#### Behoben
 
 - Im Hochformat lag der „Überspringen“-Knopf auf dem Kommentar. Der Knopf schwebt über dem Canvas
   und wurde von nichts von der Textzeile ferngehalten, die dort die volle Breite einnimmt.

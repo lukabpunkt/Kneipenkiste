@@ -219,7 +219,7 @@ function strokeBand(ctx) {
   ctx.strokeStyle = TRACK_COLOURS.ink;
   ctx.stroke();
   ctx.lineWidth = FINISH_TAPE.thickness;
-  ctx.strokeStyle = TRACK_COLOURS.white;
+  ctx.strokeStyle = TRACK_COLOURS.paper;
   ctx.stroke();
   ctx.lineWidth = FINISH_TAPE.thickness * 0.36;
   ctx.strokeStyle = TRACK_COLOURS.banner;

@@ -12,8 +12,8 @@ import { TRACK_COLOURS } from './trackTheme.js';
 
 /** Skin and clothing, matching the figures in eventProps.js. */
 const SKIN = '#F2C9A0';
-const COAT = '#1F2937';
-const STEEL = '#4B5563';
+const COAT = '#3E4A5C';
+const STEEL = '#8892A3';
 
 /**
  * @param {CanvasRenderingContext2D} ctx
@@ -137,7 +137,7 @@ function drawArmAndPistol(ctx, s, raise, since, kick, calm) {
 function drawMuzzleFlash(ctx, s, t) {
   const reach = s * (0.1 + t * 0.16);
   ctx.globalAlpha = 1 - t;
-  ctx.fillStyle = TRACK_COLOURS.white;
+  ctx.fillStyle = TRACK_COLOURS.paper;
   ctx.beginPath();
   for (let i = 0; i < STARTER.flashSpikes * 2; i += 1) {
     const angle = (i / (STARTER.flashSpikes * 2)) * Math.PI * 2;

@@ -11,6 +11,7 @@
 import { HORSES } from '../data/horses.js';
 import { drawHorse } from './horse.js';
 import { horseColours } from './palette.js';
+import { TRACK_COLOURS } from './trackTheme.js';
 import { createPose, updatePose } from './horseAnimations.js';
 import { RENDER } from '../config.js';
 
@@ -40,11 +41,13 @@ function withAlpha(hex, alpha) {
 }
 const HORSE_SIZE = 0.2;
 
+/* The same evening ground the race runs on — this canvas sits behind the title screen, so a
+   daylight paddock here would give the whole page away before the race even starts. */
 const COLOURS = {
-  grassLight: '#7ED957',
-  grassDark: '#4CAF50',
-  sand: '#E8C88A',
-  sandDark: '#D9B370',
+  grassLight: TRACK_COLOURS.grassLight,
+  grassDark: TRACK_COLOURS.grassDark,
+  sand: TRACK_COLOURS.sand,
+  sandDark: TRACK_COLOURS.sandDark,
 };
 
 /**

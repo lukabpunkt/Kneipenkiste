@@ -259,7 +259,7 @@ function drawProp(ctx, item, anchor, phase, since, frame) {
     }
     case 'carrot': {
       const drop = Math.min(1, arriving);
-      ctx.strokeStyle = '#8B5A2B';
+      ctx.strokeStyle = '#C89A5E';
       ctx.lineWidth = Math.max(2, size * 0.04);
       ctx.beginPath();
       ctx.moveTo(x + size * 1.5, y - size * 3.2);

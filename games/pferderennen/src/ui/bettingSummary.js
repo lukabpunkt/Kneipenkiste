@@ -100,7 +100,7 @@ function betRow(state, player, { onEdit, onStake } = {}) {
   const detail = horse
     ? el('span', { className: 'overview__horse' }, [
         horseBadge(horse, 'sm'),
-        el('span', { text: horse.name }),
+        el('span', { className: 'overview__horse-name', text: horse.name }),
         // Only worth showing when the players could actually choose differently.
         state.settings.betType === 'free'
           ? el('span', {
@@ -134,12 +134,16 @@ function betRow(state, player, { onEdit, onStake } = {}) {
     },
     [
       playerChip(player),
-      detail,
-      el('span', {
-        className: 'overview__edit',
-        text: bet ? 'ändern' : 'setzen',
-        attrs: { 'aria-hidden': 'true' },
-      }),
+      // Horse and the "ändern" hint travel together: on a narrow phone the line wraps between
+      // the player and this group, never between a horse and the word that belongs to it.
+      el('span', { className: 'overview__detail' }, [
+        detail,
+        el('span', {
+          className: 'overview__edit',
+          text: bet ? 'ändern' : 'setzen',
+          attrs: { 'aria-hidden': 'true' },
+        }),
+      ]),
     ],
   );
 

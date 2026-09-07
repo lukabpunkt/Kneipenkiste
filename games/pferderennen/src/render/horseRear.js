@@ -39,7 +39,7 @@ export function drawHorseRear(ctx, { horse, colours, pose, x, y, size }) {
 
   // Shadow on the ground, shrinking as the horse leaves it.
   const grounded = 1 - Math.min(1, lift * 6);
-  ctx.fillStyle = `rgba(43, 29, 46, ${0.16 + 0.12 * grounded})`;
+  ctx.fillStyle = `rgba(8, 6, 16, ${0.34 + 0.2 * grounded})`;
   ctx.beginPath();
   ctx.ellipse(0, -0.02, 0.4 * (0.72 + 0.28 * grounded), 0.09, 0, 0, Math.PI * 2);
   ctx.fill();

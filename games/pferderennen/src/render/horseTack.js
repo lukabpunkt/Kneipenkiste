@@ -10,6 +10,7 @@
  */
 
 import { capsule, OUTLINE } from './shapes.js';
+import { textOn } from './palette.js';
 
 /** Saddle cloth with the starting number, saddle, and the browband of the bridle. */
 export function drawTack(ctx, horse, head) {
@@ -21,8 +22,9 @@ export function drawTack(ctx, horse, head) {
   ctx.fill();
   ctx.stroke();
 
-  // The number, so a horse is identifiable without relying on colour alone (audit A4).
-  ctx.fillStyle = '#FFFFFF';
+  // The number, so a horse is identifiable without relying on colour alone (audit A4). White on
+  // the six signature colours runs 1.4-4.7:1; textOn picks the one that can actually be read.
+  ctx.fillStyle = textOn(horse.color);
   ctx.font = '0.2px system-ui, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';

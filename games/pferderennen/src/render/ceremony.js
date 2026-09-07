@@ -14,7 +14,7 @@
 import { CEREMONY, RENDER } from '../config.js';
 import { drawHorse } from './horse.js';
 import { drawStandingJockey } from './jockeyStanding.js';
-import { horseColours } from './palette.js';
+import { horseColours, textOn } from './palette.js';
 import { createPose, updatePose } from './horseAnimations.js';
 import { createParticles, CONFETTI } from './particles.js';
 import { TRACK_COLOURS } from './trackTheme.js';
@@ -204,7 +204,7 @@ function drawPlace(ctx, { stage, place, horse }) {
   ctx.roundRect(centre - half, top, stage.plinthWidth, stage.plinthHeight[place] * 0.16 + 8, 6);
   ctx.fill();
 
-  ctx.fillStyle = TRACK_COLOURS.white;
+  ctx.fillStyle = textOn(horse.colorDark);
   ctx.font = `700 ${Math.max(14, stage.plinthWidth * 0.34)}px system-ui, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';

@@ -255,6 +255,25 @@ ohne ihn wäre die Liste nur zu erraten gewesen.
 - [x] **Audit A5 bestanden**
 - [x] **Audit A2 bestanden** (Re-Run als Beweis)
 
+### M15 – Kneipenkiste-Look
+
+Ziel: Pferderennen sieht aus wie eines der fünf Spiele auf https://lukabpunkt.github.io/Kneipenkiste/
+und nicht wie ein Gast im eigenen Regal. Spiellogik, Fairness und Rennablauf bleiben unberührt.
+
+- [x] 1. Luckiest Guy + Nunito statt Fredoka, Metriken aus den woff2 gemessen
+- [x] 2. `tokens.css` auf die Kneipenkiste-Nacht neu verankert
+- [x] 3. `--text-on-sky` → `--text-subtle` (die alte Bedeutung kehrte sich um)
+- [x] 4. Sticker-Knöpfe, Karten, Sheets — plus acht Kontrastfehler, die der Tausch erzeugte
+- [x] 5. Handyrahmen auf dem Desktop, Rennen vollflächig
+- [x] 6. Die sechs Pferde auf die Kneipenkiste-Spielerfarben
+- [x] 7. Abendrennen: Nachtbahn unter Flutlicht
+- [x] 8. Requisiten und Partikel für den dunklen Grund nachschattiert
+- [x] 9. PWA-Icons, Service Worker, Theme-Farbe
+- [x] **Audit A1 bestanden** — 0 rohe Farbwerte und 0 Primitive außerhalb `tokens.css`
+      (vorher: 5 rohe Werte in `race.css`, 3 Primitive in `screens.css`)
+- [x] **Audit A4 bestanden** — jede geänderte Paarung nachgerechnet, nicht geschätzt
+- [x] **Fairness unverändert** — `src/engine/` wurde nicht angefasst, Audit ziffernidentisch
+
 ---
 
 ## Audit-Protokoll
@@ -461,6 +480,30 @@ irgendwann stört, ist `--sub` der Hebel.
 ## Entscheidungen
 
 _(Datum – Entscheidung – Begründung)_
+
+- **2026-09-07 – Die Rennszene wird zum Abendrennen, nicht zur hellen Bühne in dunkler App.**
+  Der Zoll macht es andersherum (helle Zollhalle in dunkler App), und das wäre der billigere Weg
+  gewesen. Aber die Bahn ist bei uns kein Requisit, sondern der Ort — wenn die Kneipe dunkel ist
+  und die Bahn nicht, sind es zwei Abende. Komposition und Zeichencode bleiben; es sind 24 Werte
+  in `trackTheme.js` plus Flutlicht, das aus dem schon vorhandenen Cache- und Blit-Weg kommt und
+  darum keine zusätzlichen Pfad-Operationen pro Frame kostet.
+
+- **2026-09-07 – Menüs im Handyrahmen, das Rennen nicht.**
+  Die Schwesterspiele rahmen auf dem Desktop alles. Wir haben aber eine Querformat-Bahn und einen
+  Zehn-Fuß-Modus, die kein anderes Spiel hat, und eine 480-px-Spalte würde beide wegwerfen.
+  `data-frame` auf `<html>` schaltet zwischen beidem und gated zugleich die Fernseher-Schriftgröße,
+  die bis dahin Menüs vergrößerte, die es in dieser Breite gar nicht mehr gibt.
+
+- **2026-09-07 – Amber innen, Orange außen.**
+  Alle vier Schwesterspiele laufen intern auf `#FFB800`, tragen auf ihrer Hub-Karte aber ihre
+  eigene Signaturfarbe (Sprengmeister außen grün, Zoll außen stahlgrau). Pferderennen folgt dem:
+  Amber im Spiel, Orange bleibt die Kartenfarbe.
+
+- **2026-09-07 – Die sechs Pferde bekommen die Kneipenkiste-Spielerfarben.**
+  Sie lagen ohnehin dicht daneben, die Pferde bleiben also erkennbar. Der Gewinn ist, dass sie
+  jetzt zu einem Satz gehören statt einem zu ähneln — ein lila Pferd ist exakt das Lila eines
+  lila Spielers in Drinkshot. Nebeneffekt: die alte Abzeichen-Konstruktion (Füllung Shade, Text
+  Papier) scheiterte auf der neuen Palette bei vier von sechs Pferden und musste sich umdrehen.
 
 - **2026-09-04 – Vollbild wird im Klick-Handler betreten, nicht beim Mount des Renn-Screens.**
   `requestFullscreen()` ist nur innerhalb einer Nutzergeste erlaubt; wenn der Screen montiert, ist

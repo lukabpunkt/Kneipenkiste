@@ -241,21 +241,25 @@ export function mount(container, store) {
     if (offerCarry) {
       body.replaceChildren(carryCard(state));
     } else if (player) {
+      // filter(Boolean), because replaceChildren turns anything that is not a Node into a text
+      // node — a bare null ends up on screen as the word "null".
       body.replaceChildren(
-        horseGrid(state, draft, pickHorse),
-        draft ? stakePanel(state) : el('p', { className: 'hint', text: 'Tipp auf ein Pferd.' }),
-        // A change can be called off; the round in progress cannot, there is nothing to go back to.
-        editing
-          ? button({
-              label: 'Abbrechen',
-              variant: 'ghost',
-              onClick: () => {
-                editing = null;
-                draft = null;
-                render();
-              },
-            })
-          : null,
+        ...[
+          horseGrid(state, draft, pickHorse),
+          draft ? stakePanel(state) : el('p', { className: 'hint', text: 'Tipp auf ein Pferd.' }),
+          // A change can be called off; the round in progress cannot, there is nothing to go back to.
+          editing
+            ? button({
+                label: 'Abbrechen',
+                variant: 'ghost',
+                onClick: () => {
+                  editing = null;
+                  draft = null;
+                  render();
+                },
+              })
+            : null,
+        ].filter(Boolean),
       );
     } else {
       body.replaceChildren(overview(state));

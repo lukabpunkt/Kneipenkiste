@@ -108,10 +108,22 @@ export function createRouter({ store, container, screens }) {
     view.className = previous ? 'screen screen--entering' : 'screen';
     view.dataset.screen = name;
 
+    // Which shape the app takes on a desktop: the race breaks out of the phone frame, everything
+    // else lives in it. Set before the screen is appended, so the race canvas measures the full
+    // box on its very first frame instead of the frame's 480px and then resizing.
+    if (name === 'race') setFrame('full');
+
     if (previous) {
       previous.classList.add('screen--leaving');
       if (transitionTimer !== null) clearTimeout(transitionTimer);
-      transitionTimer = setTimeout(() => previous.remove(), TRANSITION_MS);
+      transitionTimer = setTimeout(() => {
+        previous.remove();
+        // The other way round waits for the leaving screen to go: putting the frame back while
+        // the race is still fading out would squeeze it mid-transition.
+        if (name !== 'race') setFrame('phone');
+      }, TRANSITION_MS);
+    } else if (name !== 'race') {
+      setFrame('phone');
     }
 
     container.append(view);
@@ -123,6 +135,13 @@ export function createRouter({ store, container, screens }) {
       view.classList.remove('screen--entering');
     }
     container.scrollTop = 0;
+  }
+
+  /**
+   * @param {'phone' | 'full'} shape
+   */
+  function setFrame(shape) {
+    document.documentElement.dataset.frame = shape;
   }
 
   /**
@@ -180,6 +199,7 @@ export function createRouter({ store, container, screens }) {
       currentModule?.unmount();
       currentModule = null;
       currentName = null;
+      delete document.documentElement.dataset.frame;
     },
   };
 }

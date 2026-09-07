@@ -25,7 +25,6 @@
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--text-3xl);
-  font-weight: 600;
   color: var(--text);
   /* Fredoka's strokes are heavy enough to carry themselves; the old highlight now reads as a
      misregistered second copy. What is left is a soft warm drop so the word sits on the sky. */
@@ -35,7 +34,7 @@
 .start__tagline {
   max-width: none;
   margin: var(--space-2) 0 0;
-  color: var(--text-on-sky);
+  color: var(--text-subtle);
   font-size: var(--text-md);
 }
 
@@ -176,12 +175,12 @@
   padding-inline: var(--space-2);
   border-color: transparent;
   background: transparent;
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-weight: 800;
 }
 
 .player-row__name:focus {
-  background: var(--paper);
+  background: var(--surface-raised);
   border-color: var(--accent);
 }
 
@@ -206,10 +205,11 @@
   align-items: flex-start;
   gap: var(--space-2);
   padding: var(--space-4) var(--space-3);
-  border: 3px solid transparent;
+  /* Not transparent: a dark card on a dark page has no silhouette without it. */
+  border: 3px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
-  box-shadow: var(--elev-2);
+  box-shadow: var(--elev-2), var(--hairline);
   text-align: left;
   cursor: pointer;
   transition:
@@ -348,8 +348,14 @@
 .overview__pick {
   display: flex;
   flex: 1 1 100%;
+  /* A long player name plus a long horse name does not fit one line on a 320px phone. Rather
+     than squeezing the horse down to a three-pixel sliver, let it drop to a line of its own. */
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
+  /* The button is itself a flex item, and its automatic minimum is its own min-content — 295px
+     on a 320px phone. Releasing only the children does nothing until this is released too. */
+  min-width: 0;
   min-height: var(--tap-min);
   padding: var(--space-2);
   margin-inline: calc(var(--space-2) * -1);
@@ -441,16 +447,47 @@
   border-bottom: 0;
 }
 
+/*
+ * The row carries player, horse and an "ändern" chip on one line, which on a 320px phone is
+ * 21px more than there is. Both names give way before the layout does: a flex child will not
+ * shrink past its content without min-width: 0, so it is spelled out here.
+ */
 .overview__horse {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  min-width: 0;
+  /* When the line has to give, the horse gives all of it: it keeps its numbered badge either
+     way, whereas a player cut down to "An…" has lost the one thing that says whose row this is.
+     The name is capped at 14 characters, so even at 320px there is room for the whole of it. */
+  flex-shrink: 1;
   font-size: var(--text-xs);
   color: var(--text-muted);
 }
 
+.overview__horse-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Never abbreviate a person. */
+.overview__pick .player-chip {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.overview__detail {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
 .overview__sips {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
+  font-weight: 800;
 }
 
 /* --- Race placeholder ---------------------------------------------------- */
@@ -563,13 +600,13 @@
   width: 26px;
   height: 26px;
   border-radius: var(--radius-pill);
-  background: var(--horse-dark, var(--horse-color));
-  color: var(--paper);
-  font-family: var(--font-display);
-  font-weight: 600;
+  background: var(--horse-color);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-xs);
-  /* The signature colour as a ring, because white on it reaches only 2.2-4.2:1 (audit A4). */
-  box-shadow: 0 0 0 2px var(--horse-color);
+  /* Ink on the signature colour, not paper on its shade — see .horse-badge (audit A4). */
+  box-shadow: 0 2px 0 var(--horse-dark, transparent);
 }
 
 .ceremony__name--1 .ceremony__place {
@@ -579,8 +616,8 @@
 }
 
 .ceremony__horse {
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-xs);
   text-align: center;
   line-height: 1.2;
@@ -620,12 +657,12 @@
  * tint says which kind of line this is, and the icon disc says it again where the eye lands.
  */
 .payout--deal {
-  --payout-tone: var(--success-700);
+  --payout-tone: var(--success);
   background: var(--success-tint);
 }
 
 .payout--drink {
-  --payout-tone: var(--danger-700);
+  --payout-tone: var(--danger);
   background: var(--danger-tint);
 }
 
@@ -642,7 +679,7 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-pill);
-  background: var(--surface);
+  background: var(--surface-raised);
   color: var(--payout-tone, var(--text-muted));
   box-shadow: var(--elev-1);
 }
@@ -699,8 +736,9 @@
   width: 48px;
   height: 48px;
   border-radius: var(--radius-pill);
-  background: var(--tint-strong);
-  color: var(--accent-300);
+  /* The tints are translucent paper now, which is invisible on the one card that IS paper. */
+  background: var(--tint-on-inverse);
+  color: var(--accent-on-inverse);
 }
 
 .house__text {
@@ -749,8 +787,9 @@
   height: 26px;
   border-radius: var(--radius-pill);
   background: var(--accent);
-  color: var(--paper);
-  font-family: var(--font-display);
+  color: var(--on-accent);
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-xs);
 }
 
@@ -837,7 +876,6 @@
 
 .stat-tile__value {
   font-family: var(--font-display);
-  font-weight: 600;
   font-size: var(--text-lg);
   line-height: 1.1;
 }
@@ -887,8 +925,8 @@
 }
 
 .stats-table tbody td {
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-weight: 800;
 }
 
 /* The avatar used to sit flush against the name with no space at all. */
@@ -959,44 +997,12 @@
 
 /* --- Desktop ------------------------------------------------------------- */
 
-@media (min-width: 900px) {
-  .horse-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  /*
-   * On a wide screen the payouts stop being a long column nobody can take in at once. Two per
-   * row means a table of six sees its whole settlement without scrolling.
-   */
-  .payouts {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    align-items: start;
-  }
-
-  /* A button spanning the whole desktop width looks accidental rather than inviting. Not a
-     child selector: the start screen wraps its primary action so a second line can sit under it. */
-  .screen__footer .btn--wide {
-    display: flex;
-    max-width: 420px;
-    margin-inline: auto;
-  }
-
-  .start__title {
-    font-size: 72px;
-  }
-
-  .results__actions {
-    flex-direction: row-reverse;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .results__actions .btn--primary {
-    width: auto;
-    min-width: 260px;
-  }
-}
+/*
+ * There is no wide menu layout any more. Every screen except the race lives in a 480px phone
+ * frame on a desktop (see base.css), so the three-up horse grid, the two-column payouts, the
+ * 72px title and the centred action row that used to live here were all sized for a width the
+ * menus never see now. The race keeps its own wide handling in race.css.
+ */
 
 .betting__footer {
   display: flex;
@@ -1005,7 +1011,7 @@
 }
 
 .betting__footer-hint {
-  color: var(--text-on-sky);
+  color: var(--text-subtle);
   text-align: center;
 }
 
