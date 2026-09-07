@@ -50,8 +50,15 @@
     background-color var(--dur-fast) var(--ease-snappy);
 }
 
+/*
+ * A full-width button does not need the side padding a hugging one does, and on a 320px phone
+ * that padding is the difference between "Weiter zu den Wetten →" fitting and forcing the whole
+ * page 22px wider than the screen. The label may not wrap (see white-space above), so the room
+ * has to come from somewhere.
+ */
 .btn--wide {
   width: 100%;
+  padding-inline: var(--space-3);
 }
 
 /* Ink rather than paper on the accent: paper reaches only 1.64:1 on the amber and the primary
@@ -61,7 +68,9 @@
   min-height: var(--btn-primary-height);
   background: var(--accent);
   color: var(--on-accent);
-  font-size: var(--text-lg);
+  /* Fluid at the bottom end too: the longest label in the game is 257px at 22px, and a 320px
+     phone has 258px to give it. Below ~400px the primary drops to 20px and it fits. */
+  font-size: clamp(1.25rem, 5.5vw, var(--text-lg));
 }
 
 /*
