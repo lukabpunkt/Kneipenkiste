@@ -1,0 +1,322 @@
+{
+  "app": {
+    "title": "Customs",
+    "tagline": "Pack your case. Cross the border. Don't get caught."
+  },
+  "orientation": {
+    "headline": "Please hold upright",
+    "body": "Customs only inspects in portrait mode."
+  },
+  "common": {
+    "next": "Next",
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "sips_one": "sip",
+    "sips_other": "sips",
+    "tokens_one": "token",
+    "tokens_other": "tokens",
+    "items_one": "item",
+    "items_other": "items"
+  },
+  "title": {
+    "play": "Play",
+    "rules": "Rules",
+    "settings": "Settings"
+  },
+  "lobby": {
+    "headline": "Who's travelling?",
+    "cta": "Open the border",
+    "officerNext": "Officer round {round}: {name}",
+    "tooFewPlayers": "Two travellers and one officer — that's not customs, that's a coin toss. Get someone else.",
+    "addPlayer": "Add player",
+    "interrogationDuration": "Interrogation",
+    "packTimer": "Thinking time",
+    "officerNextLabel": "Officer round {round}:",
+    "changeColor": "Change {name}'s colour",
+    "playerName": "Name",
+    "removePlayer": "Remove {name}",
+    "timerOff": "off"
+  },
+  "modes": {
+    "bribery": {
+      "name": "Bribery",
+      "hint": "Travellers may openly offer the officer tokens."
+    },
+    "sniffer": {
+      "name": "Sniffer dog",
+      "hint": "Waldi gives one reliable hint — at the cost of one opening."
+    },
+    "diplomat": {
+      "name": "Diplomat",
+      "hint": "One traveller secretly has immunity."
+    },
+    "highSeason": {
+      "name": "High season",
+      "hint": "Up to {max} items and one more opening. Barely more gets through — but twice the drinking."
+    },
+    "openingsNow": "The officer opens {count}"
+  },
+  "officerIntro": {
+    "headline": "{name} is the customs officer.",
+    "body": "Everyone else packs.",
+    "tap": "Tap"
+  },
+  "pass": {
+    "headline": "Pass to {name}",
+    "body": "Only {name} may look now.",
+    "tap": "I am {name}"
+  },
+  "pack": {
+    "headline": "What are you packing?",
+    "clean": "Clean",
+    "cleanGoods": "Clean goods",
+    "contraband": "Contraband",
+    "close": "Close the case",
+    "risk": "Caught = {caught} sips · Through = hand out {tokens}",
+    "riskClean": "Clean. No risk, no loot.",
+    "immunity": "You have diplomatic immunity. They don't know.",
+    "timeout": "Time's up — your case stays clean.",
+    "decrease": "One item less",
+    "increase": "One item more",
+    "amountLabel": "{amount} items of contraband"
+  },
+  "packed": {
+    "headline": "All cases closed.",
+    "body": "Phone in the middle."
+  },
+  "hall": {
+    "interrogation": "Interrogation in progress.",
+    "endInterrogation": "End interrogation",
+    "replayHints": "Show again",
+    "hintsDone": "The officer is up.",
+    "bribeOffer": "Bribe",
+    "bribeAccept": "Accept",
+    "bribeDecline": "Decline",
+    "bribeAccepted": "Paid",
+    "bribeSpeech": "I'll give you {amount} to hand out if you don't open mine.",
+    "dogBark": "Waldi barks.",
+    "dogQuiet": "Waldi moves on.",
+    "officerNote": "Officer",
+    "hintsRunning": "The luggage rolls in …",
+    "stageDescription": "Customs hall with {count} cases on the belt.",
+    "stageFailed": "The hall could not be loaded."
+  },
+  "hints": {
+    "wobble": "wobbled",
+    "drip": "drips",
+    "heavy": "is heavy",
+    "click": "ticks",
+    "feather": "sheds feathers",
+    "dog": "was sniffed"
+  },
+  "questions": [
+    "Anything to declare?",
+    "What's that ticking in your case?",
+    "Why are you sweating?",
+    "Who at this table is definitely smuggling?",
+    "Describe the contents. Slowly.",
+    "Where are you travelling and why are you lying?"
+  ],
+  "inspect": {
+    "headline": "Inspection",
+    "openings": "Openings: {left}",
+    "waveAll": "Wave everyone through",
+    "next": "Next",
+    "scanning": "Scanning …",
+    "bannerCaught": "{name} BUSTED · drinks {sips}",
+    "bannerClean": "HARASSMENT · {officer} drinks {sips}",
+    "bannerDiplomat": "DIPLOMAT · {officer} drinks {sips}",
+    "pickSuitcase": "Which case?",
+    "revealClean": "Socks, a toothbrush, a teddy.",
+    "revealDiplomat": "A diplomatic passport.",
+    "snifferNote": "Waldi costs one"
+  },
+  "gate": {
+    "headline": "Gate",
+    "next": "NEXT: {name}",
+    "stampOk": "OK",
+    "stampBusted": "BUSTED",
+    "stampHarassment": "HARASSMENT",
+    "bannerThrough": "{name} GOT THROUGH · hands out {tokens}",
+    "bannerOk": "{name} passes.",
+    "stampThrough": "Got through"
+  },
+  "distribute": {
+    "headline": "{name} hands out {tokens}",
+    "hint": "Tap = +1, long press = −1. Not to yourself.",
+    "done": "Done",
+    "giveTo": "{name}: {sips}"
+  },
+  "result": {
+    "banner": {
+      "officerOfTheMonth": "Officer of the month",
+      "gotThrough": "{name} got through",
+      "smugglerParadise": "Smuggler's paradise",
+      "harassment": "Harassment!",
+      "honestRound": "An honest round"
+    },
+    "bonus": {
+      "allCaught": "Caught them all: +{tokens}",
+      "goodInstinct": "Good instinct: +{tokens}"
+    },
+    "suitcases": "All cases",
+    "opened": "Opened",
+    "passed": "Through",
+    "hintResolution": "Hints",
+    "hintTrue": "was true",
+    "hintFalse": "lied",
+    "hintTrueLine": "{hint}: {amount} — good nose.",
+    "hintFalseLine": "{hint} was clean. Fell for it.",
+    "stats": "Statistics",
+    "statSmuggled": "Smuggled across",
+    "statCaught": "Caught",
+    "statHitRate": "Hit rate as officer",
+    "statHarassed": "Innocents harassed",
+    "boldestSmuggler": "Boldest smuggler",
+    "bestNose": "Best nose",
+    "nextRound": "Next round",
+    "changePlayers": "Change players",
+    "changeMode": "Change mode",
+    "reason": {
+      "caught": "busted · drinks {sips}",
+      "harassment": "harassment · drinks {sips}",
+      "diplomat": "diplomat · drinks {sips}"
+    },
+    "share": "Share",
+    "shareThrough": "{name} smuggled {amount} across the border 🛃",
+    "shareCaught": "{officer} busted {name} with {amount} 🛃",
+    "shareHonest": "Nobody got past {officer} — then again, nobody was carrying 🛃"
+  },
+  "rules": {
+    "headline": "Rules",
+    "lead": "Everyone is a traveller with a suitcase — except one. That one is the customs officer and wants to know what is in those cases. You play with a single phone that gets passed around.",
+    "sections": {
+      "roles": {
+        "title": "Who is who",
+        "body": "Each round exactly one person is the customs officer, taking turns. Everyone else travels and has a suitcase in their colour.",
+        "points": [
+          "The officer is the only one who taps. Their buttons carry their colour.",
+          "The travellers talk — you answer out loud, not on the phone.",
+          "After the round the officer changes."
+        ]
+      },
+      "pack": {
+        "title": "1. Packing",
+        "body": "The phone goes around. Each traveller sees their case alone and packs {min} to {max} items of contraband. Nobody else sees the number — until the end of the round.",
+        "points": [
+          "{min} is clean: no risk, no loot. That is a real choice, not a fallback.",
+          "The more is in there, the more there is to hand out — and the more a bust costs.",
+          "What you pack is always silly: rubber ducks, cheese, garden gnomes."
+        ]
+      },
+      "hints": {
+        "title": "2. The hints",
+        "body": "Once everyone has packed, the cases roll across the belt. The officer gets {hints} small observations: a case ticks, drips, wobbles, is heavy, springs back. Everyone sees them.",
+        "points": [
+          "A hint is only mostly right. Roughly {truth} in 10 point at a case that really holds something — the rest point at a clean one.",
+          "A hint never says how much is inside. A ticking case may hold one item or six. Or nothing.",
+          "So a case without a hint is not a clean case. It is only one nobody said anything about.",
+          "How many hints there are depends on the number of players: {min_hints} to {max_hints}."
+        ]
+      },
+      "interrogation": {
+        "title": "3. The interrogation",
+        "body": "For {seconds} seconds the officer may ask anything, and everyone has to answer. This is the heart of the game — this is where people lie, sweat and overdo it.",
+        "points": [
+          "The phone lies in the middle. It only shows the time and a question prompt when the officer runs dry.",
+          "Lying is allowed. Including for those carrying nothing.",
+          "The officer may end the interrogation at any time."
+        ]
+      },
+      "inspect": {
+        "title": "4. The inspection",
+        "body": "Now the officer opens cases in the scanner — but only a limited number. With {min_players} players it is one, with six it is two, above that three.",
+        "points": [
+          "They tap a case, the image builds up line by line and stalls halfway. Before that nothing is readable — that is on purpose.",
+          "Busted: the traveller drinks {caught} sips per item found.",
+          "Clean case opened: the officer drinks {harassment} sips. Searching without cause has a price.",
+          "An opened case is done. The others stay shut."
+        ]
+      },
+      "gate": {
+        "title": "5. The border",
+        "body": "Every case that was not opened crosses the border. Only here does the table see what made it through.",
+        "points": [
+          "Whoever gets contraband through hands out one sip per item — to whoever they like.",
+          "Whoever was clean and never opened has won nothing and lost nothing.",
+          "If not a single item made it through, the officer gets {bonus_all} sips to hand out.",
+          "If they opened only smugglers and no innocent, there is {bonus_instinct} extra sip for good instinct."
+        ]
+      },
+      "modes": {
+        "title": "Extra modes",
+        "body": "Four switches in the lobby. They are independent and combine freely.",
+        "points": [
+          "Bribery: travellers may openly offer the officer {min_bribe} to {max_bribe} sips. If they accept, the case stays shut — and everyone saw who paid.",
+          "Sniffer dog: Waldi sniffs one case. His hint is always right — in exchange the officer opens one case fewer.",
+          "Diplomat: one traveller has secret immunity. If their case is opened, nothing happens to them and the officer drinks {diplomat} sips.",
+          "High season: Up to {max_high} items and one more opening. But barely more gets through than usual: what the mode really doubles is what gets caught — and with it the drinking."
+        ]
+      },
+      "end": {
+        "title": "End of the round",
+        "body": "At the end everything is public: every amount, every hint with the truth behind it, and who the diplomat was. Then the next person is the officer.",
+        "points": [
+          "There are no points and no end of game. You stop when you want to stop.",
+          "Drinking is always voluntary — water counts."
+        ]
+      }
+    }
+  },
+  "settings": {
+    "headline": "Settings",
+    "sound": "Sound",
+    "music": "Music",
+    "haptics": "Haptics",
+    "lowEffects": "Fewer effects",
+    "language": "Language"
+  },
+  "onboarding": {
+    "pack": "0 = clean and safe. More = more risk, more loot.",
+    "hall": "Hints are only mostly right."
+  },
+  "backDialog": {
+    "headline": "Abandon the round?",
+    "body": "The cases will not be inspected.",
+    "confirm": "Abandon",
+    "dismiss": "Keep playing"
+  },
+  "items": {
+    "ducks": "{count} rubber ducks",
+    "cheese": "{count} wheels of cheese",
+    "gnomes": "{count} garden gnomes",
+    "flamingos": "{count} flamingos",
+    "pineapples": "{count} pineapples",
+    "sombreros": "{count} sombreros",
+    "cuckoo": "{count} cuckoo clocks",
+    "cacti": "{count} cacti"
+  },
+  "hintSubject": {
+    "wobble": "The wobbling case",
+    "drip": "The dripping case",
+    "heavy": "The heavy case",
+    "click": "The ticking case",
+    "feather": "The case with the feather",
+    "dog": "The sniffed case"
+  },
+  "fatal": {
+    "headline": "Customs is closed",
+    "body": "The game could not start. Trying again resets the saved session.",
+    "retry": "Try again"
+  },
+  "hintsShort": {
+    "wobble": "wobbles",
+    "drip": "drips",
+    "heavy": "heavy",
+    "click": "ticks",
+    "feather": "feather",
+    "dog": "Waldi"
+  }
+}

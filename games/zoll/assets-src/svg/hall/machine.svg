@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Das Roentgengeraet: Stahlkasten mit Tunnel und Warnstreifen. Der Koffer faehrt hindurch. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 220" width="260" height="220">
+  <rect x="10" y="10" width="240" height="200" rx="18" fill="#8C93A8" stroke="#1A1024" stroke-width="10"/>
+  <rect x="10" y="10" width="240" height="18" fill="#FFB800"/>
+  <path d="M10 10 l18 18 M46 10 l18 18 M82 10 l18 18 M118 10 l18 18 M154 10 l18 18 M190 10 l18 18 M226 10 l18 18"
+        stroke="#1A1024" stroke-width="9"/>
+  <rect x="46" y="96" width="168" height="104" rx="10" fill="#1A1024"/>
+  <rect x="58" y="106" width="144" height="94" fill="#0B2233"/>
+  <g fill="#4A506A">
+    <rect x="30" y="60" width="200" height="12" rx="6"/>
+  </g>
+  <g stroke="#1A1024" stroke-width="6" fill="#4A506A">
+    <rect x="52" y="86" width="20" height="14" rx="4"/>
+    <rect x="188" y="86" width="20" height="14" rx="4"/>
+  </g>
+</svg>

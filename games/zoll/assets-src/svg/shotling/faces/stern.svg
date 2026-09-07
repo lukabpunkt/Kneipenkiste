@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gesicht "stern" — dienstlich. Gerade Brauen, gerader Mund. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <ellipse cx="27" cy="28" rx="13" ry="14" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <ellipse cx="69" cy="28" rx="13" ry="14" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <circle cx="29" cy="30" r="6" fill="#1A1024"/>
+  <circle cx="67" cy="30" r="6" fill="#1A1024"/>
+  <path d="M14 12 L40 14 M82 12 L56 14" stroke="#1A1024" stroke-width="6" stroke-linecap="round"/>
+  <path d="M38 52 H58" stroke="#1A1024" stroke-width="5" stroke-linecap="round"/>
+</svg>

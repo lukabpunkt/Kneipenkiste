@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Der aufgeklappte Deckel. Dreht um die untere Kante, wenn der Koffer aufspringt. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 72" width="160" height="72">
+  <path d="M10 68 L10 24 A16 16 0 0 1 26 8 L134 8 A16 16 0 0 1 150 24 L150 68 Z"
+        fill="#FFFFFF" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+  <rect x="20" y="18" width="120" height="42" rx="8" fill="#D2D2D2"/>
+</svg>

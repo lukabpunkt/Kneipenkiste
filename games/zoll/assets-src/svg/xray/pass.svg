@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Diplomatenpass mit Stern. Der Alarm setzt an und bricht ab. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 88" width="64" height="88">
+  <rect x="6" y="6" width="52" height="76" rx="7" fill="#3DF5C6"/>
+  <path d="M32 24 L37 38 L52 39 L40 48 L44 62 L32 54 L20 62 L24 48 L12 39 L27 38 Z" fill="#0B2233"/>
+</svg>

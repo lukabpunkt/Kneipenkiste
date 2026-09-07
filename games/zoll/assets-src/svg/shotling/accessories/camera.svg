@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kamera am Hals — haengt am Riemen vor dem Torso. Jeder Tourist hat eine. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 56" width="72" height="56">
+  <path d="M10 14 L36 4 L62 14" fill="none" stroke="#1A1024" stroke-width="5" stroke-linecap="round"/>
+  <rect x="8" y="14" width="56" height="34" rx="7" fill="#4A506A" stroke="#1A1024" stroke-width="6"/>
+  <rect x="22" y="8" width="16" height="8" rx="3" fill="#4A506A" stroke="#1A1024" stroke-width="5"/>
+  <circle cx="36" cy="31" r="12" fill="#8FD3FF" stroke="#1A1024" stroke-width="6"/>
+  <circle cx="32" cy="27" r="4" fill="#FFF8E7" opacity="0.9"/>
+  <circle cx="55" cy="22" r="3" fill="#FF2D55"/>
+</svg>

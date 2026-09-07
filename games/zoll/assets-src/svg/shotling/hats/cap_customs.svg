@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Schirmmuetze des Beamten. Die Muetze wird in Spielerfarbe getintet (weiss), der Schirm bleibt ink. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 72" width="128" height="72">
+  <g id="hat-base" transform="translate(0 10)">
+    <path d="M26 40 C26 16 42 6 64 6 C86 6 102 16 102 40 Z" fill="#FFFFFF" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+    <rect x="24" y="34" width="80" height="10" rx="4" fill="#1A1024"/>
+    <path d="M18 44 C6 44 2 50 4 54 L118 54 C122 50 118 44 106 44 Z" fill="#1A1024"/>
+    <rect x="56" y="14" width="16" height="12" rx="3" fill="#FFB800" stroke="#1A1024" stroke-width="5"/>
+  </g>
+</svg>

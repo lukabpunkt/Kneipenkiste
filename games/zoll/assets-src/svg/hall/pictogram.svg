@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Flughafen-Piktogramm an der Wand: Koffer mit Pfeil. Reine Deko. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="88" height="88">
+  <rect x="6" y="6" width="76" height="76" rx="10" fill="#4A506A"/>
+  <rect x="22" y="34" width="44" height="32" rx="6" fill="#FFF8E7"/>
+  <path d="M36 34 V26 A8 8 0 0 1 52 26 V34" fill="none" stroke="#FFF8E7" stroke-width="5"/>
+  <path d="M44 12 V22 M38 18 L44 24 L50 18" stroke="#FFB800" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

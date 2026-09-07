@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Teddy. Das peinliche Item aus `clean_teddy` — das Publikum macht "Aww". -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 80" width="72" height="80">
+  <circle cx="16" cy="18" r="10" fill="#A0682E" stroke="#1A1024" stroke-width="6"/>
+  <circle cx="56" cy="18" r="10" fill="#A0682E" stroke="#1A1024" stroke-width="6"/>
+  <circle cx="36" cy="26" r="20" fill="#C08447" stroke="#1A1024" stroke-width="6"/>
+  <ellipse cx="36" cy="58" rx="22" ry="18" fill="#C08447" stroke="#1A1024" stroke-width="6"/>
+  <circle cx="29" cy="23" r="3" fill="#1A1024"/>
+  <circle cx="43" cy="23" r="3" fill="#1A1024"/>
+  <ellipse cx="36" cy="32" rx="6" ry="4" fill="#1A1024"/>
+</svg>

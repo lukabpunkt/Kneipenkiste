@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ein Buch. Reiselektuere, nichts weiter. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 72" width="56" height="72">
+  <rect x="6" y="6" width="44" height="60" rx="5" fill="#AF73EE" stroke="#1A1024" stroke-width="6"/>
+  <path d="M14 6 V66" stroke="#7B3FBF" stroke-width="6"/>
+  <path d="M24 22 H42 M24 34 H42 M24 46 H36" stroke="#FFF8E7" stroke-width="4" stroke-linecap="round"/>
+</svg>

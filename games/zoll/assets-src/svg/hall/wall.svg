@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hallenwand: helles Panel mit Fugen. Die Halle ist die einzige helle Buehne der Familie. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <rect width="400" height="200" fill="#EEF0F4"/>
+  <path d="M0 60 H400 M0 130 H400" stroke="#DDE1E8" stroke-width="4"/>
+  <path d="M100 0 V200 M200 0 V200 M300 0 V200" stroke="#DDE1E8" stroke-width="3"/>
+</svg>

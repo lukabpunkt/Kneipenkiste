@@ -1,0 +1,351 @@
+{
+  "frames": {
+    "cuckoo": {
+      "frame": {
+        "x": 3,
+        "y": 3,
+        "w": 64,
+        "h": 92
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 4,
+        "w": 64,
+        "h": 92
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "flamingos": {
+      "frame": {
+        "x": 3,
+        "y": 101,
+        "w": 56,
+        "h": 91
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 3,
+        "w": 56,
+        "h": 91
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "pineapples": {
+      "frame": {
+        "x": 3,
+        "y": 198,
+        "w": 52,
+        "h": 90
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 2,
+        "w": 52,
+        "h": 90
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "gnomes": {
+      "frame": {
+        "x": 3,
+        "y": 294,
+        "w": 44,
+        "h": 80
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 10,
+        "y": 4,
+        "w": 44,
+        "h": 80
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "pass": {
+      "frame": {
+        "x": 3,
+        "y": 380,
+        "w": 52,
+        "h": 76
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 6,
+        "w": 52,
+        "h": 76
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "cacti": {
+      "frame": {
+        "x": 53,
+        "y": 294,
+        "w": 72,
+        "h": 74
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 18,
+        "w": 72,
+        "h": 74
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "teddy": {
+      "frame": {
+        "x": 61,
+        "y": 198,
+        "w": 60,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 6,
+        "w": 60,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 80
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "duck_bow": {
+      "frame": {
+        "x": 127,
+        "y": 198,
+        "w": 73,
+        "h": 63
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 12,
+        "w": 73,
+        "h": 63
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 80
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "toothbrush": {
+      "frame": {
+        "x": 127,
+        "y": 267,
+        "w": 72,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 4,
+        "w": 72,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 24
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "ducks": {
+      "frame": {
+        "x": 65,
+        "y": 101,
+        "w": 73,
+        "h": 61
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 8,
+        "w": 73,
+        "h": 61
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 72
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "sombreros": {
+      "frame": {
+        "x": 144,
+        "y": 101,
+        "w": 88,
+        "h": 54
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 6,
+        "w": 88,
+        "h": 54
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "mug": {
+      "frame": {
+        "x": 73,
+        "y": 3,
+        "w": 55,
+        "h": 46
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 10,
+        "w": 55,
+        "h": 46
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "cheese": {
+      "frame": {
+        "x": 73,
+        "y": 55,
+        "w": 64,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 12,
+        "w": 64,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "socks": {
+      "frame": {
+        "x": 134,
+        "y": 3,
+        "w": 44,
+        "h": 46
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 14,
+        "y": 6,
+        "w": 44,
+        "h": 46
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 56
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "app": "http://github.com/odrick/free-tex-packer-core",
+    "version": "0.3.9",
+    "image": "xray@1x.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 256,
+      "h": 512
+    },
+    "scale": 1
+  }
+}

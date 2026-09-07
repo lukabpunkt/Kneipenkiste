@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gummiente. Der Klassiker unter der Schmuggelware. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 72" width="80" height="72">
+  <ellipse cx="40" cy="52" rx="34" ry="17" fill="#FFD32A" stroke="#1A1024" stroke-width="6"/>
+  <circle cx="54" cy="26" r="18" fill="#FFD32A" stroke="#1A1024" stroke-width="6"/>
+  <path d="M70 26 L79 30 L70 34 Z" fill="#FF7F50" stroke="#1A1024" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="57" cy="21" r="3.5" fill="#1A1024"/>
+  <path d="M14 48 Q24 42 32 50" fill="none" stroke="#D4A800" stroke-width="5" stroke-linecap="round"/>
+</svg>

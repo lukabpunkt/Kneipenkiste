@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Schlappohr. Schwingt beim Laufen nach (Follow-Through). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 56" width="32" height="56">
+  <path d="M16 6 C28 6 30 22 28 36 C26 48 18 52 12 50 C4 46 2 30 4 18 C6 8 10 6 16 6 Z"
+        fill="#7A4E20" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+</svg>

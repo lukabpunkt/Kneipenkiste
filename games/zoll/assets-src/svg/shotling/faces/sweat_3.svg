@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gesicht "sweat_3" — Panik. Drei Tropfen, zitternder Mund. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <ellipse cx="27" cy="26" rx="14" ry="16" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <ellipse cx="69" cy="26" rx="14" ry="16" fill="#FFFFFF" stroke="#1A1024" stroke-width="5"/>
+  <circle cx="27" cy="27" r="5" fill="#1A1024"/>
+  <circle cx="69" cy="27" r="5" fill="#1A1024"/>
+  <path d="M36 52 l5 -5 l5 5 l5 -5 l5 5" stroke="#1A1024" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M88 8 C88 8 94 17 94 21 A6 6 0 0 1 82 21 C82 17 88 8 88 8 Z" fill="#8FD3FF" stroke="#1A1024" stroke-width="4"/>
+  <path d="M8 14 C8 14 14 22 14 26 A6 6 0 0 1 2 26 C2 22 8 14 8 14 Z" fill="#8FD3FF" stroke="#1A1024" stroke-width="4"/>
+  <path d="M48 2 C48 2 53 9 53 13 A5 5 0 0 1 43 13 C43 9 48 2 48 2 Z" fill="#8FD3FF" stroke="#1A1024" stroke-width="4"/>
+</svg>

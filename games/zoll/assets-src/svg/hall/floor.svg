@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Linoleumboden mit Fliesenfugen. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <rect width="400" height="200" fill="#D8D3C6"/>
+  <path d="M0 50 H400 M0 100 H400 M0 150 H400" stroke="#C4BFB0" stroke-width="3"/>
+  <path d="M50 0 V200 M150 0 V200 M250 0 V200 M350 0 V200" stroke="#C4BFB0" stroke-width="3"/>
+</svg>

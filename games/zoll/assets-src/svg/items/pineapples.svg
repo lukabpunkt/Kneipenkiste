@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ananas. Krone oben, Rautenmuster, freundliches Gesicht. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 96" width="64" height="96">
+  <path d="M32 4 L20 26 M32 4 L44 26 M32 4 L32 28" stroke="#2ED573" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="32" cy="60" rx="26" ry="32" fill="#FFD32A" stroke="#1A1024" stroke-width="6"/>
+  <path d="M12 44 L52 76 M12 60 L52 92 M12 76 L36 92 M52 44 L12 76 M52 60 L28 92" stroke="#D4A800" stroke-width="3"/>
+  <circle cx="24" cy="56" r="3.5" fill="#1A1024"/>
+  <circle cx="40" cy="56" r="3.5" fill="#1A1024"/>
+  <path d="M24 70 Q32 78 40 70" fill="none" stroke="#1A1024" stroke-width="4" stroke-linecap="round"/>
+</svg>
