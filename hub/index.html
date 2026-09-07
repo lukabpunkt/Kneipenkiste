@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0F0E1A" />
+    <meta
+      name="description"
+      content="Kneipenkiste — Pass-the-Phone-Spiele für den Küchentisch. Ein Handy, ein Tisch, deine Freunde. Kein Download, kein Konto, kein Server."
+    />
+    <title>Kneipenkiste</title>
+
+    <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
+    <link rel="preload" href="./fonts/luckiest-guy-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./fonts/nunito-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./hub.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <p class="eyebrow">Pass-the-Phone-Spiele für den Küchentisch</p>
+      <h1 class="wordmark">Kneipen<span>kiste</span></h1>
+      <p class="claim" id="claim">Handy in die Mitte. Los.</p>
+    </header>
+
+    <main>
+      <h2 class="visually-hidden">Spiele</h2>
+      <ul class="games" id="games" aria-busy="true">
+        <!-- Karten kommen aus games.json (hub.js). Ohne JS bleibt dieser Fallback: -->
+        <noscript>
+          <li><a class="card" href="./drinkshot/">Drinkshot</a></li>
+          <li><a class="card" href="./sprengmeister/">Sprengmeister</a></li>
+          <li><a class="card" href="./pferderennen/">Pferderennen</a></li>
+          <li><a class="card" href="./tresor/">Der Tresor</a></li>
+          <li><a class="card" href="./zoll/">Der Zoll</a></li>
+        </noscript>
+      </ul>
+    </main>
+
+    <footer class="colophon">
+      <p>
+        Kein Download, kein Konto, kein Server. Jedes Spiel läuft nach dem ersten Laden offline und lässt
+        sich über „Zum Home-Bildschirm“ wie eine App installieren.
+      </p>
+      <p class="fine">
+        <span class="pill">Beta</span> Weitere Spiele kommen dazu. Bitte verantwortungsvoll trinken — und
+        nur, wer volljährig ist.
+      </p>
+    </footer>
+
+    <script type="module" src="./hub.js"></script>
+  </body>
+</html>

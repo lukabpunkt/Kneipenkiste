@@ -1,0 +1,11 @@
+# Abhängigkeiten (ein Root-node_modules für alle Workspaces)
+node_modules/
+
+# Zusammengesetzte Seite — entsteht bei jedem `npm run build:site`
+site/
+
+# macOS
+.DS_Store
+
+# Lokale Claude-Sitzungsdaten
+.claude/

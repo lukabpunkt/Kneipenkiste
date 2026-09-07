@@ -1,0 +1,199 @@
+name: CI
+
+# Ein Repo, fünf Spiele: Die teuren Läufe (E2E, Fairness-Audit) fahren nur für
+# Spiele, die sich geändert haben. Der Gesamt-Build läuft immer — er beweist,
+# dass die Seite zusammenbaut.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Was hat sich geändert?
+    runs-on: ubuntu-latest
+    outputs:
+      games: ${{ steps.filter.outputs.changes }}
+      root: ${{ steps.filter.outputs.root }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            root:
+              - 'package.json'
+              - 'package-lock.json'
+              - 'scripts/**'
+              - 'hub/**'
+              - '.github/workflows/**'
+            drinkshot:
+              - 'games/drinkshot/**'
+            sprengmeister:
+              - 'games/sprengmeister/**'
+            pferderennen:
+              - 'games/pferderennen/**'
+            tresor:
+              - 'games/tresor/**'
+            zoll:
+              - 'games/zoll/**'
+
+  site:
+    name: Gesamt-Build (site/)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build:site
+      - name: Struktur prüfen
+        run: |
+          for g in drinkshot sprengmeister pferderennen tresor zoll; do
+            test -f "site/$g/index.html" || { echo "::error::site/$g/index.html fehlt"; exit 1; }
+          done
+          test -f site/index.html && test -f site/games.json && test -f site/.nojekyll
+          echo "✓ Launcher + 5 Spiele in site/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site/
+          retention-days: 3
+
+  quality:
+    name: Qualität · ${{ matrix.game }}
+    needs: changes
+    # Leere Matrix wäre ein Fehler: nur laufen, wenn mindestens ein Spiel dabei ist.
+    if: needs.changes.outputs.games != '[]' && needs.changes.outputs.games != '' && needs.changes.outputs.games != '["root"]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        game: ${{ fromJSON(needs.changes.outputs.games) }}
+        exclude:
+          - game: root
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      # Die Vite-Spiele bündeln Typecheck, Lint und Unit-Tests in `npm test`;
+      # Pferderennen hat nur Vitest darin und bekommt Lint separat.
+      - name: Typecheck · Lint · Unit
+        run: npm run test -w games/${{ matrix.game }}
+
+      - name: Lint (Pferderennen)
+        if: matrix.game == 'pferderennen'
+        run: npm run lint -w games/pferderennen
+
+      - name: Kontrast (Audit A5)
+        if: matrix.game == 'drinkshot' || matrix.game == 'tresor' || matrix.game == 'zoll'
+        run: npm run check:contrast -w games/${{ matrix.game }}
+
+      - name: Farb-Audit (Tresor, Audit A2)
+        if: matrix.game == 'tresor'
+        run: npm run check:colors -w games/tresor
+
+      - name: Kein Math.random im Regelkern
+        if: matrix.game != 'pferderennen'
+        run: |
+          if grep -rn 'Math\.random' games/${{ matrix.game }}/src/core --include='*.ts' \
+             | grep -vE ':[0-9]+:[[:space:]]*(\*|//|/\*)'; then
+            echo "::error::Math.random in src/core/ — nutze core/rng.ts."
+            exit 1
+          fi
+          echo "✓ Regelkern würfelt über crypto"
+
+      - name: Precache-Liste aktuell (Pferderennen)
+        if: matrix.game == 'pferderennen'
+        run: |
+          npm run sw -w games/pferderennen
+          git diff --exit-code games/pferderennen/sw.js
+
+      - name: Build (mit Spiel-eigenem Base-Pfad)
+        run: npm run build -w games/${{ matrix.game }}
+        if: matrix.game != 'pferderennen'
+
+      - name: Bundle-Budget (gzip ≤ 450 KB JS)
+        if: matrix.game != 'pferderennen'
+        run: |
+          cd games/${{ matrix.game }}
+          total=0
+          for file in dist/assets/*.js dist/*.js; do
+            [ -f "$file" ] || continue
+            total=$((total + $(gzip -c "$file" | wc -c)))
+          done
+          limit=$((450 * 1024))
+          echo "JS gzip: $((total / 1024)) KB (Grenze $((limit / 1024)) KB)"
+          [ "$total" -le "$limit" ] || { echo "::error::JS-Bundle über Budget."; exit 1; }
+
+      - name: Kein Test-Seed im Build (Sprengmeister, ADR-11)
+        if: matrix.game == 'sprengmeister'
+        run: |
+          if grep -rlE "(get|has)\([\"']seed[\"']\)" games/sprengmeister/dist/assets/*.js; then
+            echo "::error::Der ?seed=-Hook ist im Produktions-Build gelandet."
+            exit 1
+          fi
+
+  fairness:
+    name: Fairness-Audit (Pferderennen, 220k Rennen)
+    needs: changes
+    if: contains(fromJSON(needs.changes.outputs.games), 'pferderennen')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run audit:fairness -w games/pferderennen -- --n=100000 --sub=30000 --verify-partition
+
+  e2e:
+    name: E2E · ${{ matrix.game }}
+    needs: changes
+    if: needs.changes.outputs.games != '[]' && needs.changes.outputs.games != '' && needs.changes.outputs.games != '["root"]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        game: ${{ fromJSON(needs.changes.outputs.games) }}
+        exclude:
+          - game: root
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Playwright-Browser (iPhone 12 = WebKit, Pixel 5 = Chromium)
+        run: npx playwright install --with-deps chromium webkit
+      - name: E2E
+        # Läuft im Spielordner mit dessen eigener Playwright-Config, eigenem
+        # Preview-Port und eigenem Default-Base-Pfad — genau wie vor dem Umzug.
+        run: |
+          if [ "${{ matrix.game }}" = "pferderennen" ]; then
+            npm run e2e -w games/pferderennen
+          else
+            npm run test:e2e -w games/${{ matrix.game }}
+          fi
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.game }}
+          path: |
+            games/${{ matrix.game }}/playwright-report/
+            games/${{ matrix.game }}/test-results/
+          retention-days: 7

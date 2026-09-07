@@ -1,0 +1,56 @@
+{
+  "title": "Kneipenkiste",
+  "claim": "Handy in die Mitte. Los.",
+  "games": [
+    {
+      "id": "drinkshot",
+      "title": "Drinkshot",
+      "tagline": "Setzen, zittern, trinken. Ein Scharfschütze, kleine Männchen — wer viel setzt, wird eher getroffen.",
+      "players": "2–8",
+      "path": "./drinkshot/",
+      "icon": "./drinkshot/icons/icon-192.png",
+      "accent": "#FFB800",
+      "status": "beta"
+    },
+    {
+      "id": "sprengmeister",
+      "title": "Sprengmeister",
+      "tagline": "Schatzsuche auf einem Feld voller Minen, die deine Freunde heimlich gelegt haben.",
+      "players": "3–8",
+      "path": "./sprengmeister/",
+      "icon": "./sprengmeister/icons/icon-192.png",
+      "accent": "#7ED957",
+      "status": "beta"
+    },
+    {
+      "id": "pferderennen",
+      "title": "Pferderennen",
+      "tagline": "Sechs Cartoon-Pferde, eine Bahn voller Blödsinn, und alle setzen aufs falsche Pferd.",
+      "players": "2–∞",
+      "path": "./pferderennen/",
+      "icon": "./pferderennen/assets/icons/icon-192.png",
+      "accent": "#FF6B36",
+      "status": "beta"
+    },
+    {
+      "id": "tresor",
+      "title": "Der Tresor",
+      "tagline": "30 Sekunden verhandeln, dann geheim entscheiden: Teilen oder Stehlen — aber nur einmal.",
+      "players": "3–8",
+      "path": "./tresor/",
+      "icon": "./tresor/icons/icon-192.png",
+      "accent": "#FFC93C",
+      "status": "beta"
+    },
+    {
+      "id": "zoll",
+      "title": "Der Zoll",
+      "tagline": "Koffer packen, Grenze passieren, nicht auffliegen. Der Beamte verhört — und öffnet zwei Koffer.",
+      "players": "4–8",
+      "path": "./zoll/",
+      "icon": "./zoll/icons/icon-192.png",
+      "accent": "#8C93A8",
+      "status": "beta"
+    }
+  ]
+}

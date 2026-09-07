@@ -1,0 +1,25 @@
+{
+  "name": "kneipenkiste",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Kneipenkiste — Pass-the-Phone-Spiele für den Küchentisch. Ein Repo, eine Seite, alle Spiele.",
+  "author": "Luka Bloemendal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lukabpunkt/Kneipenkiste.git"
+  },
+  "workspaces": [
+    "games/*"
+  ],
+  "scripts": {
+    "build:site": "node scripts/build-site.mjs",
+    "preview:site": "node scripts/preview-site.mjs",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write \"hub/**/*.{html,css,js,json}\" \"scripts/**/*.mjs\" \"*.{json,md}\""
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

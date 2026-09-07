@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Nicht gefunden · Kneipenkiste</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        background: #0f0e1a;
+        color: #fff8e7;
+        font-family: 'Nunito', system-ui, sans-serif;
+        text-align: center;
+        padding: 24px;
+      }
+      h1 {
+        font-size: 28px;
+        margin: 0 0 8px;
+      }
+      p {
+        color: #c9c5da;
+        margin: 0 0 20px;
+      }
+      a {
+        color: #ffb800;
+        font-weight: 800;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1>Hier steht kein Spiel.</h1>
+      <p>Die Seite gibt es nicht (mehr). Zurück zur Kiste:</p>
+      <a id="home" href="/">Kneipenkiste öffnen →</a>
+    </div>
+    <script>
+      // Von /Kneipenkiste/irgendwas/ zurück auf /Kneipenkiste/ — funktioniert auch
+      // unter einer eigenen Domain, weil der erste Pfadteil dann einfach leer ist.
+      const first = location.pathname.split('/')[1];
+      const home = first && first.toLowerCase() === 'kneipenkiste' ? `/${first}/` : '/';
+      document.getElementById('home').href = home;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+name: Deploy zu GitHub Pages
+
+# Live unter https://lukabpunkt.github.io/Kneipenkiste/
+# Läuft erst, wenn CI auf main grün war — ein roter Stand geht nie live.
+# Für die spätere eigene Domain: Repository-Variable SITE_BASE auf "/" setzen
+# und hub/CNAME anlegen; sonst ändert sich nichts.
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Gesamt-Build
+        run: npm run build:site
+        env:
+          SITE_BASE: ${{ vars.SITE_BASE || '/Kneipenkiste/' }}
+      # Pages muss einmalig auf "GitHub Actions" stehen (Settings → Pages → Source),
+      # der Workflow-Token darf das nicht selbst aktivieren.
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
