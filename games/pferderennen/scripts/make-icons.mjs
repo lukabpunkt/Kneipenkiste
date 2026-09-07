@@ -21,8 +21,9 @@ const OUT = join(ROOT, 'assets', 'icons');
 
 /** Hopfen Hengst: the warm coat is the one that still reads against a dark ground at 48 px. */
 const HORSE_INDEX = 4;
-/** The ground the portrait sits on — deep ink, so the horse is the bright thing in a dock. */
-const GROUND = ['#4a3350', '#2b1d2e'];
+/** The ground the portrait sits on — the Kneipenkiste panel over its ground, so the icon sits in
+    the same dock as its four sister games and the horse is the bright thing on it. */
+const GROUND = ['#27263d', '#0f0e1a'];
 
 /** What to write. A maskable icon keeps its subject inside the safe circle, hence the bigger inset. */
 const ICONS = [
