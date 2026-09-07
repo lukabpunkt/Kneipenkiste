@@ -1,0 +1,191 @@
+{
+  "app": {
+    "name": "Drinkshot",
+    "tagline": "Setz. Renn. Trink."
+  },
+  "common": {
+    "back": "Zurück",
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "ok": "Alles klar",
+    "sips_one": "Schluck",
+    "sips_other": "Schlücke",
+    "sipsCount_one": "{count} Schluck",
+    "sipsCount_other": "{count} Schlücke"
+  },
+  "title": {
+    "play": "Spielen",
+    "rules": "Regeln",
+    "settings": "Einstellungen",
+    "soundOn": "Ton an",
+    "soundOff": "Ton aus"
+  },
+  "disclaimer": {
+    "headline": "Kurz vorweg",
+    "body": "Ab 18. Trink verantwortungsvoll. Wasser ist auch ein Getränk.",
+    "accept": "Verstanden"
+  },
+  "lobby": {
+    "headline": "Wer spielt mit?",
+    "addPlayer": "Spieler hinzufügen",
+    "removePlayer": "{name} entfernen",
+    "namePlaceholder": "Name",
+    "nameLabel": "Name von Spieler {index}",
+    "defaultName": "Spieler {index}",
+    "start": "Los geht's!",
+    "mode": "Modus",
+    "duration": "Dauer",
+    "playerCount": "{count} von {max}",
+    "tooFewPlayers": "Zu zweit ist's ein Duell, allein ist's traurig. Füge noch jemanden hinzu.",
+    "maxPlayers": "Mehr als {max} passen nicht ums Handy.",
+    "eliminated": "Ausgeschieden"
+  },
+  "pass": {
+    "handOver": "Gib das Handy an",
+    "tapWhenReady": "Tippe, wenn nur du aufs Display schaust",
+    "position": "Spieler {index} von {count}"
+  },
+  "bet": {
+    "headline": "Wie viele Schlücke setzt du?",
+    "hint": "Mehr Einsatz = höheres Risiko",
+    "confirm": "Bestätigen & verstecken",
+    "increase": "Einsatz erhöhen",
+    "decrease": "Einsatz senken",
+    "value": "Dein Einsatz: {sips}",
+    "risk": {
+      "careful": "Vorsichtig",
+      "bold": "Mutig",
+      "insane": "Wahnsinnig"
+    },
+    "blind": "Blind gesetzt. Viel Glück."
+  },
+  "ready": {
+    "headline": "Alle haben gesetzt",
+    "putDown": "Legt das Handy in die Mitte",
+    "players": "{count} Spieler dabei",
+    "start": "Los!",
+    "stillIn": "Noch {count} im Rennen"
+  },
+  "arena": {
+    "hud": "RUNDE {round} · {count} ZIELE",
+    "lock": "LOCK",
+    "shot": "SHOT!",
+    "placeholder": "Hier läuft ab M2 die Arena.",
+    "skip": "Tippen zum Überspringen",
+    "abortRound": "Runde abbrechen?",
+    "abortBody": "Die Einsätze dieser Runde sind dann weg.",
+    "abortConfirm": "Ja, abbrechen",
+    "abortCancel": "Weiterspielen"
+  },
+  "result": {
+    "drinks": "{name} trinkt {sips}!",
+    "drinksDistributor": "{name} verteilt {sips}!",
+    "everyoneElseDrinks": "Alle anderen trinken {sips}.",
+    "nobodyDrinks": "Niemand trinkt.",
+    "miracle": "Niemand trinkt. Wunder passieren.",
+    "miracleBadge": "Legende",
+    "eliminated": "{name} ist raus.",
+    "winner": "{name} hat überlebt und verteilt {sips}.",
+    "survives": "{name} überlebt!",
+    "showdownShots": "{count} Schüsse. Einer steht noch.",
+    "showdownSub": "Alle anderen trinken ihren Einsatz. {name} verteilt {sips}.",
+    "survivorBadge": "Überlebt",
+    "needMorePlayers": "Nur noch eine Person übrig. Ändere die Spieler für eine neue Session.",
+    "allBets": "Alle Einsätze",
+    "tableName": "Name",
+    "tableBet": "Einsatz",
+    "tableChance": "Chance",
+    "scoreboard": "Heute getrunken",
+    "nextRound": "Nächste Runde",
+    "changePlayers": "Spieler ändern",
+    "changeMode": "Modus ändern",
+    "zone": {
+      "head": "Kopfschuss!",
+      "body": "Mitten in die Brust!",
+      "leg": "Ins Bein… und nochmal!",
+      "butt": "Volltreffer, Hosenboden!",
+      "miss": "Erst daneben. Dann doch nicht.",
+      "miracle": "Glück gehabt!"
+    },
+    "continue": "Weiter",
+    "revealedBets": "Aufgedeckte Einsätze",
+    "stakeSecret": "?",
+    "stakesSecret": "Solange das Turnier läuft, wird nur aufgedeckt, wen es getroffen hat. Die Chancen bleiben ebenfalls verdeckt — sie würden die Einsätze der anderen verraten."
+  },
+  "settings": {
+    "headline": "Einstellungen",
+    "sound": "Ton",
+    "music": "Musik",
+    "haptics": "Vibration",
+    "duration": "Dauer der Show",
+    "mode": "Modus",
+    "miracles": "Wunder erlauben",
+    "lowEffects": "Reduzierte Effekte",
+    "language": "Sprache",
+    "resetSession": "Session zurücksetzen",
+    "resetDone": "Session zurückgesetzt.",
+    "durationOption": {
+      "short": "Kurz",
+      "normal": "Normal",
+      "long": "Lang"
+    },
+    "durationSeconds": "{seconds} s"
+  },
+  "mode": {
+    "classic": "Klassik",
+    "classicHint": "Der Getroffene trinkt seinen eigenen Einsatz.",
+    "distributor": "Verteiler",
+    "distributorHint": "Alle anderen trinken den Einsatz des Getroffenen.",
+    "suddenDeath": "Sudden Death",
+    "suddenDeathHint": "Wer getroffen wird, ist raus. Der Letzte verteilt.",
+    "doubleTap": "Double Tap",
+    "doubleTapHint": "Zwei Schüsse, zwei Opfer.",
+    "showdown": "Showdown",
+    "showdownHint": "Es wird geschossen, bis nur einer übrig ist.",
+    "recommended": "Ab {count} Personen"
+  },
+  "rules": {
+    "headline": "Regeln",
+    "card1Title": "Setzen",
+    "card1Body": "Jeder setzt heimlich 1 bis 10 Schlücke. Niemand sieht deine Zahl.",
+    "card2Title": "Zielen",
+    "card2Body": "Ein Scharfschütze visiert die Männchen an. Je mehr du setzt, desto größer deine Chance getroffen zu werden.",
+    "card3Title": "Trinken",
+    "card3Body": "Wer getroffen wird, trinkt seinen Einsatz. Danach werden alle Einsätze aufgedeckt.",
+    "card4Title": "Nochmal",
+    "card4Body": "Nächste Runde, gleiche Leute. Der Abend hat ein Scoreboard.",
+    "cardPosition": "Karte {index} von {count}"
+  },
+  "orientation": {
+    "headline": "Bitte Handy drehen",
+    "body": "Drinkshot läuft im Hochformat."
+  },
+  "pwa": {
+    "updateAvailable": "Neue Version verfügbar.",
+    "reload": "Neu laden",
+    "offlineReady": "Läuft jetzt auch offline."
+  },
+  "error": {
+    "generic": "Da ist was schiefgelaufen.",
+    "retry": "Nochmal versuchen",
+    "assets": "Grafiken konnten nicht geladen werden.",
+    "webgl": "Dein Browser kann die Arena nicht anzeigen. Das Ergebnis steht trotzdem."
+  },
+  "deaths": {
+    "notYet": "Noch nicht!",
+    "ouch": "Aua!",
+    "whyMe": "Warum ich?!",
+    "phew": "Puh!",
+    "notAgain": "Nicht schon wieder!"
+  },
+  "onboarding": {
+    "bet": "Je höher dein Einsatz, desto mehr trinkst du — aber desto wahrscheinlicher trifft es dich auch.",
+    "pass": "Reich das Handy weiter. Niemand darf den Einsatz der anderen sehen."
+  },
+  "nav": {
+    "home": "Hauptmenü",
+    "homeAria": "Zurück zum Hauptmenü",
+    "abortAria": "Runde abbrechen"
+  }
+}

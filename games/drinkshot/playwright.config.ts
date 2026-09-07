@@ -1,0 +1,68 @@
+import { defineConfig, devices } from '@playwright/test';
+
+/*
+ * Der Port ist ueberschreibbar, weil 4173 der Vite-Standard ist: Laeuft daneben die
+ * Vorschau eines anderen Projekts, uebernahm `reuseExistingServer` bisher stillschweigend
+ * deren Server — und der Lauf brach mit einem Timeout ab, ohne den Grund zu nennen.
+ */
+const PORT = process.env.PREVIEW_PORT ?? '4173';
+const BASE_URL = `http://localhost:${PORT}/Drinkshot/`;
+
+/**
+ * Mobile-Emulation ist Pflicht (CLAUDE.md "Mobile First").
+ * Ab M1 laeuft `flow.spec.ts`, ab M3 `perf.spec.ts` (Architektur §12).
+ */
+export default defineConfig({
+  testDir: './tests/e2e',
+  /*
+   * Bewusst **nicht** parallel: Ein grosser Teil der Tests spielt eine 10–22 s lange Show
+   * in Echtzeit ab und misst dabei Wartezeiten. Laufen zwei davon gleichzeitig, nehmen
+   * sie sich die CPU weg — die leichten Tests werden dadurch flaky und die Zeitmessungen
+   * falsch. Ein Testlauf dauert so ein paar Minuten länger und ist dafür verlässlich.
+   */
+  fullyParallel: false,
+  workers: 1,
+  forbidOnly: !!process.env.CI,
+  /*
+   * Zwei Versuche in der CI. Die Runner haben zwei Kerne und keine GPU; eine Runde dauert
+   * dort mit WebKit über eine Minute, und einzelne zeitbasierte Zusicherungen kippen
+   * gelegentlich. Lokal bleibt es bei null Versuchen — dort ist ein roter Test echt.
+   */
+  retries: process.env.CI ? 2 : 0,
+  /*
+   * Playwrights Standard von 5 s geht von statischen Seiten aus. Hier hängt fast jede
+   * Zusicherung hinter einer Animation: 320 ms Wipe, 260 ms Sheet, dazu das Aufbauen der
+   * Arena. Auf einem ausgelasteten Rechner — CI-Runner mit zwei Kernen oder ein parallel
+   * laufender Dev-Server — reicht das nicht, und man repariert dann Tests, die in Ordnung
+   * sind. Zehn Sekunden sind immer noch kurz genug, um echte Hänger zu finden.
+   */
+  expect: { timeout: 10_000 },
+  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
+  use: {
+    baseURL: BASE_URL,
+    trace: 'on-first-retry',
+  },
+  projects: [
+    { name: 'iPhone 12', use: { ...devices['iPhone 12'] } },
+    {
+      name: 'Pixel 5',
+      use: {
+        ...devices['Pixel 5'],
+        launchOptions: {
+          /*
+           * Ohne diese Flags rendert Headless-Chromium per SwiftShader in Software.
+           * Die Arena läuft dann mit 30 statt 60 fps — eine Eigenschaft des Testrechners,
+           * nicht des Spiels. `perf.spec.ts` erkennt den Software-Fall und sagt es.
+           */
+          args: ['--use-angle=default', '--enable-gpu', '--ignore-gpu-blocklist'],
+        },
+      },
+    },
+  ],
+  webServer: {
+    command: `npm run build && npm run preview -- --port ${PORT} --strictPort`,
+    url: BASE_URL,
+    reuseExistingServer: !process.env.CI,
+    timeout: 180_000,
+  },
+});
