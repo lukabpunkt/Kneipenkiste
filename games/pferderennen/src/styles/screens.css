@@ -25,7 +25,6 @@
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--text-3xl);
-  font-weight: 600;
   color: var(--text);
   /* Fredoka's strokes are heavy enough to carry themselves; the old highlight now reads as a
      misregistered second copy. What is left is a soft warm drop so the word sits on the sky. */
@@ -176,12 +175,12 @@
   padding-inline: var(--space-2);
   border-color: transparent;
   background: transparent;
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-weight: 800;
 }
 
 .player-row__name:focus {
-  background: var(--paper);
+  background: var(--surface-raised);
   border-color: var(--accent);
 }
 
@@ -206,10 +205,11 @@
   align-items: flex-start;
   gap: var(--space-2);
   padding: var(--space-4) var(--space-3);
-  border: 3px solid transparent;
+  /* Not transparent: a dark card on a dark page has no silhouette without it. */
+  border: 3px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
-  box-shadow: var(--elev-2);
+  box-shadow: var(--elev-2), var(--hairline);
   text-align: left;
   cursor: pointer;
   transition:
@@ -450,7 +450,8 @@
 }
 
 .overview__sips {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
+  font-weight: 800;
 }
 
 /* --- Race placeholder ---------------------------------------------------- */
@@ -563,13 +564,13 @@
   width: 26px;
   height: 26px;
   border-radius: var(--radius-pill);
-  background: var(--horse-dark, var(--horse-color));
-  color: var(--paper);
-  font-family: var(--font-display);
-  font-weight: 600;
+  background: var(--horse-color);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-xs);
-  /* The signature colour as a ring, because white on it reaches only 2.2-4.2:1 (audit A4). */
-  box-shadow: 0 0 0 2px var(--horse-color);
+  /* Ink on the signature colour, not paper on its shade — see .horse-badge (audit A4). */
+  box-shadow: 0 2px 0 var(--horse-dark, transparent);
 }
 
 .ceremony__name--1 .ceremony__place {
@@ -579,8 +580,8 @@
 }
 
 .ceremony__horse {
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-xs);
   text-align: center;
   line-height: 1.2;
@@ -620,12 +621,12 @@
  * tint says which kind of line this is, and the icon disc says it again where the eye lands.
  */
 .payout--deal {
-  --payout-tone: var(--success-700);
+  --payout-tone: var(--success);
   background: var(--success-tint);
 }
 
 .payout--drink {
-  --payout-tone: var(--danger-700);
+  --payout-tone: var(--danger);
   background: var(--danger-tint);
 }
 
@@ -642,7 +643,7 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-pill);
-  background: var(--surface);
+  background: var(--surface-raised);
   color: var(--payout-tone, var(--text-muted));
   box-shadow: var(--elev-1);
 }
@@ -699,8 +700,9 @@
   width: 48px;
   height: 48px;
   border-radius: var(--radius-pill);
-  background: var(--tint-strong);
-  color: var(--accent-300);
+  /* The tints are translucent paper now, which is invisible on the one card that IS paper. */
+  background: var(--tint-on-inverse);
+  color: var(--accent-on-inverse);
 }
 
 .house__text {
@@ -749,8 +751,9 @@
   height: 26px;
   border-radius: var(--radius-pill);
   background: var(--accent);
-  color: var(--paper);
-  font-family: var(--font-display);
+  color: var(--on-accent);
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-xs);
 }
 
@@ -837,7 +840,6 @@
 
 .stat-tile__value {
   font-family: var(--font-display);
-  font-weight: 600;
   font-size: var(--text-lg);
   line-height: 1.1;
 }
@@ -887,8 +889,8 @@
 }
 
 .stats-table tbody td {
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-weight: 800;
 }
 
 /* The avatar used to sit flush against the name with no space at all. */

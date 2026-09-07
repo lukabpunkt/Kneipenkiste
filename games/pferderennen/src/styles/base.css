@@ -83,6 +83,9 @@ body {
 body {
   margin: 0;
   font-family: var(--font-body);
+  /* Nunito is a variable font and its 400 is thin for a game read at arm's length across a
+     table. 600 is the body tone in every sister game; 800 is the emphasis. */
+  font-weight: 600;
   font-size: var(--text-sm);
   line-height: var(--leading-body);
   color: var(--text);
@@ -116,7 +119,8 @@ h2,
 h3 {
   font-family: var(--font-display);
   margin: 0 0 var(--space-3);
-  font-weight: 600;
+  /* Luckiest Guy has exactly one weight. Asking for more makes some engines fake it. */
+  font-weight: 400;
   line-height: var(--leading-heading);
   letter-spacing: var(--track-display);
 }
@@ -164,10 +168,11 @@ select {
  * on the ink toast and the ink house banner, where a dark ring alone would disappear.
  */
 :focus-visible {
-  outline: 3px solid var(--text);
+  /* Amber ringed in ink, so the same ring works on the dark page and on the one paper card. */
+  outline: 3px solid var(--accent);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
-  box-shadow: 0 0 0 3px var(--surface);
+  box-shadow: 0 0 0 3px var(--ink);
 }
 
 /* --- Screen skeleton ---------------------------------------------------- */

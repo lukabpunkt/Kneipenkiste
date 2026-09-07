@@ -114,6 +114,11 @@
    */
   --text-subtle: rgb(255 248 231 / 72%);
   --text-on-inverse: var(--ink);
+  /* Accent that has to hold up on --surface-inverse rather than on the page. The 500 is a pale
+     amber on paper (1.7:1); this step gets 6.9:1. */
+  --accent-on-inverse: var(--accent-900);
+  /* Translucent ink, for the one surface that is paper. The --tint-* trio cannot serve it. */
+  --tint-on-inverse: rgb(26 16 36 / 12%);
   --text-disabled: rgb(255 248 231 / 38%);
 
   /* Two border weights: a hairline that only divides, and one you are meant to see (3:1). */

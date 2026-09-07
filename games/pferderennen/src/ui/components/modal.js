@@ -45,6 +45,9 @@ export function modal({ title, content, onClose }) {
       attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'modal-title' },
     },
     [
+      // The grab handle every Kneipenkiste sheet wears. Decoration, not a control: the sheet is
+      // closed by the button, by Escape or by the backdrop, and a screen reader has no use for it.
+      el('div', { className: 'modal__handle', attrs: { 'aria-hidden': 'true' } }),
       el('header', { className: 'modal__header' }, [
         el('h2', { className: 'modal__title', text: title, attrs: { id: 'modal-title' } }),
         closeButton,

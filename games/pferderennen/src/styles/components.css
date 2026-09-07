@@ -34,31 +34,28 @@
   min-height: var(--tap-min);
   /* Twice as much padding sideways as the optical space above and below the label. */
   padding: 0 var(--space-5);
-  border: 0;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-display);
-  font-weight: 600;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-md);
   letter-spacing: var(--track-body);
   /* Labels like "+ Spieler" must not break into two lines. */
   white-space: nowrap;
   cursor: pointer;
-  box-shadow:
-    0 var(--edge) 0 var(--btn-edge),
-    var(--elev-1);
+  box-shadow: 0 var(--edge) 0 var(--btn-edge);
   transition:
-    transform var(--dur-fast) var(--ease-out),
-    box-shadow var(--dur-fast) var(--ease-out),
-    background-color var(--dur-fast) var(--ease-out);
+    transform var(--dur-fast) var(--ease-snappy),
+    box-shadow var(--dur-fast) var(--ease-snappy),
+    background-color var(--dur-fast) var(--ease-snappy);
 }
 
 .btn--wide {
   width: 100%;
 }
 
-/* Ink rather than white on the accent: white reaches only 2.84:1 on #ff6b35 and the primary
-   action is the one label that must never be hard to read (audit A4). Ink gets 5.6:1 and keeps
-   the orange as loud as it was. */
+/* Ink rather than paper on the accent: paper reaches only 1.64:1 on the amber and the primary
+   action is the one label that must never be hard to read (audit A4). Ink gets 10.6:1. */
 .btn--primary {
   --btn-edge: var(--accent-edge);
   min-height: var(--btn-primary-height);
@@ -67,9 +64,18 @@
   font-size: var(--text-lg);
 }
 
+/*
+ * Its edge is the page itself. Nothing is darker than the ground here, so a secondary button
+ * cannot cast a visible edge the way the amber one does — what carries it instead is that the
+ * face is lighter than everything around it, and that the face is what moves on press.
+ */
 .btn--secondary {
-  background: var(--surface);
+  --btn-edge: var(--bg);
+  background: var(--surface-raised);
   color: var(--text);
+  box-shadow:
+    0 var(--edge) 0 var(--btn-edge),
+    var(--hairline);
 }
 
 .btn--danger {
@@ -80,16 +86,16 @@
 
 /*
  * The one variant without an edge: a ghost is a link that grew a hit area, and giving it depth
- * would put it on the same footing as the action beside it. The hairline is what makes it work
- * on both grounds it has to live on — translucent paper alone vanishes on a cream card, and a
- * translucent ink fill alone looks like a hole on the sky.
+ * would put it on the same footing as the action beside it. It borrows the base border and
+ * lightens it — an ink outline would be invisible on a surface only a shade off ink.
  */
 .btn--ghost {
+  border-color: var(--border-strong);
   background: var(--surface-glass);
   color: var(--text);
   font-size: var(--text-sm);
-  font-weight: 500;
-  box-shadow: inset 0 0 0 1px var(--tint);
+  font-weight: 700;
+  box-shadow: none;
 }
 
 /* Hover lifts by exactly what the press sinks by, so the edge length never changes twice. */
@@ -106,8 +112,8 @@
   }
 
   .btn--ghost:hover:not(:disabled) {
-    background: var(--surface);
-    box-shadow: inset 0 0 0 1px var(--tint-strong);
+    background: var(--tint);
+    box-shadow: none;
   }
 }
 
@@ -127,16 +133,16 @@
 
 .btn--ghost:active:not(:disabled) {
   transform: none;
-  background: var(--tint);
-  box-shadow: inset 0 0 0 1px var(--tint-strong);
+  background: var(--tint-strong);
+  box-shadow: none;
 }
 
 /* A disabled control is exempt from the contrast rule, but this one still carries the goal of
-   the whole screen ("Rennen starten"), so it stays readable. It also loses its edge: nothing
-   that cannot be pressed should look pressable. */
+   the whole screen ("Rennen starten"), so it stays readable. Fading the whole button keeps the
+   label on its own face: 3.9:1, where the old translucent fill managed 2.6:1. It also loses its
+   edge — nothing that cannot be pressed should look pressable. */
 .btn:disabled {
-  background: var(--tint);
-  color: var(--text-disabled);
+  opacity: 0.55;
   box-shadow: none;
   cursor: not-allowed;
 }
@@ -168,7 +174,10 @@
   padding: var(--space-4);
   border-radius: var(--radius-lg);
   background: var(--surface);
-  box-shadow: var(--elev-2);
+  /* No sticker border here. Three pixels of ink on a panel a shade off ink is 1.1:1 — nothing.
+     A card is lifted by the highlight along its top and the shadow under it; ink outlines are
+     for the coloured surfaces that can carry them. */
+  box-shadow: var(--elev-2), var(--hairline);
 }
 
 /* --- Chips and switches -------------------------------------------------- */
@@ -176,17 +185,17 @@
 .chip {
   min-height: var(--tap-min);
   padding: 0 var(--space-4);
-  border: 0;
+  border: 2px solid var(--border);
   border-radius: var(--radius-pill);
-  background: var(--surface);
+  background: var(--surface-raised);
   color: var(--text-muted);
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-sm);
   cursor: pointer;
   /* The same edge every pressable thing in this game stands on. */
   box-shadow:
-    0 var(--edge) 0 var(--tint),
+    0 var(--edge) 0 var(--bg),
     var(--elev-1);
   transition:
     transform var(--dur-fast) var(--ease-out),
@@ -205,12 +214,10 @@
  * rather than "chosen", and from across a table it disappears altogether.
  */
 .chip--active {
+  border-color: var(--ink);
   background: var(--accent);
   color: var(--on-accent);
-  font-weight: 600;
-  box-shadow:
-    0 var(--edge) 0 var(--accent-edge),
-    var(--elev-1);
+  box-shadow: 0 var(--edge) 0 var(--accent-edge);
 }
 
 .chip--active:active {
@@ -269,7 +276,9 @@
   padding: 0 var(--space-4);
   border: 2px solid var(--border);
   border-radius: var(--radius-sm);
-  background: var(--surface);
+  /* A shade above the card it sits in, or the field has no edge of its own. */
+  background: var(--surface-raised);
+  color: var(--text);
   font-size: var(--text-md);
 }
 
@@ -371,8 +380,9 @@
   height: var(--tap-min);
   border: 0;
   border-radius: var(--radius-pill);
+  border: 3px solid var(--ink);
   background: var(--accent);
-  color: var(--text);
+  color: var(--on-accent);
   font-size: var(--text-xl);
   line-height: 1;
   cursor: pointer;
@@ -476,20 +486,21 @@
 
 /* --- Badges and chips of the game world ---------------------------------- */
 
-/* The deep tone, not the signature one: white on the signature colours reaches only 3.8-4.2:1,
-   and the lane number is the one thing on the badge that has to be readable (audit A4). The dark
-   shades stay just as distinguishable from each other, and the signature colour still rings it. */
+/* The signature colour, with ink on it. Paper on the six Kneipenkiste colours runs 2.1-6.0:1
+   and fails outright on the yellow; ink on the same six runs 5.5-12.8:1, and the discs themselves
+   clear 5:1 against the panel. The lane number is the one thing here that has to be readable
+   (audit A4), so the fill and the text swapped roles. */
 .horse-badge {
   display: grid;
   place-items: center;
   flex: 0 0 auto;
+  border: 2px solid var(--ink);
   border-radius: var(--radius-pill);
-  background: var(--horse-dark, var(--horse-color));
-  color: var(--paper);
-  font-family: var(--font-display);
-  box-shadow:
-    0 0 0 2px var(--horse-color),
-    0 3px 0 var(--horse-dark, transparent);
+  background: var(--horse-color);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 800;
+  box-shadow: 0 3px 0 var(--horse-dark, transparent);
 }
 
 .horse-badge--sm {
@@ -533,7 +544,8 @@
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-pill);
   background: var(--surface-glass);
-  font-family: var(--font-display);
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-sm);
 }
 
@@ -558,11 +570,14 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
+  border: 3px solid var(--ink);
   border-radius: var(--radius-pill);
   background: var(--text);
   color: var(--surface);
   font-size: var(--text-md);
-  box-shadow: var(--elev-2);
+  box-shadow:
+    0 4px 0 var(--surface-raised),
+    var(--elev-2);
   animation: toast-in var(--dur-base) var(--ease-bounce);
 }
 
@@ -572,7 +587,7 @@
 
 .toast--success {
   background: var(--success);
-  color: var(--text);
+  color: var(--on-success);
 }
 
 .toast--leaving {
@@ -610,11 +625,21 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  /* The sheet is the width of the phone frame, so on a desktop it reads as belonging to it. */
+  max-width: var(--frame-max-width);
   max-height: 88dvh;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   background: var(--surface);
-  box-shadow: var(--elev-2);
+  box-shadow: var(--elev-3);
   animation: sheet-up var(--dur-slow) var(--ease-out);
+}
+
+.modal__handle {
+  width: 44px;
+  height: 5px;
+  margin: var(--space-2) auto var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--tint-strong);
 }
 
 .modal__header {
@@ -712,14 +737,12 @@
   min-width: 20px;
   min-height: 20px;
   border-radius: var(--radius-pill);
-  /* Same reason as .horse-badge: white on the signature colours only reaches 2.2-4.2:1, and the
-     number is what tells you which horse this is (audit A4). */
-  background: var(--horse-dark, var(--horse-color));
-  color: var(--paper);
-  font-family: var(--font-display);
+  /* Same construction as .horse-badge: the signature colour fills it and the ink carries the
+     number, because paper on these six only reaches 2.1-6.0:1 (audit A4). */
+  background: var(--horse-color);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 800;
   font-size: var(--text-xs);
-  /* A ring in the signature colour keeps the identity the dark background gives up. */
-  box-shadow:
-    0 0 0 2px var(--horse-color),
-    0 2px 0 var(--horse-dark);
+  box-shadow: 0 2px 0 var(--horse-dark, transparent);
 }
