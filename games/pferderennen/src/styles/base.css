@@ -242,6 +242,14 @@ select {
      viewport, so a framed screen stays inside the frame. */
   height: 100%;
   min-height: 0;
+  /*
+   * And a grid item may not refuse to be narrower than its content. Without this the screen
+   * inherits the min-content width of the longest unbreakable thing inside it — on the betting
+   * summary a player name plus a horse name plus "ändern" on one line, which pushed a 320px
+   * phone 23px past its own edge. The text that has to give already knows how (ellipsis); this
+   * is what lets the layout ask it to.
+   */
+  min-width: 0;
   transition:
     opacity var(--dur-base) var(--ease-out),
     transform var(--dur-base) var(--ease-out);
