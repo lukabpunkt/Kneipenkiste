@@ -11,7 +11,16 @@
  * Tests und Playwright-Configs weiter funktionieren.
  */
 import { execSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -45,7 +54,7 @@ rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
 // 1. Launcher
-cpSync(join(root, 'hub'), out, { recursive: true });
+copy(join(root, 'hub'), out);
 console.log('✓ hub/ → site/');
 
 // 2. Spiele
@@ -65,11 +74,11 @@ for (const game of selected) {
       stdio: 'inherit',
       env: { ...process.env, [game.envKey]: base },
     });
-    cpSync(join(src, 'dist'), dest, { recursive: true });
+    copy(join(src, 'dist'), dest);
   } else {
     console.log(`→ ${game.id}: statisch kopieren`);
     for (const f of game.files) {
-      cpSync(join(src, f), join(dest, f), { recursive: true });
+      copy(join(src, f), join(dest, f));
     }
   }
   console.log(`✓ ${game.id} → site/${game.id}/`);
@@ -92,6 +101,23 @@ writeFileSync(join(out, 'games.json'), JSON.stringify(catalog, null, 2) + '\n');
 writeFileSync(join(out, '.nojekyll'), '');
 
 console.log('\nFertig. Vorschau: npm run preview:site\n');
+
+/**
+ * Rekursives Kopieren mit mkdir + copyFile. `fs.cpSync` wäre kürzer, scheitert
+ * aber auf manchen gemounteten Dateisystemen an Verzeichnisrechten.
+ */
+function copy(src, dest) {
+  if (statSync(src).isDirectory()) {
+    mkdirSync(dest, { recursive: true });
+    for (const name of readdirSync(src)) {
+      if (name === '.DS_Store') continue;
+      copy(join(src, name), join(dest, name));
+    }
+  } else {
+    mkdirSync(dirname(dest), { recursive: true });
+    copyFileSync(src, dest);
+  }
+}
 
 function normalizeBase(b) {
   let base = b.trim();
