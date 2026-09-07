@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sternchen (Art Direction §8): kreist ueber einem benommenen Digger. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <path d="M20 2 L25 14 L38 16 L28 25 L31 38 L20 31 L9 38 L12 25 L2 16 L15 14 Z"
+        fill="#FFD32A" stroke="#1A1024" stroke-width="4" stroke-linejoin="round"/>
+</svg>

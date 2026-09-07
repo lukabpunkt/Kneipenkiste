@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Erdplatte, verdeckt (Art Direction §4.1): Quadrat, Radius 12, 6 px Bodenkante,
+     3 px ink-Outline. Die Kante steckt im selben Sprite, damit eine Platte ein Draw-Call
+     bleibt — die Deko kommt als eigenes, kleines Sprite darueber. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 136" width="128" height="136">
+  <rect x="6" y="14" width="116" height="116" rx="14" fill="#8C5E33" stroke="#1A1024" stroke-width="6"/>
+  <rect x="6" y="6" width="116" height="116" rx="14" fill="#B98352" stroke="#1A1024" stroke-width="6"/>
+  <!-- Cel-Stufe: eine harte Kante unten rechts, kein Verlauf -->
+  <path d="M122 60 L122 108 A14 14 0 0 1 108 122 L54 122 Z" fill="#1A1024" opacity="0.1"/>
+</svg>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Maulwurfshuegel (Art Direction §6). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 56" width="96" height="56">
+  <path d="M8 50 Q24 10 48 10 Q72 10 88 50 Z" fill="#8C5E33" stroke="#1A1024" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M48 10 Q72 10 88 50 L48 50 Z" fill="#1A1024" opacity="0.12"/>
+</svg>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Die Kiste, geschlossen (Art Direction §5.2): Holz, Warnstreifen, Glas-Symbol. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 112" width="128" height="112">
+  <rect x="10" y="26" width="108" height="76" rx="8" fill="#B98352" stroke="#1A1024" stroke-width="7"/>
+  <rect x="10" y="18" width="108" height="20" rx="6" fill="#8C5E33" stroke="#1A1024" stroke-width="7"/>
+  <!-- Warnstreifen -->
+  <g fill="#FFB800">
+    <path d="M22 96 L38 60 L52 60 L36 96 Z"/><path d="M52 96 L68 60 L82 60 L66 96 Z"/>
+    <path d="M82 96 L98 60 L110 60 L94 96 Z"/>
+  </g>
+  <!-- Glas-Symbol der Spielefamilie -->
+  <g stroke="#1A1024" stroke-width="6" fill="#FFF8E7" stroke-linejoin="round">
+    <path d="M52 48 L76 48 L70 66 L58 66 Z"/>
+  </g>
+  <rect x="10" y="26" width="108" height="76" rx="8" fill="none" stroke="#1A1024" stroke-width="7"/>
+</svg>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Verbogene Schaufel (hit_shovel_pretzel, GDD §4.1): derselbe Stiel, zur Brezel gedreht. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 128" width="64" height="128">
+  <path d="M32 8 C10 30 54 44 32 66 C16 82 44 92 34 108"
+        stroke="#1A1024" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <path d="M32 8 C10 30 54 44 32 66 C16 82 44 92 34 108"
+        stroke="#B98352" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M20 104 L50 100 L46 120 Q34 126 24 118 Z"
+        fill="#8C93A8" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+</svg>

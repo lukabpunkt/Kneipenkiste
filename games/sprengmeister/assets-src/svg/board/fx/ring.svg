@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Legerfarben-Ring (Design-Prioritaet 2): weiss gezeichnet, wird in Spielerfarbe
+     getintet und ueber dem Krater aufgezogen. Der Ring ist der Traeger der Information
+     "wer war das" — er darf nie hinter einem Gag warten. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <circle cx="64" cy="64" r="52" fill="none" stroke="#1A1024" stroke-width="20"/>
+  <circle cx="64" cy="64" r="52" fill="none" stroke="#FFFFFF" stroke-width="12"/>
+</svg>

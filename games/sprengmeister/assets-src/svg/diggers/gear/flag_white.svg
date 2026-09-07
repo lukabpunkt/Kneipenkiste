@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Weisse Fahne (hit_crater_hop, GDD §4.1): kommt aus dem Krater hoch. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <path d="M20 92 L20 10" stroke="#1A1024" stroke-width="10" stroke-linecap="round"/>
+  <path d="M24 12 L82 24 L24 40 Z" fill="#FFF8E7" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+</svg>

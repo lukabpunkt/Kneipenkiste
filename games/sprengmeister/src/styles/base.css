@@ -1,0 +1,153 @@
+/*
+ * Grundlayout: Portrait-Frame, Safe-Areas, Fonts (Architektur §8).
+ * Menues sind DOM (CLAUDE.md) — nur das Feld ist PIXI.
+ */
+
+@font-face {
+  font-family: 'Luckiest Guy';
+  src: url('/fonts/luckiest-guy-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('/fonts/nunito-var.woff2') format('woff2-variations');
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--bg-deep);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  /* Kein Doppeltap-Zoom auf dem Feld (GDD §5). */
+  touch-action: manipulation;
+}
+
+/* Desktop bekommt denselben Portrait-Frame wie das Handy (CLAUDE.md "Mobile First"). */
+#app {
+  position: relative;
+  width: 100%;
+  max-width: var(--frame-max-width);
+  height: 100dvh;
+  margin: 0 auto;
+  overflow: hidden;
+  padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+  background: var(--bg-deep);
+}
+
+@media (min-width: 600px) and (min-height: 700px) {
+  body {
+    display: grid;
+    place-items: center;
+    background: #07060d;
+  }
+
+  #app {
+    height: min(900px, 96dvh);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 24px 80px rgb(0 0 0 / 60%);
+  }
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  touch-action: manipulation;
+}
+
+/* Landscape-Overlay auf Mobile (Architektur §8) */
+.orientation-lock {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  place-content: center;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  background: var(--bg-deep);
+}
+
+.orientation-lock__icon {
+  font-size: var(--fs-hero);
+}
+
+.orientation-lock__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+}
+
+.orientation-lock__body {
+  margin: 0;
+  max-width: 30ch;
+  color: rgb(255 248 231 / 70%);
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .orientation-lock {
+    display: flex;
+  }
+}
+
+/* Der Title-Screen von M0 — ab M1 uebernimmt der Router. */
+.boot {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 12px;
+  place-content: center;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.boot__logo {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  color: var(--hazard);
+  text-shadow: 0 4px 0 var(--ink);
+}
+
+.boot__tagline {
+  max-width: 26ch;
+  color: rgb(255 248 231 / 72%);
+}
+
+.boot__version {
+  position: absolute;
+  bottom: calc(12px + var(--safe-bottom));
+  font-size: var(--fs-xs);
+  color: rgb(255 248 231 / 35%);
+}

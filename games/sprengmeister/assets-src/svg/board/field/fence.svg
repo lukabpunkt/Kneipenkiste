@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Zaunstueck am Feldrand (Art Direction §6). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" width="160" height="80">
+  <g fill="#B98352" stroke="#1A1024" stroke-width="6" stroke-linejoin="round">
+    <path d="M18 74 L18 20 L28 10 L38 20 L38 74 Z"/>
+    <path d="M70 74 L70 20 L80 10 L90 20 L90 74 Z"/>
+    <path d="M122 74 L122 20 L132 10 L142 20 L142 74 Z"/>
+  </g>
+  <g stroke="#1A1024" stroke-width="6">
+    <path d="M8 34 L152 34"/><path d="M8 56 L152 56"/>
+  </g>
+  <g stroke="#A8763F" stroke-width="10" stroke-linecap="round">
+    <path d="M10 34 L150 34"/><path d="M10 56 L150 56"/>
+  </g>
+</svg>

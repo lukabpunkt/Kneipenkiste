@@ -1,0 +1,53 @@
+{
+  "name": "sprengmeister",
+  "private": true,
+  "version": "0.5.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "description": "Mobile-First Pass-the-Phone-Trinkspiel — Schatzsuche auf einem Minenfeld",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,js,mjs,json,css,html,md}\"",
+    "test": "npm run typecheck && npm run lint && npm run test:unit",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "build:e2e": "VITE_E2E=1 tsc --noEmit && VITE_E2E=1 vite build",
+    "test:e2e": "playwright test tests/e2e/flow.spec.ts",
+    "test:perf": "playwright test tests/e2e/perf.spec.ts",
+    "build:atlas": "node scripts/build-atlas.mjs",
+    "build:audio": "node scripts/build-audio-sprite.mjs",
+    "build:icons": "node scripts/build-icons.mjs",
+    "preview:sequences": "vite --host --open \"/?dev=1&panel=sequences\"",
+    "balance": "node scripts/balance.mjs"
+  },
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "howler": "^2.2.4",
+    "pixi.js": "^8.6.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/howler": "^2.2.12",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^9.17.0",
+    "free-tex-packer-core": "^0.3.4",
+    "globals": "^15.14.0",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.4.2",
+    "sharp": "^0.33.5",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
+    "vite": "^6.0.5",
+    "vite-plugin-pwa": "^0.21.1",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Blatt (hit_tree_landing): rieselt aus dem Baum. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <path d="M16 3 C26 10 26 22 16 29 C6 22 6 10 16 3 Z" fill="#5CB342" stroke="#1A1024" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M16 5 L16 27" stroke="#1A1024" stroke-width="3"/>
+</svg>

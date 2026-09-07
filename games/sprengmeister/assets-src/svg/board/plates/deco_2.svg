@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Platten-Deko 2: zwei Kiesel. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 32" width="48" height="32">
+  <ellipse cx="14" cy="24" rx="8" ry="6" fill="#8C5E33" stroke="#1A1024" stroke-width="4"/>
+  <ellipse cx="32" cy="20" rx="6" ry="4" fill="#A8763F" stroke="#1A1024" stroke-width="4"/>
+</svg>

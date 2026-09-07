@@ -1,0 +1,202 @@
+{
+  "app": {
+    "title": "Sprengmeister",
+    "tagline": "Dig your way to the crate. If you dare."
+  },
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "continue": "Continue",
+    "confirm": "Confirm",
+    "ok": "Got it",
+    "sips_one": "{count} sip",
+    "sips_other": "{count} sips",
+    "mines_one": "{count} mine",
+    "mines_other": "{count} mines",
+    "players_one": "{count} player",
+    "players_other": "{count} players"
+  },
+  "orientation": {
+    "headline": "Turn your phone upright",
+    "body": "Sprengmeister is played in portrait — the field sits flat on the table."
+  },
+  "title": {
+    "play": "Play",
+    "rules": "Rules",
+    "settings": "Settings",
+    "disclaimer": "Drinking game, 18+. Drink responsibly — water counts too."
+  },
+  "lobby": {
+    "headline": "Who's digging?",
+    "addPlayer": "Add player",
+    "removePlayer": "Remove {name}",
+    "namePlaceholder": "Player {index}",
+    "fieldSize": "Field {size} × {size}",
+    "fieldSizeHint": "{count} plates, {mines} mines buried",
+    "cta": "Mine the field",
+    "tooFewPlayers": "With two of you, you always know who planted it. Grab someone else.",
+    "modes": "Modes",
+    "timers": "Timers"
+  },
+  "modes": {
+    "doubleAgent": {
+      "name": "Double agent",
+      "hint": "One live mine, one dud. You see who planted it — not whether it blows."
+    },
+    "nightDigger": {
+      "name": "Night digger",
+      "hint": "No temperature hints. Just worms and gut feeling."
+    },
+    "twoChests": {
+      "name": "Two crates",
+      "hint": "Two crates, half the tokens each. The round ends on the second find."
+    },
+    "chainReaction": {
+      "name": "Chain reaction",
+      "hint": "One blast sets off the neighbours. Nobody drinks for it — but everyone sees who planted them."
+    },
+    "masterBonus": {
+      "name": "Demolition bonus",
+      "hint": "Two victims in one round: bonus token. Only ever dug your own mines: one sip."
+    }
+  },
+  "timers": {
+    "off": "Off",
+    "seconds": "{count} s",
+    "placeLabel": "Planting",
+    "digLabel": "Digging"
+  },
+  "pass": {
+    "handTo": "Pass to {name}",
+    "tapToStart": "Tap when nobody else is looking",
+    "privacy": "Nobody peeking?"
+  },
+  "place": {
+    "headline": "Plant {count} mines.",
+    "headlineDoubleAgent": "One mine, one dud.",
+    "counter": "{placed} / {total}",
+    "toolMine": "Mine",
+    "toolDud": "Dud",
+    "bury": "Bury",
+    "tooltip": "Your own mines can't hurt YOU. Remember where they are.",
+    "timeUp": "Time's up — the rest was buried at random."
+  },
+  "buried": {
+    "headline": "All mines buried.",
+    "body": "Phone in the middle.",
+    "cta": "Here we go"
+  },
+  "dig": {
+    "turn": "{name} IS DIGGING",
+    "drinks": "{name} DRINKS {count}",
+    "killFeed": "{layer} → {victim}",
+    "chest": "{name} FOUND THE CRATE!",
+    "greed": "THE PRICE OF GREED",
+    "dud": "Pfff.",
+    "chainReaction": "Chain reaction!",
+    "masterBonus": "DEMOLITION MASTER!",
+    "coward": "Coward…",
+    "tooltip": "Hot = the crate is right next door.",
+    "minesRemaining": "{count} still buried",
+    "timeUp": "Time's up — a random plate was dug.",
+    "chestsRemaining": "{count} chests left",
+    "dudSign": "DUD",
+    "dudHeadline": "DUD",
+    "dudFeed": "{layer} planted this one",
+    "sipsOf": "{name} {count}",
+    "sipsLabel": "Sips"
+  },
+  "hint": {
+    "hot": "Hot",
+    "warm": "Warm",
+    "cold": "Cold",
+    "none": ""
+  },
+  "distribute": {
+    "handTo": "Pass to {name}",
+    "headline": "Hand out {count}",
+    "hint": "Tap: +1 · Long press: −1",
+    "notYourself": "Nothing goes to yourself.",
+    "remaining": "{count} left to give",
+    "cta": "Pay out"
+  },
+  "result": {
+    "finder": "{name} found the crate!",
+    "greed": "The price of greed",
+    "doubleFind": "Double find",
+    "drinkers": "Drinks",
+    "killFeed": "Who got who",
+    "stats": "Stats",
+    "phew": "Phew",
+    "nextRound": "Next round",
+    "changePlayers": "Change players",
+    "changeModes": "Change modes",
+    "share": "{layer} blew {victim} up {count}× 💣",
+    "masterBonus": "DEMOLITION MASTER: {name}",
+    "coward": "Coward: {name}",
+    "deadliest": "Deadliest layer",
+    "shareButton": "Share",
+    "shareCopied": "Copied to clipboard",
+    "sips": "Sips"
+  },
+  "stats": {
+    "sips": "Sips taken",
+    "blastsCaused": "Blasts caused",
+    "blastsTaken": "Blasts taken",
+    "chestsFound": "Crates found",
+    "mostBlasted": "Most blasted",
+    "deadliestLayer": "Deadliest planter",
+    "empty": "No round played yet."
+  },
+  "rules": {
+    "headline": "Rules",
+    "place": {
+      "title": "Planting",
+      "body": "The phone goes around. Everyone secretly buries two mines. Your own mines can't hurt you — remember where they are."
+    },
+    "dig": {
+      "title": "Digging",
+      "body": "Take turns opening one plate. Someone else's mine: you drink 2 per mine, and the planter's colour flares over the crater."
+    },
+    "hints": {
+      "title": "Hints",
+      "body": "Every empty hole shows how close the crate is: Hot (right next door), Warm (two plates away), Cold (further off)."
+    },
+    "payout": {
+      "title": "Payout",
+      "body": "Whoever gets blown up drinks straight away. Planters and the finder collect tokens and hand them out at the end of the round — just not to themselves."
+    },
+    "dud": {
+      "title": "Duds",
+      "body": "In double-agent mode everyone buries one live mine and one dud. A dud only goes \"pfff\" — it costs nothing. The layer’s colour still shows: you see who planted it, but never whether it will blow."
+    }
+  },
+  "settings": {
+    "headline": "Settings",
+    "sound": "Sound",
+    "music": "Music",
+    "haptics": "Haptics",
+    "lowEffects": "Reduced effects",
+    "language": "Language",
+    "resetSession": "Reset session"
+  },
+  "dialog": {
+    "abortRound": "Abandon the round?",
+    "abortRoundBody": "The mines you buried are gone then.",
+    "abortConfirm": "Abandon",
+    "abortKeep": "Keep playing"
+  },
+  "a11y": {
+    "plateCovered": "Plate {index}, covered",
+    "plateEmpty": "Plate {index}, open, {hint}",
+    "plateCrater": "Plate {index}, crater from {names}",
+    "plateTreasure": "Plate {index}, crate",
+    "plateMine": "Plate {index}, mine from {name}"
+  },
+  "error": {
+    "title": "Something blew up",
+    "body": "This screen failed to load. Your session is saved.",
+    "reload": "Reload"
+  }
+}

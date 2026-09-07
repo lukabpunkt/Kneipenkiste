@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Erdklumpen (Art Direction §8): fliegt mit Gravity aus dem Krater. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <path d="M16 3 L27 10 L29 22 L18 29 L6 25 L3 12 Z" fill="#8C5E33" stroke="#1A1024" stroke-width="4" stroke-linejoin="round"/>
+</svg>

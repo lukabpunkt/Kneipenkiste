@@ -1,0 +1,346 @@
+/**
+ * Dig (GDD §5, Screen 5) — die Grabphase.
+ *
+ * Ablauf eines Taps, und die Reihenfolge ist verbindlich (CLAUDE.md, Architektur §3):
+ *
+ * 1. `tileTap` an die FSM — dort faellt die Entscheidung, genau einmal.
+ * 2. `DigDirector.play()` inszeniert das fertige Ergebnis: Kamera, Anticipation,
+ *    Aufdecken, Farbring, Banner. Das Feld ist waehrenddessen gesperrt; Taps werden
+ *    **ignoriert, nicht gepuffert**.
+ * 3. `digShown` an die FSM: naechster Spieler, oder Rundenende.
+ *
+ * Der Screen inszeniert selbst nichts. Er haelt Banner, Timer und Token-Anzeige — was
+ * auf dem Feld passiert, gehoert dem Director.
+ */
+
+import { t } from '@/core/i18n';
+import { createDevPanel, devMode, type DevPanel } from '@/ui/components/devPanel';
+import { seedActive } from '@/ui/devSeed';
+import { createBannerHost, type KillLine } from '@/ui/components/drinkBanner';
+import { STORAGE_KEY_ONBOARDING } from '@/config/rules';
+import { tickTurn } from '@/audio/AudioManager';
+import { createSipCounter } from '@/ui/components/sipCounter';
+import { createStageHost } from '@/ui/components/stageHost';
+import { createTimerRing, type TimerRing } from '@/ui/components/timerRing';
+import { createTokenStack } from '@/ui/components/tokenStack';
+import { createTurnBanner } from '@/ui/components/turnBanner';
+import { showToast } from '@/ui/components/toast';
+import { digPayout } from '@/core/payout';
+import { acquireWakeLock, releaseWakeLock } from '@/ui/wakeLock';
+import type { ScreenFactory } from '@/ui/router';
+import type { Cell, DigResult, PlayerId } from '@/core/types';
+
+export const createDigScreen: ScreenFactory = ({ fsm, router }) => {
+  const el = document.createElement('section');
+  el.className = 'screen screen--dig';
+
+  const playerById = (id: PlayerId) => fsm.context.players.find((p) => p.id === id);
+  const nameOf = (id: PlayerId) => playerById(id)?.name;
+  const colorOf = (id: PlayerId) => playerById(id)?.colorId;
+
+  const turnBanner = createTurnBanner();
+  const bannerHost = createBannerHost();
+
+  /*
+   * Der Director ruft `showBanner` im Moment des Aufdeckens auf — Schluecke und
+   * Schuldiger erscheinen also **mit** der Explosion, nicht danach (Design-Prioritaet 2).
+   */
+  const stage = createStageHost({ showBanner: (result) => void present(result) });
+
+  const tokenStack = createTokenStack({ colorOf, nameOf });
+  /*
+   * Die Konsequenz, die stehen bleibt (ADR-27). Das Banner ist nach 2,2 s weg; wer in
+   * dem Moment das Handy weiterreicht, hat die Zahl nie gesehen.
+   */
+  const sipCounter = createSipCounter({ colorOf, nameOf });
+
+  const footer = document.createElement('div');
+  footer.className = 'dig__footer';
+
+  const minesLeft = document.createElement('p');
+  minesLeft.className = 'dig__mines-left';
+  /*
+   * Beide Zahlen sind hoefliche Live-Regionen: Sie aendern sich nach jeder Grabung, und
+   * ein Screenreader soll sie nachreichen, ohne das Banner zu unterbrechen (Audit A5).
+   */
+  minesLeft.setAttribute('aria-live', 'polite');
+
+  /**
+   * Zwei-Kisten-Anzeige (GDD §3.6, Roadmap M5.2).
+   *
+   * Nur im Modus "Zwei Kisten" — sonst ist die Zahl immer 1 und damit keine Information,
+   * sondern Rauschen. Sobald die erste gefunden ist, sagt sie das Entscheidende: Die
+   * Runde laeuft weiter, und die zweite liegt noch irgendwo.
+   */
+  const chestsLeft = document.createElement('p');
+  chestsLeft.className = 'dig__chests-left';
+  chestsLeft.setAttribute('aria-live', 'polite');
+  chestsLeft.hidden = !fsm.context.settings.modes.twoChests;
+
+  footer.append(minesLeft, chestsLeft, sipCounter.el, tokenStack.el);
+
+  /*
+   * **Das Trink-Banner liegt ueber dem Feld, nicht darueber im Layout** (ADR-27).
+   *
+   * Vorher stand es als eigenes Flex-Kind zwischen Turn-Banner und Feld: Es erschien am
+   * oberen Bildrand, waehrend der Blick unten am Krater war, und schob beim Erscheinen
+   * das ganze Feld nach unten. Jetzt faehrt es dort ein, wo gerade etwas passiert ist.
+   */
+  stage.el.append(bannerHost.el);
+
+  /*
+   * Wie Lobby und Place-Screen: Der Rumpf scrollt, die Fusszeile nicht. Auf einem kurzen
+   * Geraet (390 x 664 im Browser) lief der Dig-Screen um 40 px ueber — und unten stand
+   * ausgerechnet der Schluck-Zaehler, also die Konsequenz, die man sehen soll (ADR-27/28).
+   */
+  const body = document.createElement('div');
+  body.className = 'dig__body';
+  body.append(turnBanner.el, stage.el);
+
+  el.append(body, footer);
+
+  if (seedActive()) {
+    const note = document.createElement('p');
+    note.className = 'dig__seed-note';
+    note.textContent = 'Test-Seed aktiv';
+    el.append(note);
+  }
+
+  let ring: TimerRing | null = null;
+  let detachTap: (() => void) | undefined;
+  let dev: DevPanel | undefined;
+  let busy = false;
+  /** Token-Konten, wie sie sich waehrend der Runde ansammeln (Anzeige, nicht Wahrheit). */
+  const tokens: Record<PlayerId, number> = {};
+
+  /* ---------------------------------------------------------------- */
+
+  /**
+   * Ein Tick pro Zug (GDD §6). Er macht aus einer Reihe von Grabungen einen Takt — man
+   * hoert, dass die Runde laeuft, ohne dass jemand mitzaehlen muss.
+   */
+  function renderTurn(): void {
+    const player = fsm.currentPlayer();
+    if (!player) return;
+    turnBanner.setPlayer(player.name, player.colorId);
+    tickTurn();
+  }
+
+  function renderBoard(): void {
+    const view = fsm.view();
+    stage.board?.renderPublic(view);
+    minesLeft.textContent = t('dig.minesRemaining', { count: view.minesRemaining });
+    chestsLeft.textContent = t('dig.chestsRemaining', { count: view.chestsRemaining });
+    tokenStack.render(tokens);
+  }
+
+  function startTimer(): void {
+    ring?.stop();
+    turnBanner.setTimer(null);
+
+    const seconds = fsm.context.settings.digTimerSec;
+    if (seconds === 0) return;
+
+    ring = createTimerRing({
+      seconds,
+      onDone: () => {
+        if (busy) return;
+        showToast(t('dig.timeUp'), { variant: 'info' });
+        // Auch der erzwungene Zug laeuft ueber die FSM und sicheren Zufall.
+        void run(() => fsm.digRandom());
+      },
+    });
+    turnBanner.setTimer(ring.el);
+    ring.start();
+  }
+
+  /**
+   * Der einzige Erklaertext des Spiels (Roadmap M5.4), und er erscheint genau einmal.
+   *
+   * "Heiss = Kiste ist direkt daneben" ist die eine Regel, die man nicht errät — alles
+   * andere zeigt das Feld von selbst. Ein Tutorial waere hier falsch: Das Spiel wird am
+   * Tisch von jemandem erklaert, der es kennt, und wer stattdessen fuenf Dialoge
+   * wegtippen muss, hat schon verloren (Design-Prioritaet 5).
+   *
+   * Im Nachtgraeber-Modus faellt der Hinweis weg — dort gibt es keine Hinweise, und ein
+   * Tipp zu etwas, das nicht existiert, ist schlimmer als keiner.
+   */
+  function showOnboardingOnce(): void {
+    if (fsm.context.settings.modes.nightDigger) return;
+    try {
+      if (globalThis.localStorage?.getItem(STORAGE_KEY_ONBOARDING) === '1') return;
+      globalThis.localStorage?.setItem(STORAGE_KEY_ONBOARDING, '1');
+    } catch {
+      // Private Mode: Dann erscheint der Hinweis jedes Mal. Harmlos.
+    }
+    showToast(t('dig.tooltip'), { variant: 'info', durationMs: 5000 });
+  }
+
+  /**
+   * Der gemeinsame Weg fuer den Tap und den abgelaufenen Timer: entscheiden lassen,
+   * inszenieren, weitergeben.
+   */
+  async function run(dig: () => boolean): Promise<void> {
+    const board = stage.board;
+    if (busy || !board) return;
+    busy = true;
+    ring?.stop();
+
+    if (!dig()) {
+      busy = false;
+      startTimer();
+      return;
+    }
+
+    const result = fsm.context.lastDig;
+    if (!result) {
+      busy = false;
+      return;
+    }
+
+    // Der Director sperrt das Feld selbst und gibt es danach wieder frei.
+    await board.play(result, fsm.view());
+
+    const after = fsm.view();
+    minesLeft.textContent = t('dig.minesRemaining', { count: after.minesRemaining });
+    chestsLeft.textContent = t('dig.chestsRemaining', { count: after.chestsRemaining });
+
+    const roundOver = result.roundOver;
+    fsm.send({ type: 'digShown' });
+    busy = false;
+
+    if (roundOver) {
+      void router.go(fsm.state === 'DISTRIBUTE' ? 'distribute' : 'result');
+      return;
+    }
+
+    renderTurn();
+    startTimer();
+  }
+
+  /**
+   * Das Banner zu einer Grabung. Ein Banner pro Ergebnis, und **Schluecke und
+   * Schuldiger stehen darin zusammen** — nie nacheinander (Design-Prioritaet 2).
+   */
+  async function present(result: DigResult): Promise<void> {
+    const digger = playerById(result.by);
+    if (!digger) return;
+
+    const payout = digPayout(result, fsm.view().size, fsm.context.settings.modes);
+    for (const [playerId, amount] of Object.entries(payout.tokens)) {
+      tokens[playerId] = (tokens[playerId] ?? 0) + amount;
+    }
+    tokenStack.render(tokens);
+    // Schluecke gibt es nur bei Krater und Preis der Gier — beides oeffentliche Ergebnisse.
+    sipCounter.add(result.by, payout.sips);
+
+    const kills: KillLine[] = payout.kills.flatMap((kill) => {
+      const layer = playerById(kill.layer);
+      const victim = playerById(kill.victim);
+      if (!layer || !victim) return [];
+      return [
+        {
+          layerName: layer.name,
+          layerColor: layer.colorId,
+          victimName: victim.name,
+          victimColor: victim.colorId,
+        },
+      ];
+    });
+
+    if (result.chainReveals.length > 0) showToast(t('dig.chainReaction'), { variant: 'info' });
+
+    switch (result.kind) {
+      case 'crater':
+        await bannerHost.show({
+          drinker: { name: digger.name, sips: payout.sips },
+          kills,
+          variant: 'boom',
+        });
+        return;
+
+      case 'greed':
+        await bannerHost.show({
+          headline: t('dig.greed'),
+          drinker: { name: digger.name, sips: payout.sips },
+          kills,
+          variant: 'boom',
+        });
+        return;
+
+      case 'treasure':
+        await bannerHost.show({
+          headline: t('dig.chest', { name: digger.name.toUpperCase() }),
+          kills: [],
+          variant: 'treasure',
+        });
+        return;
+
+      case 'dud': {
+        const layers: KillLine[] = result.dudOwners.flatMap((id) => {
+          const layer = playerById(id);
+          if (!layer) return [];
+          // Der Blindgaenger nennt seinen Leger, kostet aber nichts — genau das ist
+          // der Bluff des Doppelagent-Modus (GDD §3.6).
+          return [
+            {
+              layerName: layer.name,
+              layerColor: layer.colorId,
+              victimName: digger.name,
+              victimColor: digger.colorId,
+            },
+          ];
+        });
+        /*
+         * Die Ueberschrift nennt das Wort. "Pfff." allein hat im Playtest niemandem
+         * gesagt, was gerade passiert ist — der Ton stimmte, die Information fehlte.
+         */
+        await bannerHost.show({
+          headline: t('dig.dudHeadline'),
+          note: t('dig.dud'),
+          kills: layers,
+          variant: 'dud',
+        });
+        return;
+      }
+
+      /*
+       * `empty` — und damit auch der stumme eigene Trittstein. Kein Banner, kein Ton,
+       * kein Frame Unterschied (ADR-2).
+       */
+      case 'empty':
+        return;
+    }
+  }
+
+  return {
+    el,
+
+    activate() {
+      void acquireWakeLock();
+      renderTurn();
+      showOnboardingOnce();
+
+      if (devMode()) {
+        dev = createDevPanel(fsm, () => stage.board);
+        el.append(dev.el);
+        dev.start();
+      }
+
+      void stage.mount(fsm, 'dig').then((board) => {
+        detachTap = board.onTileTap((cell: Cell) => void run(() => fsm.send({ type: 'tileTap', cell })));
+        renderBoard();
+        startTimer();
+      });
+    },
+
+    destroy() {
+      ring?.stop();
+      detachTap?.();
+      dev?.stop();
+      bannerHost.clear();
+      stage.unmount();
+      void releaseWakeLock();
+    },
+  };
+};

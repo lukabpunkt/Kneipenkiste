@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Sprengmeister</title>
+  <!--
+    App-Icon: eine Cartoon-Bombe im aufgegrabenen Loch, daneben der weggekippte
+    Plattendeckel (Art Direction §1, §4.1). Runde ACME-Bombe mit glimmender Lunte —
+    nichts, das an echte Landminen erinnert.
+    Dicke ink-Outlines, Cel-Shading, kein Verlauf.
+
+    Komposition: Die Wiese fuellt zwei Drittel, damit das Icon auch bei 192 px als
+    "Feld" lesbar bleibt und sich vom dunklen Scope (Drinkshot) und Tresorraum
+    (Tresor) auf einen Blick unterscheidet.
+
+    Quelle für public/icons/* — gebaut mit `npm run build:icons`.
+  -->
+  <rect width="512" height="512" fill="#0F0E1A" />
+
+  <!-- Wiese -->
+  <path d="M0 168 Q128 140 256 160 Q384 180 512 152 L512 512 L0 512 Z" fill="#7ED957" />
+  <path d="M0 262 Q140 238 268 258 Q392 276 512 250 L512 512 L0 512 Z" fill="#5CB342" />
+
+  <!-- Weggekippter Plattendeckel, links hinter der Bombe -->
+  <g transform="rotate(-20 116 340)">
+    <rect x="26" y="322" width="180" height="30" rx="10" fill="#8C5E33" stroke="#1A1024" stroke-width="12" />
+    <rect x="26" y="278" width="180" height="56" rx="14" fill="#B98352" stroke="#1A1024" stroke-width="12" />
+    <!-- Grasbueschel auf dem Deckel: macht ihn als Stueck Wiese lesbar, nicht als Brett -->
+    <path d="M74 278 l-8 -26 l14 11 l6 -22 l9 26 z" fill="#5CB342" stroke="#1A1024" stroke-width="7" stroke-linejoin="round" />
+    <path d="M150 278 l-7 -22 l12 9 l5 -19 l8 22 z" fill="#5CB342" stroke="#1A1024" stroke-width="7" stroke-linejoin="round" />
+  </g>
+
+  <!-- Das Loch, in dem die Bombe sitzt -->
+  <ellipse cx="286" cy="374" rx="150" ry="46" fill="#1A1024" />
+  <ellipse cx="286" cy="368" rx="136" ry="38" fill="#4A2E17" />
+
+  <!-- Bombe -->
+  <circle cx="286" cy="296" r="122" fill="#1A1024" />
+  <circle cx="286" cy="296" r="110" fill="#2E2740" />
+  <!-- Cel-Shading: eine harte Kante, kein Verlauf -->
+  <path d="M286 186 A110 110 0 0 1 286 406 Z" fill="#191324" />
+  <!-- Glanzpunkt -->
+  <ellipse cx="242" cy="252" rx="30" ry="20" fill="#FFF8E7" opacity="0.9" transform="rotate(-30 242 252)" />
+
+  <!-- Erdrand vor der Bombe, damit sie IM Loch sitzt statt davor zu schweben -->
+  <path
+    d="M150 374 A150 46 0 0 0 422 374 A150 46 0 0 1 150 374 Z"
+    fill="#4A2E17"
+    stroke="#1A1024"
+    stroke-width="10"
+    stroke-linejoin="round"
+  />
+
+  <!-- Zündkappe -->
+  <rect x="258" y="164" width="56" height="34" rx="10" fill="#8C5E33" stroke="#1A1024" stroke-width="10" />
+
+  <!-- Lunte -->
+  <path d="M286 168 C286 128 330 122 340 92" fill="none" stroke="#1A1024" stroke-width="22" stroke-linecap="round" />
+  <path d="M286 168 C286 128 330 122 340 92" fill="none" stroke="#D18E00" stroke-width="11" stroke-linecap="round" />
+
+  <!-- Funke am Luntenende -->
+  <g stroke="#1A1024" stroke-width="9" stroke-linecap="round">
+    <line x1="342" y1="88" x2="342" y2="52" />
+    <line x1="342" y1="88" x2="382" y2="66" />
+    <line x1="342" y1="88" x2="306" y2="62" />
+  </g>
+  <g stroke="#FFB800" stroke-width="4" stroke-linecap="round">
+    <line x1="342" y1="88" x2="342" y2="52" />
+    <line x1="342" y1="88" x2="382" y2="66" />
+    <line x1="342" y1="88" x2="306" y2="62" />
+  </g>
+  <circle cx="342" cy="86" r="19" fill="#1A1024" />
+  <circle cx="342" cy="86" r="12" fill="#FFB800" />
+
+  <!-- Grasbüschel am Lochrand -->
+  <path d="M118 396 l-9 -30 l16 13 l7 -26 l10 30 z" fill="#5CB342" stroke="#1A1024" stroke-width="7" stroke-linejoin="round" />
+  <path d="M436 388 l-8 -26 l14 11 l6 -22 l9 26 z" fill="#5CB342" stroke="#1A1024" stroke-width="7" stroke-linejoin="round" />
+</svg>

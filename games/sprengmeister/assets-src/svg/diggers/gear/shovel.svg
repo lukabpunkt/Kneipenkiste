@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Schaufel (Art Direction §5): Hand-Slot. Stiel zeigt nach oben, Blatt nach unten. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 128" width="64" height="128">
+  <path d="M32 8 L32 84" stroke="#1A1024" stroke-width="14" stroke-linecap="round"/>
+  <path d="M32 8 L32 84" stroke="#B98352" stroke-width="8" stroke-linecap="round"/>
+  <!-- D-Griff oben -->
+  <path d="M22 12 Q32 2 42 12" stroke="#1A1024" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <!-- Blatt -->
+  <path d="M14 82 L50 82 L44 116 Q32 124 20 116 Z"
+        fill="#8C93A8" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M32 82 L32 118" stroke="#1A1024" stroke-width="4" opacity="0.5"/>
+</svg>

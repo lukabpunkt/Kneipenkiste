@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Aufgestellte Haare (hit_soot_face, GDD §4.1): sitzen ueber dem Kopf. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 64" width="128" height="64">
+  <g stroke="#1A1024" stroke-width="9" stroke-linecap="round" fill="none">
+    <path d="M30 60 L14 16"/><path d="M46 60 L38 8"/><path d="M64 60 L64 4"/>
+    <path d="M82 60 L90 8"/><path d="M98 60 L114 16"/>
+  </g>
+</svg>
