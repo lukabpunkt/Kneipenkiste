@@ -1,6 +1,6 @@
 # 🍺 Kneipenkiste
 
-Pass-the-Phone-Spiele für den Küchentisch. Ein Handy, ein Tisch, deine Freunde — kein Download, kein Konto, kein Server.
+Trinkspiele fürs Handy — ein Gerät, alle spielen mit. Kein Download, kein Konto, kein Server.
 
 **Spielen (Beta):** https://lukabpunkt.github.io/Kneipenkiste/
 
