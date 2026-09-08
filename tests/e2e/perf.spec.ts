@@ -128,6 +128,51 @@ test.describe('Bühne', () => {
     expect(peakDraws).toBeLessThanOrEqual(RENDER.maxDrawBatches);
   });
 
+  test('bleibt während der Fall-Sequenzen bei höchstens zwei Long-Tasks (Audit A4)', async ({ page }) => {
+    await seedSession(page, { playerCount: 6, pace: 'normal' });
+    await page.goto(`${BASE}?dev=1`);
+    await page.getByRole('button', { name: 'Spielen' }).click();
+    await startRound(page);
+    await endNegotiation(page);
+
+    /*
+     * Drei auf einem Balken (`fall_domino` möglich) plus ein Paar: die dichteste Stelle,
+     * die das Spiel kennt — zwei Sequenzen gleichzeitig, Splitter, Spritzer, Sprechblasen.
+     */
+    await chooseAll(page, [1, 1, 1, 3, 3, 5]);
+
+    /*
+     * Long-Tasks zählen, **bevor** die Show anfängt. Ein Task über 50 ms ist ein Frame,
+     * der ausfällt — und im Bruch fällt genau der auf, an dem es kracht.
+     */
+    await page.evaluate(() => {
+      const target = globalThis as unknown as { __longTasks?: number };
+      target.__longTasks = 0;
+      try {
+        new PerformanceObserver((list) => {
+          target.__longTasks = (target.__longTasks ?? 0) + list.getEntries().length;
+        }).observe({ entryTypes: ['longtask'] });
+      } catch {
+        /* Kein Long-Task-API (WebKit) — dann bleibt der Zähler bei 0 und der Test bei Chromium. */
+      }
+    });
+
+    await page.getByRole('button', { name: 'Der Schritt' }).click();
+    await expect(page.locator('.step__stage canvas')).toBeVisible({ timeout: 30_000 });
+
+    const skip = page.locator('.step__skip');
+    await expect(skip).toBeEnabled({ timeout: 40_000 });
+    /* Bis ans Ende laufen lassen — der Aufstieg gehört zur Sequenz. */
+    await page.waitForTimeout(3000);
+
+    const longTasks = (await page.evaluate(
+      () => (globalThis as unknown as { __longTasks?: number }).__longTasks ?? 0
+    )) as number;
+
+    console.log(`Long-Tasks während der Stürze: ${longTasks}`);
+    expect(longTasks).toBeLessThanOrEqual(2);
+  });
+
   test('räumt die Bühne ab, wenn der Schritt vorbei ist', async ({ page }) => {
     await seedSession(page, { playerCount: 3 });
     await page.goto(BASE);

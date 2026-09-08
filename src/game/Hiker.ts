@@ -107,6 +107,8 @@ export class Hiker {
   private facing: 1 | -1 = 1;
   /** Solange eine Sequenz das Rig führt, hält sich der Walk-Cycle heraus. */
   private driven = false;
+  /** Wohin der Hut geflogen ist — `reset()` holt ihn zurück. */
+  private detachedHat: Container | undefined;
 
   constructor(options: HikerOptions) {
     this.sheet = options.sheet;
@@ -238,6 +240,16 @@ export class Hiker {
     return RIG.height * this.baseScale;
   }
 
+  /** Breite in Welteinheiten — für Abstände und Stapel. */
+  get width(): number {
+    return this.height * 0.46;
+  }
+
+  /** Der Körper ohne Schatten: Das ist, was eine Sequenz kippen und stauchen darf. */
+  get rig(): { body: Container; head: Container; hat: Sprite } {
+    return { body: this.body, head: this.head, hat: this.hat };
+  }
+
   /**
    * Läuft zu einem Punkt und ist **zu einer bestimmten Zeit** dort.
    *
@@ -311,6 +323,35 @@ export class Hiker {
     this.head.rotation = 0;
   }
 
+  /**
+   * Hängt den Hut an einen anderen Container um, damit er unabhängig vom Kopf fliegen
+   * kann (GDD §4.3, `fall_coyote_delay`: "die Hüte bleiben oben und schweben hinterher").
+   *
+   * Die Weltposition bleibt erhalten, sonst springt der Hut im Moment des Umhängens.
+   */
+  detachHat(target: Container): Sprite | null {
+    if (this.detachedHat || !this.hat.visible) return null;
+
+    const global = this.hat.getGlobalPosition();
+    this.detachedHat = target;
+    target.addChild(this.hat);
+    this.hat.position.copyFrom(target.toLocal(global));
+    this.hat.scale.set(this.view.scale.x, this.view.scale.y);
+    this.hat.rotation = this.view.rotation;
+    return this.hat;
+  }
+
+  /**
+   * Squash & Stretch (Art Direction §7).
+   *
+   * `1` ist die Ruhelage, kleinere Werte platten, grössere strecken. Die Gegenachse wird
+   * mitgerechnet, damit das Volumen erhalten bleibt — sonst sieht es nach Skalierung aus
+   * statt nach Aufprall.
+   */
+  squash(amount: number): void {
+    this.body.scale.set(1 / amount, amount);
+  }
+
   /** Nass am Seil wieder hochklettern — jede Fall-Sequenz endet damit (Art Direction §7). */
   wetClimb(toX: number, toY: number): gsap.core.Timeline {
     this.setFace('wet');
@@ -366,7 +407,25 @@ export class Hiker {
     this.speed = 0;
     this.facing = 1;
 
-    gsap.killTweensOf([this.view, this.view.position, this.body, this.head, this.armL, this.armR]);
+    gsap.killTweensOf([
+      this.view,
+      this.view.position,
+      this.view.scale,
+      this.body,
+      this.body.scale,
+      this.head,
+      this.armL,
+      this.armR,
+      this.hat,
+      this.hat.position,
+      this.hat.scale,
+    ]);
+
+    /* Einen weggeflogenen Hut zurück an den Kopf holen. */
+    if (this.detachedHat) {
+      this.head.addChild(this.hat);
+      this.detachedHat = undefined;
+    }
 
     this.view.rotation = 0;
     this.view.alpha = 1;
@@ -392,6 +451,7 @@ export class Hiker {
     this.hat.position.set(0, RIG.hat.y - RIG.head.y);
     this.hat.rotation = 0;
     this.hat.alpha = 1;
+    this.hat.scale.set(1);
     this.hat.visible = true;
 
     this.fish.visible = false;

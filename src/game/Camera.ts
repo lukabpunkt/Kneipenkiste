@@ -103,7 +103,7 @@ export class Camera {
   }
 
   /** Der Schlag im Moment des Bruchs. */
-  shake(strength = CAMERA.shakePx, durationMs = CAMERA.shakeMs): gsap.core.Timeline {
+  shake(strength: number = CAMERA.shakePx, durationMs: number = CAMERA.shakeMs): gsap.core.Timeline {
     const timeline = gsap.timeline({
       onUpdate: () => this.apply(),
       onComplete: () => {
@@ -128,7 +128,7 @@ export class Camera {
   }
 
   /** Die Kamera folgt dem Sturz bis zum Fluss und kommt dann zurück. */
-  followFall(durationMs = CAMERA.fallPanMs): gsap.core.Timeline {
+  followFall(durationMs: number = CAMERA.fallPanMs): gsap.core.Timeline {
     const timeline = gsap.timeline();
     timeline
       .to(this.focus, {

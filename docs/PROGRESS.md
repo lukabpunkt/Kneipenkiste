@@ -6,7 +6,7 @@
 | M1 UI-Flow (Platzhalter-Schritt) | ✅ fertig | `v0.1.0` | A1 bestanden |
 | M2 Schlucht, Brücke, Hikers | ✅ fertig | `v0.2.0` | A2 bestanden |
 | M3 Show: Knarren, Blickkontakt, Audio | ✅ fertig | `v0.3.0` | A3 bestanden |
-| M4 Fall-Sequenzen | ⬜ offen | – | – |
+| M4 Fall-Sequenzen | ✅ fertig | `v0.4.0` | A4 bestanden |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
 | M6 Playtest & Release | ⬜ offen | – | – |
 
@@ -164,3 +164,73 @@
 - Der Vertrag steht: `Sequence.build(ctx)` liefert eine Timeline, `ctx.timing.snapMs` sagt, wann der Balken reisst, die drei Labels sind Pflicht. `BasicFall.ts` ist die Vorlage.
 - `sequences.test.ts` erwartet ausdrücklich, dass die sechs Fall-Sequenzen **fehlen**. Wer sie baut, dreht diesen Test um — das ist die Erinnerung, ihn anzupassen.
 - Gustav kann `carry()` für `fall_seesaw`, die Sterne-Partikel warten auf `fall_bounce_wall`, das "HILFE"-Schild auf `fall_coyote_delay`. Die Bausteine liegen bereit.
+
+## Audit A4 — 2026-09-08
+
+**Ergebnis:** BESTANDEN (ein SOLL offen: Video und Lustig-Test sind manuell)
+
+### Eine Zeile je Sequenz
+
+Alle sechs bauen auf `fallKit.ts` (ADR-22) und tragen dadurch dieselbe Signatur: Blickkontakt bei 0 ms, Bruch bei 900 ms, danach der eigene Gag, am Ende klettert jeder wieder hoch. Geprüft wird jede Zeile in `fallSequences.test.ts` auf einer echten Bühne ohne Renderer (ADR-23).
+
+| Sequenz | Gag — in 1 s lesbar | Labels · Reset | Prinzipien · Ton | Dauer | Long-Tasks* |
+|---|---|---|---|---|---|
+| `fall_hold_hands` (Gewicht 3) | Zwei greifen sich an den Händen und drehen sich im Fall um einen gemeinsamen Punkt wie Eiskunstläufer. Wer fällt und mit wem, steht in einem einzigen Bild. | 0 / 900 / 4150 ms ✅ · trocken, aufrecht, Hut auf ✅ | Anticipation (Zusammenrücken vor dem Bruch), Follow-Through (Rotation läuft nach dem Platsch aus), Hit-Stop im Blick · `creak_1` → `plank_snap` → `whistle_fall` → `splash` | 4,15 s ✅ | 2 (Pixel 5) ✅ |
+| `fall_coyote_delay` (2) | Der Balken ist weg, die beiden stehen noch 950 ms in der Luft, halten ein "HILFE"-Schild hoch — dann erst fallen sie. Die Hüte bleiben oben und schweben hinterher. | 0 / 900 / 4650 ms ✅ · Hut ist zurück am Kopf ✅ | Anticipation als Pause, Timing (die Pause **ist** der Gag), Follow-Through (Hüte), Secondary Action (Blick nach unten) · `crowd_gasp` in der Pause, `hat_flutter`, `whistle_fall` | 4,65 s ✅ | 2 ✅ |
+| `fall_seesaw` (2) | Der Balken kippt wie eine Wippe: Der Schwere geht runter und katapultiert den Leichten hoch — auf Gustav, der ihn ein Stück trägt und dann fallen lässt. | 0 / 900 / 4520 ms ✅ · Gustav gibt den Passagier frei, kein Rest-Parent ✅ | Squash beim Aufprall, Overshoot beim Katapult, Arcs (Flugbahn), Appeal (Gustav lacht) · `rock_squash`, `balloon_deflate`, `vulture_screech`, `vulture_laugh` | 4,52 s ✅ | 2 ✅ |
+| `fall_rope_swing` (2) | Sie greifen im letzten Moment die Seile, schwingen zur nächsten Wand, klatschen dagegen (Squash auf 0,62) — und rutschen dann doch ab. Sternchen. | 0 / 900 / 4650 ms ✅ · `body.scale` wieder 1/1 ✅ | Anticipation (Greifen), Squash & Stretch (Wandkontakt), Arcs (Pendel), Follow-Through (Sterne) · `rope_strain`, `rock_squash`, `whistle_fall` | 4,65 s ✅ | 2 ✅ |
+| `fall_domino` (3, nur ab drei) | Der erste kippt auf den zweiten, der auf den dritten, im Abstand von 130 ms. Sie fallen als Stapel; der unterste fragt "Warum ich?!". | 0 / 900 / 4490 ms ✅ · Rotation 0, Stapel aufgelöst ✅ | Staggering (die Kette), Anticipation je Glied, Overshoot beim Kippen, Appeal (Sprechblase) · `step_thud` je Glied, `whistle_fall` | 4,49 s ✅ | 2 ✅ |
+| `fall_bounce_wall` (2) | Ping-Pong zwischen den Wänden, drei Aufpraller mit Squash, Landung als Häufchen auf einem Felsvorsprung — und dann rutscht der Felsvorsprung ab. Zweistufige Pointe. | 0 / 900 / 4580 ms ✅ · Kamera zurück auf die Brücke ✅ | Squash & Stretch (jeder Aufprall), Timing (Bounces werden kürzer), Anticipation vor der zweiten Pointe, Hit-Stop auf dem Vorsprung · `rock_squash` ×3, `relief_exhale`, `wood_rot` | 4,58 s ✅ | 2 ✅ |
+
+\* Long-Tasks werden nicht je Sequenz einzeln gemessen, sondern an der dichtesten Stelle, die das Spiel überhaupt erzeugt: sechs Spieler, drei auf einem Balken und zwei auf einem zweiten, also `fall_domino` und ein Paar-Sturz gleichzeitig, mit Splittern, Spritzern und zwei Sprechblasen. Wer diesen Frame übersteht, übersteht jede Sequenz allein. Gemessen: 2 von 2 erlaubten.
+
+Der "Lustig-Test" (≥ 2 von 3 grinsen) ist ein SOLL und steht als manueller Check unten. Die Bilder dafür liegen fertig: `docs/screens/falls/` hat je Sequenz fünf Momente (Blick, Bruch, Gag, Nachschlag, Aufstieg).
+
+### Gesamt
+
+| Check | Status | Notiz |
+|---|---|---|
+| `fall_domino` nur ab drei Beteiligten | ✅ | Steht als `minGroup: 3` im Katalog, nicht in der Sequenz — der Choreographer wählt schon in `core/`, eine Sequenz, die sich selbst ablehnt, käme zu spät. `sequenceRegistry.test.ts` spielt 1 000 Runden und findet Domino nie bei einem Paar. |
+| No-Repeat-Fenster 3 über 1 000 Runden | ✅ | Über 1 000 Runden wird jede Fall- und jede Sicher-Sequenz benutzt, und keine wiederholt sich innerhalb des Fensters. Gewichtung geprüft: `hold_hands` läuft öfter als `rope_swing`, und in 5 000 Zügen kommt keine Sequenz seltener als ROUNDS/2. Gleicher Seed ⇒ gleiche Folge. |
+| Overlays kombinieren korrekt | ✅ | `rotten_crack` und `deserter_stamp` liegen auf derselben Timeline wie die Fall-Sequenz und zielen auf ihre eigenen Ziele; `show.test.ts` prüft über 1 000 Runden, dass jedes Overlay den richtigen Spieler und Balken trifft, auch wenn zwei Sequenzen gleichzeitig laufen. |
+| Dauer ≤ 5 s je Sequenz | ✅ | Gemessen 4,15–4,65 s. Der Test prüft beide Seiten: nicht länger als 5 s und nicht kürzer als 1,5 s — eine leere Timeline soll nicht als "bestanden" durchgehen. |
+| Labels `eyeContact` < `snap` < `climbedBack` | ✅ | Je Sequenz ein Test, plus: `eyeContact` liegt bei genau 0. Der Blick ist der Anfang der Sequenz (ADR-18), nicht eine Station in der Mitte. |
+| Nach `reset()` steht jeder trocken und aufrecht da | ✅ | Der teuerste Test des Meilensteins und der wichtigste: Rotation 0, Deckkraft 1, Gesicht `neutral`, nicht mehr fremdgesteuert, `body.scale` 1/1, Hut wieder am Kopf. Sechs Sequenzen greifen tief in die Figuren — ohne diesen Test bringt die siebte Runde einen halb umgedrehten Wanderer mit. |
+| ≤ 2 Long-Tasks während der Stürze | ✅ | `perf.spec.ts` fährt sechs Spieler auf drei Balken (`fall_domino` plus ein Paar — die dichteste Stelle, die das Spiel kennt) und zählt Long-Tasks ab dem Schritt: **2 von 2 erlaubt** auf Pixel 5 unter SwiftShader, 0 auf WebKit (kein Long-Task-API). Am Limit, nicht darüber — siehe Follow-ups. |
+| Partikel- und Draw-Budget halten | ✅ | Höchststand 27 Partikel von 200, 1 Draw-Call auch mit Sprechblasen und Splittern. |
+| Dev-Preview zeigt jede Sequenz auf Knopfdruck | ✅ | `?dev=1&panel=sequences`: ein Knopf je Sequenz, und der Knopf zeigt **die** Sequenz, nicht irgendeine (ADR-25). Die Liste klappt weg, sobald die Show läuft. |
+| Video `docs/screens/m4-falls.mp4` | ⏳ manuell | SOLL. Die 30 Standbilder sind da; ein Video braucht eine Bildschirmaufnahme vom Gerät. |
+| "Lustig-Test": ≥ 2 von 3 grinsen | ⏳ manuell | Siehe unten. |
+
+**Zahlen:** 367 Unit-Tests · 42 E2E · 14 Katalog-Sequenzen (6 Fall + 3 Sicher + 3 Misc + 2 Overlay) plus `basic_fall` als Fallback · Dauer 4,15–4,65 s · Long-Tasks 2/2 · 27 Partikel · 1 Draw-Call · JS-Loop 0,10 ms p95 · JS 258 KB gzip (Budget 450), davon 37 KB im Einstiegs-Chunk.
+
+**Zur E2E-Zahl:** 42 von 42 sind grün, aber nicht in einem einzigen Lauf. Der Durchlauf über beide Geräte brauchte 1,1 Stunden statt der üblichen zehn Minuten, weil auf dieser Maschine ein Unity-Batch-Job dauerhaft einen Kern belegte; vier WebKit-Tests scheiterten dabei an Playwrights Stabilitäts-Prüfung ("element is not stable"), zwei davon an unterschiedlichen Stellen bei zwei Läufen. Nachgefahren ohne Last: dieselben vier grün in 3,1 Minuten. Das ist eine Aussage über die Maschine, nicht über den Code — und deshalb steht sie hier und nicht als bestandener Haken.
+
+**Was M4 gebracht hat**
+- **Die sechs Stürze.** Händchenhalten, Coyote-Pause, Wippe, Seilschwung, Domino, Wandkicker. Damit ist der Katalog aus GDD §4.3 vollständig; `missingImplementations()` gibt eine leere Liste zurück, und der M3-Test, der ausdrücklich prüfte, dass sie **fehlen**, ist umgedreht.
+- **Ein Bausatz statt sechs Kopien** (ADR-22). `eyeContact`, `snap`, `splash`, `climbBack`, `dropToRiver`, `hatsFlutter` liegen in `fallKit.ts`. Die Signatur des Spiels steht damit an genau einer Stelle im Code — und jede Sequenz-Datei enthält nur noch ihren Gag. `BasicFall.ts` ist dadurch von der Vorlage zur kürzesten der sieben geschrumpft.
+- **Sequenzen werden getestet, nicht abgetippt** (ADR-23). Bis M3 durchsuchten die Tests den Quelltext nach `addLabel(...)`. Jetzt läuft jede Sequenz wirklich, auf einer Bühne aus echten Hikers ohne Renderer, und der Test schaut sich das Ergebnis an: Wo liegen die Labels, wie lang ist die Timeline, was klingt, und wie steht die Figur nach dem Reset da.
+- **Die Preview ist ein Werkzeug geworden** (ADR-25). Ein Knopf je Sequenz, der genau diese Sequenz zeigt; die Liste klappt weg, sobald es losgeht; `npm run capture:falls` fotografiert je Sequenz fünf Momente nach `docs/screens/falls/`.
+
+**Vier Fehler, die erst das laufende Bild gezeigt hat:**
+1. **Der Router hat Screens verschluckt.** Der Sequenz-Preview schickt eine ganze Runde in einem Rutsch los; der Choose-Screen mountete, wenn die FSM schon beim Schritt war, und warf. Die erste Reparatur — "das jüngste Ziel gewinnt" — hat den Preview gerettet und im echten Spiel Screens übersprungen, auf denen die Runde gerade stand: vier E2E-Tests fielen, und die Symptome (leerer Bedenkzeit-Timer, fehlender Schritt-Screen) sahen nach allem aus, nur nicht nach dem Router. Jetzt fragt der Router die FSM, ob ein Ziel noch aktuell ist (ADR-24). Aus demselben Fehler kamen zwei Härtungen: Eine gescheiterte Navigation legt die Schlange nicht mehr still, und der Wipe wird auch im Fehlerfall abgeräumt — er deckt den ganzen Screen ab und schluckt sonst jeden Tap. `tests/unit/router.test.ts` hält alle drei fest.
+2. **`fall_bounce_wall` dauerte 5,04 s** — vier Hundertstel über dem A4-Limit, und das ist trotzdem ein Nein. Die Kamerafahrt hinunter war zu lang und die Pause auf dem Felsvorsprung zu großzügig; beides gekürzt (420 ms statt 600, 0,5 s statt 0,6). Der zweistufige Gag ist geblieben.
+3. **PIXI-Text starb in jsdom.** `Cannot set properties of null (setting 'font')` — ein `Text` misst beim Erzeugen über einen 2D-Kontext, den es in jsdom nicht gibt. Ohne Sprechblasen wären die Tests aber genau um die Stelle herumgelaufen, die die Sequenzen ausmacht. Jetzt stellt `tests/setup.ts` eine Attrappe mit fester Glyphenbreite.
+4. **Die Preview zeigte irgendeinen Sturz.** Der Knopf stellte nur die Ausgangslage her; welche der sechs lief, entschied die gewichtete Auswahl. Wer "Wippe" drückte, sah viermal etwas anderes — zum Ansehen unbrauchbar und zum Abfotografieren erst recht (ADR-25).
+
+**Offene SOLL-Follow-ups:**
+1. **Long-Tasks stehen bei 2 von 2 erlaubten** — bestanden, aber ohne Luft. Gemessen unter SwiftShader ohne GPU; auf echter Hardware sollte es besser aussehen. Der Frame-Check auf dem Referenzgerät steht unten als manueller Punkt, und beim Polish-Durchgang in M5 gehört die Stelle noch einmal angesehen.
+2. Aus M3 offen: Die Töne sind synthetisiert (ADR-20) und klingen so; echte Aufnahmen ersetzen die WAVs Datei für Datei.
+3. Aus M2 offen: Symbole auf der Bühne klein (~11 px); WebGPU-/Canvas-Renderer ungenutzt im Bühnen-Chunk (~21 KB gzip).
+
+**Manuelle Checks für Luka vor M5:**
+- [ ] **Lustig-Test (A4, SOLL):** Drei Personen sehen die sechs Stürze (`?dev=1&panel=sequences`, ein Knopf je Sequenz). Ziel: Bei mindestens zwei von drei zieht sich bei mindestens vier der sechs das Gesicht. Welche floppt, kommt in die Notizen — Gewichtung ist eine Zahl in `config/sequences.ts`.
+- [ ] **Video `docs/screens/m4-falls.mp4`** (SOLL): eine Bildschirmaufnahme vom Handy, alle sechs Sequenzen hintereinander. Die 30 Standbilder in `docs/screens/falls/` ersetzen es nicht — an einem Sturz interessiert die Bewegung.
+- [ ] **Frame-Rate beim dichtesten Bild:** sechs Spieler, drei auf einem Balken plus ein Paar. `?dev=1` zeigt JS-Zeit und Draw-Calls unten rechts. Ziel 60 fps, Minimum 30.
+- [ ] **Klettert wirklich jeder wieder hoch?** Fünf Runden am Stück spielen und darauf achten, ob jemand nass, schief oder ohne Hut zurückkommt. Der Test prüft das nach jeder Sequenz einzeln — was er nicht prüfen kann, ist die sechste Runde nach fünf verschiedenen Stürzen.
+- [ ] Aus M3 offen: Spannungs-Test mit drei Personen; Ton auf dem Handy; einmal stumm durchspielen.
+
+**Anmerkungen für M5:**
+- Die Bausteine für Polish liegen bereit: `fallKit.ts` ist die Stelle, an der eine Änderung an der Signatur alle sechs Sequenzen erreicht.
+- `stageHarness.ts` kann jede Bühnen-Sequenz ohne Renderer bauen — die Sicher- und Misc-Sequenzen aus M3 sind bisher nur über den Quelltext geprüft. Sie auf denselben Test umzustellen ist eine halbe Stunde und schließt die letzte Lücke im Sequenz-System.
+- Der Router hat jetzt ein `outdated`. Wer in M5 einen Screen ergänzt, muss ihn in `SCREEN_FOR_STATE` eintragen, sonst gilt er als veraltet und mountet nie.

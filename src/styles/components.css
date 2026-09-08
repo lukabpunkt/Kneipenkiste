@@ -629,11 +629,25 @@ button.plank:active:not(:disabled) {
   font-size: 11px;
 }
 
-.dev-sequences h2 {
-  margin: 0 0 4px;
-  font-family: inherit;
-  font-size: 11px;
-  opacity: 0.6;
+.dev-sequences__toggle {
+  padding: 4px 6px;
+  border: none;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 12%);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.dev-sequences__list {
+  display: grid;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+/* Eingeklappt bleibt nur der Knopf stehen — die Bühne gehört der Sequenz. */
+.dev-sequences[data-open='false'] .dev-sequences__list {
+  display: none;
 }
 
 .dev-sequences__item {

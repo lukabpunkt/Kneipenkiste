@@ -1,15 +1,13 @@
 /**
- * Das Sequenz-System (Audit A3).
+ * Das Sequenz-System, von aussen betrachtet (Audit A3/A4).
  *
- * Zwei Dinge werden hier festgehalten, und beide sind Verträge, keine Details:
+ * Hier stehen die Prüfungen, die man am **Quelltext** machen muss, weil sie von einer
+ * laufenden Timeline nicht zu beantworten sind: Ist jede Datei angemeldet? Greift eine
+ * Sequenz an der Projektion vorbei? Steht irgendwo Text hart im Code?
  *
- * 1. **Katalog und Registry passen zusammen.** Der Choreographer wählt in M0 aus dem
- *    Katalog; gebaut wird in M3/M4. Wählt er etwas, das es nicht gibt, bliebe die Show
- *    stehen — deshalb sagt `missingImplementations()` jederzeit, was fehlt.
- * 2. **Jede Fall-Sequenz trägt `eyeContact` < `snap` < `climbedBack`.** Das ist die
- *    Signatur des Spiels als prüfbare Zusicherung (ADR-3, Architektur §7).
- *
- * Was hier **nicht** geprüft wird, ist das Aussehen. Dafür gibt es den Look-Check.
+ * Was die Sequenzen **tun** — Labels, Dauer, Zustand nach dem Zurücksetzen — prüft
+ * `fallSequences.test.ts` an der echten Timeline auf einer Bühne ohne Renderer. Das ist
+ * die stärkere Aussage, und sie hat in M3 nur gefehlt, weil es den Harnisch noch nicht gab.
  */
 
 import { describe, expect, it } from 'vitest';
@@ -20,7 +18,7 @@ import {
   OVERLAY_SEQUENCES,
   SAFE_SEQUENCES,
 } from '@/config/sequences';
-import { PREVIEW_SCENARIOS } from '@/dev/sequencePreview';
+import { PREVIEW_SCENARIOS, fullPicks } from '@/dev/sequencePreview';
 
 /*
  * Die Sequenzen selbst ziehen PIXI und GSAP nach. In jsdom lässt sich das laden, aber
@@ -36,7 +34,14 @@ function sequenceFiles(dir = SEQUENCE_ROOT, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) sequenceFiles(full, out);
-    else if (full.endsWith('.ts') && !full.endsWith('Sequence.ts') && !full.endsWith('context.ts') && !full.endsWith('index.ts')) {
+    else if (
+      full.endsWith('.ts') &&
+      /* Interface, Kontext, Anmeldung und die geteilten Bausteine sind keine Sequenzen. */
+      !full.endsWith('Sequence.ts') &&
+      !full.endsWith('context.ts') &&
+      !full.endsWith('index.ts') &&
+      !full.endsWith('fallKit.ts')
+    ) {
       out.push(full);
     }
   }
@@ -80,14 +85,15 @@ describe('Registry', () => {
     for (const id of Object.values(OVERLAY_SEQUENCES)) expect(built.has(id), id).toBe(true);
   });
 
-  it('lässt die sechs Fall-Sequenzen offen — sie kommen in M4', () => {
+  it('hat seit M4 alle sechs Fall-Sequenzen gebaut', () => {
     /*
-     * Bewusst als Test und nicht als Kommentar: Wenn M4 sie baut, schlägt genau dieser
-     * Test fehl und erinnert daran, ihn umzudrehen.
+     * In M3 stand hier das Gegenteil — der Test war die Erinnerung, ihn umzudrehen,
+     * sobald M4 die Sequenzen baut. Genau das ist passiert.
      */
     for (const meta of FALL_SEQUENCES) {
-      expect(built.has(meta.id), `${meta.id} ist gebaut — dann gehört dieser Test angepasst`).toBe(false);
+      expect(built.has(meta.id), `${meta.id} fehlt`).toBe(true);
     }
+    /* Der Rückfall bleibt: Ein Tippfehler im Katalog soll die Show nicht anhalten. */
     expect(built.has('basic_fall')).toBe(true);
   });
 
@@ -100,33 +106,26 @@ describe('Registry', () => {
   });
 });
 
-describe('Die Signatur in der Fall-Sequenz (ADR-3)', () => {
+describe('Die geteilten Bausteine', () => {
   const fallFiles = files.filter((file) => file.includes('/fall/'));
 
   it('gibt es überhaupt', () => {
     expect(fallFiles.length).toBeGreaterThan(0);
   });
 
-  it('setzt in jeder Fall-Sequenz `eyeContact` < `snap` < `climbedBack`', () => {
+  it('baut jede Fall-Sequenz aus denselben Teilen (Roadmap M4.3)', () => {
+    /*
+     * Blickkontakt, Bruch, Platsch und Aufstieg kommen aus `fallKit` — nicht weil es
+     * kürzer ist, sondern weil es die einzige Art ist, die Signatur (ADR-3) und "jeder
+     * klettert wieder hoch" (Art Direction §7) sechsmal gleich zu bekommen.
+     *
+     * **Dass** sie richtig laufen, prüft `fallSequences.test.ts` an der echten Timeline.
+     */
     for (const file of fallFiles) {
       const source = sources.get(file)!;
-      const eye = source.indexOf("addLabel('eyeContact'");
-      const snap = source.indexOf("addLabel('snap'");
-      const back = source.indexOf("addLabel('climbedBack'");
-
-      expect(eye, `${file}: eyeContact fehlt`).toBeGreaterThanOrEqual(0);
-      expect(snap, `${file}: snap fehlt`).toBeGreaterThanOrEqual(0);
-      expect(back, `${file}: climbedBack fehlt`).toBeGreaterThanOrEqual(0);
-
-      /* Die Reihenfolge im Quelltext ist die Reihenfolge auf der Timeline. */
-      expect(eye, `${file}: eyeContact muss vor snap stehen`).toBeLessThan(snap);
-      expect(snap, `${file}: snap muss vor climbedBack stehen`).toBeLessThan(back);
-    }
-  });
-
-  it('lässt jede Fall-Sequenz mit einem Aufstieg enden — kein Hiker verschwindet', () => {
-    for (const file of fallFiles) {
-      expect(sources.get(file)!, file).toContain('wetClimb');
+      for (const part of ['eyeContact(', 'snap(', 'splash(', 'climbBack(']) {
+        expect(source, `${file}: benutzt ${part} nicht`).toContain(part);
+      }
     }
   });
 });
@@ -166,6 +165,24 @@ describe('Dev-Preview', () => {
     for (const scenario of PREVIEW_SCENARIOS) {
       expect(scenario.picks.length, scenario.id).toBe(scenario.players);
       expect(scenario.label.length, scenario.id).toBeGreaterThan(3);
+    }
+  });
+
+  it('füllt jedes Szenario auf die Spielerzahl der Lobby auf', () => {
+    /*
+     * Ohne das bleibt die Runde in CHOOSE stehen, sobald die Lobby mehr Leute hat als das
+     * Szenario nennt — genau so ist der Preview beim ersten Versuch hängengeblieben.
+     */
+    for (const scenario of PREVIEW_SCENARIOS) {
+      for (const playerCount of [3, 5, 8]) {
+        const planks = Array.from({ length: playerCount + 2 }, (_, i) => i + 1);
+        const picks = fullPicks(scenario, playerCount, planks);
+
+        expect(picks.length, `${scenario.id} bei n = ${playerCount}`).toBe(playerCount);
+        for (const pick of picks) {
+          if (pick !== 'rope') expect(planks, scenario.id).toContain(pick);
+        }
+      }
     }
   });
 });

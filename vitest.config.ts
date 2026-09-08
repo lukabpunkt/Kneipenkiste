@@ -7,6 +7,8 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    /* jsdom hat kein Canvas — PIXI misst Text darüber (siehe `tests/setup.ts`). */
+    setupFiles: ['tests/setup.ts'],
     include: ['tests/unit/**/*.test.ts'],
     globals: false,
     coverage: {

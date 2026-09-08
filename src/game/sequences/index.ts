@@ -5,11 +5,18 @@
  * Eine neue Sequenz braucht genau zwei Handgriffe (Datei anlegen, hier importieren), und
  * `sequences.test.ts` prüft, dass Katalog und Registry deckungsgleich sind.
  *
- * **M3-Stand:** Die sechs Fall-Sequenzen aus GDD §4.3 fehlen noch; für jeden Bruch läuft
- * `basic_fall`. `missingImplementations()` sagt jederzeit, welche das sind.
+ * **M4-Stand:** Alle vierzehn Inszenierungen aus GDD §9.5 sind gebaut.
+ * `missingImplementations()` meldet jetzt nichts mehr — der Test darauf ist die
+ * Absicherung, dass das so bleibt, wenn jemand den Katalog erweitert.
  */
 
 import './fall/BasicFall';
+import './fall/HoldHands';
+import './fall/CoyoteDelay';
+import './fall/Seesaw';
+import './fall/RopeSwing';
+import './fall/Domino';
+import './fall/BounceWall';
 import './safe/WobbleHold';
 import './safe/ConfidentStroll';
 import './safe/Tiptoe';
@@ -31,9 +38,10 @@ export {
 } from './Sequence';
 
 /**
- * Was läuft, wenn die gewählte Fall-Sequenz noch nicht gebaut ist.
+ * Was läuft, wenn eine gewählte Fall-Sequenz nicht gefunden wird.
  *
- * Bis M4 ist das jede: Der Choreographer wählt aus dem Katalog (`fall_hold_hands` und so
- * weiter), gebaut ist bisher nur diese hier. Die Show soll deshalb nicht stehenbleiben.
+ * Seit M4 sollte das nie vorkommen — der Katalog und die Registry sind deckungsgleich,
+ * und ein Test hält das fest. Der Rückfall bleibt trotzdem: Eine Show, die wegen eines
+ * Tippfehlers im Katalog stehenbliebe, wäre die schlechtere Antwort.
  */
 export const FALLBACK_FALL_ID = 'basic_fall';

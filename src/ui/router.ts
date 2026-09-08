@@ -90,6 +90,18 @@ export interface Router {
 export interface RouterOptions {
   host: HTMLElement;
   context: Omit<ScreenContext, 'router'>;
+  /**
+   * Ist dieses Ziel beim Ausführen noch das, was die FSM zeigen will?
+   *
+   * Ein Wipe dauert 320 ms, und der Sequenz-Preview schickt eine ganze Runde in einem
+   * Rutsch los. Ein Auftrag, der so lange in der Schlange lag, dass die FSM den Zustand
+   * längst verlassen hat, darf nicht mehr mounten: Der Choose-Screen fragt beim Bauen
+   * "wer ist dran?" — und bekommt `null`, wenn der Schritt schon läuft.
+   *
+   * Der Test fragt die FSM, nicht die Schlange. Ein "das jüngste Ziel gewinnt" würde
+   * auch Screens überspringen, auf denen das Spiel gerade wirklich steht.
+   */
+  outdated?: (id: ScreenId) => boolean;
 }
 
 /**
@@ -170,10 +182,16 @@ export function createRouter(options: RouterOptions): Router {
     };
 
     await safeAnimate(overlay, enter, wipeOptions, { respectReducedMotion: false });
-    mount(id);
-    await safeAnimate(overlay, leave, wipeOptions, { respectReducedMotion: false });
-
-    overlay.remove();
+    try {
+      mount(id);
+      await safeAnimate(overlay, leave, wipeOptions, { respectReducedMotion: false });
+    } finally {
+      /*
+       * Der Wipe deckt den ganzen Screen ab. Bliebe er nach einem Fehler liegen, wäre das
+       * Spiel nicht nur falsch, sondern unbedienbar — die Farbfläche schluckt jeden Tap.
+       */
+      overlay.remove();
+    }
     instance?.activate?.();
   };
 
@@ -183,7 +201,10 @@ export function createRouter(options: RouterOptions): Router {
     },
 
     go(id, navOptions = {}) {
-      queue = queue.then(async () => {
+      const run = queue.then(async () => {
+        /* Zu spät: Die FSM ist weiter, dieser Screen würde veraltet mounten. */
+        if (options.outdated?.(id) === true) return;
+
         if (current === null) {
           /* Erster Screen: kein Wipe, sonst blitzt die Farbe beim Start auf. */
           mount(id);
@@ -193,16 +214,23 @@ export function createRouter(options: RouterOptions): Router {
         if (current === id) return;
         await wipe(id, navOptions);
       });
-      return queue;
+      /*
+       * Die Kette überlebt einen Fehler: An `queue` hängt jeder weitere Screenwechsel —
+       * bliebe sie im Rejected-Zustand liegen, käme der Router für den Rest der Sitzung
+       * keinen Schritt mehr weiter. Der Aufrufer bekommt den Fehler trotzdem.
+       */
+      queue = run.catch(() => undefined);
+      return run;
     },
 
     refresh() {
-      queue = queue.then(() => {
+      const run = queue.then(() => {
         if (current === null) return;
         mount(current);
         instance?.activate?.();
       });
-      return queue;
+      queue = run.catch(() => undefined);
+      return run;
     },
 
     get current() {

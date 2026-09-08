@@ -20,7 +20,7 @@ import {
   suspendAudio,
   unlockAudio,
 } from '@/audio/AudioManager';
-import { buildStepScript } from '@/core/choreographer';
+import { buildStepScript, createSequencePicker } from '@/core/choreographer';
 import { createFsm, type GameState } from '@/core/fsm';
 import { detectLocale, setLocale, t } from '@/core/i18n';
 import { chooseView, publicView, resultView } from '@/core/publicView';
@@ -33,7 +33,7 @@ import {
   type SessionController,
 } from '@/core/session';
 import { createDevPanel, devSeed, isDevMode, readStageStats } from '@/dev/devPanel';
-import { createSequencePanel, isSequencePanel } from '@/dev/sequencePreview';
+import { createSequencePanel, isSequencePanel, withForcedFall } from '@/dev/sequencePreview';
 import { confirmDialog } from '@/ui/components/sheet';
 import { setHapticsEnabled } from '@/ui/haptics';
 import { SCREEN_FOR_STATE, createRouter, type ScreenId } from '@/ui/router';
@@ -105,6 +105,14 @@ export function createApp(host: HTMLElement): App {
     modes: { ...session.settings().modes },
     /* Nur im Dev-Build; produktiv bleibt es beim sicheren Zufall. */
     ...(seed === null ? {} : { rng: createSeededRng(seed) }),
+    /*
+     * Ein `?seed=` macht die ganze Show reproduzierbar, **inklusive** Sequenzwahl —
+     * sonst hiesse "deterministisch bei Seed" (Architektur §6) nur "dieselben Brüche in
+     * anderer Verpackung". Im Preview kommt die Erzwingung obendrauf.
+     */
+    ...(seed === null && !dev
+      ? {}
+      : { picker: withForcedFall(createSequencePicker(seed ?? Date.now())) }),
   });
 
   /* Eine wiederhergestellte Session bringt ihre halb geschrumpfte Brücke mit (Audit A1). */
@@ -139,6 +147,13 @@ export function createApp(host: HTMLElement): App {
       reveal: () => resultView(requireResult()),
       stepScript: () => buildStepScript(requireResult(), session.settings().pace),
     },
+    /*
+     * Jeder Screenwechsel kommt aus einem FSM-Übergang. Steht die FSM beim Ausführen
+     * längst woanders, war der Auftrag ein Zwischenstand — der Sequenz-Preview schickt
+     * eine ganze Runde in einem Rutsch, und ein Choose-Screen, der dann noch mountet,
+     * findet keinen Spieler mehr.
+     */
+    outdated: (id) => SCREEN_FOR_STATE[fsm.state] !== id,
   });
 
   router.register('title', createTitleScreen);
