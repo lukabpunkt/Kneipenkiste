@@ -16,7 +16,9 @@ import type { StepScript } from '@/core/choreographer';
 import type { ResultView } from '@/core/publicView';
 import type { PlankId, PlayerId } from '@/core/types';
 import { Bridge } from './Bridge';
+import { FxKit } from './fx';
 import { startPosition } from './geometry';
+import './sequences';
 import { Camera } from './Camera';
 import { Canyon } from './Canyon';
 import { Carpenter } from './Carpenter';
@@ -55,6 +57,13 @@ export interface MountOptions {
   onFinished: () => void;
   /** Schritt, Bruch und Skip-Freigabe — als Ereignisse der Timeline, nicht der Wanduhr. */
   onBeat?: (beat: StepBeat) => void;
+  /**
+   * Übersetzte Texte. Die Bühne kennt kein i18n-Modul: Sprechblasen und Schilder tragen
+   * Text, und der gehört dem Screen, nicht dem Renderer (CLAUDE.md).
+   */
+  t: (key: string, params?: Record<string, string | number>) => string;
+  /** Ein Sound aus dem Sprite. Ist der Ton aus, tut die Funktion nichts. */
+  play: (key: string) => void;
 }
 
 export interface MountedStage {
@@ -64,7 +73,13 @@ export interface MountedStage {
   skip(): void;
   setLowEffects(low: boolean): void;
   /** Messwerte für Dev-Panel und Perf-Test. */
-  stats(): { frameTimes: readonly number[]; workTimes: readonly number[]; drawCalls: number };
+  stats(): {
+    frameTimes: readonly number[];
+    workTimes: readonly number[];
+    drawCalls: number;
+    /** Wie viele Partikel gerade fliegen — Budget aus Art Direction §8. */
+    particles: number;
+  };
   destroy(): void;
 }
 
@@ -129,8 +144,9 @@ export async function mountStage(options: MountOptions): Promise<MountedStage> {
 
   const vulture = new Vulture(assets.chars);
   const carpenter = new Carpenter(assets.chars);
+  const fx = new FxKit(assets.world);
 
-  canyon.midground.addChild(bridge.view, figures, carpenter.view);
+  canyon.midground.addChild(bridge.view, figures, carpenter.view, fx.view);
   /* Gustav sitzt auf dem linken Plateau, also vor der Brücke, aber hinter den Hikers. */
   canyon.midground.addChildAt(vulture.view, 0);
   stage.world.addChild(canyon.view);
@@ -144,14 +160,19 @@ export async function mountStage(options: MountOptions): Promise<MountedStage> {
 
   const director = new StepDirector({
     script: options.script,
+    reveal: options.reveal,
     bridge,
     canyon,
     camera,
     vulture,
     carpenter,
+    fx,
     hikers,
     occupants,
     playerCount: options.playerCount,
+    rng,
+    t: options.t,
+    play: options.play,
     onFinished: options.onFinished,
     ...(options.onBeat ? { onBeat: options.onBeat } : {}),
   });
@@ -161,6 +182,7 @@ export async function mountStage(options: MountOptions): Promise<MountedStage> {
     const started = performance.now();
     canyon.update(ticker.deltaMS);
     bridge.update(canyon.windAt());
+    fx.update(ticker.deltaMS);
     for (const hiker of hikers.values()) hiker.update();
     /* Was der Loop wirklich kostet — die Frame-Zeit misst nur den Bildschirmtakt. */
     stage.recordWork(performance.now() - started);
@@ -169,10 +191,11 @@ export async function mountStage(options: MountOptions): Promise<MountedStage> {
 
   stage.attach(options.host);
 
-  const stats = (): { frameTimes: readonly number[]; workTimes: readonly number[]; drawCalls: number } => ({
+  const stats = (): MountedStage['stats'] extends () => infer R ? R : never => ({
     frameTimes: stage.frameTimes(),
     workTimes: stage.workTimes(),
     drawCalls: stage.drawCalls(),
+    particles: fx.activeParticles(),
   });
   /* Dev-Panel und `perf.spec.ts` lesen hier mit — sonst niemand. */
   publishStageStats(stats);
@@ -194,6 +217,7 @@ export async function mountStage(options: MountOptions): Promise<MountedStage> {
       offLayout();
       director.destroy();
       gsap.globalTimeline.clear();
+      fx.destroy();
       for (const hiker of hikers.values()) hiker.destroy();
       hikers.clear();
       bridge.destroy();

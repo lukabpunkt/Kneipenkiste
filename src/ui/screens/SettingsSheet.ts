@@ -16,6 +16,7 @@ import {
 } from '@/config/rules';
 import { LOCALES } from '@/core/i18n';
 import { setLocale, t } from '@/core/i18n';
+import { setSoundEnabled } from '@/audio/AudioManager';
 import { setHapticsEnabled } from '../haptics';
 import { createButton } from '../components/button';
 import { openSheet, type Sheet } from '../components/sheet';
@@ -115,7 +116,10 @@ export function openSettingsSheet(host: HTMLElement, ctx: ScreenContext): Sheet 
             rebuild();
           }
         ),
-        toggleRow(t('settings.sound'), settings.sound, (value) => ctx.session.setSettings({ sound: value })),
+        toggleRow(t('settings.sound'), settings.sound, (value) => {
+          ctx.session.setSettings({ sound: value });
+          setSoundEnabled(value);
+        }),
         toggleRow(t('settings.haptics'), settings.haptics, (value) => {
           ctx.session.setSettings({ haptics: value });
           setHapticsEnabled(value);

@@ -8,7 +8,10 @@
  * ein anderer Moment.
  *
  * Aufruf: `npm run build && npm run preview` in einem Terminal, dann
- *         `node scripts/capture-screens.mjs [ausgabeordner] [spielerzahl]`
+ *         `node scripts/capture-screens.mjs [ausgabeordner] [spielerzahl] [praefix]`
+ *
+ * Das Präfix benennt den Meilenstein, dessen Look-Check die Bilder belegen — die Show
+ * ändert sich, und ein Bild von heute unter dem Namen von gestern wäre eine Fälschung.
  */
 
 import { mkdir } from 'node:fs/promises';
@@ -17,6 +20,7 @@ import { chromium } from '@playwright/test';
 
 const OUT_DIR = process.argv[2] ?? 'docs/screens';
 const PLAYERS = Number(process.argv[3] ?? 5);
+const PREFIX = process.argv[4] ?? 'm3';
 const BASE = 'http://localhost:4173/Haengebruecke/?dev=1';
 
 /** Wer wohin tritt: die ersten beiden auf denselben Balken — sonst gibt es nichts zu sehen. */
@@ -58,7 +62,7 @@ await page.addInitScript((count) => {
 await page.goto(BASE);
 await page.getByRole('button', { name: 'Spielen' }).click();
 await page.getByRole('button', { name: 'Auf die Brücke' }).click();
-await page.screenshot({ path: path.join(OUT_DIR, `m2-negotiation-${PLAYERS}.png`) });
+await page.screenshot({ path: path.join(OUT_DIR, `${PREFIX}-negotiation-${PLAYERS}.png`) });
 await page.getByRole('button', { name: 'Alle bereit' }).click();
 
 for (const pick of picks(PLAYERS)) {
@@ -71,7 +75,14 @@ await page.locator('[data-screen="sealed"] .btn:not([disabled])').waitFor({ time
 await page.getByRole('button', { name: 'Der Schritt' }).click();
 await page.locator('.step__stage canvas').waitFor({ timeout: 20_000 });
 
-/* Die Momente, die A2 sehen will. */
+/*
+ * Die Momente, die der Look-Check sehen will.
+ *
+ * Feste Zeitpunkte für alles ausser dem Nachspiel: Wann das kommt, hängt von Spielerzahl,
+ * Tempo und Zahl der Brüche ab — eine geratene Zahl liefert je nach Runde ein Bild vom
+ * Verteilen-Screen. Deshalb wird bis zum Ende der Show mitgeschnitten und der letzte
+ * Frame **mit Canvas** als `aftermath` behalten.
+ */
 const moments = [
   ['lineup', 900],
   ['run', 2400],
@@ -79,24 +90,42 @@ const moments = [
   ['creak', 4900],
   ['eyecontact', 5600],
   ['break', 7000],
-  ['aftermath', 9500],
+  ['climb', 9500],
 ];
 
-let last = 0;
+let elapsed = 0;
 for (const [name, at] of moments) {
-  await page.waitForTimeout(Math.max(0, at - last));
-  last = at;
-  await page.screenshot({ path: path.join(OUT_DIR, `m2-${name}-${PLAYERS}.png`) });
+  await page.waitForTimeout(Math.max(0, at - elapsed));
+  elapsed = at;
+  await page.screenshot({ path: path.join(OUT_DIR, `${PREFIX}-${name}-${PLAYERS}.png`) });
 }
 
+/* Messwerte holen, **solange die Bühne steht** — beim Abräumen meldet sie sich ab. */
 const stats = await page.evaluate(() => globalThis.__stageStats?.());
 if (stats) {
   const sorted = [...stats.frameTimes].sort((a, b) => a - b);
   const at = (q) => sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * q))] ?? 0;
-  console.log(`Frames: p50 ${at(0.5).toFixed(1)} ms · p95 ${at(0.95).toFixed(1)} ms · ${stats.drawCalls} Draw-Calls`);
+  console.log(
+    `Frames: p50 ${at(0.5).toFixed(1)} ms · p95 ${at(0.95).toFixed(1)} ms · ` +
+      `${stats.drawCalls} Draw-Calls · ${stats.particles} Partikel`
+  );
 } else {
   console.log('Keine Messwerte — läuft die Bühne?');
 }
+
+/*
+ * Abbruchbedingung ist das **Canvas**, nicht der Screen: Die Bühne wird abgeräumt, bevor
+ * der Router den Screen austauscht — wer auf den Screen wartet, fotografiert die leere
+ * Farbfläche dahinter.
+ */
+const aftermathPath = path.join(OUT_DIR, `${PREFIX}-aftermath-${PLAYERS}.png`);
+for (let i = 0; i < 40; i += 1) {
+  if ((await page.locator('.step__stage canvas').count()) === 0) break;
+  await page.screenshot({ path: aftermathPath });
+  await page.waitForTimeout(400);
+}
+
+console.log('Endstand:', await page.evaluate(() => document.querySelector('[data-screen]')?.dataset.screen));
 
 console.log(`${moments.length + 1} Bilder in ${OUT_DIR} (n = ${PLAYERS}).`);
 if (problems.length > 0) {

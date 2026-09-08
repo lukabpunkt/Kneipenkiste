@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel für 3–8 Personen über Anti-Koordi
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot), [Der Tresor](https://github.com/lukabpunkt/Tresor), [Sprengmeister](https://github.com/lukabpunkt/Sprengmeister) und [Der Zoll](https://github.com/lukabpunkt/Zoll) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M2 abgeschlossen (`v0.2.0`) — die Schlucht lebt: Brücke mit Durchhang, Wind, Nebel, Fluss, acht Hikers, Gustav und Balthasar in PixiJS. Als Nächstes M3: Knarren, Blickkontakt und Audio als vollständige Show.
+**Status:** M3 abgeschlossen (`v0.3.0`) — die Spannungsmaschine läuft: Fake-Knarren auf allen Balken, Slow-Mo-Blickkontakt mit "Oh."-Sprechblase, neun Inszenierungen, Ton. Als Nächstes M4: die sechs großen Fall-Sequenzen.
 
 ## Planung
 
@@ -35,6 +35,8 @@ npm run balance -- 20000 # Kollisionsraten je n/B (M6)
 npm run build:atlas      # SVG → Atlas (world + chars)
 npm run capture:screens  # Bühnen-Screenshots für den Look-Check
 npm run check:colorblind # Deuteranopie-Simulation auf dem Bühnenbild
+npm run build:audio      # 32 Klänge synthetisieren und zum Sprite bauen
+npm run preview:sequences # Sequenz-Preview (?dev=1&panel=sequences)
 npm run test:perf        # JS-Budget und Draw-Batches (Audit A2)
 ```
 
@@ -46,5 +48,5 @@ npm run test:perf        # JS-Budget und Draw-Batches (Audit A2)
 ```
 cd /Users/lukabloemendal/Documents/Hängebrücke
 claude
-> Lies CLAUDE.md und docs/. Setze Milestone M3 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A3 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
+> Lies CLAUDE.md und docs/. Setze Milestone M4 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A4 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
 ```

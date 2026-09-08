@@ -20,8 +20,8 @@ import { existsSync } from 'node:fs';
 import sharp from 'sharp';
 import { PLAYER_COLORS } from '../src/config/theme.ts';
 
-const SOURCE = process.argv[2] ?? 'docs/screens/m2-creak-8.png';
-const TARGET = process.argv[3] ?? 'docs/screens/m2-deuteranopia-8.png';
+const SOURCE = process.argv[2] ?? 'docs/screens/m3-creak-8.png';
+const TARGET = process.argv[3] ?? 'docs/screens/m3-deuteranopia-8.png';
 
 /* --- Teil 1: das, was sich zusichern lässt --- */
 

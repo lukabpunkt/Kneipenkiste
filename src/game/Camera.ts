@@ -25,6 +25,15 @@ import { STAGE } from '@/config/theme';
  */
 const RESTING_Y = STAGE.bridgeY + 430;
 
+/**
+ * Wie weit die Kamera seitlich aus der Mitte darf.
+ *
+ * Der Zoom beim Blickkontakt zielt auf einen bestimmten Balken. Liegt der ganz aussen,
+ * schoebe eine ungebremste Kamera die halbe Bruecke aus dem Bild — und der Sturz faende
+ * am Rand statt in der Mitte statt.
+ */
+const MAX_PAN_X = STAGE.worldWidth * 0.16;
+
 export class Camera {
   /**
    * Der Punkt, auf den die Kamera schaut (Welteinheiten).
@@ -81,9 +90,10 @@ export class Camera {
   }
 
   /** Näher ran an den Balken, auf dem es gleich kracht. */
-  zoomTo(x: number, y: number, durationMs: number, zoom = CAMERA.creakZoom): gsap.core.Tween {
+  zoomTo(x: number, y: number, durationMs: number, zoom: number = CAMERA.creakZoom): gsap.core.Tween {
+    const center = STAGE.worldWidth / 2;
     return gsap.to(this.focus, {
-      x,
+      x: Math.max(center - MAX_PAN_X, Math.min(center + MAX_PAN_X, x)),
       y,
       zoom,
       duration: durationMs / 1000,
@@ -117,11 +127,13 @@ export class Camera {
     return timeline;
   }
 
-  /** Der Kamera folgt dem Sturz bis zum Fluss und kommt dann zurück. */
+  /** Die Kamera folgt dem Sturz bis zum Fluss und kommt dann zurück. */
   followFall(durationMs = CAMERA.fallPanMs): gsap.core.Timeline {
     const timeline = gsap.timeline();
     timeline
       .to(this.focus, {
+        /* Auf dem Weg nach unten wieder in die Mitte — der Fluss ist überall gleich breit. */
+        x: STAGE.worldWidth / 2,
         y: STAGE.riverY - 40,
         zoom: 0.9,
         duration: durationMs / 1000,

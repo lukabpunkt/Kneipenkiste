@@ -10,6 +10,7 @@
  * Absprache, sodass beim Tippen auf "Der Schritt" nichts mehr fehlt.
  */
 
+import { play, playMusic } from '@/audio/AudioManager';
 import { t } from '@/core/i18n';
 import { vibrate } from '../haptics';
 import { createButton } from '../components/button';
@@ -67,6 +68,9 @@ export function createStepScreen(ctx: ScreenContext): ScreenInstance {
     el,
 
     activate() {
+      /* Der Spannungs-Drone läuft, bis es kracht (GDD §6). */
+      playMusic('music_step');
+
       void (async () => {
         try {
           const game = await import('@/game');
@@ -83,6 +87,9 @@ export function createStepScreen(ctx: ScreenContext): ScreenInstance {
             seed: script.totalMs,
             onFinished: () => finish(),
             onBeat,
+            /* Die Bühne kennt weder i18n noch Audio — sie bekommt beides gereicht. */
+            t,
+            play,
           });
 
           loading.remove();

@@ -5,7 +5,7 @@
 | M0 Setup & Regelkern | ✅ fertig | `v0.0.1` | A0 bestanden |
 | M1 UI-Flow (Platzhalter-Schritt) | ✅ fertig | `v0.1.0` | A1 bestanden |
 | M2 Schlucht, Brücke, Hikers | ✅ fertig | `v0.2.0` | A2 bestanden |
-| M3 Show: Knarren, Blickkontakt, Audio | ⬜ offen | – | – |
+| M3 Show: Knarren, Blickkontakt, Audio | ✅ fertig | `v0.3.0` | A3 bestanden |
 | M4 Fall-Sequenzen | ⬜ offen | – | – |
 | M5 Polish, Modi, A11y | ⬜ offen | – | – |
 | M6 Playtest & Release | ⬜ offen | – | – |
@@ -122,3 +122,45 @@
 - Der `StepDirector` spielt das Skript vollständig, aber der Bruch ist noch eine direkte Animation ohne Sequenz. M3 hängt Registry und Sicher-/Misc-/Overlay-Sequenzen an dieselben Stellen; `breaks[].sequenceId` steht bereits im Skript.
 - Knarren, Blickkontakt, Slow-Mo, Bruch-Reihenfolge und Hit-Stop laufen schon — M3 ergänzt Audio und die Sequenz-Auswahl, nicht die Choreographie.
 - Gustav kann sechs Dinge (kreisen, kreischen, lachen, Uhr, tragen, landen); im Einsatz sind bisher drei. Die anderen warten auf ihre Sequenzen.
+
+## Audit A3 — 2026-09-08
+
+**Ergebnis:** BESTANDEN
+
+| Check | Status | Notiz |
+|---|---|---|
+| 1 000 simulierte Runden: gezeigte Gruppen == `RoundResult.groups`; Bruch-Reihenfolge == Skript | ✅ | `show.test.ts` prüft je Runde neun Zusicherungen: wer läuft, welche Balken knarren, welche brechen (und in welcher Reihenfolge), wer sich ansieht, wer eine Sicher-Sequenz bekommt, welches Nachspiel läuft, welche Overlays auf wen zielen, und dass kein Skript den 20-s-Deckel reisst. Zufällige Spielerzahl, Balkenzahl, Modi und Wahlen. |
+| Knarren auf allen besetzten Balken (0.7 / 1.0 / morsch 0.4→1.0); Blickkontakt immer vor Bruch; Slow-Mo aktiv | ✅ | Amplituden je Gruppe im selben Test geprüft. Blickkontakt: nur Kollisionsgruppen, `at < snap.at`, nie vor dem gemeinsamen Schritt, immer mit mindestens zwei Beteiligten. Slow-Mo läuft über `timeScale` der **ganzen** Timeline — auch Nebel und Wind werden langsam. |
+| Safe-, Misc- und Overlay-Sequenzen registriert, Dev-Preview, Dauer-Limits | ✅ | Neun Sequenzen gebaut: `basic_fall`, drei Sicher-, drei Misc-, zwei Overlays. `sequences.test.ts` bindet Katalog und Registry aneinander und hält fest, dass die sechs Fall-Sequenzen offen sind — der Test schlägt fehl, sobald M4 sie baut. Preview unter `?dev=1&panel=sequences`: für jede gebaute Sequenz ein Szenario, das sie auslöst. |
+| Timing-Presets ± 1 s; Tap-to-Skip erst nach letztem Bruch | ✅ | Presets gegen `choreo.ts` geprüft; kurz < normal < lang. Der Hit-Stop ist in allen dreien gleich — er ist die Signatur, nicht der Puffer. Skip hängt an einem Timeline-Beat, nicht an der Wanduhr (ADR-17); über 1 000 Runden liegt jeder Bruch vor `skippableFrom`. |
+| Perf-Test grün; Sound-Sync ± 50 ms; stumm voll spielbar | ✅ | JS-Loop 0,10 ms p95, 1 Draw-Call trotz Sprechblasen, Partikel-Höchststand 36 von 200. Sound-Sync ergibt sich aus der Bauweise: Jeder `play()` sitzt als `call()` auf derselben Timeline wie die Animation, es gibt also keinen zweiten Taktgeber, der auseinanderlaufen könnte. Stumm: eigener Test, alles scheitert still. |
+| Wake-Lock; Tab-Wechsel Pause/Resume | ✅ | Wake-Lock von der Absprache bis zum Verteilen. Im Hintergrund hält der PIXI-Ticker an, GSAP pausiert, der AudioContext wird suspendiert. |
+| Spannungs-Test: 3 Personen sehen 5 Schritte | ⏳ manuell | Siehe unten — das kann kein Test beantworten. |
+
+**Zahlen:** 320 Unit-Tests · 40 E2E · 9 Sequenzen · 32 Sound-Keys · JS 249 KB gzip (Budget 450) · Audio 316 KB · JS-Loop 0,10 ms p95 · 1 Draw-Call.
+
+**Was M3 gebracht hat**
+- **Das Sequenz-System.** Registry, Kontext, Auswahl. Der Director besitzt die Beats, die Sequenzen besitzen, was darin passiert — deshalb tauscht M4 sechs Dateien und keine Zeile im Director (ADR-18).
+- **Die Fall-Sequenz trägt den Blickkontakt.** `eyeContact` < `snap` < `climbedBack` als Labels, pro Datei prüfbar. Die Signatur des Spiels kann in M4 nicht versehentlich wegfallen.
+- **Effekte:** Partikel-Pools (Splitter, Spritzer, Ringe, Sterne) ohne Allokation im Loop, Sprechblasen, Schilder, Stempel.
+- **Ton:** 32 Klänge als ein 316-KB-Sprite, synthetisiert (ADR-20). Musik je Abschnitt, Wind, iOS-Entsperren beim ersten Tap.
+
+**Drei Fehler, die erst das laufende Bild gezeigt hat:**
+1. **Die Gestürzten flogen zurück zur Aufstellung.** Die Timeline entsteht vor dem Anlauf; feste Zielwerte zeigten dorthin, wo die Hikers beim Bauen standen. Jetzt sind positionsabhängige Ziele Funktionen (ADR-19).
+2. **Sie kamen als Geister zurück.** Die Ausblendung lief parallel zum Aufstieg und überschrieb dessen Deckkraft.
+3. **Die Kamera schob die Brücke aus dem Bild,** wenn der Kollisionsbalken am Rand lag. Der Schwenk ist jetzt auf ein Sechstel Weltbreite begrenzt.
+
+**Offene SOLL-Follow-ups:**
+1. Die Töne sind synthetisiert und klingen so. Sie zu ersetzen ist ein Austausch von WAVs in `audio-src/`, kein Code — gehört in M5 oder M6.
+2. Aus M2 offen: Symbole auf der Bühne klein (~11 px); WebGPU-/Canvas-Renderer ungenutzt im Chunk (~21 KB gzip).
+
+**Manuelle Checks für Luka vor M4:**
+- [ ] **Spannungs-Test (A3, MUSS):** Drei Personen sehen fünf Schritte mit unbekanntem Ergebnis. Ziel: ≥ 2 sagen, sie waren beim Knarren unsicher, ob ihr Balken hält; ≥ 1 hörbare Reaktion beim Blickkontakt. Das ist der Kern-Check des Meilensteins — die Spannungsmaschine funktioniert oder nicht.
+- [ ] **Ton auf dem Handy:** Erster Tap entsperrt? Musik wechselt zwischen Lobby, Absprache und Schritt? Kracht der Bruch im richtigen Moment? Und: einmal stumm durchspielen.
+- [ ] **Sequenz-Preview** öffnen (`?dev=1&panel=sequences`) und die neun Inszenierungen einzeln ansehen — vor allem `all_safe_rot` und `rotten_crack`.
+- [ ] Klingen die synthetisierten Töne erträglich genug für den Playtest, oder sollen sie vorher ersetzt werden?
+
+**Anmerkungen für M4:**
+- Der Vertrag steht: `Sequence.build(ctx)` liefert eine Timeline, `ctx.timing.snapMs` sagt, wann der Balken reisst, die drei Labels sind Pflicht. `BasicFall.ts` ist die Vorlage.
+- `sequences.test.ts` erwartet ausdrücklich, dass die sechs Fall-Sequenzen **fehlen**. Wer sie baut, dreht diesen Test um — das ist die Erinnerung, ihn anzupassen.
+- Gustav kann `carry()` für `fall_seesaw`, die Sterne-Partikel warten auf `fall_bounce_wall`, das "HILFE"-Schild auf `fall_coyote_delay`. Die Bausteine liegen bereit.

@@ -1,40 +1,56 @@
 /**
  * Der StepDirector (Architektur §6) — er spielt das `StepScript` ab, mehr nicht.
  *
- * Das Ergebnis steht seit `resolveRound()` fest; hier wird nichts mehr entschieden.
- * Der Director übersetzt eine Zeitachse in eine GSAP-Timeline: Intro → Anlauf →
- * gemeinsamer Schritt mit Hit-Stop → Knarren → Blickkontakt in Slow-Mo → Bruch →
- * Nachspiel.
+ * Das Ergebnis steht seit `resolveRound()` fest; hier wird nichts mehr entschieden. Der
+ * Director übersetzt eine Zeitachse in **eine** GSAP-Timeline und hängt an den passenden
+ * Stellen Sequenzen ein.
  *
- * **M2-Stand:** Der Bruch läuft als direkte Animation, ohne Fall-Sequenz. Die sechs
- * Sequenzen kommen in M4 und hängen sich an dieselben Stellen (`breaks[].sequenceId`).
- * Was hier schon vollständig ist, ist die Choreographie — und die ist der Teil, an dem
- * die Show hängt.
+ * Die Arbeitsteilung, und sie ist der Kern von M3:
+ *
+ * - Der Director besitzt die *Beats*: Intro, Anlauf, gemeinsamer Schritt mit Hit-Stop,
+ *   Knarren, Slow-Mo, Bruch-Reihenfolge, Nachspiel.
+ * - Die *Sequenzen* besitzen, was in einem Beat passiert. Eine Fall-Sequenz beginnt beim
+ *   Blickkontakt und trägt ihn selbst (ADR-3) — der Director sagt nur, wann.
+ *
+ * Deshalb tauscht M4 sechs Dateien und keine Zeile hier.
  */
 
 import gsap from 'gsap';
-import { STAGE, hikerSpreadFor } from '@/config/theme';
+import { EYE_CONTACT } from '@/config/choreo';
+import { MISC_SEQUENCES, OVERLAY_SEQUENCES } from '@/config/sequences';
 import type { StepScript } from '@/core/choreographer';
+import type { ResultView } from '@/core/publicView';
+import type { SeededRng } from '@/core/rng';
 import type { PlankId, PlayerId } from '@/core/types';
 import type { Bridge } from './Bridge';
 import type { Camera } from './Camera';
 import type { Canyon } from './Canyon';
 import type { Carpenter } from './Carpenter';
+import type { FxKit } from './fx';
 import type { Hiker } from './Hiker';
 import type { Vulture } from './Vulture';
+import { STAGE, hikerSpreadFor } from '@/config/theme';
+import { FALLBACK_FALL_ID, getSequence, type SequenceContext } from './sequences';
+
+export type StepBeat = 'step' | 'break' | 'skippable';
 
 export interface StepDirectorContext {
   script: StepScript;
+  reveal: ResultView;
   bridge: Bridge;
   canyon: Canyon;
   camera: Camera;
   vulture: Vulture;
   carpenter: Carpenter;
+  fx: FxKit;
   hikers: Map<PlayerId, Hiker>;
   /** Wer auf welchem Balken steht — für Staffelung und Blickkontakt. */
   occupants: Map<PlankId, PlayerId[]>;
   /** Bestimmt, wie breit zwei Hikers auf einem Balken auseinanderstehen. */
   playerCount: number;
+  rng: SeededRng;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  play: (key: string) => void;
   onFinished: () => void;
   /**
    * Meldet Momente, an denen der Screen mithören muss: der gemeinsame Schritt, jeder
@@ -46,8 +62,6 @@ export interface StepDirectorContext {
    */
   onBeat?: (beat: StepBeat) => void;
 }
-
-export type StepBeat = 'step' | 'break' | 'skippable';
 
 export class StepDirector {
   private readonly timeline: gsap.core.Timeline;
@@ -67,6 +81,44 @@ export class StepDirector {
     this.ctx.onBeat?.(name);
   }
 
+  /** Der Kontext, den jede Sequenz bekommt — ohne die `Round`, nur mit dem Reveal. */
+  private contextFor(plank: PlankId | undefined, players: PlayerId[], timing: { eyeContactMs: number; snapMs: number }): SequenceContext {
+    return {
+      reveal: this.ctx.reveal,
+      ...(plank !== undefined ? { plank } : {}),
+      players,
+      hikers: this.ctx.hikers,
+      bridge: this.ctx.bridge,
+      canyon: this.ctx.canyon,
+      camera: this.ctx.camera,
+      vulture: this.ctx.vulture,
+      carpenter: this.ctx.carpenter,
+      fx: this.ctx.fx,
+      t: this.ctx.t,
+      play: this.ctx.play,
+      rng: this.ctx.rng,
+      timing,
+    };
+  }
+
+  /**
+   * Spielt eine Sequenz, oder die Ersatz-Sequenz, wenn sie noch nicht gebaut ist.
+   *
+   * Bis M4 ist jede Fall-Sequenz aus dem Katalog "noch nicht gebaut" — der Choreographer
+   * wählt `fall_hold_hands`, gespielt wird `basic_fall`. Eine Show, die wegen einer
+   * fehlenden Datei stehenbleibt, wäre die schlechtere Antwort.
+   */
+  private playSequence(
+    id: string,
+    fallbackId: string | null,
+    ctx: SequenceContext,
+    at: number
+  ): void {
+    const sequence = getSequence(id) ?? (fallbackId ? getSequence(fallbackId) : undefined);
+    if (!sequence) return;
+    this.timeline.add(sequence.build(ctx), at);
+  }
+
   private build(): void {
     const { script, bridge, camera, vulture, hikers } = this.ctx;
     const tl = this.timeline;
@@ -74,17 +126,25 @@ export class StepDirector {
     /* --- Intro: Kamerafahrt über die Schlucht, Gustav kreist --- */
     tl.add(camera.intro(script.intro.endsAt), 0);
     tl.add(vulture.circle(script.intro.endsAt), 0);
+    tl.call(() => this.ctx.play('wind_loop'), undefined, 0);
+
     if (script.intro.deathZone) {
-      /* Die Todeszone wird gross angekündigt (GDD §4.2) — das Schild und die Trommel. */
-      tl.add(vulture.screech(), this.at(script.intro.endsAt * 0.5));
+      /* Die Todeszone wird gross angekündigt — vor dem Anlauf, nicht danach (GDD §4.2). */
+      this.playSequence(
+        MISC_SEQUENCES.deathzoneSign,
+        null,
+        this.contextFor(undefined, [], { eyeContactMs: 0, snapMs: 0 }),
+        this.at(script.intro.endsAt * 0.35)
+      );
     }
 
     /* --- Anlauf: alle laufen gleichzeitig los und kommen im selben Frame an --- */
     const runMs = script.step.at - script.intro.endsAt;
+    tl.call(() => this.ctx.play('footsteps_run'), undefined, this.at(script.intro.endsAt));
+
     for (const entry of script.run) {
       const hiker = hikers.get(entry.hikerId);
       if (!hiker) continue;
-
       const target = this.targetFor(entry.hikerId, entry.plank);
       /*
        * Die Signatur (CLAUDE.md): `runTo` bekommt eine **Dauer**, keine Geschwindigkeit.
@@ -98,6 +158,7 @@ export class StepDirector {
     tl.call(
       () => {
         for (const hiker of hikers.values()) hiker.setFace('scared');
+        this.ctx.play('step_thud');
         this.beat('step');
       },
       undefined,
@@ -106,61 +167,61 @@ export class StepDirector {
 
     /* --- Knarren: jeder besetzte Balken, die sicheren leiser (ADR-3) --- */
     const creakAt = script.step.at + script.step.hitStopMs;
-    for (const entry of script.creak) {
+    script.creak.forEach((entry, index) => {
       tl.call(
         () => {
           bridge.planks.get(entry.plank)?.creak(entry.amplitude);
           for (const playerId of this.ctx.occupants.get(entry.plank) ?? []) {
             hikers.get(playerId)?.wobble(entry.amplitude);
           }
+          /* Vier Knarr-Varianten, damit acht Balken nicht im Chor dasselbe sagen. */
+          this.ctx.play(`creak_${(index % 4) + 1}`);
         },
         undefined,
-        this.at(creakAt)
+        this.at(creakAt + index * 60)
       );
 
       /* Der morsche Balken fällt mitten im Knarren aus der Tarnung. */
       if (entry.revealAt !== undefined && entry.amplitudeEnd !== undefined) {
         const amplitude = entry.amplitudeEnd;
         tl.call(
-          () => bridge.planks.get(entry.plank)?.setCreakAmplitude(amplitude),
+          () => {
+            bridge.planks.get(entry.plank)?.setCreakAmplitude(amplitude);
+            this.ctx.play('rope_strain');
+          },
           undefined,
           this.at(entry.revealAt)
         );
       }
-    }
+    });
 
-    /* --- Blickkontakt: die Signatur, immer vor dem Bruch (ADR-3) --- */
-    for (const look of script.eyeContact) {
-      tl.call(
-        () => {
-          const [a, b] = look.hikerIds;
-          const first = a ? hikers.get(a) : undefined;
-          const second = b ? hikers.get(b) : undefined;
-          if (first && second) {
-            first.lookAt(second);
-            second.lookAt(first);
-          }
-          /* Ab drei Leuten schaut jeder den an, der links von ihm steht. */
-          for (let i = 2; i < look.hikerIds.length; i += 1) {
-            const other = hikers.get(look.hikerIds[i - 1]!);
-            const self = hikers.get(look.hikerIds[i]!);
-            if (other && self) self.lookAt(other);
-          }
-        },
-        undefined,
-        this.at(look.at)
-      );
+    /*
+     * --- Bruch: die Fall-Sequenz trägt Blickkontakt UND Bruch ---
+     *
+     * Sie startet beim Blickkontakt, nicht beim Bruch. Nur so steckt die Signatur in der
+     * Sequenz und kann in M4 nicht versehentlich weggelassen werden (Architektur §7).
+     */
+    for (const entry of script.breaks) {
+      const players = this.ctx.occupants.get(entry.plank) ?? [];
+      const look = script.eyeContact.find((item) => item.plank === entry.plank);
+      const startAt = look ? look.at : entry.at;
 
-      const plank = bridge.planks.get(look.plank);
-      if (plank) tl.add(camera.zoomTo(plank.baseX, plank.baseY, 400), this.at(look.at));
+      tl.call(() => this.beat('break'), undefined, this.at(entry.at));
+
+      const isRotten = entry.sequenceId === OVERLAY_SEQUENCES.rottenCrack;
+      const ctx = this.contextFor(entry.plank, players, {
+        eyeContactMs: look ? EYE_CONTACT.durationMs : 0,
+        snapMs: entry.at - startAt,
+      });
+
+      /* Der morsche Balken bricht ohne Zeugen — sein Overlay ist die ganze Sequenz. */
+      this.playSequence(entry.sequenceId, isRotten ? null : FALLBACK_FALL_ID, ctx, this.at(startAt));
     }
 
     /*
-     * Slow-Mo vom ersten Blick bis zum ersten Bruch.
-     *
-     * Über `timeScale` der ganzen Timeline, nicht über einzelne Tweens: Nur so wird das
-     * gesamte Bild langsam — Knarren, Wind, Kamera. Ein Slow-Mo, in dem der Nebel weiter
-     * in Echtzeit zieht, ist kein Slow-Mo.
+     * Slow-Mo vom ersten Blick bis zum ersten Bruch — über `timeScale` der ganzen
+     * Timeline, nicht über einzelne Tweens: Ein Slow-Mo, in dem der Nebel weiter in
+     * Echtzeit zieht, ist kein Slow-Mo.
      */
     if (script.slowMo) {
       const { from, to, factor } = script.slowMo;
@@ -168,57 +229,25 @@ export class StepDirector {
       tl.call(() => tl.timeScale(1), undefined, this.at(to));
     }
 
-    /* --- Bruch: nacheinander, mit Kamera-Shake (M4 hängt hier die Sequenzen ein) --- */
-    for (const entry of script.breaks) {
-      const plank = bridge.planks.get(entry.plank);
-      const fallers = this.ctx.occupants.get(entry.plank) ?? [];
-      const rotten = entry.sequenceId === 'rotten_crack';
-
-      tl.call(
-        () => {
-          this.beat('break');
-          if (!plank) return;
-          for (const playerId of fallers) hikers.get(playerId)?.stopWobble();
-          if (rotten) {
-            bridge.revealRotten(entry.plank);
-            plank.crumble();
-          } else {
-            plank.snap();
-          }
-        },
-        undefined,
-        this.at(entry.at)
-      );
-
-      tl.add(camera.shake(), this.at(entry.at));
-
-      /* Der Fall — in M2 als schlichter Sturz zum Fluss, ab M4 als Sequenz. */
-      fallers.forEach((playerId, index) => {
-        const hiker = hikers.get(playerId);
-        if (!hiker) return;
-        /*
-         * Jeder driftet ein Stück in seine eigene Richtung. Ohne das fallen zwei Hikers
-         * deckungsgleich, und aus dem Bild "die beiden stürzen zusammen" wird "einer
-         * stürzt" — das Gegenteil dessen, was die Runde erzählt.
-         */
-        const drift = (index - (fallers.length - 1) / 2) * 46;
-        tl.add(this.basicFall(hiker, drift), this.at(entry.at + 60));
-      });
-    }
-
     /* --- Sicher: ausatmen, sobald es das erste Mal kracht --- */
     for (const entry of script.safe) {
-      const hiker = hikers.get(entry.hikerId);
-      if (!hiker) continue;
-      tl.call(
-        () => {
-          hiker.stopWobble();
-          hiker.resetHead();
-          hiker.setFace('happy');
-          bridge.planks.get(this.plankOf(entry.hikerId) ?? -1)?.stopCreak();
-        },
-        undefined,
+      const plank = this.plankOf(entry.hikerId);
+      this.playSequence(
+        entry.sequenceId,
+        null,
+        this.contextFor(plank, [entry.hikerId], { eyeContactMs: 0, snapMs: 0 }),
         this.at(entry.at)
+      );
+    }
+
+    /* --- Overlays: Stempel und Kommentare --- */
+    for (const overlay of script.overlays) {
+      if (overlay.id === OVERLAY_SEQUENCES.rottenCrack) continue; /* läuft schon als Bruch */
+      this.playSequence(
+        overlay.id,
+        null,
+        this.contextFor(this.plankOf(overlay.target), [overlay.target], { eyeContactMs: 0, snapMs: 0 }),
+        this.at(script.aftermath.at - 400)
       );
     }
 
@@ -229,62 +258,15 @@ export class StepDirector {
     tl.call(() => this.beat('skippable'), undefined, this.at(script.skippableFrom));
 
     /* --- Nachspiel --- */
-    this.buildAftermath();
-
     tl.addLabel('aftermath', this.at(script.aftermath.at));
-  }
-
-  /** Der schlichte Sturz aus M2: fallen, platschen, nass wieder hochklettern. */
-  private basicFall(hiker: Hiker, driftX = 0): gsap.core.Timeline {
-    const startX = hiker.x;
-    const startY = hiker.y;
-
-    hiker.setDriven(true);
-    hiker.setFace('help');
-
-    const timeline = gsap.timeline();
-    timeline
-      .to(hiker.view.position, { y: STAGE.riverY - 10, duration: 0.85, ease: 'power2.in' })
-      .to(hiker.view.position, { x: startX + driftX, duration: 0.85, ease: 'sine.out' }, '<')
-      .to(hiker.view, { rotation: 1.6, duration: 0.85, ease: 'none' }, '<')
-      .to(hiker.view, { alpha: 0.25, duration: 0.2 })
-      /* Jeder klettert wieder hoch — kein Hiker verschwindet (Art Direction §7). */
-      .add(hiker.wetClimb(startX, startY))
-      .call(() => hiker.setDriven(false));
-    return timeline;
-  }
-
-  private buildAftermath(): void {
-    const { script, bridge, carpenter, vulture, hikers } = this.ctx;
-    const tl = this.timeline;
-    const at = this.at(script.aftermath.at);
-
-    if (script.aftermath.kind === 'allSafeRot' && script.removedPlank !== undefined) {
-      const removed = script.removedPlank;
-      /*
-       * `all_safe_rot`: Erst jubeln alle — und dann fault vor ihren Augen ein Balken ab.
-       * Das ist Design-Pfeiler 3 in einem Bild: Frieden ist nie stabil.
-       */
-      tl.call(
-        () => {
-          for (const hiker of hikers.values()) hiker.safeWave();
-        },
-        undefined,
-        at
-      );
-      tl.add(vulture.laugh(), at + 0.4);
-      const rot = bridge.rot(removed);
-      if (rot) tl.add(rot, at + 0.6);
-      return;
-    }
-
-    if (script.aftermath.kind === 'repair') {
-      const broken = [...bridge.planks.values()].filter((plank) => plank.isBroken());
-      tl.add(
-        carpenter.repair(broken, (plank) => plank.reset()),
-        at
-      );
-    }
+    const aftermathId =
+      script.aftermath.kind === 'allSafeRot' ? MISC_SEQUENCES.allSafeRot : MISC_SEQUENCES.repairCarpenter;
+    this.playSequence(
+      aftermathId,
+      null,
+      this.contextFor(undefined, [], { eyeContactMs: 0, snapMs: 0 }),
+      this.at(script.aftermath.at)
+    );
   }
 
   private plankOf(hikerId: PlayerId): PlankId | undefined {
@@ -298,7 +280,10 @@ export class StepDirector {
   private targetFor(hikerId: PlayerId, plank: PlankId | 'rope'): { x: number; y: number } {
     if (plank === 'rope') {
       /* Der Seil-Nutzer hangelt sich unter der Brücke durch (GDD §3.6). */
-      return { x: STAGE.plateauRightStart - 30, y: STAGE.bridgeY + STAGE.bridgeSagY + 70 };
+      return {
+        x: STAGE.plateauRightStart - 30,
+        y: STAGE.bridgeY + STAGE.bridgeSagY + 70,
+      };
     }
 
     const occupants = this.ctx.occupants.get(plank) ?? [hikerId];
@@ -318,7 +303,6 @@ export class StepDirector {
     this.timeline.seek('aftermath');
   }
 
-  /** Wie weit die Show ist, in Millisekunden. */
   elapsedMs(): number {
     return this.timeline.time() * 1000;
   }

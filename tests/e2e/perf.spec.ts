@@ -20,13 +20,14 @@
  */
 
 import { expect, test } from '@playwright/test';
-import { RENDER } from '../../src/config/theme';
+import { PARTICLE_BUDGET, RENDER } from '../../src/config/theme';
 import { BASE, chooseAll, endNegotiation, seedSession, startRound } from './helpers';
 
 interface StageStats {
   frameTimes: number[];
   workTimes: number[];
   drawCalls: number;
+  particles: number;
 }
 
 function percentile(times: readonly number[], q: number): number {
@@ -89,6 +90,42 @@ test.describe('Bühne', () => {
     expect(stats!.drawCalls).toBeLessThanOrEqual(RENDER.maxDrawBatches);
 
     expect(problems).toEqual([]);
+  });
+
+  test('bleibt im Partikel-Budget, während es kracht (Art Direction §8)', async ({ page }) => {
+    await seedSession(page, { playerCount: 8, pace: 'normal' });
+    await page.goto(`${BASE}?dev=1`);
+    await page.getByRole('button', { name: 'Spielen' }).click();
+    await startRound(page);
+    await endNegotiation(page);
+
+    /* Vier Kollisionsgruppen: der Fall mit den meisten Splittern und Spritzern. */
+    await chooseAll(page, [1, 1, 2, 2, 3, 3, 4, 4]);
+    await page.getByRole('button', { name: 'Der Schritt' }).click();
+    await expect(page.locator('.step__stage canvas')).toBeVisible({ timeout: 30_000 });
+
+    /* Über den ganzen Bruch messen, nicht danach — der Höchststand zählt. */
+    let peak = 0;
+    let peakDraws = 0;
+    for (let i = 0; i < 40; i += 1) {
+      await page.waitForTimeout(300);
+      const stats = (await page.evaluate(
+        () => (globalThis as { __stageStats?: () => StageStats }).__stageStats?.() ?? null
+      )) as StageStats | null;
+      if (!stats) break;
+      peak = Math.max(peak, stats.particles);
+      peakDraws = Math.max(peakDraws, stats.drawCalls);
+    }
+
+    console.log(`Partikel-Höchststand ${peak} · Draw-Calls max ${peakDraws}`);
+
+    expect(peak).toBeGreaterThan(0);
+    expect(peak).toBeLessThanOrEqual(PARTICLE_BUDGET.total);
+    /*
+     * Auch mit Sprechblasen: Ein PIXI-`Text` bringt seine eigene Textur mit. Bleibt das
+     * hier unter drei, batcht PIXI sie mit — steigt es, gehört der Text in den Atlas.
+     */
+    expect(peakDraws).toBeLessThanOrEqual(RENDER.maxDrawBatches);
   });
 
   test('räumt die Bühne ab, wenn der Schritt vorbei ist', async ({ page }) => {

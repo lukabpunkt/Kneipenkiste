@@ -1,7 +1,7 @@
 {
   "name": "haengebruecke",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Die Hängebrücke — Mobile-First Pass-the-Phone-Trinkspiel über Anti-Koordination",
   "scripts": {
@@ -20,7 +20,8 @@
     "test:perf": "playwright test tests/e2e/perf.spec.ts --project=\"Pixel 5\"",
     "build:signs": "node scripts/build-signs.mjs",
     "build:atlas": "node scripts/build-signs.mjs && node scripts/build-atlas.mjs",
-    "build:audio": "node scripts/build-audio-sprite.mjs",
+    "synth:audio": "node scripts/synth-audio.mjs",
+    "build:audio": "node scripts/synth-audio.mjs && node scripts/build-audio-sprite.mjs",
     "preview:sequences": "vite --host --open \"/?dev=1&panel=sequences\"",
     "balance": "vite-node scripts/balance.mts",
     "capture:screens": "node scripts/capture-screens.mjs",

@@ -9,6 +9,17 @@
  * was ein Screen über die laufende Runde weiß, kommt hier durch (Architektur §4).
  */
 
+import {
+  loadAudio,
+  playMusic,
+  preloadAudio,
+  resumeAudio,
+  setMusicVolume,
+  setSoundEnabled,
+  stopMusic,
+  suspendAudio,
+  unlockAudio,
+} from '@/audio/AudioManager';
 import { buildStepScript } from '@/core/choreographer';
 import { createFsm, type GameState } from '@/core/fsm';
 import { detectLocale, setLocale, t } from '@/core/i18n';
@@ -22,6 +33,7 @@ import {
   type SessionController,
 } from '@/core/session';
 import { createDevPanel, devSeed, isDevMode, readStageStats } from '@/dev/devPanel';
+import { createSequencePanel, isSequencePanel } from '@/dev/sequencePreview';
 import { confirmDialog } from '@/ui/components/sheet';
 import { setHapticsEnabled } from '@/ui/haptics';
 import { SCREEN_FOR_STATE, createRouter, type ScreenId } from '@/ui/router';
@@ -70,6 +82,20 @@ export function createApp(host: HTMLElement): App {
   if (!stored) session.setSettings({ locale: detectLocale() });
   setLocale(session.settings().locale);
   setHapticsEnabled(session.settings().haptics);
+  setSoundEnabled(session.settings().sound);
+  setMusicVolume(session.settings().music);
+  preloadAudio();
+
+  /*
+   * iOS gibt Audio erst nach einer echten Nutzergeste frei — und die Geste muss
+   * **synchron** im Event-Handler ankommen. Deshalb hier am Dokument und nicht in einem
+   * Screen: Der erste Tap irgendwo entsperrt, egal welcher Screen gerade steht.
+   */
+  const unlockOnce = (): void => {
+    unlockAudio();
+    document.removeEventListener('pointerdown', unlockOnce, true);
+  };
+  document.addEventListener('pointerdown', unlockOnce, true);
 
   const dev = isDevMode();
   const seed = devSeed();
@@ -167,7 +193,14 @@ export function createApp(host: HTMLElement): App {
      */
     if (transition.to === 'NEGOTIATION' || transition.to === 'SILENCE') {
       void import('@/game').then((game) => game.preloadStageAssets());
+      void loadAudio();
     }
+
+    /* Musik je Abschnitt — die Uhr tickt in der Absprache, der Drone im Schritt. */
+    if (transition.to === 'LOBBY' || transition.to === 'TITLE') playMusic('music_lobby');
+    else if (transition.to === 'NEGOTIATION' || transition.to === 'SILENCE') {
+      playMusic('music_negotiation');
+    } else if (transition.to === 'RESULT' || transition.to === 'DISTRIBUTE') stopMusic();
 
     /*
      * Die Bühne lebt nur während des Schritts. Sie danach abzuräumen ist kein Aufräumen
@@ -199,6 +232,13 @@ export function createApp(host: HTMLElement): App {
 
   const unwatch = watchWakeLock(() => AWAKE_STATES.includes(fsm.state));
 
+  /* Im Hintergrund schweigt das Spiel — sonst tickt die Uhr in der Hosentasche weiter. */
+  const onVisibility = (): void => {
+    if (document.hidden) suspendAudio();
+    else resumeAudio();
+  };
+  document.addEventListener('visibilitychange', onVisibility);
+
   /* --- Zurück-Taste des Browsers = "Runde abbrechen?" --- */
   const onPopState = (): void => {
     askToAbort();
@@ -218,13 +258,28 @@ export function createApp(host: HTMLElement): App {
     : null;
   if (devPanel) (host.parentElement ?? document.body).append(devPanel);
 
+  /*
+   * Der Sequenz-Preview hängt neben dem Router-Host, nicht darin: `mount()` leert den
+   * Host bei jedem Screenwechsel, und die Show wechselt Screens.
+   */
+  const sequencePanel =
+    dev && isSequencePanel()
+      ? createSequencePanel(fsm, () => session.players().map((player) => player.id))
+      : null;
+  if (sequencePanel) (host.parentElement ?? document.body).append(sequencePanel);
+
   return {
     session,
     destroy() {
       unsubscribe();
       unwatch();
+      stopMusic();
+      suspendAudio();
+      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('pointerdown', unlockOnce, true);
       globalThis.removeEventListener('popstate', onPopState);
       devPanel?.remove();
+      sequencePanel?.remove();
       void releaseWakeLock();
     },
   };
