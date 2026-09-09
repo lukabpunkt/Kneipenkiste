@@ -177,6 +177,8 @@ export const MOTION = {
   bannerMs: 520,
   /** Seile schwingen im Leerlauf (CSS). */
   ropeIdleMs: 4000,
+  /** Ein Durchgang des Titel-Loops: gehen, brechen, fallen, hochklettern (CSS). */
+  titleLoopMs: 9000,
   /* GSAP-Easings fuer die Buehne (M2+). */
   easeOut: 'power2.out',
   easeIn: 'power2.in',

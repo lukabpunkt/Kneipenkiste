@@ -50,6 +50,7 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
   bridgeBox.append(createBridgeTop({
     planks,
     display: true,
+    wave: true,
     removed: reveal.removedPlank !== undefined ? [reveal.removedPlank] : [],
   }));
 
@@ -57,16 +58,41 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
   const lines = document.createElement('div');
   lines.className = 'result__lines';
 
+  /*
+   * Der Zusammenstoß bekommt ein Bild, keine Zeile: zwei Gesichter und dazwischen der
+   * Knall. Das ist die Information, die abends hängenbleibt — wer mit wem (GDD §7). Die
+   * Textfassung bleibt als `aria-label` daran, damit ein Screenreader denselben Satz
+   * bekommt und nicht drei Farbpunkte vorgelesen kriegt.
+   */
   for (const group of reveal.planks.filter((p) => p.collision)) {
-    lines.append(
-      line(
-        t('result.collisionOn', {
-          plank: group.id,
-          names: group.players.map((id) => ctx.session.nameOf(id)).join(` ${t('common.and')} `),
-        }),
-        'collision'
-      )
-    );
+    const names = group.players.map((id) => ctx.session.nameOf(id)).join(` ${t('common.and')} `);
+    const label = t('result.collisionOn', { plank: group.id, names });
+
+    const crash = document.createElement('div');
+    crash.className = 'result__crash';
+    crash.dataset.plank = String(group.id);
+    crash.setAttribute('role', 'img');
+    crash.setAttribute('aria-label', label);
+
+    group.players.forEach((playerId, index) => {
+      if (index > 0) {
+        const boom = document.createElement('span');
+        boom.className = 'result__boom';
+        boom.setAttribute('aria-hidden', 'true');
+        crash.append(boom);
+      }
+      crash.append(
+        createBadge({ name: ctx.session.nameOf(playerId), colorId: ctx.session.colorOf(playerId), small: true })
+      );
+    });
+
+    const on = document.createElement('span');
+    on.className = 'result__crash-plank';
+    on.setAttribute('aria-hidden', 'true');
+    on.textContent = t('common.plank', { n: group.id });
+    crash.append(on);
+
+    lines.append(crash);
   }
 
   if (reveal.rottenPlank !== undefined) {
@@ -191,6 +217,32 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
       onClick: () => ctx.fsm.send({ type: 'changePlayers' }),
     })
   );
+
+  /*
+   * Teilen (Roadmap M5.3) — nur, wenn es etwas zu erzählen gibt und das Gerät es kann.
+   * Der Text geht an das Teilen-Blatt des Systems, nicht an uns: kein Netzwerk, kein
+   * Backend, keine Analytics (CLAUDE.md). Ohne Web-Share-API steht der Knopf gar nicht
+   * erst da — ein Knopf, der nichts tut, ist schlimmer als kein Knopf.
+   */
+  const pairing = topPairing(ctx.session.get().stats);
+  if (pairing && pairing.falls > 1 && typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+    footer.append(
+      createButton({
+        label: t('result.share'),
+        variant: 'ghost',
+        className: 'result__share',
+        onClick: () => {
+          const text = t('share.pair', {
+            a: ctx.session.nameOf(pairing.a),
+            b: ctx.session.nameOf(pairing.b),
+            count: pairing.falls,
+          });
+          /* Bricht der Nutzer das Blatt ab, wirft `share()` — das ist kein Fehler. */
+          void navigator.share?.({ text }).catch(() => undefined);
+        },
+      })
+    );
+  }
 
   el.append(banner, bridgeBox, lines, drinkers, preview, vulture, footer);
   return { el };

@@ -63,7 +63,9 @@
     "deathZoneRule": "Todeszone: Es gibt weniger Balken als Leute. Sicher stehen verteilt {giving}.",
     "flagPrompt": "Fahne auf …",
     "flagOf": "{name}: Fahne auf {plank}",
-    "tooltip": "Redet. Versprecht. Brecht es."
+    "tooltip": "Redet. Versprecht. Brecht es.",
+    "flagConflict": "Fahnen-Streit auf Balken {plank}: {names}.",
+    "flagConflictShort": "{count} Fahnen"
   },
   "silence": {
     "headline": "Nebel",
@@ -150,7 +152,8 @@
       "Wieder niemand? Ich hab Hunger.",
       "Ihr habt geredet. Ihr habt gelogen. Sehr gut.",
       "Der Balken war nicht das Problem."
-    ]
+    ],
+    "share": "Teilen"
   },
   "rules": {
     "headline": "In drei Sätzen",

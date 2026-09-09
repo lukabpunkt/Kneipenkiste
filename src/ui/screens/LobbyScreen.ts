@@ -21,6 +21,14 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
   const el = document.createElement('section');
   el.className = 'screen screen--lobby';
 
+  /*
+   * Der Screen baut sich bei jeder Änderung komplett neu auf. Eine Einflug-Animation an
+   * den Zeilen wäre deshalb bei jedem Tippen im Namensfeld wieder da — einmal hübsch,
+   * beim dritten Mal Zappeln. Also fliegt die Liste nur beim ersten Aufbau ein.
+   */
+  let firstRender = true;
+  let lastPlankCount = ctx.session.bridge().count;
+
   const render = (): void => {
     const players = ctx.session.players();
     const settings = ctx.session.settings();
@@ -52,10 +60,14 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
      * startet. Nach zwei friedlichen Runden steht hier weniger als `n + 2`; die
      * theoretische Startbreite anzuzeigen wäre eine Zahl, die gleich nicht mehr stimmt.
      */
+    const plankCount = ctx.session.bridge().count;
     const bridgeInfo = document.createElement('p');
     bridgeInfo.className = 'lobby__bridge';
+    /* Die Zahl schlägt kurz aus, wenn sie sich ändert — sie ist die Ansage des Spiels. */
+    if (plankCount !== lastPlankCount) bridgeInfo.dataset.changed = 'true';
+    lastPlankCount = plankCount;
     bridgeInfo.textContent = t('lobby.bridgeInfo', {
-      count: ctx.session.bridge().count,
+      count: plankCount,
       players: players.length,
     });
 
@@ -63,9 +75,10 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
     const list = document.createElement('ul');
     list.className = 'lobby__players';
 
-    for (const player of players) {
+    players.forEach((player, index) => {
       const item = document.createElement('li');
       item.className = 'lobby__player';
+      if (firstRender) item.style.setProperty('--row-index', String(index));
 
       const name = document.createElement('input');
       name.type = 'text';
@@ -105,7 +118,7 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
       }
 
       list.append(item);
-    }
+    });
 
     const add = createButton({
       label: t('lobby.addPlayer'),
@@ -220,7 +233,9 @@ export function createLobbyScreen(ctx: ScreenContext): ScreenInstance {
     count.className = 'lobby__count';
     count.textContent = `${players.length} ${plural('common.players', players.length)}`;
 
+    if (firstRender) list.dataset.enter = 'true';
     el.append(header, bridgeInfo, list, add, count, modes, duration, footer);
+    firstRender = false;
   };
 
   render();

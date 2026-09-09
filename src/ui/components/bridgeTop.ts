@@ -7,7 +7,7 @@
  * schaut, soll im Result denselben Balken wiedererkennen.
  *
  * Zustände je Balken (Art Direction §4.1):
- *   normal · selected · flagged · resultSafe · resultCollision · resultRotten · removed
+ *   normal · selected · flagged · flaggedConflict · resultSafe · resultCollision · resultRotten · removed
  *
  * Die Lücke eines abgefaulten Balkens bleibt sichtbar — sonst rutschen die Nummern
  * zusammen und "Balken 4 ist abgefault" ergibt nächste Runde keinen Sinn mehr.
@@ -17,7 +17,15 @@ import { LAYOUT, colorById, hex, plankHeightFor, type ColorId } from '@/config/t
 import { t } from '@/core/i18n';
 import type { PlankId, PlayerId } from '@/core/types';
 
-export type PlankState = 'normal' | 'selected' | 'flagged' | 'resultSafe' | 'resultCollision' | 'resultRotten';
+export type PlankState =
+  | 'normal'
+  | 'selected'
+  | 'flagged'
+  /** Zwei oder mehr Fahnen auf demselben Balken — der Streit, um den es geht (GDD §3.2). */
+  | 'flaggedConflict'
+  | 'resultSafe'
+  | 'resultCollision'
+  | 'resultRotten';
 
 export interface PlankMarker {
   playerId: PlayerId;
@@ -49,6 +57,12 @@ export interface BridgeTopOptions {
   display?: boolean;
   /** Nummernschilder anzeigen. Im Result verdecken sie sonst die Köpfe. */
   showSigns?: boolean;
+  /**
+   * Die Balken klappen nacheinander auf (Result, Roadmap M5.3). Das ist kein Schmuck:
+   * Die Welle läuft von Balken 1 nach rechts und zwingt den Blick, die Brücke einmal
+   * ganz abzugehen — statt sofort auf der eigenen Farbe zu landen.
+   */
+  wave?: boolean;
   ariaLabel?: string;
 }
 
@@ -88,14 +102,13 @@ export function createBridgeTop(options: BridgeTopOptions): HTMLElement {
 
   const list = document.createElement('div');
   list.className = 'bridge__planks';
+  if (options.wave === true) list.dataset.wave = 'true';
   el.append(list);
 
   rows.forEach((row, index) => {
-    if (row.kind === 'gap') {
-      list.append(createGap(row.id));
-      return;
-    }
-    list.append(createPlank(row.plank, options.showSigns !== false, index));
+    const node = row.kind === 'gap' ? createGap(row.id) : createPlank(row.plank, options.showSigns !== false, index);
+    if (options.wave === true) node.style.setProperty('--row-index', String(index));
+    list.append(node);
   });
 
   return el;
@@ -171,6 +184,9 @@ function describe(model: PlankModel): string {
   const base = t('common.plank', { n: model.id });
   const count = (model.markers ?? []).filter((m) => !m.flag).length;
 
+  if (model.state === 'flaggedConflict') {
+    return `${base}: ${t('negotiation.flagConflictShort', { count: (model.markers ?? []).filter((m) => m.flag).length })}`;
+  }
   if (model.state === 'resultCollision') return `${base}: ${t('banner.crash')}`;
   if (model.state === 'resultRotten') return `${base}: ${t('banner.badLuck')}`;
   if (model.state === 'resultSafe') return `${base}: ${t('result.givers')}`;

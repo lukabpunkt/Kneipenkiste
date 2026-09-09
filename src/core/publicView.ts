@@ -157,6 +157,12 @@ export interface ResultView {
   removedPlank?: PlankId;
   nextPlankCount: number;
   repaired: boolean;
+  /**
+   * Die Rucksäcke, sofern "Schwergewicht" läuft. Beim Reveal ist das keine Geheimnis-
+   * frage mehr — und die Bühne braucht sie, sonst trägt jeder denselben kleinen Rucksack,
+   * während der Screen daneben von dreifachem Verteilen spricht (Roadmap M5.2).
+   */
+  weights?: Record<PlayerId, Weight>;
 }
 
 /** Der Reveal. Die einzige Projektion, die Wahlen und den morschen Balken zeigt. */
@@ -195,6 +201,7 @@ export function resultView(result: RoundResult): ResultView {
   if (result.modes.rotten && result.bridge.rottenPlank !== undefined) {
     view.rottenPlank = result.bridge.rottenPlank;
   }
+  if (result.modes.weights && result.weights) view.weights = { ...result.weights };
   if (result.removedPlank !== undefined) view.removedPlank = result.removedPlank;
 
   return view;

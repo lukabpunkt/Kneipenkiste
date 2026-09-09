@@ -81,6 +81,10 @@ export function createStepScreen(ctx: ScreenContext): ScreenInstance {
             script,
             reveal,
             colors: new Map(ctx.session.players().map((p) => [p.id, p.colorId])),
+            /* Rucksäcke: Wer dreifach verteilt, soll auch dreifach beladen laufen. */
+            ...(reveal.weights
+              ? { weights: new Map(Object.entries(reveal.weights)) }
+              : {}),
             slots: ctx.session.get().bridge.planks.length + ctx.session.get().bridge.removed.length,
             playerCount: ctx.session.players().length,
             lowEffects: ctx.session.settings().lowEffects || game.detectLowEffects(),

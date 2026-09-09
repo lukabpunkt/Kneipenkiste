@@ -63,7 +63,9 @@
     "deathZoneRule": "Death zone: fewer planks than people. Standing alone hands out {giving}.",
     "flagPrompt": "Flag on …",
     "flagOf": "{name}: flag on {plank}",
-    "tooltip": "Talk. Promise. Break it."
+    "tooltip": "Talk. Promise. Break it.",
+    "flagConflict": "Flag stand-off on plank {plank}: {names}.",
+    "flagConflictShort": "{count} flags"
   },
   "silence": {
     "headline": "Fog",
@@ -150,7 +152,8 @@
       "Nobody again? I'm hungry.",
       "You talked. You lied. Excellent.",
       "The plank was not the problem."
-    ]
+    ],
+    "share": "Share"
   },
   "rules": {
     "headline": "In three sentences",

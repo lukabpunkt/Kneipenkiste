@@ -29,7 +29,7 @@ import type { Carpenter } from './Carpenter';
 import type { FxKit } from './fx';
 import type { Hiker } from './Hiker';
 import type { Vulture } from './Vulture';
-import { STAGE, hikerSpreadFor } from '@/config/theme';
+import { STAGE, hikerHeightFor, hikerSpreadFor } from '@/config/theme';
 import { FALLBACK_FALL_ID, getSequence, type SequenceContext } from './sequences';
 
 export type StepBeat = 'step' | 'break' | 'skippable';
@@ -148,9 +148,14 @@ export class StepDirector {
       const target = this.targetFor(entry.hikerId, entry.plank);
       /*
        * Die Signatur (CLAUDE.md): `runTo` bekommt eine **Dauer**, keine Geschwindigkeit.
-       * Acht verschiedene Distanzen, ein Ankunftsframe.
+       * Acht verschiedene Distanzen, ein Ankunftsframe — auch der am Seil, der nicht
+       * läuft, sondern hangelt (GDD §3.6).
        */
-      tl.add(hiker.runTo(target.x, target.y, runMs), this.at(script.intro.endsAt));
+      const move =
+        entry.plank === 'rope'
+          ? hiker.climbRope(target.x, target.y, runMs)
+          : hiker.runTo(target.x, target.y, runMs);
+      tl.add(move, this.at(script.intro.endsAt));
     }
 
     /* --- Der Schritt: Hit-Stop. Ein Frame, in dem die Welt steht --- */
@@ -279,10 +284,17 @@ export class StepDirector {
   /** Wohin ein Hiker läuft: auf seinen Balken, oder unter die Brücke ans Seil. */
   private targetFor(hikerId: PlayerId, plank: PlankId | 'rope'): { x: number; y: number } {
     if (plank === 'rope') {
-      /* Der Seil-Nutzer hangelt sich unter der Brücke durch (GDD §3.6). */
+      /*
+       * Der Seil-Nutzer hangelt sich unter der Brücke durch (GDD §3.6).
+       *
+       * Der Ursprung eines Hikers liegt zwischen den Füßen. Setzt man ihn knapp unter die
+       * Brücke, ragt sein Kopf oben wieder heraus und er steht scheinbar auf dem Plateau —
+       * genau so sah es im ersten Durchlauf aus. Er muss um seine **ganze Höhe** tiefer,
+       * dann hängen die Hände am Seil und der Rest baumelt.
+       */
       return {
         x: STAGE.plateauRightStart - 30,
-        y: STAGE.bridgeY + STAGE.bridgeSagY + 70,
+        y: STAGE.bridgeY + STAGE.bridgeSagY + hikerHeightFor(this.ctx.playerCount) * 0.95,
       };
     }
 

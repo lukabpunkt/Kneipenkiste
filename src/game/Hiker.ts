@@ -286,6 +286,86 @@ export class Hiker {
     return timeline;
   }
 
+  /**
+   * Hangeln (GDD §3.6, Roadmap M5.2) — die einzige Fortbewegung, die nicht über die
+   * Brücke geht, sondern darunter.
+   *
+   * Wer das Seil nimmt, kauft sich mit einem Schluck aus der Runde heraus. Das soll man
+   * sehen: Arme über dem Kopf, Beine baumelnd, der Körper pendelt bei jedem Griff. Der
+   * Griffwechsel läuft mit `repeat: -1` **innerhalb** der Anreisedauer und wird zum
+   * Schluss abgeräumt — sonst hinge der Arm für den Rest der Show über dem Kopf.
+   */
+  climbRope(x: number, y: number, durationMs: number): gsap.core.Timeline {
+    const seconds = Math.max(0.001, durationMs / 1000);
+    /*
+     * Griffe zählen, statt unendlich zu wiederholen.
+     *
+     * `repeat: -1` wäre die naheliegende Schreibweise und wäre ein Show-Stopper: Ein
+     * unendliches Kind macht die Eltern-Timeline unendlich lang — die Show käme nie an
+     * ihr Ende, `onFinished` nie zum Result. Also wird die Anzahl der Griffe aus der
+     * Anreisedauer gerechnet, und die Bewegung endet genau mit der Ankunft.
+     */
+    const grips = Math.max(1, Math.round(seconds / 0.84));
+    const grip = seconds / (grips * 2);
+    const swings = grips * 2 - 1;
+
+    this.driven = true;
+    this.setRope(true);
+    this.facing = x >= this.view.position.x ? 1 : -1;
+    this.body.scale.x = this.facing;
+
+    const timeline = gsap.timeline({
+      onComplete: () => {
+        this.driven = false;
+        this.speed = 0;
+      },
+    });
+
+    timeline.to(this.view.position, { x, y, duration: seconds, ease: 'none' }, 0);
+
+    /* Greifen: ein Arm oben, der andere holt nach. */
+    timeline.fromTo(
+      this.armL,
+      { rotation: -2.5 },
+      { rotation: -1.6, duration: grip, ease: 'sine.inOut', yoyo: true, repeat: swings },
+      0
+    );
+    timeline.fromTo(
+      this.armR,
+      { rotation: 1.6 },
+      { rotation: 2.5, duration: grip, ease: 'sine.inOut', yoyo: true, repeat: swings },
+      0
+    );
+    /* Der Körper pendelt gegen den Griff — daher kommt das Gefühl von Gewicht. */
+    timeline.fromTo(
+      this.body,
+      { rotation: -0.07 },
+      { rotation: 0.07, duration: grip, ease: 'sine.inOut', yoyo: true, repeat: swings },
+      0
+    );
+    timeline.fromTo(
+      [this.legL, this.legR],
+      { rotation: 0.14 },
+      { rotation: -0.14, duration: grip, ease: 'sine.inOut', yoyo: true, repeat: swings },
+      0
+    );
+
+    /* Angekommen: Die Hände bleiben oben — er hängt ja weiter. */
+    timeline.call(
+      () => {
+        this.armL.rotation = -2.3;
+        this.armR.rotation = 2.3;
+        this.legL.rotation = 0.06;
+        this.legR.rotation = -0.06;
+        this.body.rotation = 0;
+      },
+      undefined,
+      seconds
+    );
+
+    return timeline;
+  }
+
   /** Arme rudern, Knie weich — der Moment, in dem der Balken unter einem nachgibt. */
   wobble(intensity = 1): gsap.core.Tween {
     return gsap.to(this.body, {

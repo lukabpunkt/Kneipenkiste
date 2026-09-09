@@ -78,7 +78,13 @@ export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
 
     const planks: PlankModel[] = current.planks.map((plank) => ({
       id: plank.id,
-      state: plank.flaggedBy.length > 0 ? 'flagged' : 'normal',
+      /*
+       * Zwei Fahnen auf einem Balken sind kein Zustand, sondern eine Ansage: Beide haben
+       * es öffentlich gesagt, einer wird lügen müssen. Der Balken zeigt das, statt zwei
+       * Punkte nebeneinander zu setzen, die man übersieht (GDD §3.2).
+       */
+      state:
+        plank.flaggedBy.length > 1 ? 'flaggedConflict' : plank.flaggedBy.length > 0 ? 'flagged' : 'normal',
       markers: plank.flaggedBy.map((playerId) => ({
         playerId,
         colorId: ctx.session.colorOf(playerId),
@@ -96,6 +102,20 @@ export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
     );
 
     if (!current.modes.flags) return;
+
+    /* Und derselbe Streit noch einmal in Worten — Farbpunkte allein tragen keine Namen. */
+    const conflicts = current.planks.filter((plank) => plank.flaggedBy.length > 1);
+    for (const plank of conflicts) {
+      const row = document.createElement('p');
+      row.className = 'negotiation__conflict';
+      row.dataset.plank = String(plank.id);
+      row.setAttribute('role', 'status');
+      row.textContent = t('negotiation.flagConflict', {
+        plank: plank.id,
+        names: plank.flaggedBy.map((id) => ctx.session.nameOf(id)).join(` ${t('common.and')} `),
+      });
+      bridgeBox.append(row);
+    }
 
     bridgeBox.append(
       createFlagRow({
