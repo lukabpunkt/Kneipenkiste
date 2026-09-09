@@ -4,7 +4,7 @@ Ein Mobile-First Pass-the-Phone-Trinkspiel für 3–8 Personen über Anti-Koordi
 
 Schwesterprojekt von [Drinkshot](https://github.com/lukabpunkt/Drinkshot), [Der Tresor](https://github.com/lukabpunkt/Tresor), [Sprengmeister](https://github.com/lukabpunkt/Sprengmeister) und [Der Zoll](https://github.com/lukabpunkt/Zoll) — gleicher Stack, gleiche Design-Sprache, gleiche Charaktere.
 
-**Status:** M4 abgeschlossen (`v0.4.0`) — die sechs großen Stürze sind da: Händchenhalten, Coyote-Pause, Wippe, Seilschwung, Domino, Wandkicker. Alle unter fünf Sekunden, alle mit Blickkontakt davor, und jeder klettert wieder hoch. Als Nächstes M5: Polish, Modi, Accessibility.
+**Status:** M5 abgeschlossen (`v0.5.0`) — Politur: Der Titel erzählt das Spiel in neun Sekunden, zwei Fahnen auf einem Balken sind ein sichtbarer Streit, Rucksäcke und Seil-Hangeln stehen auf der Bühne, und Kontrast, Fokus und „Bewegung reduzieren“ sind geprüft statt behauptet. Lighthouse Mobile 91 / 100 / 100. Als Nächstes M6: Playtest und Release 1.0.
 
 ## Planung
 
@@ -38,6 +38,7 @@ npm run check:colorblind # Deuteranopie-Simulation auf dem Bühnenbild
 npm run build:audio      # 32 Klänge synthetisieren und zum Sprite bauen
 npm run preview:sequences # Sequenz-Preview (?dev=1&panel=sequences)
 npm run capture:falls    # fünf Momente je Fall-Sequenz nach docs/screens/falls/
+npm run capture:ui       # Titel-Loop, Absprache und Result nach docs/screens/
 npm run test:perf        # JS-Budget und Draw-Batches (Audit A2)
 ```
 
@@ -49,5 +50,5 @@ npm run test:perf        # JS-Budget und Draw-Batches (Audit A2)
 ```
 cd /Users/lukabloemendal/Documents/Hängebrücke
 claude
-> Lies CLAUDE.md und docs/. Setze Milestone M5 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A5 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
+> Lies CLAUDE.md und docs/. Setze Milestone M6 aus docs/04-ROADMAP.md vollständig um, führe danach Audit A6 aus docs/05-AUDITS.md durch und schreibe den Report nach docs/PROGRESS.md.
 ```

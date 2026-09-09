@@ -12,6 +12,7 @@ import { createBridgeTop, type PlankModel } from '../components/bridgeTop';
 import { createCountdownRing } from '../components/countdownRing';
 import { createFlagRow } from '../components/flagRow';
 import { createCoachMark } from '../components/coach';
+import { createModeChips } from '../components/modeChips';
 import type { ScreenContext, ScreenInstance } from '../router';
 
 export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
@@ -141,6 +142,10 @@ export function createNegotiationScreen(ctx: ScreenContext): ScreenInstance {
 
   renderBridge();
   el.append(header, heading, rule, bridgeBox, notBinding, footer);
+
+  /* Welche Sonderregeln heute gelten — dort, wo darüber geredet wird. */
+  const chips = createModeChips(view.modes);
+  if (chips) el.insertBefore(chips, bridgeBox);
 
   /* Einmal im Leben der Installation: warum das Reden nichts wert ist (Roadmap M5.4). */
   const coach = createCoachMark('negotiation');

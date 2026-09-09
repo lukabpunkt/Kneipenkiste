@@ -231,6 +231,65 @@ test.describe('Modi', () => {
     /* 2 Personen × Gewicht 3 = 6 Schlucke. */
     await expect(page.locator('.result__row[data-reason="collision"]').first()).toContainText('Rudi');
   });
+
+  /*
+   * A5 verlangt, dass **alle** Modus-Kombinationen spielbar sind. Statt die Paare
+   * einzeln durchzuspielen (Fahne + Schwergewicht, Morsch + Seil, Nebel + Todeszone)
+   * läuft hier der Extremfall: alles gleichzeitig, in der Todeszone, wo ein Sturz
+   * garantiert ist. Wer diese Runde übersteht, übersteht jede Teilmenge davon.
+   */
+  test('alle fünf Modi gleichzeitig, in der Todeszone', async ({ page }) => {
+    const problems: string[] = [];
+    page.on('pageerror', (error) => problems.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') problems.push(message.text());
+    });
+
+    await seedSession(page, {
+      playerCount: 3,
+      modes: { flags: true, rotten: true, weights: true, fog: true, rope: true },
+    });
+    await page.goto(BASE_DEV);
+    await page.getByRole('button', { name: 'Spielen' }).click();
+    await page.getByRole('button', { name: 'Auf die Brücke' }).click();
+
+    /* Nebel schlägt Absprache: keine Fahnen, kein Reden, nur Stille (GDD §3.6). */
+    await expect(page.locator('[data-screen="silence"]')).toBeVisible();
+    /* Und trotzdem steht da, was heute gilt. */
+    await expect(page.locator('.mode-chips .chip--mode')).toHaveCount(5);
+
+    /*
+     * Die Todeszone lässt sich nur erzwingen, solange die Runde noch nicht gewählt hat —
+     * der Dev-Knopf ist ausserhalb von Absprache und Stille absichtlich gesperrt.
+     */
+    await page.getByRole('button', { name: 'Todeszone' }).click();
+    await expect(page.locator('[data-screen="silence"]')).toBeVisible();
+
+    await expect(page.locator('[data-screen="pass"]')).toBeVisible({ timeout: 20_000 });
+
+    /* Todeszone: B = n − 1 = 2 Balken für 3 Leute — einer muss sich einen teilen. */
+    await tapPass(page);
+    await expect(page.locator('[data-screen="choose"] .plank:not(.plank--removed)')).toHaveCount(2);
+    await page.locator('.weight__step[data-weight="2"]').click();
+    await page.locator('[data-screen="choose"] .plank[data-plank="1"]').click();
+
+    await tapPass(page);
+    await page.locator('[data-screen="choose"] .plank[data-plank="1"]').click();
+
+    await tapPass(page);
+    await page.getByRole('button', { name: 'Seil nehmen (einmalig)' }).click();
+
+    await expect(page.locator('[data-screen="sealed"]')).toBeVisible();
+    await watchStep(page);
+    await distribute(page);
+
+    await expect(page.locator('[data-screen="result"]')).toBeVisible({ timeout: 15_000 });
+    /* Der Zusammenstoß als Bild — mit beiden Namen darin (Roadmap M5.3). */
+    const crash = page.locator('.result__crash').first();
+    await expect(crash).toBeVisible();
+    await expect(crash).toContainText('Rudi');
+    expect(problems).toEqual([]);
+  });
 });
 
 test.describe('Privatsphäre und Bedienung', () => {
@@ -331,6 +390,61 @@ test.describe('Privatsphäre und Bedienung', () => {
     await page.locator('.screen__abort').click();
     await page.getByRole('dialog').getByRole('button', { name: 'Ja' }).click();
     await expect(page.locator('[data-screen="lobby"]')).toBeVisible();
+  });
+});
+
+test.describe('Barrierefreiheit (Audit A5)', () => {
+  /*
+   * Tastatur ist in A5 ein SOLL, aber ein billiges: Wenn der Titel mit Tab und Enter
+   * spielbar ist, sind es die anderen Screens auch — sie bestehen aus denselben
+   * Knöpfen. Geprüft wird beides, was dazugehört: dass der Fokus ankommt und dass man
+   * **sieht**, wo er ist.
+   */
+  test('der Titel lässt sich mit Tastatur bedienen, und der Fokus ist sichtbar', async ({
+    page,
+    browserName,
+  }) => {
+    /*
+     * Nur Chromium: Safari wandert mit Tab standardmässig **nicht** auf Knöpfe — dafür
+     * muss man "Volle Tastaturnavigation" einschalten. Das ist eine Einstellung des
+     * Systems, keine Eigenschaft der Seite; ein Test darauf würde nur Safaris Default
+     * prüfen. Der Fokusring selbst gilt trotzdem für beide.
+     */
+    test.skip(browserName === 'webkit', 'Safari fokussiert Knöpfe nur mit voller Tastaturnavigation');
+
+    await seedSession(page, { playerCount: 3 });
+    await page.goto(BASE);
+    await expect(page.locator('h1')).toHaveText('Die Hängebrücke');
+
+    await page.keyboard.press('Tab');
+    const focused = page.locator(':focus');
+    await expect(focused).toHaveText('Spielen');
+
+    /* Der Ring kommt aus `:focus-visible` — ohne ihn tappt man im Dunkeln. */
+    const outlineWidth = await focused.evaluate(
+      (el) => globalThis.getComputedStyle(el).outlineWidth
+    );
+    expect(parseFloat(outlineWidth)).toBeGreaterThanOrEqual(2);
+
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[data-screen="lobby"]')).toBeVisible();
+  });
+
+  test('respektiert "Bewegung reduzieren" beim Screenwechsel', async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: 'reduce' });
+    const page = await context.newPage();
+    await seedSession(page, { playerCount: 3 });
+    await page.goto(BASE);
+
+    /* Der Wipe wird zum Fade — und der Screenwechsel bleibt trotzdem ein Wechsel. */
+    const wipeMs = await page.evaluate(() =>
+      globalThis.getComputedStyle(document.documentElement).getPropertyValue('--wipe-ms').trim()
+    );
+    expect(wipeMs).toBe('1ms');
+
+    await page.getByRole('button', { name: 'Spielen' }).click();
+    await expect(page.locator('[data-screen="lobby"]')).toBeVisible();
+    await context.close();
   });
 });
 

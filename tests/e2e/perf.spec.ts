@@ -210,8 +210,15 @@ test.describe('Bühne', () => {
     await page.goto(BASE);
     await expect(page.locator('h1')).toHaveText('Die Hängebrücke');
 
-    /* Vor dem ersten Tap: ein Chunk. PIXI und GSAP warten (Architektur §1). */
-    expect(scripts.filter((name) => name.endsWith('.js'))).toHaveLength(1);
+    /*
+     * Vor dem ersten Tap darf nichts von der Bühne da sein: kein PIXI, kein GSAP, kein
+     * Renderer (Architektur §1). Der Ton darf kommen — er lädt nach `load` im Idle und
+     * blockiert damit nichts (ADR-28); gezählt wird deshalb nicht die Anzahl der Chunks,
+     * sondern **wer** dabei ist.
+     */
+    expect(scripts.some((name) => name.startsWith('WebGLRenderer'))).toBe(false);
+    expect(scripts.some((name) => name.startsWith('RenderTargetSystem'))).toBe(false);
+    expect(scripts.some((name) => name.startsWith('browserAll'))).toBe(false);
 
     await page.getByRole('button', { name: 'Spielen' }).click();
     await startRound(page);

@@ -10,7 +10,21 @@
  * Wenn der Ton fehlt, fehlt der Ton — nicht die Runde.
  */
 
-import { Howl, Howler } from 'howler';
+/*
+ * howler wird **dynamisch** geladen (Roadmap M5.5).
+ *
+ * Beim Import richtet es sich sofort ein: AudioContext anlegen, ein `<audio>`-Element
+ * bauen, rund zwanzig Codecs mit `canPlayType` abklopfen. Im CPU-Profil des Starts war
+ * das mit 254 ms der größte Einzelposten — für einen Ton, der erst in der Absprache
+ * gebraucht wird. Jetzt liegt howler im Audio-Chunk und kommt mit dem Sprite.
+ *
+ * Bis dahin ist jede Funktion hier still. Das ist genau das dokumentierte Verhalten für
+ * "Ton fehlt" (Audit A3) — nur eben für ein paar Sekunden statt für immer.
+ */
+import type { Howl as HowlType, HowlOptions, HowlerGlobal } from 'howler';
+
+let Howl: (new (options: HowlOptions) => HowlType) | undefined;
+let Howler: HowlerGlobal | undefined;
 
 interface SpriteFile {
   format: string[];
@@ -20,7 +34,7 @@ interface SpriteFile {
 /** Die Musik läuft leiser als die Effekte — sie trägt, sie steht nicht im Weg. */
 const MUSIC_MIX = 0.45;
 
-let howl: Howl | undefined;
+let howl: HowlType | undefined;
 let spriteMap: SpriteFile['sprite'] = {};
 let loading: Promise<void> | undefined;
 
@@ -56,6 +70,7 @@ export function loadAudio(): Promise<void> {
   loading ??= (async () => {
     try {
       const base = import.meta.env.BASE_URL;
+      /* Erst die Beschreibung holen — ohne Sprite braucht es howler gar nicht. */
       const response = await fetch(`${base}audio/sprite.json`);
       const file = (await response.json()) as SpriteFile;
       spriteMap = file.sprite;
@@ -66,12 +81,23 @@ export function loadAudio(): Promise<void> {
         sprite[key] = value[2] ? [value[0], value[1], true] : [value[0], value[1]];
       }
 
+      const howler = await import('howler');
+      Howl = howler.Howl;
+      Howler = howler.Howler;
+
       howl = new Howl({
         src: file.format.map((ext) => `${base}audio/sprite.${ext}`),
         sprite,
         preload: true,
         html5: false,
       });
+
+      /*
+       * Wurde vor dem Laden schon getippt, ist die Geste vorbei. howler hängt sich beim
+       * Erzeugen selbst an den nächsten Tap, um zu entsperren — hier wird nur der schon
+       * gestellte Antrag nachgeholt, falls der Browser ihn annimmt.
+       */
+      if (unlocked) resumeContext();
     } catch (error) {
       console.warn('[audio] Sprite konnte nicht geladen werden — es bleibt still.', error);
     }
@@ -79,9 +105,34 @@ export function loadAudio(): Promise<void> {
   return loading;
 }
 
-/** Im Hintergrund laden, während geredet wird. */
+/** Der AudioContext ist erst nach dem dynamischen Import da. */
+function resumeContext(): void {
+  try {
+    void (Howler?.ctx as AudioContext | undefined)?.resume();
+  } catch {
+    /* Kein AudioContext — dann eben stumm. */
+  }
+}
+
+/**
+ * Im Hintergrund laden — aber erst, wenn der Titel steht.
+ *
+ * Beim Start aufgerufen würde es sich mit dem ersten Bild um den Hauptthread streiten:
+ * 316 KB holen, dekodieren, howler einrichten. Der Titel braucht keinen Ton, die Lobby
+ * schon — und zwischen beiden liegt mindestens ein Tap.
+ */
 export function preloadAudio(): void {
-  void loadAudio();
+  const start = (): void => void loadAudio();
+  const idle = (globalThis as { requestIdleCallback?: (cb: () => void, options?: { timeout: number }) => void })
+    .requestIdleCallback;
+
+  const schedule = (): void => {
+    if (idle) idle(start, { timeout: 2000 });
+    else globalThis.setTimeout(start, 400);
+  };
+
+  if (document.readyState === 'complete') schedule();
+  else globalThis.addEventListener('load', schedule, { once: true });
 }
 
 /**
@@ -91,12 +142,7 @@ export function preloadAudio(): void {
 export function unlockAudio(): void {
   if (unlocked) return;
   unlocked = true;
-  try {
-    const context = Howler.ctx as AudioContext | undefined;
-    void context?.resume();
-  } catch {
-    /* Kein AudioContext — dann eben stumm. */
-  }
+  resumeContext();
 }
 
 /** Ein Effekt. Unbekannte Keys sind still, kein Fehler. */
@@ -141,7 +187,7 @@ export function stopMusic(): void {
 /** Im Hintergrund schweigt das Spiel — sonst tickt die Uhr in der Hosentasche weiter. */
 export function suspendAudio(): void {
   try {
-    void (Howler.ctx as AudioContext | undefined)?.suspend();
+    void (Howler?.ctx as AudioContext | undefined)?.suspend();
   } catch {
     /* egal */
   }
@@ -149,11 +195,7 @@ export function suspendAudio(): void {
 
 export function resumeAudio(): void {
   if (!soundOn) return;
-  try {
-    void (Howler.ctx as AudioContext | undefined)?.resume();
-  } catch {
-    /* egal */
-  }
+  resumeContext();
 }
 
 /** Nur für Tests. */

@@ -53,6 +53,25 @@ function renderBootFailure(root: HTMLElement, error: unknown): void {
   root.append(box);
 }
 
+/**
+ * Der Service Worker meldet sich erst an, wenn der Titel steht (Roadmap M5.5).
+ *
+ * Bei der Installation lädt Workbox den ganzen Precache — Chunks, Atlas, Schriften, Ton.
+ * Passiert das während des Starts, konkurriert es mit dem ersten Bild: gemessen wurde
+ * eine Blockierzeit, die den Lighthouse-Wert allein aus dieser Reihenfolge drückte.
+ * Nach `load` ist der Titel längst da, und das Nachladen stört niemanden mehr.
+ */
+function registerServiceWorker(): void {
+  if (!('serviceWorker' in navigator) || !import.meta.env.PROD) return;
+
+  const register = (): void => {
+    void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`);
+  };
+
+  if (document.readyState === 'complete') register();
+  else globalThis.addEventListener('load', register, { once: true });
+}
+
 function boot(): void {
   setLocale(detectLocale());
 
@@ -69,9 +88,7 @@ function boot(): void {
   /* Nach `createApp`: Die App setzt die gespeicherte Sprache, das Overlay folgt ihr. */
   translateStaticNodes();
 
-  if ('serviceWorker' in navigator && import.meta.env.PROD) {
-    void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`);
-  }
+  registerServiceWorker();
 }
 
 boot();

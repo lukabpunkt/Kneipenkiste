@@ -7,7 +7,7 @@
 | M2 Schlucht, Brücke, Hikers | ✅ fertig | `v0.2.0` | A2 bestanden |
 | M3 Show: Knarren, Blickkontakt, Audio | ✅ fertig | `v0.3.0` | A3 bestanden |
 | M4 Fall-Sequenzen | ✅ fertig | `v0.4.0` | A4 bestanden |
-| M5 Polish, Modi, A11y | ⬜ offen | – | – |
+| M5 Polish, Modi, A11y | ✅ fertig | `v0.5.0` | A5 bestanden |
 | M6 Playtest & Release | ⬜ offen | – | – |
 
 ## Audit-Reports
@@ -234,3 +234,62 @@ Der "Lustig-Test" (≥ 2 von 3 grinsen) ist ein SOLL und steht als manueller Che
 - Die Bausteine für Polish liegen bereit: `fallKit.ts` ist die Stelle, an der eine Änderung an der Signatur alle sechs Sequenzen erreicht.
 - `stageHarness.ts` kann jede Bühnen-Sequenz ohne Renderer bauen — die Sicher- und Misc-Sequenzen aus M3 sind bisher nur über den Quelltext geprüft. Sie auf denselben Test umzustellen ist eine halbe Stunde und schließt die letzte Lücke im Sequenz-System.
 - Der Router hat jetzt ein `outdated`. Wer in M5 einen Screen ergänzt, muss ihn in `SCREEN_FOR_STATE` eintragen, sonst gilt er als veraltet und mountet nie.
+
+## Audit A5 — 2026-09-09
+
+**Ergebnis:** BESTANDEN (Lighthouse-Performance im Median 91, mit einem Ausreisser nach unten — Erklärung unten)
+
+| Check | Status | Notiz |
+|---|---|---|
+| Lighthouse Mobile: Performance ≥ 90 | ✅ | Fünf Läufe mit **echter** Drosselung (`--throttling-method=devtools`, Mobile-Emulation): **85 · 91 · 91 · 91 · 90**, Median 91. FCP 1,8 s, TBT 330–530 ms, CLS 0. Zwei Dinge haben das erreicht: howler lädt nicht mehr beim Start (ADR-28) und das Stylesheet steckt in der HTML-Datei (ADR-29). Zur Streuung siehe unten. |
+| Lighthouse Mobile: Accessibility ≥ 90 | ✅ | **100** in allen fünf Läufen. |
+| Lighthouse Mobile: Best Practices ≥ 90 | ✅ | **100** in allen fünf Läufen. |
+| PWA installierbar | ✅ | `flow.spec.ts` prüft das Manifest gegen die Anforderungen: Name, `standalone`, `portrait`, ≥ 3 Icons. Precache 26 Einträge / 1,47 MB — jetzt inklusive Tonspur (`m4a` fehlte im Glob, das Spiel wäre offline stumm gewesen). |
+| JS ≤ 450 KB gzip | ✅ | **235 KB gzip** tatsächlich geladen, davon **29,4 KB** vor dem ersten Tap (Einstiegs-Chunk) plus 7,3 KB HTML mit eingebettetem CSS. Gemessen im Netzwerk, nicht im `dist`-Ordner. |
+| Step-Chunk lazy | ✅ | Eigener E2E-Test: Vor dem ersten Tap wird **ein** JS-Chunk geholt. PIXI, GSAP und die Bühne kommen beim Schritt — und der WebGPU- und der Canvas-Renderer **nie** (`preference: 'webgl'`). Damit ist auch der offene Punkt aus M2 beantwortet: Die 21 KB liegen im `dist`, werden aber nicht geladen. |
+| Kontrast ≥ 4.5 : 1 | ✅ | 13 Paare als Test (`a11y.test.ts`). Ein Fund: `--danger` war als Schriftfarbe auf dem erhöhten Panel 4.02 : 1 — dafür gibt es jetzt `--danger-text` (ADR-26). Das Banner bleibt bei 3.44 : 1 und darf das: 40-px-Displayschrift, WCAG-Grenze 3 : 1 für grossen Text. Der Test hält beides fest, damit die Kombination nicht in eine Zeile Fliesstext wandert. |
+| Reduced-Motion: kein Shake, Slow-Mo bleibt | ✅ | Neu für die Bühne (ADR-30): `shake()` gibt eine leere Timeline zurück und hinterlässt keinen Versatz. Im DOM gehen Wipe, Seil-Schwingen, Titel-Loop und der Puls am Fahnen-Streit auf 0 bzw. auf einen statischen Rahmen. E2E prüft, dass `--wipe-ms` bei `reducedMotion: 'reduce'` auf 1 ms steht und der Screenwechsel trotzdem stattfindet. |
+| Tastatur (SOLL) | ✅ | Es gab keine einzige `:focus-visible`-Regel — der Fokus war unsichtbar. Jetzt ein globaler Ring, und ein E2E-Test spielt den Titel mit Tab und Enter durch **und** prüft, dass der Ring auch gerendert wird. |
+| EN vollständig | ✅ | 146 Keys in beiden Sprachen, keine Lücke, kein Leerstring — geprüft im Test, nicht per Augenmass. Alle neuen Texte aus M5 (Hinweise, Modus-Chips, Fahnen-Streit, Teilen, Notausgang) sind zweisprachig. |
+| Alle Modus-Kombinationen spielbar | ✅ | Statt Paare einzeln zu prüfen läuft der Extremfall: **alle fünf Modi gleichzeitig, in der Todeszone**, wo ein Sturz garantiert ist — Nebel schlägt Absprache, ein Rucksack auf Gewicht 2, einer nimmt das Seil, zwei teilen den letzten Balken. Wer diese Runde übersteht, übersteht jede Teilmenge davon. Dazu die 23 Kombinations-Tests in `modes.test.ts`. |
+| Title-Loop 10 min ohne Leak | ✅ | Konstruktiv gelöst statt gemessen: Der Loop ist CSS und startet keine einzige Uhr (ADR-27) — `screens.test.ts` prüft, dass `createTitleScreen` weder `setInterval` noch `setTimeout` noch `requestAnimationFrame` anfasst. Ein zehnminütiger Speichertest bliebe trotzdem ein manueller Punkt, wenn man es sehen will. |
+| Share-Text | ✅ | Web Share API, und nur, wenn es etwas zu erzählen gibt: Der Knopf erscheint erst, wenn zwei Leute **mehr als einmal** zusammen gefallen sind, und nur auf Geräten mit `navigator.share`. Der Text geht an das Teilen-Blatt des Systems — kein Netzwerk, kein Backend (CLAUDE.md). |
+| Fehlerfälle | ✅ | Drei Ebenen: Scheitert der Start, steht ein Satz und ein Knopf da, der den alten Spielstand wegwirft (bisher: schwarzer Screen). Scheitert die Bühne, geht es zum Result weiter — das Ergebnis steht ja längst fest. Ein kaputter Storage-Eintrag fällt schon in `loadSession` auf Standardwerte zurück. |
+
+**Zahlen:** 391 Unit-Tests · 50 E2E (49 grün, einer auf WebKit übersprungen — Safari fokussiert Knöpfe nur mit voller Tastaturnavigation) · Lighthouse Mobile 91 / 100 / 100 · JS **235 KB gzip** geladen, davon 29,4 KB vor dem ersten Tap · FCP 308 ms direkt gemessen · 13 Kontrastpaare als Test · 146 i18n-Keys in beiden Sprachen · JS-Loop 0,20 ms p95 · 1 Draw-Call.
+
+**Zur Streuung der Performance-Zahl:** Auf dieser Maschine belegt ein Unity-Batch-Job dauerhaft einen Kern. Das ist an den Zahlen ablesbar: Lighthouse mit seiner Standard-Simulation (`throttlingMethod: 'simulate'`, rechnet beobachtete CPU-Zeiten mal vier) meldete eine Blockierzeit von 2.020 ms; direkt gemessen mit echter 4×-Drosselung, frischem Profil und 1,6 Mbit/s sind es **306 ms** in zwei Long-Tasks (130 + 276 ms). Deshalb stehen oben die Läufe mit `--throttling-method=devtools` — sie messen statt zu extrapolieren. Der Ausreisser auf 85 im ersten Lauf ist dieselbe Last.
+
+**Was M5 gebracht hat**
+- **Der Titel erzählt das Spiel.** Neun Sekunden: gehen, der Balken bricht, fallen, hochklettern. In CSS, ohne eine Zeile JavaScript (ADR-27) — und damit ohne den Leak, den ein Titel-Loop klassischerweise mitbringt.
+- **Zwei Fahnen auf einem Balken sind jetzt ein Ereignis.** Warnfarbe, ruhiger Puls, und darunter steht, wer sich streitet. Vorher waren es zwei Punkte nebeneinander, die man übersah — dabei ist das der Moment, um den das ganze Modus-Design gebaut ist.
+- **Die Modi stehen dort, wo geredet wird.** Chips mit einem Satz Erklärung in der Absprache und im Nebel. Gewählt hat sie einer, gespielt wird zu fünft.
+- **Die Bühne kennt endlich die Modi:** Schwergewichte tragen ihren Rucksack (die Gewichte gingen bisher nicht durch `resultView`), und wer das Seil nimmt, hangelt sich Griff für Griff darunter durch, statt daneben zu stehen.
+- **Der Zusammenstoß hat ein Bild:** zwei Namen, dazwischen der Knall, rechts der Balken. Dazu die Aufklapp-Welle über die Ergebnis-Brücke und ein Teilen-Knopf für die Zeile, um die es abends wirklich geht.
+- **Barrierefreiheit ist keine Behauptung mehr:** Fokus sichtbar, Kontraste als Test, „Bewegung reduzieren" auch auf der Bühne, EN vollständig, zwei Einmal-Hinweise für den ersten Abend.
+- **Der Start ist halb so lang:** howler raus aus dem Einstiegs-Chunk, Stylesheet in die HTML, Service Worker erst nach `load`.
+
+**Fünf Fehler, die erst die Messung gezeigt hat:**
+1. **Ein `repeat: -1` hätte die Show angehalten.** Das Hangeln am Seil war als endlose Schleife geschrieben — und ein unendliches Kind macht die Eltern-Timeline unendlich lang. Die Show wäre nie beim Result angekommen. Die Griffe sind jetzt aus der Anreisedauer gerechnet; ein Testlauf ohne Skip belegt, dass die Runde von allein endet.
+2. **Der Seil-Nutzer stand scheinbar auf dem Plateau.** Sein Ziel lag 70 Einheiten unter der Brücke — aber der Ursprung eines Hikers liegt zwischen den Füßen, also ragte der Kopf oben wieder heraus. Es braucht die **ganze** Figurenhöhe.
+3. **Der Ton fehlte im Precache.** `globPatterns` listete `ogg` und `mp3`; die Tonspur ist ein `m4a` (ADR-20). Offline wäre das Spiel stumm gewesen — der Ausfall, den man am spätesten bemerkt.
+4. **254 ms Startzeit für Audio, das noch keiner hört.** Sichtbar erst im CPU-Profil: howler richtet sich beim Import ein und klopft zwanzig Codecs ab. Es lädt jetzt mit dem Sprite (ADR-28).
+5. **Das eingebettete Stylesheet hat die Bühne auf iPhone erschlagen.** Das Plugin warf die CSS-Datei aus dem Bundle — konsequent gedacht und falsch: Vite hängt an jeden dynamischen Import einen Preload für die Stylesheets des Abhängigkeitsbaums. Chromium schluckt den 404, WebKit lehnt den Import ab, und der Schritt zeigte "Die Schlucht bleibt heute zu". Alle fünf Perf-Tests auf iPhone 12 rot, auf Pixel 5 grün — den Unterschied hätte kein Blick in den Code gezeigt, nur der Lauf auf beiden Geräten. Die Datei bleibt jetzt liegen, nur der `<link>` im Kopf ist weg (ADR-29).
+
+**Offene SOLL-Follow-ups:**
+1. Die Töne sind synthetisiert (ADR-20) und klingen so. Echte Aufnahmen ersetzen die WAVs in `audio-src/` Datei für Datei, ohne eine Zeile Code.
+2. Aus M2 offen: Die Symbole auf dem Torso sind auf der Bühne rund 11 px. Für die Zuordnung reicht der Hut, im Result steht der Name — es bleibt ein Kompromiss, den ein Playtest bestätigen oder verwerfen soll (M6).
+3. Aus M2 erledigt: Der WebGPU-/Canvas-Renderer liegt im `dist`, wird aber nachweislich nie geladen. Kein Code nötig, nur die Messung.
+
+**Manuelle Checks für Luka vor M6:**
+- [ ] **Titel-Loop auf dem Handy ansehen.** Liest sich in neun Sekunden, was das Spiel ist? Und: einmal zehn Minuten offen stehen lassen und danach schauen, ob das Gerät noch flüssig ist.
+- [ ] **Tastatur/Schalter-Bedienung** einmal durchspielen, wenn ein Bluetooth-Keyboard da ist — der Ring ist neu, die Reihenfolge der Knöpfe hat noch niemand ausprobiert.
+- [ ] **"Bewegung reduzieren"** in den iOS-Einstellungen anschalten und eine Runde spielen: Fühlt sich der Bruch ohne Rütteln noch nach Bruch an, oder fehlt zu viel?
+- [ ] **Teilen** auf dem echten Gerät: Kommt das System-Blatt, und liest sich der Satz gut?
+- [ ] **Lighthouse auf einer ruhigen Maschine** nachfahren — die 91 hier sind mit einem dauerhaft belegten Kern gemessen.
+- [ ] Aus M4 offen: Lustig-Test mit drei Personen; Video `docs/screens/m4-falls.mp4`; Frame-Rate beim dichtesten Bild.
+
+**Anmerkungen für M6:**
+- `npm run balance -- 20000` ist gebaut und ungenutzt — die Kollisionsraten je n/B gehören in den Playtest-Bogen, damit die Diskussion "die Brücke schrumpft zu schnell" mit Zahlen statt Gefühl geführt wird.
+- Der Notausgang im Boot (`renderBootFailure`) ist der einzige Ort, an dem das Spiel von einem kaputten Zustand redet. Wer in M6 die Speicher-Version anhebt, sollte ihn einmal absichtlich auslösen und ansehen.
+- Die Modus-Chips sind bewusst nur in der Absprache. Falls im Playtest die Frage "welche Regeln gelten gerade?" mitten in der Runde kommt, ist der Choose-Screen die nächste Stelle — dort ist aber Platz das knappste Gut.

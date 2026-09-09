@@ -10,6 +10,7 @@ import { FOG_SILENCE_SEC } from '@/config/rules';
 import { t } from '@/core/i18n';
 import { ICON_CLOSE, createIconButton } from '../components/button';
 import { createCountdownRing } from '../components/countdownRing';
+import { createModeChips } from '../components/modeChips';
 import type { ScreenContext, ScreenInstance } from '../router';
 
 export function createSilenceScreen(ctx: ScreenContext): ScreenInstance {
@@ -41,6 +42,11 @@ export function createSilenceScreen(ctx: ScreenContext): ScreenInstance {
   fog.setAttribute('aria-hidden', 'true');
 
   el.append(abort, fog, heading, ring.el, body);
+
+  /* Auch im Nebel: Wer nicht reden darf, soll wenigstens die Regeln sehen. */
+  /* Der Nebel ist die Absprache — nur ohne Reden. Dieselbe Projektion, dieselbe Phase. */
+  const chips = createModeChips(ctx.view('NEGOTIATION').modes);
+  if (chips) el.append(chips);
 
   return {
     el,
