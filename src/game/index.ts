@@ -53,6 +53,8 @@ export interface MountOptions {
   slots: number;
   playerCount: number;
   lowEffects: boolean;
+  /** `prefers-reduced-motion` des Geräts — schaltet das Rütteln ab (Audit A5). */
+  reducedMotion?: boolean;
   seed: number;
   onFinished: () => void;
   /** Schritt, Bruch und Skip-Freigabe — als Ereignisse der Timeline, nicht der Wanduhr. */
@@ -153,6 +155,7 @@ export async function mountStage(options: MountOptions): Promise<MountedStage> {
 
   /* --- Kamera --- */
   const camera = new Camera(stage.world);
+  camera.setReducedMotion(options.reducedMotion === true);
   const offLayout = stage.onLayout((layout) =>
     camera.setBaseScale(layout.scale, layout.width, layout.height)
   );

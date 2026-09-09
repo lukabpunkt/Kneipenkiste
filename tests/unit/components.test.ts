@@ -36,6 +36,40 @@ describe('BridgeTop', () => {
     }
   });
 
+  it('macht aus zwei Fahnen auf einem Balken einen sichtbaren Streit (Roadmap M5.2)', () => {
+    const el = createBridgeTop({
+      planks: [
+        {
+          id: 3,
+          state: 'flaggedConflict',
+          markers: [
+            { playerId: 'p1', colorId: 'red', flag: true },
+            { playerId: 'p2', colorId: 'blue', flag: true },
+          ],
+        },
+      ],
+    });
+
+    const plank = el.querySelector('.plank')!;
+    expect(plank.classList.contains('plank--flaggedConflict')).toBe(true);
+    /* Und ein Screenreader hört die Zahl, nicht zwei namenlose Punkte. */
+    expect(plank.getAttribute('aria-label')).toContain('2');
+  });
+
+  it('nummeriert die Balken für die Aufklapp-Welle (Roadmap M5.3)', () => {
+    const planks = [plank(1), plank(2), plank(3)];
+    const still = createBridgeTop({ planks });
+    expect(still.querySelector('.bridge__planks')?.getAttribute('data-wave')).toBeNull();
+    expect((still.querySelector('.plank') as HTMLElement).style.getPropertyValue('--row-index')).toBe('');
+
+    const wave = createBridgeTop({ planks, wave: true });
+    expect(wave.querySelector('.bridge__planks')?.getAttribute('data-wave')).toBe('true');
+    const indices = [...wave.querySelectorAll<HTMLElement>('.plank')].map((el) =>
+      el.style.getPropertyValue('--row-index')
+    );
+    expect(indices).toEqual(['0', '1', '2']);
+  });
+
   it('macht nur bedienbare Balken zu Buttons', () => {
     const passive = createBridgeTop({ planks: [plank(1), plank(2)] });
     expect(passive.querySelectorAll('button')).toHaveLength(0);

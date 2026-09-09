@@ -35,6 +35,20 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/*
+ * Tastatur-Fokus (Audit A5).
+ *
+ * `:focus-visible`, nicht `:focus`: Der Router setzt den Fokus bei jedem Screenwechsel
+ * auf den Screen selbst, damit ein Screenreader den Wechsel mitbekommt — ein Ring um den
+ * halben Bildschirm wäre dabei nur Verwirrung. Wer mit der Tastatur oder einem Schalter
+ * spielt, sieht ihn; wer tippt, nicht.
+ */
+:focus-visible {
+  outline: 3px solid var(--canyon);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
 #app {
   position: relative;
   width: 100%;

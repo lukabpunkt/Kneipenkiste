@@ -1,7 +1,9 @@
 {
   "app": {
     "title": "The Rope Bridge",
-    "tagline": "Alone is safe. Together you get wet."
+    "tagline": "Alone is safe. Together you get wet.",
+    "bootFailed": "Something went wrong. Most likely an old saved session is in the way.",
+    "bootFailedAction": "Start over"
   },
   "common": {
     "back": "Back",
@@ -185,5 +187,10 @@
   },
   "share": {
     "pair": "{a} and {b} fell together for the {count}. time 🌉"
+  },
+  "coach": {
+    "negotiation": "Talk about whatever you like. The choice comes next, in secret — and nobody has to keep their word.",
+    "result": "Every round without a fall costs the bridge one plank. At some point there is not enough for anyone.",
+    "gotIt": "Got it"
   }
 }

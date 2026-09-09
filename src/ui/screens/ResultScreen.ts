@@ -13,6 +13,7 @@ import { createBridgeTop, type PlankModel } from '../components/bridgeTop';
 import { createButton } from '../components/button';
 import { openSheet } from '../components/sheet';
 import { createTokenStack } from '../components/tokenStack';
+import { createCoachMark } from '../components/coach';
 import type { ScreenContext, ScreenInstance } from '../router';
 
 export function createResultScreen(ctx: ScreenContext): ScreenInstance {
@@ -245,6 +246,11 @@ export function createResultScreen(ctx: ScreenContext): ScreenInstance {
   }
 
   el.append(banner, bridgeBox, lines, drinkers, preview, vulture, footer);
+
+  /* Und einmal: dass die Brücke schrumpft, ist keine Panne, sondern der Plan (Pfeiler 3). */
+  const coach = createCoachMark('result');
+  if (coach) el.insertBefore(coach, footer);
+
   return { el };
 
   function openStats(): void {

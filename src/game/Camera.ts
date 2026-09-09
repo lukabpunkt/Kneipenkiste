@@ -46,7 +46,21 @@ export class Camera {
   private readonly shakeOffset = { x: 0, y: 0 };
   private baseScale = 1;
 
+  /**
+   * „Bewegung reduzieren" (Audit A5).
+   *
+   * Ausgeschaltet wird genau eine Sache: das Rütteln. Es trägt keine Information — wer
+   * es nicht sieht, verpasst nichts am Spiel, und für Menschen mit vestibulärer Störung
+   * ist es das Unangenehmste, was ein Bildschirm tun kann. Die Slow-Mo bleibt, weil sie
+   * **Information** ist: Sie sagt "gleich passiert es".
+   */
+  private reducedMotion = false;
+
   constructor(private readonly world: Container) {}
+
+  setReducedMotion(value: boolean): void {
+    this.reducedMotion = value;
+  }
 
   /** Der Router meldet jede Layout-Änderung; daraus kommt die Grundskalierung. */
   setBaseScale(scale: number, viewWidth: number, viewHeight: number): void {
@@ -104,6 +118,9 @@ export class Camera {
 
   /** Der Schlag im Moment des Bruchs. */
   shake(strength: number = CAMERA.shakePx, durationMs: number = CAMERA.shakeMs): gsap.core.Timeline {
+    /* Eine leere Timeline, keine ausgelassene: Die Sequenz rechnet mit einem Rückgabewert. */
+    if (this.reducedMotion) return gsap.timeline();
+
     const timeline = gsap.timeline({
       onUpdate: () => this.apply(),
       onComplete: () => {

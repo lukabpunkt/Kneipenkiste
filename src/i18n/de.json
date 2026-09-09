@@ -1,7 +1,9 @@
 {
   "app": {
     "title": "Die Hängebrücke",
-    "tagline": "Allein ist sicher. Zu zweit wird es nass."
+    "tagline": "Allein ist sicher. Zu zweit wird es nass.",
+    "bootFailed": "Da ist etwas schiefgegangen. Wahrscheinlich liegt ein alter Spielstand quer.",
+    "bootFailedAction": "Neu starten"
   },
   "common": {
     "back": "Zurück",
@@ -185,5 +187,10 @@
   },
   "share": {
     "pair": "{a} und {b} sind zum {count}. Mal zusammen abgestürzt 🌉"
+  },
+  "coach": {
+    "negotiation": "Redet, worüber ihr wollt. Gewählt wird gleich geheim — und niemand muss sich an etwas halten.",
+    "result": "Jede Runde ohne Sturz kostet die Brücke einen Balken. Irgendwann reicht sie für niemanden mehr.",
+    "gotIt": "Verstanden"
   }
 }

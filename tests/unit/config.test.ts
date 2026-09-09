@@ -121,6 +121,7 @@ describe('theme.ts', () => {
       ['river', UI_COLORS.river],
       ['safe', UI_COLORS.safe],
       ['danger', UI_COLORS.danger],
+      ['danger-text', UI_COLORS.dangerText],
     ];
     for (const [name, value] of pairs) expect(cssVar(name), name).toBe(hex(value));
 

@@ -322,7 +322,7 @@
 /* Der Satz, an dem das ganze Spiel hängt. */
 .negotiation__conflict {
   margin: var(--space-2) 0 0;
-  color: var(--danger);
+  color: var(--danger-text);
   font-family: var(--font-display);
   font-size: var(--fs-sm);
   text-align: center;
@@ -705,7 +705,7 @@
 
 .result__line[data-kind='collision'],
 .result__line[data-kind='desertion'] {
-  color: var(--danger);
+  color: var(--danger-text);
   font-weight: 700;
 }
 
@@ -737,7 +737,7 @@
 
 .result__crash-plank {
   margin-left: auto;
-  color: var(--danger);
+  color: var(--danger-text);
   font-family: var(--font-display);
   font-size: var(--fs-sm);
 }
@@ -786,7 +786,7 @@
 }
 
 .result__preview[data-kind='shrunk'] {
-  color: var(--danger);
+  color: var(--danger-text);
 }
 
 .result__preview[data-kind='repaired'] {
@@ -900,4 +900,11 @@
   margin-top: var(--space-4);
   display: grid;
   gap: var(--space-1);
+}
+
+/* Der Notausgang aus `main.ts` — bewusst ohne Schnörkel. */
+.screen--boot-failed {
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
 }

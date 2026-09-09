@@ -194,4 +194,35 @@ test.describe('Bühne', () => {
      */
     await expect(page.locator('canvas')).toHaveCount(0, { timeout: 15_000 });
   });
+
+  /*
+   * Bundle-Prüfung (Roadmap M5.5, Audit A5) — an dem gemessen, was das Gerät wirklich
+   * lädt, nicht an dem, was in `dist/` liegt. Vite legt für WebGPU- und Canvas-Renderer
+   * eigene Chunks an; ob sie je geholt werden, sieht man nur im Netzwerk.
+   */
+  test('lädt die Bühne erst beim Schritt und nie den falschen Renderer (Audit A5)', async ({ page }) => {
+    const scripts: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().endsWith('.js')) scripts.push(request.url().split('/').pop() ?? '');
+    });
+
+    await seedSession(page, { playerCount: 3 });
+    await page.goto(BASE);
+    await expect(page.locator('h1')).toHaveText('Die Hängebrücke');
+
+    /* Vor dem ersten Tap: ein Chunk. PIXI und GSAP warten (Architektur §1). */
+    expect(scripts.filter((name) => name.endsWith('.js'))).toHaveLength(1);
+
+    await page.getByRole('button', { name: 'Spielen' }).click();
+    await startRound(page);
+    await endNegotiation(page);
+    await chooseAll(page, [1, 1, 3]);
+    await page.getByRole('button', { name: 'Der Schritt' }).click();
+    await expect(page.locator('.step__stage canvas')).toBeVisible({ timeout: 30_000 });
+
+    /* Der WebGL-Renderer kommt, die beiden anderen bleiben liegen — `preference: 'webgl'`. */
+    expect(scripts.some((name) => name.startsWith('WebGLRenderer'))).toBe(true);
+    expect(scripts.filter((name) => name.startsWith('WebGPURenderer'))).toEqual([]);
+    expect(scripts.filter((name) => name.startsWith('CanvasRenderer'))).toEqual([]);
+  });
 });

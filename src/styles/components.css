@@ -57,7 +57,7 @@
 }
 
 .btn--danger {
-  --btn-color: var(--danger);
+  --btn-color: var(--danger-text);
   --btn-shade: #c01c3f;
   --btn-text: var(--paper);
 }
@@ -710,4 +710,33 @@ button.plank:active:not(:disabled) {
 
 .dev-panel__button:disabled {
   opacity: 0.4;
+}
+
+/* ------------------------------------------------------------------ */
+/* Einmal-Hinweise (Roadmap M5.4)                                      */
+/* ------------------------------------------------------------------ */
+
+.coach {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 2px dashed var(--canyon);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel-raised);
+}
+
+.coach__text {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.coach__close {
+  justify-self: end;
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--canyon);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
 }

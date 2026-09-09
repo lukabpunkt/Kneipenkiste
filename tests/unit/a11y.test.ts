@@ -104,3 +104,66 @@ describe('Informationssicherheit (Standing Audit)', () => {
     expect(offenders).toEqual([]);
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* Kontrast (Audit A5)                                                 */
+/* ------------------------------------------------------------------ */
+
+/** Relative Leuchtdichte nach WCAG 2.1. */
+function luminance(hex: string): number {
+  const channels = [1, 3, 5]
+    .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * channels[0]! + 0.7152 * channels[1]! + 0.0722 * channels[2]!;
+}
+
+function contrast(a: string, b: string): number {
+  const [l1, l2] = [luminance(a), luminance(b)];
+  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+}
+
+describe('Kontrast (Audit A5)', () => {
+  const css = readFileSync('src/styles/tokens.css', 'utf8');
+  const token = (name: string): string => {
+    const match = new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`).exec(css);
+    expect(match, `--${name} fehlt in tokens.css`).not.toBeNull();
+    return match![1]!.toLowerCase();
+  };
+
+  /*
+   * Nur Paare, die es im Spiel wirklich gibt — eine Matrix aller Farben gegen alle wäre
+   * eine Zahl, die niemand liest. Die Liste wächst mit jedem neuen Textplatz.
+   */
+  const PAIRS: [string, string][] = [
+    ['paper', 'bg-deep'],
+    ['paper', 'bg-panel'],
+    ['paper', 'bg-panel-raised'],
+    ['canyon', 'bg-deep'],
+    ['canyon', 'bg-panel'],
+    ['danger-text', 'bg-deep'],
+    ['danger-text', 'bg-panel'],
+    ['danger-text', 'bg-panel-raised'],
+    ['safe', 'bg-deep'],
+    ['safe', 'bg-panel'],
+    /* Knopfbeschriftung auf dem gelben Primärknopf und auf Holz. */
+    ['ink', 'canyon'],
+    ['ink', 'wood'],
+    ['ink', 'paper'],
+  ];
+
+  it.each(PAIRS)('%s auf %s erreicht 4.5 : 1', (fore, back) => {
+    expect(contrast(token(fore), token(back))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  /*
+   * Das Banner ist die einzige Stelle mit hellem Text auf Warnrot. Es trägt die
+   * Display-Schrift in `--fs-2xl` (40 px), und für grossen Text verlangt WCAG 3 : 1.
+   * Steht hier ein Test, damit niemand die Kombination später in eine Zeile Fliesstext
+   * kopiert und sich auf "haben wir doch schon" beruft.
+   */
+  it('das Banner bleibt über 3 : 1 — und ist deshalb gross', () => {
+    const ratio = contrast(token('paper'), token('danger'));
+    expect(ratio).toBeGreaterThanOrEqual(3);
+    expect(ratio).toBeLessThan(4.5);
+  });
+});

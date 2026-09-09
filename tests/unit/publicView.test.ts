@@ -159,6 +159,24 @@ describe('resultView — ab hier ist alles oeffentlich', () => {
     expect(view.deserters).toEqual(['p1']);
   });
 
+  it('reicht die Rucksaecke an die Buehne durch — aber nur im Modus (Roadmap M5.2)', () => {
+    const withMode = resultView(
+      resolveRound(
+        roundOf({ picks: [1, 2, 3], plankCount: 5, modes: { weights: true }, weights: { p1: 3, p2: 1, p3: 2 } }),
+        { rng: createSeededRng(11) }
+      )
+    );
+    expect(withMode.weights).toEqual({ p1: 3, p2: 1, p3: 2 });
+
+    /* Ohne den Modus gibt es keine Gewichte — und damit auch nichts zu zeigen. */
+    const withoutMode = resultView(
+      resolveRound(roundOf({ picks: [1, 2, 3], plankCount: 5, weights: { p1: 3 } }), {
+        rng: createSeededRng(11),
+      })
+    );
+    expect(withoutMode.weights).toBeUndefined();
+  });
+
   it('verschweigt den morschen Balken, wenn der Modus aus war', () => {
     const round = roundOf({ picks: [1, 2, 3], plankCount: 5, rottenPlank: 4 });
     const view = resultView(resolveRound(round, { rng: createSeededRng(10) }));

@@ -13,6 +13,7 @@
 import { play, playMusic } from '@/audio/AudioManager';
 import { t } from '@/core/i18n';
 import { vibrate } from '../haptics';
+import { prefersReducedMotion } from '../motion';
 import { createButton } from '../components/button';
 import type { MountedStage } from '@/game';
 import type { ScreenContext, ScreenInstance } from '../router';
@@ -88,6 +89,7 @@ export function createStepScreen(ctx: ScreenContext): ScreenInstance {
             slots: ctx.session.get().bridge.planks.length + ctx.session.get().bridge.removed.length,
             playerCount: ctx.session.players().length,
             lowEffects: ctx.session.settings().lowEffects || game.detectLowEffects(),
+            reducedMotion: prefersReducedMotion(),
             seed: script.totalMs,
             onFinished: () => finish(),
             onBeat,

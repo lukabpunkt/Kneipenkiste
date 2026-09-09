@@ -77,6 +77,14 @@ export const UI_COLORS = {
   /* Ergebnisse */
   safe: 0x2ed573,
   danger: 0xff2d55,
+  /**
+   * Dieselbe Warnung, aber als **Text**.
+   *
+   * `danger` ist auf `bgPanelRaised` nur 4.0 : 1 — unter den 4.5, die A5 verlangt. Für
+   * eine Fläche oder einen Rahmen ist das egal, für einen Satz nicht. Deshalb zwei
+   * Töne: `danger` färbt, `dangerText` schreibt.
+   */
+  dangerText: 0xff6b81,
   flag: 0xffffff,
 } as const;
 
