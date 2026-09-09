@@ -47,8 +47,16 @@ let musicId: number | undefined;
 let musicKey: string | undefined;
 
 export function setSoundEnabled(value: boolean): void {
+  const wasOff = !soundOn;
   soundOn = value;
-  if (!value) stopMusic();
+
+  if (!value) {
+    stopMusic();
+    return;
+  }
+  /* Eingeschaltet heisst: jetzt laden. Der naechste Effekt soll nicht der erste sein,
+     der auf das Sprite wartet. */
+  if (wasOff) void loadAudio();
 }
 
 export function isSoundEnabled(): boolean {
@@ -67,6 +75,17 @@ export function setMusicVolume(value: number): void {
  * Spiel läuft dann stumm weiter, wie mit ausgeschaltetem Ton.
  */
 export function loadAudio(): Promise<void> {
+  /*
+   * Ton aus heisst Ton aus — kein Sprite, kein AudioContext.
+   *
+   * Bisher wurde beides auch bei stummem Spiel angelegt: 316 KB laden und einen
+   * AudioContext oeffnen, den niemand benutzt. Auf einer Maschine mit belegtem Audio-
+   * Geraet meldet der Browser dann "The AudioContext encountered an error from the audio
+   * device" auf die Konsole — im E2E ein Fehlschlag, auf einem Handy eine Warnung ohne
+   * Anlass. `setSoundEnabled(true)` holt das Laden sofort nach.
+   */
+  if (!soundOn) return Promise.resolve();
+
   loading ??= (async () => {
     try {
       const base = import.meta.env.BASE_URL;

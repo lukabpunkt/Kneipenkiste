@@ -115,6 +115,12 @@ jobs:
       - name: E2E-Flow
         run: npm run test:e2e
 
+      # Getrennt vom Flow, damit man in der Zusammenfassung sieht, **was** rot ist:
+      # ein Bedienfehler oder ein gerissenes Budget. Nur Pixel 5 — WebKit hat kein
+      # Long-Task-API, und die Draw-Calls messen wir ueber SwiftShader (ADR-16).
+      - name: E2E-Performance (A2/A4/A5)
+        run: npm run test:perf
+
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

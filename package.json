@@ -1,7 +1,7 @@
 {
   "name": "haengebruecke",
   "private": true,
-  "version": "0.5.0",
+  "version": "1.0.0-rc.1",
   "type": "module",
   "description": "Die Hängebrücke — Mobile-First Pass-the-Phone-Trinkspiel über Anti-Koordination",
   "scripts": {
@@ -27,6 +27,7 @@
     "capture:screens": "node scripts/capture-screens.mjs",
     "capture:falls": "node scripts/capture-falls.mjs",
     "capture:ui": "node scripts/capture-ui.mjs",
+    "capture:gif": "node scripts/capture-gif.mjs",
     "check:colorblind": "vite-node scripts/check-colorblind.mjs"
   },
   "dependencies": {

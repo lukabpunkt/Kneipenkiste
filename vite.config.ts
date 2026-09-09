@@ -107,7 +107,12 @@ export default defineConfig({
          * nichts. @1x liegt im Precache (damit die Schlucht auch offline steht), @2x holt
          * sich die Runtime-Regel unten beim ersten Schritt und behält sie danach.
          */
-        globIgnores: ['**/atlas/*@2x.*'],
+        /*
+         * Der @2x-Atlas und die Store-Screenshots bleiben aus dem Precache: Der Atlas,
+         * weil ein Gerät immer nur eine Auflösung braucht; die Screenshots, weil sie nur
+         * die Installations-Ansicht schmücken und im Spiel nie geladen werden.
+         */
+        globIgnores: ['**/atlas/*@2x.*', '**/screenshots/*'],
         cleanupOutdatedCaches: true,
         navigateFallback: 'index.html',
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,

@@ -8,7 +8,16 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { isSoundEnabled, play, playMusic, setMusicVolume, setSoundEnabled, stopMusic, unlockAudio } from '@/audio/AudioManager';
+import {
+  isSoundEnabled,
+  loadAudio,
+  play,
+  playMusic,
+  setMusicVolume,
+  setSoundEnabled,
+  stopMusic,
+  unlockAudio,
+} from '@/audio/AudioManager';
 
 /** Die Keys aus GDD §6 — was die Show ruft, muss es im Sprite geben. */
 const REQUIRED = [
@@ -112,5 +121,23 @@ describe('Was die Show ruft', () => {
       }
     }
     expect(missing).toEqual([]);
+  });
+});
+
+describe('Stumm heisst stumm (Roadmap M6.3)', () => {
+  it('laedt bei ausgeschaltetem Ton nichts — und oeffnet keinen AudioContext', async () => {
+    let fetched = 0;
+    const original = globalThis.fetch;
+    globalThis.fetch = (async (...args: Parameters<typeof fetch>) => {
+      fetched += 1;
+      return original(...args);
+    }) as typeof fetch;
+
+    setSoundEnabled(false);
+    await loadAudio();
+    expect(fetched).toBe(0);
+
+    globalThis.fetch = original;
+    setSoundEnabled(true);
   });
 });

@@ -8,7 +8,7 @@
 | M3 Show: Knarren, Blickkontakt, Audio | ✅ fertig | `v0.3.0` | A3 bestanden |
 | M4 Fall-Sequenzen | ✅ fertig | `v0.4.0` | A4 bestanden |
 | M5 Polish, Modi, A11y | ✅ fertig | `v0.5.0` | A5 bestanden |
-| M6 Playtest & Release | ⬜ offen | – | – |
+| M6 Playtest & Release | 🟡 gebaut, Playtest offen | `v1.0.0-rc.1` | A6 offen |
 
 ## Audit-Reports
 
@@ -293,3 +293,63 @@ Der "Lustig-Test" (≥ 2 von 3 grinsen) ist ein SOLL und steht als manueller Che
 - `npm run balance -- 20000` ist gebaut und ungenutzt — die Kollisionsraten je n/B gehören in den Playtest-Bogen, damit die Diskussion "die Brücke schrumpft zu schnell" mit Zahlen statt Gefühl geführt wird.
 - Der Notausgang im Boot (`renderBootFailure`) ist der einzige Ort, an dem das Spiel von einem kaputten Zustand redet. Wer in M6 die Speicher-Version anhebt, sollte ihn einmal absichtlich auslösen und ansehen.
 - Die Modus-Chips sind bewusst nur in der Absprache. Falls im Playtest die Frage "welche Regeln gelten gerade?" mitten in der Runde kommt, ist der Choose-Screen die nächste Stelle — dort ist aber Platz das knappste Gut.
+
+## Audit A6 — 2026-09-09
+
+**Ergebnis:** OFFEN — alles Bauliche ist grün, der Playtest steht aus.
+
+A6 ist kein Test, den ein Rechner bestehen kann: Elf seiner zwölf Zeilen fragen, was
+vier bis sechs Menschen an einem Tisch tun. Simulieren lässt sich das nicht, und es zu
+behaupten wäre schlimmer, als es offen zu lassen. Deshalb ist alles gebaut, gemessen und
+vorbereitet — und `v1.0.0` **nicht** getaggt. Der Stand heißt `v1.0.0-rc.1`.
+
+| Check | Status | Notiz |
+|---|---|---|
+| Zeit bis erster Schritt ≤ 90 s | ⏳ manuell | Bogen in `docs/PLAYTEST-01.md` §1. Die Stoppuhr läuft ab dem ersten Tap, nicht ab dem Erklären. |
+| Absprache wird zum Reden genutzt (≥ 6 von 8) | ⏳ manuell | §2, eine Spalte je Runde. |
+| Hörbare Reaktion beim Blickkontakt (≥ 6 von 8) | ⏳ manuell | §2. Das ist der Kern-Check der ganzen Spannungsmaschine aus M3. |
+| Lachen bei Fall-Sequenz (≥ 5 von 8) | ⏳ manuell | §2, plus eine Zeile je Sequenz — welche floppt, ist eine Zahl in `config/sequences.ts`. |
+| Gebrochenes Versprechen mit Reaktion (≥ 1) | ⏳ manuell | §2. Ohne das funktioniert Design-Pfeiler 2 nicht. |
+| Kollisionsrate 40–70 % ausserhalb der Todeszone | ✅ vorhergesagt · ⏳ gemessen | Der Balancing-Pass sagt für 8-Runden-Sitzungen bei 20 % Wortbruch: n = 4 → 45 %, n = 5 → 54 %, n = 6 → 61 %, n = 7 → 68 %. Bei 10–30 % Wortbruch liegt fast jede Zelle im Korridor (ADR-32). Was die Gruppe wirklich tut, sagt der Bogen. |
+| Todeszone ≥ 1 in 8 Runden | ⚠️ vorhergesagt knapp | Simulation: bei drei bis fünf Leuten in 23–88 % der Sitzungen, ab sechs nur in 3–11 %. Grund ist die volle Reparatur nach jedem Krach (GDD §3.7). Kein Wert wurde deshalb gedreht — der Hebel steht in ADR-32 und wartet auf den Playtest. |
+| „Nochmal spielen?" / „War es fair?" ≥ 80 % Ja | ⏳ manuell | §4, und zwar **vor** jeder Erklärung gefragt. |
+| „Was war verwirrend?" → Top-5 | ⏳ manuell | §5. Nur fünf; der Rest ist Backlog und wird auch so notiert. |
+| Abstürze 0 · Ruckler ≤ 1 · Sound-Aussetzer 0 | ⏳ manuell | §3. Automatisch abgesichert ist, was sich absichern lässt: kein `console.error` im E2E, ein Draw-Call, ≤ 2 Long-Tasks im dichtesten Bild. |
+| Gerätematrix | ✅ emuliert · ⏳ Hardware | `docs/DEVICE-MATRIX.md` trennt beides sauber: 50 E2E auf WebKit und Chromium in jedem Lauf, 18 Zeilen für echte Geräte. Was nur Hardware beantworten kann, steht mit Begründung dabei — GPU, Wake-Lock, Vibration, Safe-Areas, Offline. |
+| PWA | ✅ | Manifest um `id`, `dir` und drei Store-Screenshots ergänzt (die Installations-Ansicht auf Android zeigt sie); die Screenshots bleiben bewusst aus dem Precache. Installierbarkeit prüft `flow.spec.ts` gegen das Manifest. |
+| Live-URL | ⏳ | Der Deploy-Workflow liegt bereit (`.github/workflows/deploy.yml`, Push auf `main`). Das Repo hat noch kein Remote — der erste Push ist Lukas Entscheidung, nicht meine. |
+| README | ✅ | Neu geschrieben: animiertes Bild, Rundenablauf in fünf Zeilen, Modi, Spielen, Bauen, Doku-Index. |
+| CHANGELOG | ✅ | `CHANGELOG.md` von 0.0.1 bis 0.5.0, mit dem offenen Rest für 1.0 ganz oben. |
+| Lizenz | ✅ | MIT, plus der Satz, der nicht in die Lizenz gehört: Es ist ein Trinkspiel. |
+| Tag `v1.0.0` | ⏳ bewusst offen | `v1.0.0-rc.1` ist getaggt. 1.0 kommt nach dem Playtest und den Top-5. |
+
+**Zahlen:** 400 Unit-Tests · 50 E2E auf zwei Engines · `core/` 99,45 % Statements / 97,29 % Branches / 100 % Functions · 235 KB JS gzip · Lighthouse Mobile 91 / 100 / 100 · 32 ADRs.
+
+**Was M6 gebracht hat**
+- **Ein Balancing-Pass, der das Spiel modelliert statt Würfel.** Die alte Simulation warf jede Wahl frei — bei acht Leuten auf zehn Balken kracht es dann in 98 % der Runden, und die Zahl sagt nichts über einen Abend. Jetzt gibt es `negotiated` (jeder bekommt einen Balken zugesagt und bricht sein Wort mit Wahrscheinlichkeit p) und `simulateSession` (acht Runden am Stück mit Schrumpfen und Reparatur, über den echten `resolveRound`). `npm run balance` zeigt vier Tabellen; die vierte ist die, die A6 meint.
+- **Und ein Ergebnis, das nichts ändert (ADR-32).** Bei 10–30 % Wortbruch liegt fast jede Zelle im Korridor, und die Ausreisser fängt die Mechanik selbst: Eine perfekt abgesprochene Fünfergruppe steht in Runde 4 in der Todeszone. Einen GDD-Wert vor dem Playtest gegen die eigene Simulation zu drehen wäre geraten, nicht gemessen.
+- **Ein Playtest-Bogen zum Ausfüllen, nicht zum Lesen.** Setup, Rundenraster, Sequenz-Tabelle, die fünf Fragen in der richtigen Reihenfolge, Top-5 — und die elf offenen manuellen Checks aus M2 bis M5 gesammelt an einer Stelle.
+- **Ein GIF-Encoder.** Für das animierte README-Bild und das A4-Video gab es zwei Wege: eine Bildbibliothek als Abhängigkeit, oder 300 Zeilen PNG-Dekoder und GIF89a-Encoder in `scripts/lib/`. Es wurde der zweite — dieselbe Entscheidung wie beim Ton (ADR-20), aus demselben Grund.
+- **Release-Papiere:** MIT-Lizenz, Changelog über sechs Versionen, Gerätematrix, README mit allem, was jemand braucht, der das Repo zum ersten Mal öffnet.
+
+**Drei Fehler, die beim Bauen auffielen:**
+1. **Die Simulation beschrieb ein anderes Spiel.** Sie war seit M0 da und wurde in M6 zum ersten Mal ernst genommen — und dann war klar, dass "jeder würfelt" keine Aussage über eine Runde mit Absprache erlaubt. Das ist kein Bug, aber es ist der Grund, warum der Balancing-Pass vorher keine Zahl geliefert hätte, auf die man etwas hätte stützen können.
+2. **Stumm war nicht stumm.** Bei ausgeschaltetem Ton lud das Spiel trotzdem das 316-KB-Sprite und öffnete einen AudioContext, den niemand benutzte. Auf einer Maschine mit belegtem Audio-Gerät meldet der Browser darauf "The AudioContext encountered an error from the audio device" auf die Konsole — im E2E ein Fehlschlag (drei Tests auf beiden Engines), auf einem Handy eine Warnung ohne Anlass. Gefunden hat es der Standing Audit "keine `console.error` im E2E", und zwar erst, nachdem das Laden in M5 auf einen späteren, geschäftigeren Moment verschoben wurde. Jetzt heißt Ton aus: kein Sprite, kein Kontext.
+3. **Der Ton hätte offline gefehlt** — das kam schon in M5 heraus, gehört aber hierher: `m4a` stand nicht im Precache-Glob. Ein Ausfall, den man erst im Flugmodus bemerkt, also genau bei dem Playtest, für den das Handy zur Seite gelegt wird.
+
+**Offene SOLL-Follow-ups:**
+1. Die Töne sind synthetisiert (ADR-20). Echte Aufnahmen ersetzen die WAVs in `audio-src/` Datei für Datei — der beste Zeitpunkt ist nach dem Playtest, wenn klar ist, welche Klänge tragen.
+2. Aus M2 offen: Die Symbole auf dem Torso sind auf der Bühne rund 11 px. Ob das reicht, beantwortet der Playtest — bis dahin trägt der Hut die Zuordnung.
+3. Der Live-Deploy braucht ein Remote und einen Push.
+
+**Manuelle Checks für Luka vor 1.0:**
+- [ ] **Playtest 01 durchführen** — `docs/PLAYTEST-01.md`, 4–6 Personen, ≥ 8 Runden, davon 2 mit Fahne und 2 mit Schwergewicht. Das ist der ganze Meilenstein.
+- [ ] **Top-5-Findings beheben** und im Bogen abhaken.
+- [ ] **Gerätematrix** auf echter Hardware durchgehen (`docs/DEVICE-MATRIX.md`) — vor allem 60 fps, Ton-Entsperren, Offline und Safe-Areas.
+- [ ] **Repo pushen und Pages einmalig aktivieren:** `gh api --method POST repos/lukabpunkt/Haengebruecke/pages -f build_type=workflow` (steht auch im Deploy-Workflow).
+- [ ] **Dann erst `v1.0.0`** — Version anheben, Changelog-Abschnitt schliessen, taggen.
+
+**Anmerkungen für 1.0**
+- Der Backlog nach 1.0 steht in `docs/04-ROADMAP.md`: vier weitere Fall-Sequenzen, zwei neue Modi, Canyon-Themen. Nichts davon gehört in den Playtest — er soll das Spiel prüfen, das jetzt da ist.
+- Wenn der Playtest sagt, die Brücke fühle sich zu statisch an, ist die Stelle die Reparatur (GDD §3.7) und nicht `B_0`. Die Simulation kann die Alternative in Minuten durchrechnen: `simulateSession` liegt bereit.
+- Der GIF-Encoder in `scripts/lib/` ist absichtlich klein gehalten (eine globale Palette, kein Dithering, keine Differenz-Frames). Wenn ein Bild später mehr Frames braucht, ist die Datei die Stelle, an der man das ändert — nicht der Aufrufer.
