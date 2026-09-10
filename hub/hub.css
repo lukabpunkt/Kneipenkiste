@@ -115,6 +115,21 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   gap: 14px;
+  /*
+   * Alle Kacheln gleich hoch — auch die einspaltige Liste auf dem Handy.
+   *
+   * `1fr` fuer automatische Zeilen heisst: Jede Zeile wird so hoch wie die hoechste.
+   * Ohne das richtet sich jede Karte nach ihrem eigenen Text, und eine Tagline, die
+   * eine Zeile mehr umbricht, macht genau eine Kachel groesser als den Rest — auf dem
+   * Handy sind das 20 px, die man sofort sieht.
+   *
+   * Der Preis: Wird eine Tagline deutlich laenger als die anderen, waechst die ganze
+   * Reihe mit. Deshalb bleiben die Texte in `games.json` ungefaehr gleich lang.
+   */
+  grid-auto-rows: 1fr;
+}
+.games > li {
+  display: grid;
 }
 @media (min-width: 640px) {
   .games {
@@ -135,6 +150,12 @@ body {
   column-gap: 16px;
   row-gap: 4px;
   align-items: center;
+  /*
+   * Die Karte fuellt ihre Zeile, der Inhalt bleibt darin mittig. Das Fuellen macht das
+   * `stretch` des Grids, nicht `height: 100%` — eine Prozenthoehe in einer automatisch
+   * gemessenen Zeile ist zirkulaer, und bei 320 px lief der Text unten aus der Karte.
+   */
+  align-content: center;
   min-height: 112px;
   padding: 16px 16px 14px;
   background: var(--panel);
