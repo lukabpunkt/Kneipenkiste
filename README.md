@@ -44,7 +44,7 @@ Nebel (keine Absprache) und Seil (einmal pro Session sicher durchhangeln, für e
 Als Web-App, ohne Installation und ohne Konto — **kein Backend, keine Analytics, keine
 externen Requests**. Alles bleibt auf dem Gerät.
 
-- **Live:** `https://lukabpunkt.github.io/Haengebruecke/` (nach dem ersten Deploy)
+- **Live:** in der [Kneipenkiste](https://lukabpunkt.github.io/Kneipenkiste/) — dort liegen alle Spiele der Familie auf einer Seite.
 - **Als App:** im Browser-Menü „Zum Startbildschirm" — läuft danach offline im Vollbild.
 - Am besten mit einem Handy, das herumgereicht wird. Desktop bekommt denselben
   Portrait-Rahmen, nicht die halbe Brücke im Breitbild.

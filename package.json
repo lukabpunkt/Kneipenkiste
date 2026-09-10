@@ -18,6 +18,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test tests/e2e/flow.spec.ts",
     "test:perf": "playwright test tests/e2e/perf.spec.ts --project=\"Pixel 5\"",
+    "build:icons": "node scripts/build-icons.mjs",
     "build:signs": "node scripts/build-signs.mjs",
     "build:atlas": "node scripts/build-signs.mjs && node scripts/build-atlas.mjs",
     "synth:audio": "node scripts/synth-audio.mjs",

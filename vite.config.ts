@@ -68,7 +68,7 @@ function inlineStylesheet(): Plugin {
  * `base` = '/Haengebruecke/' wegen GitHub Pages (ADR-6: Repo-Name ohne Umlaut).
  */
 export default defineConfig({
-  base: process.env.BRIDGE_BASE ?? '/Haengebruecke/',
+  base: process.env.HAENGEBRUECKE_BASE ?? '/Haengebruecke/',
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
   },
