@@ -1,0 +1,167 @@
+{
+  "format": [
+    "m4a"
+  ],
+  "sprite": {
+    "balloon_deflate": [
+      0,
+      800,
+      false
+    ],
+    "creak_1": [
+      920,
+      550,
+      false
+    ],
+    "creak_2": [
+      1590,
+      550,
+      false
+    ],
+    "creak_3": [
+      2260,
+      550,
+      false
+    ],
+    "creak_4": [
+      2930,
+      550,
+      false
+    ],
+    "crowd_gasp": [
+      3600,
+      800,
+      false
+    ],
+    "crowd_laugh": [
+      4520,
+      1100,
+      false
+    ],
+    "drum_deathzone": [
+      5740,
+      1600,
+      false
+    ],
+    "footsteps_run": [
+      7460,
+      1200,
+      false
+    ],
+    "hammer_rhythm": [
+      8780,
+      1400,
+      false
+    ],
+    "hat_flutter": [
+      10300,
+      600,
+      false
+    ],
+    "music_lobby": [
+      11020,
+      4000,
+      true
+    ],
+    "music_negotiation": [
+      15140,
+      4000,
+      true
+    ],
+    "music_step": [
+      19260,
+      6000,
+      true
+    ],
+    "pass_whoosh": [
+      25380,
+      360,
+      false
+    ],
+    "plank_crumble": [
+      25860,
+      800,
+      false
+    ],
+    "plank_select": [
+      26780,
+      100,
+      false
+    ],
+    "plank_snap": [
+      27000,
+      450,
+      false
+    ],
+    "relief_exhale": [
+      27570,
+      700,
+      false
+    ],
+    "rock_squash": [
+      28390,
+      300,
+      false
+    ],
+    "rope_strain": [
+      28810,
+      600,
+      false
+    ],
+    "seal": [
+      29530,
+      280,
+      false
+    ],
+    "splash": [
+      29930,
+      700,
+      false
+    ],
+    "stamp": [
+      30750,
+      260,
+      false
+    ],
+    "step_thud": [
+      31130,
+      300,
+      false
+    ],
+    "ui_confirm": [
+      31550,
+      240,
+      false
+    ],
+    "ui_tap": [
+      31910,
+      70,
+      false
+    ],
+    "vulture_laugh": [
+      32100,
+      700,
+      false
+    ],
+    "vulture_screech": [
+      32920,
+      500,
+      false
+    ],
+    "whistle_fall": [
+      33540,
+      900,
+      false
+    ],
+    "wind_loop": [
+      34560,
+      4000,
+      true
+    ],
+    "wood_rot": [
+      38680,
+      900,
+      false
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Die Schluchtwand hinter der Bruecke: dunkler als die Plateaus, damit die Tiefe
+     lesbar bleibt. Wird ueber die volle Breite gekachelt — deshalb schmal. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 400" width="128" height="400">
+  <rect width="128" height="400" fill="#8C4426"/>
+  <g stroke="#7A3A24" stroke-width="9" stroke-linecap="round" opacity="0.38">
+    <path d="M0 60 H128"/><path d="M0 150 H128"/><path d="M0 246 H128"/><path d="M0 340 H128"/>
+  </g>
+  <g stroke="#7A3A24" stroke-width="6" opacity="0.22">
+    <path d="M32 0 V400"/><path d="M90 0 V400"/>
+  </g>
+</svg>

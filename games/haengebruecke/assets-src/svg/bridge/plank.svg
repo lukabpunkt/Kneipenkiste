@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Balken, normal: graues rissiges Holz (Art Direction §1). Breit genug, dass zwei
+     Hikers nebeneinander darauf passen (>= 60 Welteinheiten, Art Direction §6). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" width="200" height="44">
+  <rect x="6" y="8" width="188" height="28" rx="7" fill="#9C8A72" stroke="#1A1024" stroke-width="8"/>
+  <g stroke="#6B5B48" stroke-width="4" stroke-linecap="round">
+    <path d="M22 18 H176" /><path d="M34 27 H162" />
+  </g>
+  <!-- Zwei Risse, damit es morsch wirkt, ohne morsch zu sein. -->
+  <path d="M64 10 l6 10 l-5 8" stroke="#6B5B48" stroke-width="3" fill="none"/>
+  <path d="M140 34 l-5 -9 l6 -8" stroke="#6B5B48" stroke-width="3" fill="none"/>
+</svg>

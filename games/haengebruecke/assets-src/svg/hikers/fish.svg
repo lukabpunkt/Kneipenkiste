@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Fisch auf dem Kopf — das Zeichen, dass jemand im Fluss gelandet ist (GDD §4.3).
+     Overlay ueber dem Hut, ungetintet. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 64" width="120" height="64">
+  <path d="M18 32 Q46 8 82 32 Q46 56 18 32 Z" fill="#3FA7D6" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M82 32 L108 14 L104 32 L108 50 Z" fill="#3FA7D6" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="34" cy="27" r="5" fill="#1A1024"/>
+  <path d="M52 20 q8 12 0 24" stroke="#1A1024" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.5"/>
+</svg>

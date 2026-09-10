@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Die Hängebrücke</title>
+  <!--
+    App-Icon: der Balken bricht, und beide gehen mit (GDD §1).
+    Ein Motiv, eine Silhouette — das grosse V des gebrochenen Balkens. Es liest sich auch
+    bei 64 px in der Kneipenkiste noch, und es erzählt in einem Bild, worum es geht: Zwei
+    haben denselben Balken gewählt.
+
+    Familien-Stil (wie Tresor und Zoll): randlos, dicke ink-Outlines, Cel-Shading mit
+    harten Kanten statt Verläufen. Farben aus `config/theme.ts`.
+    Quelle für public/icons/* — gebaut mit `npm run build:icons`.
+  -->
+
+  <!-- Himmel, Schlucht, Fluss: drei Bänder, harte Kanten, kein Verlauf (Art Direction §1) -->
+  <rect width="512" height="512" fill="#2B4C8C" />
+  <rect y="184" width="512" height="108" fill="#F5A25D" />
+  <rect y="292" width="512" height="182" fill="#6B3A20" />
+  <!-- Der Fluss ganz unten: die Tiefe, in die es gleich geht -->
+  <rect y="474" width="512" height="38" fill="#3FA7D6" />
+  <path d="M96 474h320" fill="none" stroke="#1A1024" stroke-width="10" />
+
+  <!-- Plateaus: nur so viel Fels, dass klar ist, worüber die Brücke führt -->
+  <path d="M0 292h74l22 30v190H0z" fill="#C4693E" />
+  <path d="M512 292h-74l-22 30v190h96z" fill="#C4693E" />
+  <path d="M74 292h22l22 30v190H74z" fill="#8C4426" />
+  <path d="M438 292h-22l-22 30v190h44z" fill="#8C4426" />
+
+  <!-- Das V: zwei Balkenhälften, die nach innen wegkippen. Die Bruchkanten sind gezackt. -->
+  <g stroke="#1A1024" stroke-width="14" stroke-linejoin="round">
+    <path d="M96 306l150 66-22 50-150-66z" fill="#9C8A72" />
+    <path d="M416 306l-150 66 22 50 150-66z" fill="#9C8A72" />
+    <!-- Cel-Shading: die Unterseite der Bretter liegt im Schatten -->
+    <path d="M246 372l-22 50-150-66 14-6 158 22z" fill="#6B5B48" />
+    <path d="M266 372l22 50 150-66-14-6-158 22z" fill="#6B5B48" />
+  </g>
+
+  <!-- Splitter am Bruch — der Moment, nicht der Zustand -->
+  <g fill="#9C8A72" stroke="#1A1024" stroke-width="9" stroke-linejoin="round">
+    <path d="M244 352l24 10-20 16z" />
+    <path d="M276 348l22 14-26 10z" />
+  </g>
+
+  <!--
+    Zwei Hikers, jeder auf seiner Hälfte. Kopf, Hut, Arme, Beine — mehr Figur trägt diese
+    Grösse nicht, und mehr braucht sie auch nicht: Genau so sieht der Wanderer im
+    Titel-Loop aus.
+  -->
+  <g stroke="#1A1024" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="rotate(-14 158 300)">
+      <!-- Beine auf dem kippenden Brett -->
+      <path d="M138 292l-10 26M178 292l10 26" fill="none" />
+      <!-- Arme hoch — der Reflex, wenn der Boden weggeht -->
+      <path d="M116 246l-30-30M200 246l30-30" fill="none" />
+      <circle cx="158" cy="248" r="52" fill="#FF4757" />
+    </g>
+    <g transform="rotate(14 354 300)">
+      <path d="M334 292l-10 26M374 292l10 26" fill="none" />
+      <path d="M312 246l-30-30M396 246l30-30" fill="none" />
+      <circle cx="354" cy="248" r="52" fill="#3B82F6" />
+    </g>
+  </g>
+
+  <!-- Blickkontakt und Hut, jeweils mit dem Kopf mitgekippt -->
+  <g transform="rotate(-14 158 300)">
+    <circle cx="176" cy="246" r="17" fill="#FFF8E7" />
+    <circle cx="183" cy="248" r="9" fill="#1A1024" />
+    <path d="M148 280a18 18 0 0 1 30 0" fill="none" stroke="#1A1024" stroke-width="10" stroke-linecap="round" />
+    <g stroke="#1A1024" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M100 208h116" />
+      <path d="M124 208v-28a34 22 0 0 1 68 0v28z" fill="#C42F3C" />
+    </g>
+  </g>
+  <g transform="rotate(14 354 300)">
+    <circle cx="336" cy="246" r="17" fill="#FFF8E7" />
+    <circle cx="329" cy="248" r="9" fill="#1A1024" />
+    <path d="M364 280a18 18 0 0 0 -30 0" fill="none" stroke="#1A1024" stroke-width="10" stroke-linecap="round" />
+    <g stroke="#1A1024" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M296 208h116" />
+      <path d="M320 208v-28a34 22 0 0 1 68 0v28z" fill="#2563C4" />
+    </g>
+  </g>
+</svg>

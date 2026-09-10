@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Der Himmel als ein einziges Sprite statt als Graphics-Verlauf: So liegt er im
+     Welt-Atlas und kostet keinen eigenen Draw-Batch (ADR-13).
+     Goldene Stunde: tiefblau oben, warm am Horizont (Art Direction §1).
+
+     16 px breit und zur Laufzeit gestreckt — ein Verlauf ohne waagerechte Information
+     kostet sonst ein Viertel des Atlas für nichts. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 512" width="16" height="512">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2B4C8C"/>
+      <stop offset="0.55" stop-color="#7B6A94"/>
+      <stop offset="1" stop-color="#F5A25D"/>
+    </linearGradient>
+  </defs>
+  <rect width="16" height="512" fill="url(#sky)"/>
+</svg>

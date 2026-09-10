@@ -1,0 +1,777 @@
+/*
+ * Komponenten (Art Direction §4).
+ * Sticker-Look: dicke `ink`-Outline, farbige Unterkante, alles drückt sich beim Tap.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Screen-Wipe                                                         */
+/* ------------------------------------------------------------------ */
+
+.wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  background: var(--wipe-color, var(--canyon));
+  will-change: transform;
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                             */
+/* ------------------------------------------------------------------ */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 64px;
+  padding: 0 var(--space-5);
+  border: 3px solid var(--ink);
+  border-radius: 20px;
+  background: var(--btn-color, var(--canyon));
+  color: var(--btn-text, var(--ink));
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 0 var(--btn-shade, var(--canyon-shade));
+  transition:
+    transform var(--press-ms, 90ms) var(--ease-out),
+    box-shadow var(--press-ms, 90ms) var(--ease-out);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--btn-shade, var(--canyon-shade));
+}
+
+.btn:disabled {
+  opacity: 0.42;
+  box-shadow: 0 6px 0 var(--btn-shade, var(--canyon-shade));
+}
+
+.btn--secondary {
+  --btn-color: var(--bg-panel-raised);
+  --btn-shade: #14131f;
+  --btn-text: var(--paper);
+}
+
+.btn--danger {
+  --btn-color: var(--danger-text);
+  --btn-shade: #c01c3f;
+  --btn-text: var(--paper);
+}
+
+.btn--ghost {
+  --btn-color: transparent;
+  --btn-shade: transparent;
+  --btn-text: var(--paper);
+  border-color: transparent;
+  box-shadow: none;
+  min-height: 48px;
+  font-size: var(--fs-md);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.btn__icon svg,
+.btn__symbol svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 8%);
+  color: var(--paper);
+}
+
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--bg-panel-raised);
+  color: var(--paper);
+  font-size: var(--fs-sm);
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--canyon);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* ------------------------------------------------------------------ */
+/* Badge                                                               */
+/* ------------------------------------------------------------------ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 8%);
+}
+
+.badge__dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--badge-color);
+  color: var(--badge-text);
+}
+
+.badge--small .badge__dot {
+  width: 22px;
+  height: 22px;
+}
+
+.badge__dot svg {
+  width: 12px;
+  height: 12px;
+}
+
+.badge__name:empty {
+  display: none;
+}
+
+.badge__note {
+  opacity: 0.7;
+  font-size: var(--fs-xs);
+}
+
+/* ------------------------------------------------------------------ */
+/* Die Brücke von oben (Art Direction §4.1)                            */
+/* ------------------------------------------------------------------ */
+
+.bridge {
+  position: relative;
+  padding: var(--space-4) var(--space-5);
+}
+
+/* Die Seile schwingen im Leerlauf — nur minimal, sonst wird der Screen unruhig. */
+.bridge__rope {
+  position: absolute;
+  top: var(--space-2);
+  bottom: var(--space-2);
+  width: 4px;
+  border-radius: 2px;
+  background: var(--rope);
+  box-shadow: 0 0 0 2px var(--ink);
+  animation: rope-sway var(--rope-idle-ms) ease-in-out infinite;
+}
+
+.bridge__rope--left {
+  left: var(--space-3);
+}
+
+.bridge__rope--right {
+  right: var(--space-3);
+  animation-delay: calc(var(--rope-idle-ms) / -2);
+}
+
+@keyframes rope-sway {
+  0%,
+  100% {
+    transform: translateX(0) scaleY(1);
+  }
+  50% {
+    transform: translateX(1.5px) scaleY(1.008);
+  }
+}
+
+.bridge__planks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--plank-gap);
+}
+
+.plank {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--plank-height, var(--plank-min-height));
+  padding: 0 var(--space-4);
+  border: 3px solid var(--ink);
+  border-radius: var(--radius-sm);
+  background: var(--wood);
+  color: var(--ink);
+  font-family: var(--font-display);
+  transition:
+    background var(--press-ms) var(--ease-out),
+    transform 140ms var(--ease-out);
+}
+
+button.plank:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.plank__grain {
+  position: absolute;
+  inset: 30% var(--space-4);
+  border-top: 2px solid var(--wood-dark);
+  border-bottom: 2px solid var(--wood-dark);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Das Nummernschild hängt am Seil und steht leicht schief. */
+.plank__sign {
+  position: absolute;
+  left: var(--space-3);
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  background: var(--rope);
+  color: var(--ink);
+  font-size: var(--fs-md);
+  transform: rotate(var(--sign-tilt, 0deg));
+}
+
+.plank__markers {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.plank__hiker,
+.plank__flag {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--marker-color);
+  box-shadow: 0 2px 0 var(--marker-shade);
+}
+
+/* Die Fahne ist ein Umriss, kein Kopf: Sie sagt "hier wollte jemand hin", nicht "hier steht jemand". */
+.plank__flag {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  background: var(--flag);
+  border-color: var(--marker-color);
+  border-width: 4px;
+  box-shadow: none;
+}
+
+.plank--flagged {
+  background: color-mix(in srgb, var(--wood) 82%, var(--flag));
+}
+
+/*
+ * Zwei Fahnen auf einem Balken: Das ist der Moment, in dem die Absprache kippt. Er
+ * bekommt die Warnfarbe und einen ruhigen Puls — nicht, weil er hübsch ist, sondern
+ * damit ihn niemand übersieht, der gerade zum Nachbarn spricht.
+ */
+.plank--flaggedConflict {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--wood) 72%, var(--danger));
+  animation: plank-conflict 1400ms ease-in-out infinite;
+}
+
+@keyframes plank-conflict {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger) 60%, transparent); }
+  55% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--danger) 0%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plank--flaggedConflict {
+    animation: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 55%, transparent);
+  }
+}
+
+.plank--selected {
+  background: color-mix(in srgb, var(--wood) 60%, var(--canyon));
+}
+
+.plank--resultSafe {
+  border-color: var(--safe);
+  background: color-mix(in srgb, var(--wood) 80%, var(--safe));
+}
+
+.plank--resultCollision {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--wood) 65%, var(--danger));
+}
+
+.plank--resultRotten {
+  background: var(--wood-rotten);
+}
+
+/* Die Lücke bleibt sichtbar — sonst rutschen die Nummern zusammen. */
+.plank--removed {
+  min-height: var(--plank-height, var(--plank-min-height));
+  border: 3px dashed rgb(255 255 255 / 22%);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: rgb(255 255 255 / 55%);
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+}
+
+.plank__rot-sign {
+  padding: 0 var(--space-2);
+}
+
+/* Knarren: Skew, dessen Stärke aus dem Skript kommt (0.7 sicher / 1.0 Kollision). */
+.plank[data-creaking='true'] {
+  animation: plank-creak 460ms ease-in-out infinite;
+}
+
+@keyframes plank-creak {
+  0%,
+  100% {
+    transform: skewY(0deg);
+  }
+  50% {
+    transform: skewY(calc(var(--creak-amplitude, 1) * 0.9deg));
+  }
+}
+
+.plank[data-eye-contact='true'] {
+  animation: none;
+  outline: 4px solid var(--danger);
+  outline-offset: 3px;
+}
+
+.plank[data-breaking='true'] {
+  animation: plank-snap 420ms var(--ease-out) forwards;
+}
+
+@keyframes plank-snap {
+  0% {
+    transform: rotate(0) translateY(0);
+  }
+  30% {
+    transform: rotate(-3deg) translateY(4px);
+  }
+  100% {
+    transform: rotate(9deg) translateY(46px);
+    opacity: 0.25;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Countdown mit Gustav (Art Direction §4.2)                           */
+/* ------------------------------------------------------------------ */
+
+.countdown {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--canyon) calc(var(--countdown-progress, 1) * 360deg),
+    rgb(255 255 255 / 12%) 0
+  );
+}
+
+.countdown::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--bg-panel);
+}
+
+.countdown__portrait,
+.countdown__label {
+  position: relative;
+  z-index: 1;
+}
+
+.countdown__portrait svg {
+  width: 34px;
+  height: 34px;
+  display: block;
+}
+
+.countdown__label {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  line-height: 1;
+}
+
+/* Letzte 5 Sekunden: Gustav schaut auf die Uhr, der Ring pulst. */
+.countdown[data-urgent='true'] {
+  animation: countdown-pulse 700ms ease-in-out infinite;
+}
+
+.countdown[data-urgent='true'] .countdown__eye {
+  transform: translate(-3px, 2px);
+}
+
+@keyframes countdown-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Fahnen-Reihe (Art Direction §4.3)                                   */
+/* ------------------------------------------------------------------ */
+
+.flag-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.flag-row__player {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: space-between;
+}
+
+.flag-row__picker {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.flag-row__plank {
+  min-width: 34px;
+  min-height: 34px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel-raised);
+  color: var(--paper);
+  font-family: var(--font-display);
+}
+
+.flag-row__plank[aria-pressed='true'] {
+  background: var(--flag);
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------ */
+/* Gewicht-Stepper (Art Direction §4.4)                                */
+/* ------------------------------------------------------------------ */
+
+.weight {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: center;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+}
+
+.weight__title {
+  font-family: var(--font-display);
+}
+
+.weight__pack {
+  width: 64px;
+  height: 68px;
+}
+
+.weight__controls {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.weight__step {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel-raised);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+}
+
+.weight__step[aria-pressed='true'] {
+  background: var(--canyon);
+  color: var(--ink);
+}
+
+.weight__risk {
+  margin: 0;
+  font-size: var(--fs-sm);
+  opacity: 0.85;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* Schluck-Stapel                                                      */
+/* ------------------------------------------------------------------ */
+
+.tokens {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.tokens__cup {
+  width: 14px;
+  height: 18px;
+  border: 2px solid var(--ink);
+  border-radius: 3px 3px 6px 6px;
+  background: var(--token-color, var(--canyon));
+}
+
+.tokens--small .tokens__cup {
+  width: 10px;
+  height: 13px;
+}
+
+.tokens__count {
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+}
+
+/* ------------------------------------------------------------------ */
+/* Bottom-Sheet und Dialoge                                            */
+/* ------------------------------------------------------------------ */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 62%);
+}
+
+.sheet__panel {
+  position: relative;
+  width: min(100%, var(--design-width));
+  max-height: 82dvh;
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-4) calc(var(--space-6) + var(--safe-bottom));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--bg-panel);
+}
+
+.sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.sheet__title {
+  font-size: var(--fs-xl);
+}
+
+.sheet__text {
+  margin: 0 0 var(--space-4);
+}
+
+.sheet__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.sheet__actions .btn {
+  flex: 1;
+}
+
+/* ------------------------------------------------------------------ */
+/* Toast                                                               */
+/* ------------------------------------------------------------------ */
+
+.toast {
+  position: fixed;
+  top: calc(var(--safe-top) + var(--space-4));
+  left: 50%;
+  z-index: 90;
+  transform: translateX(-50%);
+  max-width: calc(var(--design-width) - var(--space-6));
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-md);
+  background: var(--canyon);
+  color: var(--ink);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* Dev-Panel und Sequenz-Preview (?dev=1)                              */
+/* ------------------------------------------------------------------ */
+
+.dev-sequences {
+  position: fixed;
+  left: 8px;
+  top: calc(var(--safe-top) + 8px);
+  z-index: 95;
+  display: grid;
+  gap: 3px;
+  max-height: 70dvh;
+  overflow-y: auto;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  background: rgb(0 0 0 / 82%);
+  color: var(--paper);
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.dev-sequences__toggle {
+  padding: 4px 6px;
+  border: none;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 12%);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.dev-sequences__list {
+  display: grid;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+/* Eingeklappt bleibt nur der Knopf stehen — die Bühne gehört der Sequenz. */
+.dev-sequences[data-open='false'] .dev-sequences__list {
+  display: none;
+}
+
+.dev-sequences__item {
+  padding: 5px 8px;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.dev-panel {
+  position: fixed;
+  right: 8px;
+  bottom: calc(var(--safe-bottom) + 8px);
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: rgb(0 0 0 / 78%);
+  color: var(--paper);
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.dev-panel__button {
+  padding: 4px 8px;
+  border: 1px solid var(--paper);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.dev-panel__button:disabled {
+  opacity: 0.4;
+}
+
+/* ------------------------------------------------------------------ */
+/* Einmal-Hinweise (Roadmap M5.4)                                      */
+/* ------------------------------------------------------------------ */
+
+.coach {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 2px dashed var(--canyon);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel-raised);
+}
+
+.coach__text {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.coach__close {
+  justify-self: end;
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--canyon);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+}
+
+/* ------------------------------------------------------------------ */
+/* Modus-Chips (Roadmap M5.2)                                          */
+/* ------------------------------------------------------------------ */
+
+.mode-chips {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip--mode {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--canyon);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--canyon) 12%, transparent);
+  text-align: left;
+}
+
+.chip--mode .chip__label {
+  color: var(--canyon);
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+}
+
+.chip--mode .chip__hint {
+  font-size: var(--fs-xs);
+  opacity: 0.85;
+}

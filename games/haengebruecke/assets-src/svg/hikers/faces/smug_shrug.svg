@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gesicht "smug_shrug" — "Ich hab's ja gesagt." Halb geschlossene Augen, schiefes Grinsen. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" width="96" height="64">
+  <path d="M15 26 L39 26" stroke="#1A1024" stroke-width="6" stroke-linecap="round"/>
+  <path d="M57 26 L81 26" stroke="#1A1024" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="29" cy="33" r="5" fill="#1A1024"/>
+  <circle cx="67" cy="33" r="5" fill="#1A1024"/>
+  <path d="M36 50 Q48 58 62 46" stroke="#1A1024" stroke-width="5" stroke-linecap="round" fill="none"/>
+</svg>

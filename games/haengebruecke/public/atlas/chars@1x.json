@@ -1,0 +1,975 @@
+{
+  "frames": {
+    "carpenter/ladder": {
+      "frame": {
+        "x": 3,
+        "y": 3,
+        "w": 72,
+        "h": 258
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 19,
+        "y": 1,
+        "w": 72,
+        "h": 258
+      },
+      "sourceSize": {
+        "w": 110,
+        "h": 260
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vulture/perch": {
+      "frame": {
+        "x": 3,
+        "y": 267,
+        "w": 36,
+        "h": 174
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 4,
+        "w": 36,
+        "h": 174
+      },
+      "sourceSize": {
+        "w": 60,
+        "h": 180
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/stick": {
+      "frame": {
+        "x": 3,
+        "y": 447,
+        "w": 26,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 9,
+        "y": 0,
+        "w": 26,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 160
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "carpenter/hammer": {
+      "frame": {
+        "x": 3,
+        "y": 613,
+        "w": 84,
+        "h": 132
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 8,
+        "w": 84,
+        "h": 132
+      },
+      "sourceSize": {
+        "w": 84,
+        "h": 140
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/backpack_3": {
+      "frame": {
+        "x": 35,
+        "y": 447,
+        "w": 80,
+        "h": 129
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 0,
+        "w": 80,
+        "h": 129
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 132
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/foot": {
+      "frame": {
+        "x": 35,
+        "y": 582,
+        "w": 40,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 2,
+        "y": 0,
+        "w": 40,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 44,
+        "h": 24
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vulture/body": {
+      "frame": {
+        "x": 45,
+        "y": 267,
+        "w": 141,
+        "h": 115
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 30,
+        "w": 141,
+        "h": 115
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 150
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/scared": {
+      "frame": {
+        "x": 45,
+        "y": 388,
+        "w": 78,
+        "h": 53
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 9,
+        "y": 5,
+        "w": 78,
+        "h": 53
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/head": {
+      "frame": {
+        "x": 81,
+        "y": 3,
+        "w": 126,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 10,
+        "w": 126,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vulture/head": {
+      "frame": {
+        "x": 81,
+        "y": 121,
+        "w": 104,
+        "h": 109
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 23,
+        "y": 7,
+        "w": 104,
+        "h": 109
+      },
+      "sourceSize": {
+        "w": 132,
+        "h": 116
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/torso": {
+      "frame": {
+        "x": 191,
+        "y": 121,
+        "w": 82,
+        "h": 107
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 7,
+        "y": 3,
+        "w": 82,
+        "h": 107
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 112
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/symbols/triangle": {
+      "frame": {
+        "x": 191,
+        "y": 234,
+        "w": 30,
+        "h": 27
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 9,
+        "y": 9,
+        "w": 30,
+        "h": 27
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/backpack_2": {
+      "frame": {
+        "x": 213,
+        "y": 3,
+        "w": 72,
+        "h": 94
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 0,
+        "w": 72,
+        "h": 94
+      },
+      "sourceSize": {
+        "w": 84,
+        "h": 100
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vulture/wing": {
+      "frame": {
+        "x": 3,
+        "y": 751,
+        "w": 130,
+        "h": 90
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 7,
+        "y": 8,
+        "w": 130,
+        "h": 90
+      },
+      "sourceSize": {
+        "w": 150,
+        "h": 100
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "vulture/clock": {
+      "frame": {
+        "x": 93,
+        "y": 582,
+        "w": 68,
+        "h": 86
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 2,
+        "y": 2,
+        "w": 68,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "carpenter/hat": {
+      "frame": {
+        "x": 121,
+        "y": 674,
+        "w": 141,
+        "h": 63
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 9,
+        "y": 13,
+        "w": 141,
+        "h": 63
+      },
+      "sourceSize": {
+        "w": 150,
+        "h": 84
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/symbols/bolt": {
+      "frame": {
+        "x": 93,
+        "y": 674,
+        "w": 22,
+        "h": 36
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 6,
+        "w": 22,
+        "h": 36
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/backpack_1": {
+      "frame": {
+        "x": 121,
+        "y": 447,
+        "w": 56,
+        "h": 80
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 0,
+        "w": 56,
+        "h": 80
+      },
+      "sourceSize": {
+        "w": 72,
+        "h": 88
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/wet": {
+      "frame": {
+        "x": 121,
+        "y": 533,
+        "w": 77,
+        "h": 43
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 13,
+        "w": 77,
+        "h": 43
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/leg": {
+      "frame": {
+        "x": 129,
+        "y": 388,
+        "w": 26,
+        "h": 53
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 2,
+        "w": 26,
+        "h": 53
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 56
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/panic": {
+      "frame": {
+        "x": 161,
+        "y": 388,
+        "w": 82,
+        "h": 49
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 7,
+        "y": 4,
+        "w": 82,
+        "h": 49
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/hat_hiker": {
+      "frame": {
+        "x": 183,
+        "y": 443,
+        "w": 134,
+        "h": 61
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 9,
+        "w": 134,
+        "h": 61
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 76
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/arm": {
+      "frame": {
+        "x": 167,
+        "y": 582,
+        "w": 28,
+        "h": 60
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 2,
+        "y": 2,
+        "w": 28,
+        "h": 60
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/rope_harness": {
+      "frame": {
+        "x": 201,
+        "y": 582,
+        "w": 90,
+        "h": 59
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 0,
+        "w": 90,
+        "h": 59
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/oh": {
+      "frame": {
+        "x": 204,
+        "y": 510,
+        "w": 80,
+        "h": 57
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 8,
+        "y": 3,
+        "w": 80,
+        "h": 57
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/help": {
+      "frame": {
+        "x": 290,
+        "y": 510,
+        "w": 76,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 10,
+        "y": 4,
+        "w": 76,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/neutral": {
+      "frame": {
+        "x": 192,
+        "y": 267,
+        "w": 74,
+        "h": 47
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 11,
+        "y": 8,
+        "w": 74,
+        "h": 47
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/shadow": {
+      "frame": {
+        "x": 192,
+        "y": 320,
+        "w": 124,
+        "h": 44
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 2,
+        "y": 2,
+        "w": 124,
+        "h": 44
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/fish": {
+      "frame": {
+        "x": 249,
+        "y": 370,
+        "w": 98,
+        "h": 44
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 14,
+        "y": 10,
+        "w": 98,
+        "h": 44
+      },
+      "sourceSize": {
+        "w": 120,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/held_breath": {
+      "frame": {
+        "x": 272,
+        "y": 234,
+        "w": 94,
+        "h": 39
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 18,
+        "w": 94,
+        "h": 39
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/symbols/diamond": {
+      "frame": {
+        "x": 279,
+        "y": 279,
+        "w": 34,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 7,
+        "y": 7,
+        "w": 34,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/smug_shrug": {
+      "frame": {
+        "x": 319,
+        "y": 279,
+        "w": 72,
+        "h": 33
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 23,
+        "w": 72,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/happy": {
+      "frame": {
+        "x": 322,
+        "y": 318,
+        "w": 70,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 13,
+        "y": 19,
+        "w": 70,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/whistle": {
+      "frame": {
+        "x": 323,
+        "y": 420,
+        "w": 68,
+        "h": 37
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 14,
+        "y": 20,
+        "w": 68,
+        "h": 37
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/faces/blink": {
+      "frame": {
+        "x": 323,
+        "y": 463,
+        "w": 70,
+        "h": 36
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 13,
+        "y": 19,
+        "w": 70,
+        "h": 36
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 64
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/symbols/cross": {
+      "frame": {
+        "x": 353,
+        "y": 361,
+        "w": 36,
+        "h": 36
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 6,
+        "w": 36,
+        "h": 36
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/symbols/star": {
+      "frame": {
+        "x": 395,
+        "y": 361,
+        "w": 36,
+        "h": 33
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 7,
+        "w": 36,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/symbols/heart": {
+      "frame": {
+        "x": 397,
+        "y": 400,
+        "w": 30,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 9,
+        "y": 13,
+        "w": 30,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/symbols/circle": {
+      "frame": {
+        "x": 279,
+        "y": 103,
+        "w": 28,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 10,
+        "y": 10,
+        "w": 28,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "hikers/symbols/square": {
+      "frame": {
+        "x": 291,
+        "y": 137,
+        "w": 28,
+        "h": 28
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 10,
+        "y": 10,
+        "w": 28,
+        "h": 28
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "app": "http://github.com/odrick/free-tex-packer-core",
+    "version": "0.3.9",
+    "image": "chars@1x.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 512,
+      "h": 1024
+    },
+    "scale": 1
+  }
+}

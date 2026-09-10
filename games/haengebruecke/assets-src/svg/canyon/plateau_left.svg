@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Linkes Plateau: Terrakotta-Fels, auf dem die Hikers antreten.
+
+     Die Lauffläche liegt bewusst ganz **oben** im viewBox (y = 0..14): So wird das Sprite
+     einfach auf `bridgeY` gesetzt und die Brücke hängt genau an der Kante — statt dass
+     jemand einen Offset ausrechnet, der beim nächsten Nachzeichnen wieder falsch ist. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 520" width="260" height="520">
+  <path d="M0 4 H210 l26 22 l-16 26 l20 34 L212 516 H0 Z" fill="#C4693E" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+  <!-- Die helle Kante ist die Lauffläche — sie muss als Standfläche lesbar sein. -->
+  <path d="M0 4 H210 l26 22 H0 Z" fill="#E09A67"/>
+  <g stroke="#8C4426" stroke-width="7" stroke-linecap="round" opacity="0.7">
+    <path d="M0 112 H202"/><path d="M0 208 H218"/><path d="M0 306 H206"/><path d="M0 404 H214"/>
+  </g>
+  <path d="M118 30 v486" stroke="#8C4426" stroke-width="5" opacity="0.35"/>
+</svg>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gustav, Kopf: kahler rosa Hals und Schaedel, kraeftiger Schnabel, ein wacher Blick.
+     Ankerpunkt unten mittig — der Kopf dreht sich um den Halsansatz. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 116" width="132" height="116">
+  <path d="M56 112 Q48 84 56 62" stroke="#1A1024" stroke-width="24" fill="none" stroke-linecap="round"/>
+  <path d="M56 112 Q48 84 56 62" stroke="#E8A0A8" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <circle cx="62" cy="46" r="34" fill="#E8A0A8" stroke="#1A1024" stroke-width="9"/>
+  <!-- Schnabel: Haken nach unten, das Markenzeichen. -->
+  <path d="M92 36 Q126 34 122 50 Q118 66 90 60 Z" fill="#FFB800" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M96 48 Q112 50 118 48" stroke="#1A1024" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <circle cx="74" cy="36" r="9" fill="#FFFFFF" stroke="#1A1024" stroke-width="6"/>
+  <circle cx="76" cy="37" r="4.5" fill="#1A1024"/>
+</svg>

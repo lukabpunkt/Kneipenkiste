@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Der Fluss ganz unten: das Ziel jedes Sturzes. Cartoon-Wasser, kein Abgrund
+     (Art Direction §1 — jeder klettert wieder hoch).
+
+     Hoch gezeichnet und mit flacher Welle: Das Sprite wird auf rund 1000 Welteinheiten
+     gestreckt, und eine Welle, die im viewBox hübsch aussieht, wäre dann drei Hikers hoch. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 400" width="512" height="400">
+  <defs>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5FC0E8"/>
+      <stop offset="1" stop-color="#2C7FA8"/>
+    </linearGradient>
+  </defs>
+  <path d="M0 14 q64 -10 128 0 t128 0 t128 0 t128 0 V400 H0 Z" fill="url(#water)"/>
+  <g stroke="#8FD8F5" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.75">
+    <path d="M40 78 q26 -8 52 0"/><path d="M180 132 q26 -8 52 0"/>
+    <path d="M320 96 q26 -8 52 0"/><path d="M420 168 q26 -8 52 0"/>
+    <path d="M96 214 q26 -8 52 0"/><path d="M300 262 q26 -8 52 0"/>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Balthasars Zimmermannshut mit Bleistift hinterm Ohr (Art Direction §5.3).
+     Nicht getintet: Balthasar gehoert keinem Spieler. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 84" width="150" height="84">
+  <path d="M14 62 Q75 42 136 62 Q75 80 14 62 Z" fill="#8C4426" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M40 60 Q38 18 75 18 Q112 18 110 60 Q75 68 40 60 Z" fill="#C4693E" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+  <!-- Der Bleistift steckt rechts. -->
+  <g transform="rotate(-16 118 44)">
+    <rect x="104" y="36" width="42" height="11" rx="2" fill="#FFD32A" stroke="#1A1024" stroke-width="6"/>
+    <path d="M146 36 L158 41.5 L146 47 Z" fill="#FFF8E7" stroke="#1A1024" stroke-width="6" stroke-linejoin="round"/>
+  </g>
+</svg>

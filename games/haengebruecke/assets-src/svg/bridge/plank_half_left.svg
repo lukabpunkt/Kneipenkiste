@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gebrochener Balken, linke Haelfte. Die Bruchkante ist gezackt: Man soll sehen,
+     dass er gerissen ist, nicht geschnitten. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 44" width="108" height="44">
+  <path d="M6 15 a7 7 0 0 1 7 -7 H84 l6 8 l-8 6 l10 7 l-8 7 H13 a7 7 0 0 1 -7 -7 Z"
+        fill="#9C8A72" stroke="#1A1024" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M22 18 H74" stroke="#6B5B48" stroke-width="4" stroke-linecap="round"/>
+</svg>

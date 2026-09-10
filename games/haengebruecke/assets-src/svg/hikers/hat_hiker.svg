@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Krempenhut in Spielerfarbe (Art Direction §5.1). Weiss = wird getintet.
+     Der Hut ist das Erkennungszeichen auf der Bruecke: Aus einem Meter Entfernung sieht
+     man an ihm, wer auf welchem Balken steht. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 76" width="140" height="76">
+  <g stroke="#1A1024" stroke-width="9" stroke-linejoin="round">
+    <!-- Krempe: breit und leicht nach unten gebogen. -->
+    <path d="M8 56 Q70 34 132 56 Q70 74 8 56 Z" fill="#FFFFFF"/>
+    <!-- Kopfteil. -->
+    <path d="M36 54 Q34 14 70 14 Q106 14 104 54 Q70 62 36 54 Z" fill="#FFFFFF"/>
+  </g>
+  <!-- Hutband in der Schattenfarbe: trennt Kopfteil und Krempe. -->
+  <path d="M35 48 Q70 58 105 48" stroke="#1A1024" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.55"/>
+</svg>

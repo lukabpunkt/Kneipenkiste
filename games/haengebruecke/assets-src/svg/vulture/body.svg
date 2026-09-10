@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gustav, Rumpf (Art Direction §5.2): grau-braun, gedrungen, Halskrause aus Federn.
+     Kopf, Fluegel und Auge sind eigene Teile — Gustav wird gerigged animiert, nicht
+     als Sprite-Sequenz. Sechs Animationen aus drei Teilen. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 150" width="160" height="150">
+  <ellipse cx="80" cy="88" rx="56" ry="52" fill="#6B5B48" stroke="#1A1024" stroke-width="9"/>
+  <!-- Schwanzfedern. -->
+  <path d="M28 96 L4 128 L26 124 L22 140 L44 116 Z" fill="#4A3E30" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+  <!-- Halskrause: der Kragen, aus dem der nackte Hals kommt. -->
+  <path d="M50 44 Q80 26 110 44 Q98 60 80 60 Q62 60 50 44 Z" fill="#8C7A63" stroke="#1A1024" stroke-width="9" stroke-linejoin="round"/>
+  <!-- Zweite Cel-Stufe unten. -->
+  <path d="M32 108 Q80 138 128 108 Q116 138 80 138 Q44 138 32 108 Z" fill="#4A3E30" opacity="0.9"/>
+</svg>

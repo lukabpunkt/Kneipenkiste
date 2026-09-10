@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ein Seil mit eingebautem Durchhang (Catenary).
+     Als Sprite statt als Graphics: So liegt es im selben Atlas wie Felsen und Balken und
+     kostet keinen eigenen Draw-Batch (ADR-13, Audit A2 verlangt <= 3). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 140" width="640" height="140">
+  <path d="M6 12 C160 132 480 132 634 12" fill="none" stroke="#1A1024" stroke-width="20" stroke-linecap="round"/>
+  <path d="M6 12 C160 132 480 132 634 12" fill="none" stroke="#D9B77A" stroke-width="12" stroke-linecap="round"/>
+  <!-- Gedrehte Fasern: kurze Schraegstriche entlang der Kurve. -->
+  <g stroke="#B08F55" stroke-width="4" stroke-linecap="round" opacity="0.8">
+    <path d="M74 46 l10 9"/><path d="M154 76 l10 7"/><path d="M244 94 l10 5"/>
+    <path d="M334 100 l10 4"/><path d="M424 94 l10 -5"/><path d="M514 76 l10 -7"/>
+    <path d="M584 46 l10 -9"/>
+  </g>
+</svg>
