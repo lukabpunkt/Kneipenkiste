@@ -51,6 +51,16 @@
       "icon": "./zoll/icons/icon-192.png",
       "accent": "#8C93A8",
       "status": "beta"
+    },
+    {
+      "id": "haengebruecke",
+      "title": "Die Hängebrücke",
+      "tagline": "Absprechen, dann geheim wählen. Allein ist sicher, zu zweit wird es nass — und Frieden kostet einen Balken.",
+      "players": "3–8",
+      "path": "./haengebruecke/",
+      "icon": "./haengebruecke/icons/icon-192.png",
+      "accent": "#3FA7D6",
+      "status": "beta"
     }
   ]
 }

@@ -43,6 +43,8 @@ jobs:
               - 'games/tresor/**'
             zoll:
               - 'games/zoll/**'
+            haengebruecke:
+              - 'games/haengebruecke/**'
 
   site:
     name: Gesamt-Build (site/)
@@ -57,11 +59,11 @@ jobs:
       - run: npm run build:site
       - name: Struktur prüfen
         run: |
-          for g in drinkshot sprengmeister pferderennen tresor zoll; do
+          for g in drinkshot sprengmeister pferderennen tresor zoll haengebruecke; do
             test -f "site/$g/index.html" || { echo "::error::site/$g/index.html fehlt"; exit 1; }
           done
           test -f site/index.html && test -f site/games.json && test -f site/.nojekyll
-          echo "✓ Launcher + 5 Spiele in site/"
+          echo "✓ Launcher + 6 Spiele in site/"
       - uses: actions/upload-artifact@v4
         with:
           name: site

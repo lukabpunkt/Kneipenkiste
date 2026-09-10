@@ -38,6 +38,7 @@ const games = [
   { id: 'sprengmeister', kind: 'vite', envKey: 'SPRENGMEISTER_BASE' },
   { id: 'tresor', kind: 'vite', envKey: 'TRESOR_BASE' },
   { id: 'zoll', kind: 'vite', envKey: 'ZOLL_BASE' },
+  { id: 'haengebruecke', kind: 'vite', envKey: 'HAENGEBRUECKE_BASE' },
   {
     id: 'pferderennen',
     kind: 'static',
